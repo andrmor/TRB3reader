@@ -91,6 +91,60 @@ void CernRootModule::ResetPositionOfWindows()
     WAllPos->setGeometry(140,140,1000,700);
 }
 
+#include "TH2D.h"
+void CernRootModule::DrawSignature(bool bNeg)
+{
+    WOne->ShowAndFocus();
+
+    int numSamples = Reader->GetNumSamples();
+    TH2D* h = new TH2D("", "",
+                       2*numSamples, -numSamples, numSamples,
+                       100, -0.05, 1.05);
+
+    int numEvents = Reader->GetNumEvents();
+    int numChan = Map->GetNumLogicalChannels();
+
+    for (int ievent=0; ievent<numEvents; ievent++)
+        for (int ilc=0; ilc<numChan; ilc++)
+        {
+            int iHardwCh = Map->LogicalToHardware(ilc);
+            if (std::isnan(iHardwCh)) continue;
+            if (bNeg != Extractor->IsNegative(iHardwCh)) continue;
+
+            bool bRejected;
+            int sig = Extractor->extractSignal_SingleChannel(ievent, iHardwCh, &bRejected);
+            if (bRejected) continue;
+
+            const std::vector<int>* wave = Reader->GetWaveformPtr(ievent, iHardwCh);
+
+            //int sum = 0;
+            //for (int i=0; i<numSamples; i++) sum += wave->at(i);
+            //if (sum == 0) sum = 1.0;
+            //else sum = fabs(sum);
+
+            double targetVal = 0.5*sig;
+            int iHalf = 0;
+            for (; iHalf<numSamples; iHalf++)
+            {
+                if (bNeg)
+                {
+                    if (wave->at(iHalf) < -targetVal) break;
+                }
+                else
+                {
+                    if (wave->at(iHalf) > targetVal) break;
+                }
+            }
+
+            for (int i=0; i<numSamples; i++)
+            {
+                const double val = 1.0*wave->at(i)/sig;// sum;
+                h->Fill(i-iHalf, val);
+            }
+        }
+    h->Draw("colz");
+}
+
 void CernRootModule::StartGraphWindows()
 {
     QList<AGraphWindow**> ws;

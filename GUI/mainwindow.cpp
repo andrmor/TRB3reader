@@ -680,3 +680,17 @@ void MainWindow::on_actionReset_positions_of_all_windows_triggered()
     RootModule->ResetPositionOfWindows();
 #endif
 }
+
+void MainWindow::on_pbNegSignature_clicked()
+{
+#ifdef CERN_ROOT
+    if (!RootModule) return;
+    Log("");
+    if (!Reader->isValid()) return;
+
+    RootModule->DrawSignature(false);
+
+#else
+    QMessageBox::information(this, "", "Cern ROOT module was not configured!", QMessageBox::Ok, QMessageBox::Ok);
+#endif
+}

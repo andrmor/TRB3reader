@@ -90,6 +90,8 @@ private slots:
 
     void on_actionReset_positions_of_all_windows_triggered();
 
+    void on_pbNegSignature_clicked();
+
 protected:
     void closeEvent(QCloseEvent* event);
 

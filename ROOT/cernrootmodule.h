@@ -39,6 +39,8 @@ public:
     void SetWindowGeometries(const QJsonObject &js);
     void ResetPositionOfWindows();
 
+    void DrawSignature(bool bNeg);
+
 private:
     Trb3dataReader* Reader;
     Trb3signalExtractor* Extractor;

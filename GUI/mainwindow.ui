@@ -1752,6 +1752,24 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="tab_5">
+       <attribute name="title">
+        <string>Test</string>
+       </attribute>
+       <widget class="QPushButton" name="pbNegSignature">
+        <property name="geometry">
+         <rect>
+          <x>60</x>
+          <y>60</y>
+          <width>121</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Neg</string>
+        </property>
+       </widget>
+      </widget>
      </widget>
     </item>
     <item>
@@ -1893,12 +1911,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>142</x>
-     <y>167</y>
+     <x>119</x>
+     <y>95</y>
     </hint>
     <hint type="destinationlabel">
-     <x>168</x>
-     <y>192</y>
+     <x>119</x>
+     <y>95</y>
     </hint>
    </hints>
   </connection>
@@ -1910,11 +1928,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>119</x>
-     <y>350</y>
+     <y>101</y>
     </hint>
     <hint type="destinationlabel">
-     <x>126</x>
-     <y>373</y>
+     <x>119</x>
+     <y>101</y>
     </hint>
    </hints>
   </connection>
@@ -1925,12 +1943,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>155</x>
-     <y>386</y>
+     <x>119</x>
+     <y>101</y>
     </hint>
     <hint type="destinationlabel">
-     <x>345</x>
-     <y>387</y>
+     <x>119</x>
+     <y>101</y>
     </hint>
    </hints>
   </connection>
@@ -1941,12 +1959,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>159</x>
-     <y>394</y>
+     <x>119</x>
+     <y>101</y>
     </hint>
     <hint type="destinationlabel">
-     <x>449</x>
-     <y>383</y>
+     <x>119</x>
+     <y>101</y>
     </hint>
    </hints>
   </connection>
@@ -1957,12 +1975,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>122</x>
-     <y>535</y>
+     <x>119</x>
+     <y>107</y>
     </hint>
     <hint type="destinationlabel">
-     <x>251</x>
-     <y>537</y>
+     <x>94</x>
+     <y>107</y>
     </hint>
    </hints>
   </connection>
