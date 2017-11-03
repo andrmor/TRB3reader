@@ -22,15 +22,19 @@ public:
 
     std::size_t GetNumEvents() const;
     std::size_t GetNumChannels() const;
-    bool IsNegative(std::size_t channel) const;
 
-    double extractSignal_SingleChannel(int ievent, int ichannel, bool *Rejected = 0) const;
+    bool IsNegative(std::size_t channel) const;
+    bool IsRejectedEvent(int ievent) const;
+    bool IsRejectedEventFast(int ievent) const {return RejectedEvents.at(ievent);}
+
+    double extractSignal_SingleChannel(int ievent, int ichannel, bool *Rejected = 0);
 
 private:
     const Trb3dataReader* reader;
     MasterConfig Config;
     std::vector < std::vector <double> > signalData;  // format:  [ievent] [ichanel]            this is (peak - pedestal)
     std::vector<bool> NegPolChannels;
+    std::vector<bool> RejectedEvents;
 
     int numChannels;
 

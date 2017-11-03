@@ -105,6 +105,7 @@ void CernRootModule::DrawSignature(bool bNeg)
     int numChan = Map->GetNumLogicalChannels();
 
     for (int ievent=0; ievent<numEvents; ievent++)
+        if (!Extractor->IsRejectedEventFast(ievent))
         for (int ilc=0; ilc<numChan; ilc++)
         {
             int iHardwCh = Map->LogicalToHardware(ilc);
@@ -254,7 +255,7 @@ void CernRootModule::DrawSingle(int ievent, int iHardwChan, bool autoscale, doub
     gSingle->SetLineWidth(LineWidth);
     bool bRejected;
     Extractor->extractSignal_SingleChannel(ievent, iHardwChan, &bRejected);
-    gSingle->SetLineColor( bRejected ? RejectedColor : NormalColor);
+    gSingle->SetLineColor( (Extractor->IsRejectedEvent(ievent) || bRejected) ? RejectedColor : NormalColor);
 
     WOne->SetAsActiveRootWindow();
     gSingle->Draw("AL");
@@ -295,7 +296,7 @@ void CernRootModule::DrawOverlay(int ievent, bool bNeg, bool bAutoscale, double 
         g->SetLineWidth(LineWidth);
         bool bRejected;
         Extractor->extractSignal_SingleChannel(ievent, iHardwCh, &bRejected);
-        g->SetLineColor( bRejected ? RejectedColor : NormalColor);
+        g->SetLineColor( (Extractor->IsRejectedEvent(ievent) || bRejected) ? RejectedColor : NormalColor);
 
         multiGraph->Add(g, "AL");
     }
@@ -400,7 +401,7 @@ void CernRootModule::DrawAll(int ievent, bool bNeg, int padsX, int padsY, bool b
         g->SetLineWidth(LineWidth);
         bool bRejected;
         Extractor->extractSignal_SingleChannel(ievent, iHardwCh, &bRejected);
-        g->SetLineColor( bRejected ? RejectedColor : NormalColor);
+        g->SetLineColor( (Extractor->IsRejectedEvent(ievent) || bRejected) ? RejectedColor : NormalColor);
 
         g->Draw("AL");
         g->SetMinimum(Min);

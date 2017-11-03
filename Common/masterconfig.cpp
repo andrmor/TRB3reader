@@ -1,4 +1,5 @@
 #include "masterconfig.h"
+#include "ajsontools.h"
 
 #include <QJsonObject>
 #include <QJsonArray>
@@ -137,12 +138,22 @@ bool MasterConfig::readPedestalsToJson(QJsonObject &json)
 void MasterConfig::writeSignalSuppressionToJson(QJsonObject &json)
 {
     QJsonObject js;
+        QJsonObject rm_js;
+            rm_js["On"] = bZeroSignalIfReverse;
+            rm_js["Threshold"] = ReverseMaxThreshold;
+        js["ReverseMax"] = rm_js;
 
-    QJsonObject rm_js;
-        rm_js["On"] = bZeroSignalIfReverse;
-        rm_js["Threshold"] = ReverseMaxThreshold;
-    js["ReverseMax"] = rm_js;
+        js["ApplyPositiveThreshold"] = bPositiveThreshold;
+        js["PositiveThreshold"] = PositiveThreshold;
 
+        js["ApplyNegativeThreshold"] = bNegativeThreshold;
+        js["NegativeThreshold"] = NegativeThreshold;
+
+        js["ApplyPositiveIgnore"] = bPositiveIgnore;
+        js["PositiveIgnore"] = PositiveIgnore;
+
+        js["ApplyNegativeIgnore"] = bNegativeIgnore;
+        js["NegativeIgnore"] = NegativeIgnore;
     json["SignalSuppression"] = js;
 }
 
@@ -155,6 +166,18 @@ bool MasterConfig::readSignalSuppressionFromJson(QJsonObject &json)
     QJsonObject rm_js = js["ReverseMax"].toObject();
         bZeroSignalIfReverse = rm_js["On"].toBool();
         ReverseMaxThreshold = rm_js["Threshold"].toDouble();
+
+    parseJson(js, "ApplyPositiveThreshold", bPositiveThreshold);
+    parseJson(js, "PositiveThreshold", PositiveThreshold);
+
+    parseJson(js, "ApplyNegativeThreshold", bNegativeThreshold);
+    parseJson(js, "NegativeThreshold", NegativeThreshold);
+
+    parseJson(js, "ApplyPositiveIgnore", bPositiveIgnore);
+    parseJson(js, "PositiveIgnore", PositiveIgnore);
+
+    parseJson(js, "ApplyNegativeIgnore", bNegativeIgnore);
+    parseJson(js, "NegativeIgnore", NegativeIgnore);
 
     return true;
 }

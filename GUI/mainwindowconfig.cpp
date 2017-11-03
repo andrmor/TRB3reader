@@ -184,6 +184,18 @@ void MainWindow::UpdateGui()
 
     ui->cbZeroSignalIfReverseMax->setChecked(Config->bZeroSignalIfReverse);
         ui->ledReverseMaxLimit->setText(QString::number(Config->ReverseMaxThreshold));
+
+    ui->cbPosThreshold->setChecked(Config->bPositiveThreshold);
+    ui->ledPosThresholdMin->setText(QString::number(Config->PositiveThreshold));
+
+    ui->cbNegThreshold->setChecked(Config->bNegativeThreshold);
+    ui->ledNegThresholdMin->setText(QString::number(Config->NegativeThreshold));
+
+    ui->cbIgnorePosThreshold->setChecked(Config->bPositiveIgnore);
+    ui->ledPosIgnoreMax->setText(QString::number(Config->PositiveIgnore));
+
+    ui->cbIgnoreNegThreshold->setChecked(Config->bNegativeIgnore);
+    ui->ledNegIgnoreMax->setText(QString::number(Config->NegativeIgnore));
 }
 
 // --- update Config on GUI operated by user ---
@@ -247,3 +259,43 @@ void MainWindow::on_ledReverseMaxLimit_editingFinished()
     ClearData();
 }
 
+void MainWindow::on_cbPosThreshold_clicked(bool checked)
+{
+    Config->bPositiveThreshold = checked;
+    ClearData();
+}
+
+void MainWindow::on_cbNegThreshold_clicked(bool checked)
+{
+    Config->bNegativeThreshold = checked;
+}
+
+void MainWindow::on_ledPosThresholdMin_editingFinished()
+{
+    Config->PositiveThreshold = ui->ledPosThresholdMin->text().toDouble();
+}
+
+void MainWindow::on_ledNegThresholdMin_editingFinished()
+{
+    Config->NegativeThreshold = ui->ledNegThresholdMin->text().toDouble();
+}
+
+void MainWindow::on_cbIgnorePosThreshold_clicked(bool checked)
+{
+    Config->bPositiveIgnore = checked;
+}
+
+void MainWindow::on_cbIgnoreNegThreshold_clicked(bool checked)
+{
+    Config->bNegativeIgnore = checked;
+}
+
+void MainWindow::on_ledPosIgnoreMax_editingFinished()
+{
+    Config->PositiveIgnore = ui->ledPosIgnoreMax->text().toDouble();
+}
+
+void MainWindow::on_ledNegIgnoreMax_editingFinished()
+{
+    Config->NegativeIgnore = ui->ledNegIgnoreMax->text().toDouble();
+}

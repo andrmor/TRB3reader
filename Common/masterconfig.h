@@ -27,6 +27,19 @@ public:
     bool bZeroSignalIfReverse = false;
     double ReverseMaxThreshold = 0.25;
 
+    bool bPositiveThreshold = false;
+    double PositiveThreshold = 0;
+
+    bool bNegativeThreshold = false;
+    double NegativeThreshold = 0;
+
+    bool bPositiveIgnore = false;
+    double PositiveIgnore = 1.0e10;
+
+    bool bNegativeIgnore = false;
+    double NegativeIgnore = 1.0e10;
+
+
     std::string filename = "/home/andr/QtProjects/run191/te17081105154.hld";
 
 

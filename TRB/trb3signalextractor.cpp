@@ -77,9 +77,17 @@ bool Trb3signalExtractor::IsNegative(std::size_t channel) const
     return NegPolChannels[channel];
 }
 
+bool Trb3signalExtractor::IsRejectedEvent(int ievent) const
+{
+    if (ievent < 0 || ievent >= RejectedEvents.size()) return true;
+    return RejectedEvents.at(ievent);
+}
+
 void Trb3signalExtractor::extractSignals_AllEvents()
-{    
-    signalData.resize(reader->GetNumEvents());
+{
+    int numEvents = reader->GetNumEvents();
+    signalData.resize(numEvents);
+    RejectedEvents.resize(numEvents, false);
     if (reader->GetNumSamples() == 0) return;
 
     for (std::size_t ievent=0; ievent<signalData.size(); ievent++)
@@ -93,7 +101,7 @@ void Trb3signalExtractor::extractSignals_AllEvents()
     }
 }
 
-double Trb3signalExtractor::extractSignal_SingleChannel(int ievent, int ichannel, bool *Rejected) const
+double Trb3signalExtractor::extractSignal_SingleChannel(int ievent, int ichannel, bool *WasSetToZero)
 {
     double sig;
 
@@ -101,10 +109,24 @@ double Trb3signalExtractor::extractSignal_SingleChannel(int ievent, int ichannel
     {
         sig = -extractMin(reader->GetWaveformPtr(ievent, ichannel));
 
+        if (Config.bNegativeThreshold)
+            if (sig < Config.NegativeThreshold)
+            {
+                if (WasSetToZero) *WasSetToZero = true;
+                return 0;
+            }
+
+        if (Config.bNegativeIgnore)
+            if (sig > Config.NegativeIgnore)
+            {
+                RejectedEvents[ievent] = true;
+                return sig;
+            }
+
         if (Config.bZeroSignalIfReverse)
             if ( extractMax(reader->GetWaveformPtr(ievent, ichannel)) > Config.ReverseMaxThreshold*sig)
             {
-                if (Rejected) *Rejected = true;
+                if (WasSetToZero) *WasSetToZero = true;
                 return 0;
             }
     }
@@ -112,15 +134,29 @@ double Trb3signalExtractor::extractSignal_SingleChannel(int ievent, int ichannel
     {
         sig = extractMax(reader->GetWaveformPtr(ievent, ichannel));
 
+        if (Config.bPositiveThreshold)
+            if (sig < Config.PositiveThreshold)
+            {
+                if (WasSetToZero) *WasSetToZero = true;
+                return 0;
+            }
+
+        if (Config.bPositiveIgnore)
+            if (sig > Config.PositiveIgnore)
+            {
+                RejectedEvents[ievent] = true;
+                return sig;
+            }
+
         if (Config.bZeroSignalIfReverse)
             if ( -extractMin(reader->GetWaveformPtr(ievent, ichannel)) > Config.ReverseMaxThreshold*sig)
             {
-                if (Rejected) *Rejected = true;
+                if (WasSetToZero) *WasSetToZero = true;
                 return 0;
             }
     }
 
-    if (Rejected) *Rejected = false;
+    if (WasSetToZero) *WasSetToZero = false;
     return sig;
 }
 

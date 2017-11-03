@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="twMain">
       <property name="currentIndex">
-       <number>2</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -290,7 +290,7 @@
        <attribute name="title">
         <string>Configuration</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_15">
+       <layout class="QVBoxLayout" name="verticalLayout_16">
         <item>
          <spacer name="verticalSpacer_11">
           <property name="orientation">
@@ -404,7 +404,7 @@
          </widget>
         </item>
         <item>
-         <spacer name="verticalSpacer_12">
+         <spacer name="verticalSpacer_13">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>
@@ -423,24 +423,31 @@
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_8">
            <item>
-            <widget class="QCheckBox" name="cbSmoothWaveforms">
-             <property name="text">
-              <string>Smooth waveforms</string>
+            <layout class="QHBoxLayout" name="horizontalLayout_24">
+             <property name="topMargin">
+              <number>0</number>
              </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="cbSmoothBeforePedestal">
-             <property name="text">
-              <string>Apply smoothing before pedestal substraction</string>
-             </property>
-             <property name="checked">
-              <bool>false</bool>
-             </property>
-            </widget>
+             <item>
+              <widget class="QCheckBox" name="cbSmoothWaveforms">
+               <property name="text">
+                <string>Smooth waveforms</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="cbSmoothBeforePedestal">
+               <property name="text">
+                <string>before pedestal substraction</string>
+               </property>
+               <property name="checked">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
            <item>
             <widget class="QFrame" name="frAdjAv">
@@ -514,7 +521,7 @@
          </widget>
         </item>
         <item>
-         <spacer name="verticalSpacer_13">
+         <spacer name="verticalSpacer_12">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>
@@ -529,7 +536,7 @@
         <item>
          <widget class="QGroupBox" name="gbSignalRejection">
           <property name="title">
-           <string>Signal suppression (set signal=0) if:</string>
+           <string>Set signal=0 but keep the event if in a waveform:</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_7">
            <item>
@@ -551,6 +558,12 @@
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>75</width>
+                 <height>0</height>
+                </size>
                </property>
                <property name="maximumSize">
                 <size>
@@ -585,6 +598,310 @@
              </item>
             </layout>
            </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_10">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="label_24">
+               <property name="text">
+                <string>Positive channels:  </string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_27">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="cbPosThreshold">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>Signal never reaches            </string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="ledPosThresholdMin">
+               <property name="minimumSize">
+                <size>
+                 <width>75</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>75</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>0</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_29">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_3">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="label_25">
+               <property name="text">
+                <string>Negative channels:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_28">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="cbNegThreshold">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>Inverse signal never reaches</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="ledNegThresholdMin">
+               <property name="minimumSize">
+                <size>
+                 <width>75</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>75</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>0</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_30">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_18">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox">
+          <property name="title">
+           <string>Ignore event if:</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_15">
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_11">
+             <item>
+              <widget class="QLabel" name="label_28">
+               <property name="text">
+                <string>Positive channels:  </string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_31">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="cbIgnorePosThreshold">
+               <property name="text">
+                <string>Any waveform signal exceeds             </string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="ledPosIgnoreMax">
+               <property name="minimumSize">
+                <size>
+                 <width>75</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>75</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>1e10</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_32">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_14">
+             <item>
+              <widget class="QLabel" name="label_29">
+               <property name="text">
+                <string>Negative channels:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_33">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="cbIgnoreNegThreshold">
+               <property name="text">
+                <string>Any waveform inverse signal exceeds</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="ledNegIgnoreMax">
+               <property name="minimumSize">
+                <size>
+                 <width>75</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>75</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>1e10</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_34">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
           </layout>
          </widget>
         </item>
@@ -605,10 +922,18 @@
        <zorder>gbSmoothing</zorder>
        <zorder>gbSignalRejection</zorder>
        <zorder>gbPedestals</zorder>
+       <zorder>cbNegThreshold</zorder>
+       <zorder>ledNegThresholdMin</zorder>
+       <zorder>horizontalSpacer_27</zorder>
+       <zorder>horizontalSpacer_28</zorder>
+       <zorder>cbPosThreshold</zorder>
+       <zorder>ledPosThresholdMin</zorder>
+       <zorder>groupBox</zorder>
        <zorder>verticalSpacer_10</zorder>
        <zorder>verticalSpacer_11</zorder>
        <zorder>verticalSpacer_12</zorder>
        <zorder>verticalSpacer_13</zorder>
+       <zorder>verticalSpacer_18</zorder>
       </widget>
       <widget class="QWidget" name="tab_2">
        <attribute name="title">
@@ -1843,22 +2168,6 @@
   <connection>
    <sender>cbAutoscaleY</sender>
    <signal>toggled(bool)</signal>
-   <receiver>ledMinNeg</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>237</x>
-     <y>550</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>308</x>
-     <y>578</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cbAutoscaleY</sender>
-   <signal>toggled(bool)</signal>
    <receiver>ledMinPos</receiver>
    <slot>setDisabled(bool)</slot>
    <hints>
@@ -1875,32 +2184,16 @@
   <connection>
    <sender>cbAutoscaleY</sender>
    <signal>toggled(bool)</signal>
-   <receiver>ledMaxNeg</receiver>
+   <receiver>ledMinNeg</receiver>
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>154</x>
-     <y>549</y>
+     <x>237</x>
+     <y>550</y>
     </hint>
     <hint type="destinationlabel">
-     <x>418</x>
-     <y>574</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cbAutoscaleY</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>ledMaxPos</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>165</x>
-     <y>547</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>412</x>
-     <y>604</y>
+     <x>308</x>
+     <y>578</y>
     </hint>
    </hints>
   </connection>
@@ -1939,6 +2232,38 @@
   <connection>
    <sender>cbAdjacentAveraging</sender>
    <signal>toggled(bool)</signal>
+   <receiver>cbAdjAvWeighted</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>119</x>
+     <y>101</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>119</x>
+     <y>101</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cbAutoscaleY</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>ledMaxPos</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>165</x>
+     <y>547</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>412</x>
+     <y>604</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cbAdjacentAveraging</sender>
+   <signal>toggled(bool)</signal>
    <receiver>sbAdjAvPoints</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
@@ -1953,18 +2278,18 @@
    </hints>
   </connection>
   <connection>
-   <sender>cbAdjacentAveraging</sender>
+   <sender>cbAutoscaleY</sender>
    <signal>toggled(bool)</signal>
-   <receiver>cbAdjAvWeighted</receiver>
-   <slot>setEnabled(bool)</slot>
+   <receiver>ledMaxNeg</receiver>
+   <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>119</x>
-     <y>101</y>
+     <x>154</x>
+     <y>549</y>
     </hint>
     <hint type="destinationlabel">
-     <x>119</x>
-     <y>101</y>
+     <x>418</x>
+     <y>574</y>
     </hint>
    </hints>
   </connection>

@@ -278,21 +278,23 @@ bool MainWindow::sendSignalData(QTextStream &outStream, bool bUseHardware)
     if (bUseHardware)
     {
         for (int ie=0; ie<numEvents; ie++)
-        {
-            for (int ic=0; ic<numChannels; ic++)
-                outStream << Extractor->GetSignalFast(ie, ic) << " ";
-            outStream << "\r\n";
-        }
+            if (!Extractor->IsRejectedEventFast(ie))
+            {
+                for (int ic=0; ic<numChannels; ic++)
+                    outStream << Extractor->GetSignalFast(ie, ic) << " ";
+                outStream << "\r\n";
+            }
     }
     else
     {
         numChannels = Map->GetNumLogicalChannels();
         for (int ie=0; ie<numEvents; ie++)
-        {
-            for (int ic=0; ic<numChannels; ic++)
-                outStream << Extractor->GetSignalFast(ie, Map->LogicalToHardwareFast(ic)) << " ";
-            outStream << "\r\n";
-        }
+            if (!Extractor->IsRejectedEventFast(ie))
+            {
+                for (int ic=0; ic<numChannels; ic++)
+                    outStream << Extractor->GetSignalFast(ie, Map->LogicalToHardwareFast(ic)) << " ";
+                outStream << "\r\n";
+            }
     }
     return true;
 }
@@ -481,12 +483,16 @@ void MainWindow::OnEventOrChannelChanged(bool bOnlyChannel)
     }
 
     QString ss;
-    if (std::isnan(iHardwChan)) ss = "n.a.";
+    if (Extractor->IsRejectedEventFast(ievent)) ss = "Rejected event";
     else
     {
-        double signal = Extractor->GetSignalFast(ievent, iHardwChan);
-        if (std::isnan(signal)) ss = "n.a.";
-        else ss = QString::number(signal);
+        if (std::isnan(iHardwChan)) ss = "n.a.";
+        else
+        {
+            double signal = Extractor->GetSignalFast(ievent, iHardwChan);
+            if (std::isnan(signal)) ss = "n.a.";
+            else ss = QString::number(signal);
+        }
     }
     ui->leSignal->setText(ss);
 

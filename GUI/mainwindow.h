@@ -88,9 +88,28 @@ private slots:
     void on_cbSubstractPedestal_toggled(bool checked);
     void on_cbSmoothWaveforms_toggled(bool checked);
 
+
+
+
     void on_actionReset_positions_of_all_windows_triggered();
 
     void on_pbNegSignature_clicked();
+
+    void on_cbPosThreshold_clicked(bool checked);
+
+    void on_cbNegThreshold_clicked(bool checked);
+
+    void on_ledPosThresholdMin_editingFinished();
+
+    void on_ledPosIgnoreMax_editingFinished();
+
+    void on_ledNegThresholdMin_editingFinished();
+
+    void on_ledNegIgnoreMax_editingFinished();
+
+    void on_cbIgnorePosThreshold_clicked(bool checked);
+
+    void on_cbIgnoreNegThreshold_clicked(bool checked);
 
 protected:
     void closeEvent(QCloseEvent* event);
