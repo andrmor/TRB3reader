@@ -111,6 +111,8 @@ private slots:
 
     void on_cbIgnoreNegThreshold_clicked(bool checked);
 
+    void on_cobSignalExtractionMethod_activated(int index);
+
 protected:
     void closeEvent(QCloseEvent* event);
 

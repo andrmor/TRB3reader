@@ -182,6 +182,8 @@ void MainWindow::UpdateGui()
             ui->sbAdjAvPoints->setValue(Config->AdjacentAveraging_NumPoints);
             ui->cbAdjAvWeighted->setChecked(Config->AdjacentAveraging_bWeighted);
 
+    ui->cobSignalExtractionMethod->setCurrentIndex(Config->SignalExtractionMethod);
+
     ui->cbZeroSignalIfReverseMax->setChecked(Config->bZeroSignalIfReverse);
         ui->ledReverseMaxLimit->setText(QString::number(Config->ReverseMaxThreshold));
 
@@ -244,6 +246,12 @@ void MainWindow::on_sbAdjAvPoints_editingFinished()
 void MainWindow::on_cbAdjAvWeighted_clicked(bool checked)
 {
     Config->AdjacentAveraging_bWeighted = checked;
+    ClearData();
+}
+
+void MainWindow::on_cobSignalExtractionMethod_activated(int index)
+{
+    Config->SignalExtractionMethod = index;
     ClearData();
 }
 

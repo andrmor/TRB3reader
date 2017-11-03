@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="twMain">
       <property name="currentIndex">
-       <number>4</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -292,19 +292,6 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_16">
         <item>
-         <spacer name="verticalSpacer_11">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
          <widget class="QGroupBox" name="gbPedestals">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -341,6 +328,31 @@
               <enum>QFrame::Raised</enum>
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout_9">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <spacer name="horizontalSpacer_19">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>46</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
               <item>
                <widget class="QLabel" name="label_8">
                 <property name="text">
@@ -383,19 +395,6 @@
                  <number>5</number>
                 </property>
                </widget>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer_19">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>65</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
               </item>
              </layout>
             </widget>
@@ -467,8 +466,33 @@
               <enum>QFrame::NoFrame</enum>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_9">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_2">
+                <item>
+                 <spacer name="horizontalSpacer_35">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
                 <item>
                  <widget class="QCheckBox" name="cbAdjacentAveraging">
                   <property name="text">
@@ -515,6 +539,52 @@
                </layout>
               </item>
              </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_18">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox_2">
+          <property name="title">
+           <string>Signal extraction</string>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_28">
+           <item>
+            <widget class="QLabel" name="label_26">
+             <property name="text">
+              <string>Extraction method:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="cobSignalExtractionMethod">
+             <property name="toolTip">
+              <string>Separately for negative and positive channels. For negative channel, maximum of inverted waveform value.</string>
+             </property>
+             <item>
+              <property name="text">
+               <string>Maximum for each waveform independently</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Signal at common sample#, given by global maximum</string>
+              </property>
+             </item>
             </widget>
            </item>
           </layout>
@@ -758,7 +828,7 @@
          </widget>
         </item>
         <item>
-         <spacer name="verticalSpacer_18">
+         <spacer name="verticalSpacer_11">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>
@@ -905,19 +975,6 @@
           </layout>
          </widget>
         </item>
-        <item>
-         <spacer name="verticalSpacer_10">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
        </layout>
        <zorder>gbSmoothing</zorder>
        <zorder>gbSignalRejection</zorder>
@@ -929,10 +986,11 @@
        <zorder>cbPosThreshold</zorder>
        <zorder>ledPosThresholdMin</zorder>
        <zorder>groupBox</zorder>
-       <zorder>verticalSpacer_10</zorder>
-       <zorder>verticalSpacer_11</zorder>
        <zorder>verticalSpacer_12</zorder>
        <zorder>verticalSpacer_13</zorder>
+       <zorder>frSmoothing</zorder>
+       <zorder>groupBox_2</zorder>
+       <zorder>verticalSpacer_11</zorder>
        <zorder>verticalSpacer_18</zorder>
       </widget>
       <widget class="QWidget" name="tab_2">
@@ -2198,50 +2256,18 @@
    </hints>
   </connection>
   <connection>
-   <sender>cbSubstractPedestal</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>frSmoothing</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>119</x>
-     <y>95</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>119</x>
-     <y>95</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cbSmoothWaveforms</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>frAdjAv</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>119</x>
-     <y>101</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>119</x>
-     <y>101</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>cbAdjacentAveraging</sender>
    <signal>toggled(bool)</signal>
    <receiver>cbAdjAvWeighted</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>119</x>
-     <y>101</y>
+     <x>141</x>
+     <y>291</y>
     </hint>
     <hint type="destinationlabel">
-     <x>119</x>
-     <y>101</y>
+     <x>472</x>
+     <y>306</y>
     </hint>
    </hints>
   </connection>
@@ -2268,12 +2294,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>119</x>
-     <y>101</y>
+     <x>141</x>
+     <y>291</y>
     </hint>
     <hint type="destinationlabel">
-     <x>119</x>
-     <y>101</y>
+     <x>374</x>
+     <y>295</y>
     </hint>
    </hints>
   </connection>
@@ -2300,12 +2326,44 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>119</x>
-     <y>107</y>
+     <x>132</x>
+     <y>410</y>
     </hint>
     <hint type="destinationlabel">
-     <x>94</x>
-     <y>107</y>
+     <x>281</x>
+     <y>411</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cbSmoothWaveforms</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>frAdjAv</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>132</x>
+     <y>269</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>131</x>
+     <y>307</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cbSubstractPedestal</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>frSmoothing</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>131</x>
+     <y>133</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>131</x>
+     <y>169</y>
     </hint>
    </hints>
   </connection>

@@ -700,3 +700,4 @@ void MainWindow::on_pbNegSignature_clicked()
     QMessageBox::information(this, "", "Cern ROOT module was not configured!", QMessageBox::Ok, QMessageBox::Ok);
 #endif
 }
+

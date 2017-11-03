@@ -15,8 +15,8 @@ public:
       // Reading waveform data from the file, optional - substract pedestals and apply smoothing
     bool Read();
 
-    int  GetValue(int ievent, int ichannel, int isample) const;             //no argument validity check!
-    const std::vector<int>* GetWaveformPtr(int ievent, int ichannel) const; //no argument validity check!
+    int  GetValueFast(int ievent, int ichannel, int isample) const { return waveData.at(ievent).at(ichannel).at(isample);} //no argument validity check!
+    const std::vector<int>* GetWaveformPtrFast(int ievent, int ichannel) const; //no argument validity check!
 
     // processing successful?
     bool isValid() const {return (waveData.size()>0 && numChannels>0 && numSamples>0);}

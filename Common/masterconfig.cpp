@@ -20,7 +20,7 @@ bool MasterConfig::ReadFromJson(QJsonObject &json)
 {
     readSignalPolarityFromJson(json);
     readChannelMapFromJson(json);
-    readPedestalsToJson(json);
+    readPedestalsFromJson(json);
     readSmoothingFromJson(json);
     readSignalSuppressionFromJson(json);
 
@@ -122,7 +122,7 @@ void MasterConfig::writePedestalsToJson(QJsonObject &json)
     json["Pedestals"] = js;
 }
 
-bool MasterConfig::readPedestalsToJson(QJsonObject &json)
+bool MasterConfig::readPedestalsFromJson(QJsonObject &json)
 {
     if (!json.contains("Pedestals")) return false;
 
@@ -138,6 +138,8 @@ bool MasterConfig::readPedestalsToJson(QJsonObject &json)
 void MasterConfig::writeSignalSuppressionToJson(QJsonObject &json)
 {
     QJsonObject js;
+        js["ExtractionMethod"] = SignalExtractionMethod;
+
         QJsonObject rm_js;
             rm_js["On"] = bZeroSignalIfReverse;
             rm_js["Threshold"] = ReverseMaxThreshold;
@@ -154,18 +156,20 @@ void MasterConfig::writeSignalSuppressionToJson(QJsonObject &json)
 
         js["ApplyNegativeIgnore"] = bNegativeIgnore;
         js["NegativeIgnore"] = NegativeIgnore;
-    json["SignalSuppression"] = js;
+    json["SignalExtraction"] = js;
 }
 
 bool MasterConfig::readSignalSuppressionFromJson(QJsonObject &json)
-{
-    if (!json.contains("SignalSuppression")) return false;
+{    
+    QJsonObject js;
 
-    QJsonObject js = json["SignalSuppression"].toObject();
+    if (!parseJson(json, "SignalExtraction", js)) parseJson(json, "SignalSuppression", js);
 
     QJsonObject rm_js = js["ReverseMax"].toObject();
         bZeroSignalIfReverse = rm_js["On"].toBool();
         ReverseMaxThreshold = rm_js["Threshold"].toDouble();
+
+    parseJson(js, "ExtractionMethod", SignalExtractionMethod);
 
     parseJson(js, "ApplyPositiveThreshold", bPositiveThreshold);
     parseJson(js, "PositiveThreshold", PositiveThreshold);

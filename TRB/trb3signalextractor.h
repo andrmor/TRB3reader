@@ -27,7 +27,7 @@ public:
     bool IsRejectedEvent(int ievent) const;
     bool IsRejectedEventFast(int ievent) const {return RejectedEvents.at(ievent);}
 
-    double extractSignal_SingleChannel(int ievent, int ichannel, bool *Rejected = 0);
+    double extractSignalFromWaveform(int ievent, int ichannel, bool *Rejected = 0);
 
 private:
     const Trb3dataReader* reader;
@@ -40,10 +40,13 @@ private:
 
     void setPolarity(std::vector<int> negativeChannels);
 
-    void extractSignals_AllEvents(); // extact signals = peak - pedestal
+    void ExtractAllSignals(); // extact signals = peak - pedestal
 
     double extractMax(const std::vector<int>* arr) const;
     double extractMin(const std::vector<int>* arr) const;
+
+    int iNegMaxSample, iPosMaxSample;
+    double NegMax, PosMax;
 };
 
 class Trb3ExtractionMonitor

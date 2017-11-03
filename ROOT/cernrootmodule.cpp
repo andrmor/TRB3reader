@@ -110,13 +110,14 @@ void CernRootModule::DrawSignature(bool bNeg)
         {
             int iHardwCh = Map->LogicalToHardware(ilc);
             if (std::isnan(iHardwCh)) continue;
+            if (iHardwCh == 89) continue; // ****!!!!
             if (bNeg != Extractor->IsNegative(iHardwCh)) continue;
 
             bool bRejected;
-            int sig = Extractor->extractSignal_SingleChannel(ievent, iHardwCh, &bRejected);
+            int sig = Extractor->extractSignalFromWaveform(ievent, iHardwCh, &bRejected);
             if (bRejected) continue;
 
-            const std::vector<int>* wave = Reader->GetWaveformPtr(ievent, iHardwCh);
+            const std::vector<int>* wave = Reader->GetWaveformPtrFast(ievent, iHardwCh);
 
             //int sum = 0;
             //for (int i=0; i<numSamples; i++) sum += wave->at(i);
@@ -246,7 +247,7 @@ void CernRootModule::DrawSingle(int ievent, int iHardwChan, bool autoscale, doub
 
     for (int isam=0; isam<numSamples; isam++)
     {
-        const double val = Reader->GetValue(ievent, iHardwChan, isam);
+        const double val = Reader->GetValueFast(ievent, iHardwChan, isam);
         gSingle->SetPoint(isam, isam, val);
     }
 
@@ -254,7 +255,7 @@ void CernRootModule::DrawSingle(int ievent, int iHardwChan, bool autoscale, doub
 
     gSingle->SetLineWidth(LineWidth);
     bool bRejected;
-    Extractor->extractSignal_SingleChannel(ievent, iHardwChan, &bRejected);
+    Extractor->extractSignalFromWaveform(ievent, iHardwChan, &bRejected);
     gSingle->SetLineColor( (Extractor->IsRejectedEvent(ievent) || bRejected) ? RejectedColor : NormalColor);
 
     WOne->SetAsActiveRootWindow();
@@ -289,13 +290,13 @@ void CernRootModule::DrawOverlay(int ievent, bool bNeg, bool bAutoscale, double 
 
         for (int isam=0; isam<numSamples; isam++)
         {
-            const double val = Reader->GetValue(ievent, iHardwCh, isam);
+            const double val = Reader->GetValueFast(ievent, iHardwCh, isam);
             g->SetPoint(isam, isam, val);
         }
 
         g->SetLineWidth(LineWidth);
         bool bRejected;
-        Extractor->extractSignal_SingleChannel(ievent, iHardwCh, &bRejected);
+        Extractor->extractSignalFromWaveform(ievent, iHardwCh, &bRejected);
         g->SetLineColor( (Extractor->IsRejectedEvent(ievent) || bRejected) ? RejectedColor : NormalColor);
 
         multiGraph->Add(g, "AL");
@@ -361,7 +362,7 @@ void CernRootModule::DrawAll(int ievent, bool bNeg, int padsX, int padsY, bool b
 
             for (int isam=0; isam<numSamples; isam++)
             {
-                const double val = Reader->GetValue(ievent, iHardwCh, isam);
+                const double val = Reader->GetValueFast(ievent, iHardwCh, isam);
                 if (val < Min) Min = val;
                 if (val > Max) Max = val;
             }
@@ -391,7 +392,7 @@ void CernRootModule::DrawAll(int ievent, bool bNeg, int padsX, int padsY, bool b
 
         for (int isam=0; isam<numSamples; isam++)
         {
-            const double val = Reader->GetValue(ievent, iHardwCh, isam);
+            const double val = Reader->GetValueFast(ievent, iHardwCh, isam);
             g->SetPoint(isam, isam, val);
         }
 
@@ -400,7 +401,7 @@ void CernRootModule::DrawAll(int ievent, bool bNeg, int padsX, int padsY, bool b
 
         g->SetLineWidth(LineWidth);
         bool bRejected;
-        Extractor->extractSignal_SingleChannel(ievent, iHardwCh, &bRejected);
+        Extractor->extractSignalFromWaveform(ievent, iHardwCh, &bRejected);
         g->SetLineColor( (Extractor->IsRejectedEvent(ievent) || bRejected) ? RejectedColor : NormalColor);
 
         g->Draw("AL");

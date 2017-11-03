@@ -225,12 +225,7 @@ void Trb3dataReader::doAdjacentWeightedAverage(std::vector<int> &arr, int numPoi
     }
 }
 
-int Trb3dataReader::GetValue(int ievent, int ichannel, int isample) const
-{
-    return waveData[ievent][ichannel][isample];
-}
-
-const std::vector<int>* Trb3dataReader::GetWaveformPtr(int ievent, int ichannel) const
+const std::vector<int>* Trb3dataReader::GetWaveformPtrFast(int ievent, int ichannel) const
 {
     return &(waveData[ievent][ichannel]);
 }

@@ -24,6 +24,8 @@ public:
         int PedestalFrom = 0;
         int PedestalTo = 0;
 
+    int SignalExtractionMethod = 0; //0 - independent max, 1 - common sample, at global max
+
     bool bZeroSignalIfReverse = false;
     double ReverseMaxThreshold = 0.25;
 
@@ -54,7 +56,7 @@ private:
     bool readChannelMapFromJson(QJsonObject& json);
 
     void writePedestalsToJson(QJsonObject& json);
-    bool readPedestalsToJson(QJsonObject& json);
+    bool readPedestalsFromJson(QJsonObject& json);
 
     void writeSmoothingToJson(QJsonObject& json);
     bool readSmoothingFromJson(QJsonObject& json);

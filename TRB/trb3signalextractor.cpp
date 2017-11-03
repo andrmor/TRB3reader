@@ -4,6 +4,8 @@
 #include <iostream>
 #include <limits>
 
+#include <QDebug>
+
 const double NaN = std::numeric_limits<double>::quiet_NaN();
 
 Trb3signalExtractor::Trb3signalExtractor(const Trb3dataReader *reader) :
@@ -37,7 +39,7 @@ bool Trb3signalExtractor::ExtractSignals()
     if (numChannels >= NegPolChannels.size()) NegPolChannels.resize(numChannels+1, false);
 
     std::cout << "--> Extracting signals from waveforms...\n" << std::flush;
-    extractSignals_AllEvents();
+    ExtractAllSignals();
     std::cout << "--> Done!\n--> Trb3signalExtractor finished signal extraction.\n" << std::flush;
     return true;
 }
@@ -83,10 +85,12 @@ bool Trb3signalExtractor::IsRejectedEvent(int ievent) const
     return RejectedEvents.at(ievent);
 }
 
-void Trb3signalExtractor::extractSignals_AllEvents()
+void Trb3signalExtractor::ExtractAllSignals()
 {
+    qDebug() << "Method:"<< Config.SignalExtractionMethod;
     int numEvents = reader->GetNumEvents();
     signalData.resize(numEvents);
+    RejectedEvents.clear();
     RejectedEvents.resize(numEvents, false);
     if (reader->GetNumSamples() == 0) return;
 
@@ -94,20 +98,31 @@ void Trb3signalExtractor::extractSignals_AllEvents()
     {
         signalData[ievent].resize(numChannels);
 
+        iNegMaxSample = iPosMaxSample = 0;
+        NegMax = PosMax = -1.0e10;
         for (int ichannel=0; ichannel<numChannels; ichannel++)
+            signalData[ievent][ichannel] = extractSignalFromWaveform(ievent, ichannel);
+
+        if ( !RejectedEvents.at((ievent) && Config.SignalExtractionMethod==1) )
         {
-            signalData[ievent][ichannel] = extractSignal_SingleChannel(ievent, ichannel);
+            qDebug() << "max samples are at (-, +):"<<iNegMaxSample<<iPosMaxSample;
+            for (int ichannel=0; ichannel<numChannels; ichannel++)
+            {
+                int isam = IsNegative(ichannel) ? iNegMaxSample : iPosMaxSample;
+                signalData[ievent][ichannel] = reader->GetValueFast(ievent, ichannel, isam);
+            }
         }
+
     }
 }
 
-double Trb3signalExtractor::extractSignal_SingleChannel(int ievent, int ichannel, bool *WasSetToZero)
+double Trb3signalExtractor::extractSignalFromWaveform(int ievent, int ichannel, bool *WasSetToZero)
 {
     double sig;
 
     if (NegPolChannels[ichannel])
     {
-        sig = -extractMin(reader->GetWaveformPtr(ievent, ichannel));
+        sig = -extractMin(reader->GetWaveformPtrFast(ievent, ichannel));
 
         if (Config.bNegativeThreshold)
             if (sig < Config.NegativeThreshold)
@@ -124,15 +139,21 @@ double Trb3signalExtractor::extractSignal_SingleChannel(int ievent, int ichannel
             }
 
         if (Config.bZeroSignalIfReverse)
-            if ( extractMax(reader->GetWaveformPtr(ievent, ichannel)) > Config.ReverseMaxThreshold*sig)
+            if ( extractMax(reader->GetWaveformPtrFast(ievent, ichannel)) > Config.ReverseMaxThreshold*sig)
             {
                 if (WasSetToZero) *WasSetToZero = true;
                 return 0;
             }
+
+        if (sig > NegMax)
+           {
+                NegMax = sig;
+                iNegMaxSample = ichannel;
+            }
     }
     else
     {
-        sig = extractMax(reader->GetWaveformPtr(ievent, ichannel));
+        sig = extractMax(reader->GetWaveformPtrFast(ievent, ichannel));
 
         if (Config.bPositiveThreshold)
             if (sig < Config.PositiveThreshold)
@@ -149,10 +170,16 @@ double Trb3signalExtractor::extractSignal_SingleChannel(int ievent, int ichannel
             }
 
         if (Config.bZeroSignalIfReverse)
-            if ( -extractMin(reader->GetWaveformPtr(ievent, ichannel)) > Config.ReverseMaxThreshold*sig)
+            if ( -extractMin(reader->GetWaveformPtrFast(ievent, ichannel)) > Config.ReverseMaxThreshold*sig)
             {
                 if (WasSetToZero) *WasSetToZero = true;
                 return 0;
+            }
+
+        if (sig > PosMax)
+           {
+                PosMax = sig;
+                iPosMaxSample = ichannel;
             }
     }
 
