@@ -42,10 +42,11 @@ private:
 
     void ExtractAllSignals(); // extact signals = peak - pedestal
 
-    double extractMax(const std::vector<int>* arr) const;
-    double extractMin(const std::vector<int>* arr) const;
+    double extractMax(const std::vector<int>* arr);
+    double extractMin(const std::vector<int>* arr);
 
     int iNegMaxSample, iPosMaxSample;
+    int iMax, iMin;
     double NegMax, PosMax;
 };
 

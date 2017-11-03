@@ -87,7 +87,7 @@ bool Trb3signalExtractor::IsRejectedEvent(int ievent) const
 
 void Trb3signalExtractor::ExtractAllSignals()
 {
-    qDebug() << "Method:"<< Config.SignalExtractionMethod;
+    //qDebug() << "Method:"<< Config.SignalExtractionMethod;
     int numEvents = reader->GetNumEvents();
     signalData.resize(numEvents);
     RejectedEvents.clear();
@@ -103,13 +103,17 @@ void Trb3signalExtractor::ExtractAllSignals()
         for (int ichannel=0; ichannel<numChannels; ichannel++)
             signalData[ievent][ichannel] = extractSignalFromWaveform(ievent, ichannel);
 
-        if ( !RejectedEvents.at((ievent) && Config.SignalExtractionMethod==1) )
+        if ( !RejectedEvents.at(ievent) && Config.SignalExtractionMethod==1 )
         {
-            qDebug() << "max samples are at (-, +):"<<iNegMaxSample<<iPosMaxSample;
+            //qDebug() << "max samples are at: -:"<<iNegMaxSample<<NegMax<<"   +:"<<iPosMaxSample<<PosMax;
             for (int ichannel=0; ichannel<numChannels; ichannel++)
             {
-                int isam = IsNegative(ichannel) ? iNegMaxSample : iPosMaxSample;
-                signalData[ievent][ichannel] = reader->GetValueFast(ievent, ichannel, isam);
+                if (signalData.at(ievent).at(ichannel) == 0) continue; //respect suppression - applicable since it operates with max of waveform
+                if (IsNegative(ichannel))
+                    signalData[ievent][ichannel] = -reader->GetValueFast(ievent, ichannel, iNegMaxSample);
+                else
+                    signalData[ievent][ichannel] = reader->GetValueFast(ievent, ichannel, iPosMaxSample);
+
             }
         }
 
@@ -120,7 +124,7 @@ double Trb3signalExtractor::extractSignalFromWaveform(int ievent, int ichannel, 
 {
     double sig;
 
-    if (NegPolChannels[ichannel])
+    if ( NegPolChannels.at(ichannel) )
     {
         sig = -extractMin(reader->GetWaveformPtrFast(ievent, ichannel));
 
@@ -148,7 +152,7 @@ double Trb3signalExtractor::extractSignalFromWaveform(int ievent, int ichannel, 
         if (sig > NegMax)
            {
                 NegMax = sig;
-                iNegMaxSample = ichannel;
+                iNegMaxSample = iMin;
             }
     }
     else
@@ -179,7 +183,7 @@ double Trb3signalExtractor::extractSignalFromWaveform(int ievent, int ichannel, 
         if (sig > PosMax)
            {
                 PosMax = sig;
-                iPosMaxSample = ichannel;
+                iPosMaxSample = iMax;
             }
     }
 
@@ -187,18 +191,26 @@ double Trb3signalExtractor::extractSignalFromWaveform(int ievent, int ichannel, 
     return sig;
 }
 
-double Trb3signalExtractor::extractMax(const std::vector<int> *arr) const
+double Trb3signalExtractor::extractMax(const std::vector<int> *arr)
 {
     int max = (*arr)[0];
     for (int i=1; i<arr->size(); i++)
-        if ( (*arr)[i]>max) max = (*arr)[i];
+        if ( (*arr)[i]>max)
+        {
+            max = (*arr)[i];
+            iMax = i;
+        }
     return max;
 }
 
-double Trb3signalExtractor::extractMin(const std::vector<int> *arr) const
+double Trb3signalExtractor::extractMin(const std::vector<int> *arr)
 {
     int min = (*arr)[0];
     for (int i=1; i<arr->size(); i++)
-        if ( (*arr)[i]<min) min = (*arr)[i];
+        if ( (*arr)[i]<min)
+        {
+            min = (*arr)[i];
+            iMin = i;
+        }
     return min;
 }

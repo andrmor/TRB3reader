@@ -68,20 +68,7 @@ void MasterConfig::writeSignalPolarityToJson(QJsonObject &json)
 }
 
 bool MasterConfig::readSignalPolarityFromJson(QJsonObject &json)
-{
-    if (json.contains("SignalExtraction"))
-    {
-        QJsonObject js = json["SignalExtraction"].toObject();
-
-        NegativeChannels.clear();
-        QJsonArray arr = js["NegativeChannels"].toArray();
-        for (int i=0; i<arr.size(); i++)
-            NegativeChannels.push_back(arr[i].toInt());
-        PedestalFrom = js["PedestalsFrom"].toInt();
-        PedestalTo = js["PedestalsTo"].toInt();
-        return true;
-    }
-
+{    
     if (!json.contains("NegativeChannels")) return false;
 
     NegativeChannels.clear();
