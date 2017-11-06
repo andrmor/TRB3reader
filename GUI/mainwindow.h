@@ -113,6 +113,10 @@ private slots:
 
     void on_cobSignalExtractionMethod_activated(int index);
 
+    void on_pbAddListHardwChToIgnore_clicked();
+
+    void on_pteIgnoreHardwareChannels_customContextMenuRequested(const QPoint &pos);
+
 protected:
     void closeEvent(QCloseEvent* event);
 

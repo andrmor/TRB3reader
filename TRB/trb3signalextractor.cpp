@@ -101,7 +101,14 @@ void Trb3signalExtractor::ExtractAllSignals()
         iNegMaxSample = iPosMaxSample = 0;
         NegMax = PosMax = -1.0e10;
         for (int ichannel=0; ichannel<numChannels; ichannel++)
+        {
+            if (Config.IgnoreHardwareChannels.contains(ichannel) )
+            {
+                signalData[ievent][ichannel] = 0;
+                continue;
+            }
             signalData[ievent][ichannel] = extractSignalFromWaveform(ievent, ichannel);
+        }
 
         if ( !RejectedEvents.at(ievent) && Config.SignalExtractionMethod==1 )
         {

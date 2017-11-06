@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <QSet>
 
 class QJsonObject;
 
@@ -13,6 +14,7 @@ public:
 
     std::vector<int> NegativeChannels;
     std::vector<std::size_t> ChannelMap;
+    QSet<int> IgnoreHardwareChannels;
 
     bool bSmoothWaveforms = false;
         bool AdjacentAveraging_bOn = false;
@@ -54,6 +56,9 @@ private:
 
     void writeChannelMapToJson(QJsonObject& json);
     bool readChannelMapFromJson(QJsonObject& json);
+
+    void writeIgnoreChannelsToJson(QJsonObject& json);
+    bool readIgnoreChannelsFromJson(QJsonObject& json);
 
     void writePedestalsToJson(QJsonObject& json);
     bool readPedestalsFromJson(QJsonObject& json);

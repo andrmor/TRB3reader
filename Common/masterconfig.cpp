@@ -11,6 +11,7 @@ void MasterConfig::WriteToJson(QJsonObject &json)
 {
     writeSignalPolarityToJson(json);
     writeChannelMapToJson(json);
+    writeIgnoreChannelsToJson(json);
     writePedestalsToJson(json);
     writeSmoothingToJson(json);
     writeSignalSuppressionToJson(json);
@@ -20,6 +21,7 @@ bool MasterConfig::ReadFromJson(QJsonObject &json)
 {
     readSignalPolarityFromJson(json);
     readChannelMapFromJson(json);
+    readIgnoreChannelsFromJson(json);
     readPedestalsFromJson(json);
     readSmoothingFromJson(json);
     readSignalSuppressionFromJson(json);
@@ -94,6 +96,25 @@ bool MasterConfig::readChannelMapFromJson(QJsonObject &json)
     QJsonArray arr = json["ChannelMap"].toArray();
     for (int i=0; i<arr.size(); i++)
         ChannelMap.push_back(arr[i].toInt());
+
+    return true;
+}
+
+void MasterConfig::writeIgnoreChannelsToJson(QJsonObject &json)
+{
+    QJsonArray arr;
+    for (int i: IgnoreHardwareChannels) arr << i;
+    json["IgnoreHardwareChannels"] = arr;
+}
+
+bool MasterConfig::readIgnoreChannelsFromJson(QJsonObject &json)
+{
+    if (!json.contains("IgnoreHardwareChannels")) return false;
+
+    IgnoreHardwareChannels.clear();
+    QJsonArray arr = json["IgnoreHardwareChannels"].toArray();
+    for (int i=0; i<arr.size(); i++)
+        IgnoreHardwareChannels.insert(arr[i].toInt());
 
     return true;
 }

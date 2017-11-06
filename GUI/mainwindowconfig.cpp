@@ -162,15 +162,21 @@ void MainWindow::UpdateGui()
 {
     ui->ptePolarity->clear();
     QString s;
-    for (int i: Config->NegativeChannels)
-        s += QString::number(i)+" ";
+    for (int i: Config->NegativeChannels) s += QString::number(i)+" ";
     ui->ptePolarity->appendPlainText(s);
 
     ui->pteMapping->clear();
     s.clear();
-    for (int i: Config->ChannelMap)
-        s += QString::number(i)+" ";
+    for (int i: Config->ChannelMap) s += QString::number(i)+" ";
     ui->pteMapping->appendPlainText(s);
+
+    ui->pteIgnoreHardwareChannels->clear();
+    s.clear();
+    std::vector<int> ign;
+    for (int i: Config->IgnoreHardwareChannels) ign.push_back(i);
+    std::sort(ign.begin(), ign.end());
+    for (int i: ign) s += QString::number(i)+" ";
+    ui->pteIgnoreHardwareChannels->appendPlainText(s);
 
     ui->cbSubstractPedestal->setChecked(Config->bPedestalSubstraction);
         ui->sbPedestalFrom->setValue(Config->PedestalFrom);

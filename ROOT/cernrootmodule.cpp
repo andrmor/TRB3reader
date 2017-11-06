@@ -18,8 +18,8 @@
 #include "TList.h"
 #include "TPaveText.h"
 
-CernRootModule::CernRootModule(Trb3dataReader *Reader, Trb3signalExtractor *Extractor, ChannelMapper *Map, int refreshInterval) :
-    Reader(Reader), Extractor(Extractor), Map(Map)
+CernRootModule::CernRootModule(Trb3dataReader *Reader, Trb3signalExtractor *Extractor, ChannelMapper *Map, MasterConfig *Config, int refreshInterval) :
+    Reader(Reader), Extractor(Extractor), Map(Map), Config(Config)
 {
     //create ROOT application
     int rootargc=1;
@@ -256,7 +256,10 @@ void CernRootModule::DrawSingle(int ievent, int iHardwChan, bool autoscale, doub
     gSingle->SetLineWidth(LineWidth);
     bool bRejected;
     Extractor->extractSignalFromWaveform(ievent, iHardwChan, &bRejected);
-    gSingle->SetLineColor( (Extractor->IsRejectedEvent(ievent) || bRejected) ? RejectedColor : NormalColor);
+
+    bool bIgnoredChannel = Config->IgnoreHardwareChannels.contains(iHardwChan);
+    gSingle->SetLineColor( (bIgnoredChannel || Extractor->IsRejectedEvent(ievent) || bRejected) ? RejectedColor : NormalColor);
+    if (bIgnoredChannel) gSingle->SetLineStyle(7);
 
     WOne->SetAsActiveRootWindow();
     gSingle->Draw("AL");
@@ -297,7 +300,10 @@ void CernRootModule::DrawOverlay(int ievent, bool bNeg, bool bAutoscale, double 
         g->SetLineWidth(LineWidth);
         bool bRejected;
         Extractor->extractSignalFromWaveform(ievent, iHardwCh, &bRejected);
-        g->SetLineColor( (Extractor->IsRejectedEvent(ievent) || bRejected) ? RejectedColor : NormalColor);
+
+        bool bIgnoredChannel = Config->IgnoreHardwareChannels.contains(iHardwCh);
+        g->SetLineColor( (bIgnoredChannel || Extractor->IsRejectedEvent(ievent) || bRejected) ? RejectedColor : NormalColor);
+        if (bIgnoredChannel) g->SetLineStyle(7);
 
         multiGraph->Add(g, "AL");
     }
@@ -402,7 +408,10 @@ void CernRootModule::DrawAll(int ievent, bool bNeg, int padsX, int padsY, bool b
         g->SetLineWidth(LineWidth);
         bool bRejected;
         Extractor->extractSignalFromWaveform(ievent, iHardwCh, &bRejected);
-        g->SetLineColor( (Extractor->IsRejectedEvent(ievent) || bRejected) ? RejectedColor : NormalColor);
+
+        bool bIgnoredChannel = Config->IgnoreHardwareChannels.contains(iHardwCh);
+        g->SetLineColor( (bIgnoredChannel || Extractor->IsRejectedEvent(ievent) || bRejected) ? RejectedColor : NormalColor);
+        if (bIgnoredChannel) g->SetLineStyle(7);
 
         g->Draw("AL");
         g->SetMinimum(Min);

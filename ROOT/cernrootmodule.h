@@ -10,6 +10,7 @@ class TMultiGraph;
 class AGraphWindow;
 class Trb3dataReader;
 class Trb3signalExtractor;
+class MasterConfig;
 class TGraph;
 class ChannelMapper;
 
@@ -18,7 +19,7 @@ class CernRootModule : public QObject
     Q_OBJECT
 
 public:
-    CernRootModule(Trb3dataReader* Reader, Trb3signalExtractor* Extractor, ChannelMapper* Map, int refreshInterval = 100);
+    CernRootModule(Trb3dataReader* Reader, Trb3signalExtractor* Extractor, ChannelMapper* Map, MasterConfig* Config, int refreshInterval = 100);
     ~CernRootModule();
 
     //Graph windows show/hide
@@ -45,6 +46,7 @@ private:
     Trb3dataReader* Reader;
     Trb3signalExtractor* Extractor;
     ChannelMapper* Map;
+    MasterConfig* Config;
 
     TApplication* RootApp;
 

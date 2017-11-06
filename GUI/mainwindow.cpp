@@ -39,8 +39,11 @@ MainWindow::MainWindow(QWidget *parent) :
     Extractor = new Trb3signalExtractor(Reader);
     Map = new ChannelMapper();
 
+    //creating master config object
+    Config = new MasterConfig();
+
 #ifdef CERN_ROOT
-    RootModule = new CernRootModule(Reader, Extractor, Map);
+    RootModule = new CernRootModule(Reader, Extractor, Map, Config);
     connect(RootModule, &CernRootModule::WOneHidden, [=](){ui->pbShowWaveform->setChecked(false);});
     connect(RootModule, &CernRootModule::WOverNegHidden, [=](){ui->pbShowOverlayNeg->setChecked(false);});
     connect(RootModule, &CernRootModule::WOverPosHidden, [=](){ui->pbShowOverlayPos->setChecked(false);});
@@ -51,9 +54,6 @@ MainWindow::MainWindow(QWidget *parent) :
 #endif
 
     ui->cbAutoscaleY->setChecked(true);
-
-    //creating master config object
-    Config = new MasterConfig();
 
     //finding the config dir
     ConfigDir = QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation) + "/TRBreader";
@@ -176,6 +176,21 @@ void MainWindow::on_pbAddMapping_clicked()
     UpdateGui();
 }
 
+void MainWindow::on_pbAddListHardwChToIgnore_clicked()
+{
+    QString FileName = QFileDialog::getOpenFileName(this, "Add file with hardware channels to ignore (cumulative!).\n"
+                                                    "These channels will be always digitized as having zero signal");
+
+    QVector<int> arr;
+    LoadIntVectorsFromFile(FileName, &arr);
+
+    for (int i : arr) Config->IgnoreHardwareChannels.insert(i);
+
+    Log("Ignored channels were updated");
+
+    UpdateGui();
+}
+
 void MainWindow::on_ptePolarity_customContextMenuRequested(const QPoint &pos)
 {
     QMenu menu;
@@ -224,6 +239,23 @@ void MainWindow::on_pteMapping_customContextMenuRequested(const QPoint &pos)
           ClearData();
           UpdateGui();
       }
+}
+
+void MainWindow::on_pteIgnoreHardwareChannels_customContextMenuRequested(const QPoint &pos)
+{
+    QMenu menu;
+
+    QAction* Clear = menu.addAction("Clear");
+
+    QAction* selectedItem = menu.exec(ui->pteIgnoreHardwareChannels->mapToGlobal(pos));
+    if (!selectedItem) return;
+
+    if (selectedItem == Clear)
+    {
+        Config->IgnoreHardwareChannels.clear();
+        ClearData();
+        UpdateGui();
+    }
 }
 
 void MainWindow::on_pbSaveTotextFile_clicked()
@@ -700,4 +732,5 @@ void MainWindow::on_pbNegSignature_clicked()
     QMessageBox::information(this, "", "Cern ROOT module was not configured!", QMessageBox::Ok, QMessageBox::Ok);
 #endif
 }
+
 
