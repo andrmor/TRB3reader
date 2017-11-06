@@ -110,12 +110,14 @@ void CernRootModule::DrawSignature(bool bNeg)
         {
             int iHardwCh = Map->LogicalToHardware(ilc);
             if (std::isnan(iHardwCh)) continue;
-            if (iHardwCh == 89) continue; // ****!!!!
+            if (Config->IgnoreHardwareChannels.contains(iHardwCh)) continue;
             if (bNeg != Extractor->IsNegative(iHardwCh)) continue;
 
             bool bRejected;
             int sig = Extractor->extractSignalFromWaveform(ievent, iHardwCh, &bRejected);
             if (bRejected) continue;
+
+            if (bNeg) sig = -sig;
 
             const std::vector<int>* wave = Reader->GetWaveformPtrFast(ievent, iHardwCh);
 
@@ -145,6 +147,7 @@ void CernRootModule::DrawSignature(bool bNeg)
             }
         }
     h->Draw("colz");
+    WOne->UpdateRootCanvas();
 }
 
 void CernRootModule::StartGraphWindows()

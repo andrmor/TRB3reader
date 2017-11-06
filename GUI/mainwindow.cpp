@@ -726,11 +726,23 @@ void MainWindow::on_pbNegSignature_clicked()
     Log("");
     if (!Reader->isValid()) return;
 
-    RootModule->DrawSignature(false);
+    RootModule->DrawSignature(true);
 
 #else
     QMessageBox::information(this, "", "Cern ROOT module was not configured!", QMessageBox::Ok, QMessageBox::Ok);
 #endif
 }
 
+void MainWindow::on_pbPosSignature_clicked()
+{
+#ifdef CERN_ROOT
+    if (!RootModule) return;
+    Log("");
+    if (!Reader->isValid()) return;
 
+    RootModule->DrawSignature(false);
+
+#else
+    QMessageBox::information(this, "", "Cern ROOT module was not configured!", QMessageBox::Ok, QMessageBox::Ok);
+#endif
+}

@@ -43,6 +43,14 @@ public:
     bool bNegativeIgnore = false;
     double NegativeIgnore = 1.0e10;
 
+    bool bNegMaxGate = false;
+    int  NegMaxGateFrom = 0;
+    int  NegMaxGateTo = 1000;
+
+    bool bPosMaxGate = false;
+    int  PosMaxGateFrom = 0;
+    int  PosMaxGateTo = 1000;
+
 
     std::string filename = "/home/andr/QtProjects/run191/te17081105154.hld";
 
@@ -68,6 +76,9 @@ private:
 
     void writeSignalSuppressionToJson(QJsonObject& json);
     bool readSignalSuppressionFromJson(QJsonObject& json);
+
+    void writeMaxGateToJson(QJsonObject& json);
+    bool readMaxGateFromJson(QJsonObject& json);
 };
 
 #endif // MASTERCONFIG_H

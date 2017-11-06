@@ -47,7 +47,7 @@ private:
 
     int iNegMaxSample, iPosMaxSample;
     int iMax, iMin;
-    double NegMax, PosMax;
+    double NegMaxValue, PosMaxValue;
 };
 
 class Trb3ExtractionMonitor

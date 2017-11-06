@@ -98,8 +98,9 @@ void Trb3signalExtractor::ExtractAllSignals()
     {
         signalData[ievent].resize(numChannels);
 
+        // going through all channels, finding where they have reached maximum. Updating global max (+ and -) over all channels for this event
         iNegMaxSample = iPosMaxSample = 0;
-        NegMax = PosMax = -1.0e10;
+        NegMaxValue = PosMaxValue = -1.0e10;
         for (int ichannel=0; ichannel<numChannels; ichannel++)
         {
             if (Config.IgnoreHardwareChannels.contains(ichannel) )
@@ -110,21 +111,50 @@ void Trb3signalExtractor::ExtractAllSignals()
             signalData[ievent][ichannel] = extractSignalFromWaveform(ievent, ichannel);
         }
 
-        if ( !RejectedEvents.at(ievent) && Config.SignalExtractionMethod==1 )
+        if (RejectedEvents.at(ievent)) continue;
+
+        // if activated, check that the maximum is reached in the allowed gate
+        if (Config.bNegMaxGate)
+        {
+            if (iNegMaxSample < Config.NegMaxGateFrom  || iNegMaxSample > Config.NegMaxGateTo )
+            {
+                RejectedEvents[ievent] = true;
+                continue;
+            }
+        }
+        else if (Config.bPosMaxGate)
+        {
+            if (iPosMaxSample < Config.PosMaxGateFrom  || iPosMaxSample > Config.PosMaxGateTo )
+            {
+                RejectedEvents[ievent] = true;
+                continue;
+            }
+        }
+
+        // for this method reading signal value at the same channel
+        if ( Config.SignalExtractionMethod == 1 )
         {
             //qDebug() << "max samples are at: -:"<<iNegMaxSample<<NegMax<<"   +:"<<iPosMaxSample<<PosMax;
             for (int ichannel=0; ichannel<numChannels; ichannel++)
             {
                 if (signalData.at(ievent).at(ichannel) == 0) continue; //respect suppression - applicable since it operates with max of waveform
-                if (IsNegative(ichannel))
+                if ( IsNegative(ichannel) )
                     signalData[ievent][ichannel] = -reader->GetValueFast(ievent, ichannel, iNegMaxSample);
                 else
                     signalData[ievent][ichannel] = reader->GetValueFast(ievent, ichannel, iPosMaxSample);
-
             }
         }
 
+        //next event
     }
+
+
+    //statistics on rejected events:
+    int rejected = 0;
+    for (std::size_t ievent=0; ievent<signalData.size(); ievent++)
+        if (RejectedEvents.at(ievent)) rejected++;
+    qDebug() << "Rejected"<<rejected<<"events from total"<<signalData.size();
+
 }
 
 double Trb3signalExtractor::extractSignalFromWaveform(int ievent, int ichannel, bool *WasSetToZero)
@@ -156,9 +186,9 @@ double Trb3signalExtractor::extractSignalFromWaveform(int ievent, int ichannel, 
                 return 0;
             }
 
-        if (sig > NegMax)
+        if (sig > NegMaxValue)
            {
-                NegMax = sig;
+                NegMaxValue = sig;
                 iNegMaxSample = iMin;
             }
     }
@@ -187,9 +217,9 @@ double Trb3signalExtractor::extractSignalFromWaveform(int ievent, int ichannel, 
                 return 0;
             }
 
-        if (sig > PosMax)
+        if (sig > PosMaxValue)
            {
-                PosMax = sig;
+                PosMaxValue = sig;
                 iPosMaxSample = iMax;
             }
     }

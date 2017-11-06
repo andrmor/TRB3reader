@@ -117,6 +117,20 @@ private slots:
 
     void on_pteIgnoreHardwareChannels_customContextMenuRequested(const QPoint &pos);
 
+    void on_cbPosMaxSignalGate_clicked(bool checked);
+
+    void on_cbNegMaxSignalGate_clicked(bool checked);
+
+    void on_sbPosMaxFrom_editingFinished();
+
+    void on_sbPosMaxTo_editingFinished();
+
+    void on_sbNegMaxFrom_editingFinished();
+
+    void on_sbNegMaxTo_editingFinished();
+
+    void on_pbPosSignature_clicked();
+
 protected:
     void closeEvent(QCloseEvent* event);
 

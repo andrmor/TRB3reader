@@ -204,6 +204,13 @@ void MainWindow::UpdateGui()
 
     ui->cbIgnoreNegThreshold->setChecked(Config->bNegativeIgnore);
     ui->ledNegIgnoreMax->setText(QString::number(Config->NegativeIgnore));
+
+    ui->cbNegMaxSignalGate->setChecked(Config->bNegMaxGate);
+    ui->sbNegMaxFrom->setValue(Config->NegMaxGateFrom);
+    ui->sbNegMaxTo->setValue(Config->NegMaxGateTo);
+    ui->cbPosMaxSignalGate->setChecked(Config->bPosMaxGate);
+    ui->sbPosMaxFrom->setValue(Config->PosMaxGateFrom);
+    ui->sbPosMaxTo->setValue(Config->PosMaxGateTo);
 }
 
 // --- update Config on GUI operated by user ---
@@ -282,34 +289,77 @@ void MainWindow::on_cbPosThreshold_clicked(bool checked)
 void MainWindow::on_cbNegThreshold_clicked(bool checked)
 {
     Config->bNegativeThreshold = checked;
+    ClearData();
 }
 
 void MainWindow::on_ledPosThresholdMin_editingFinished()
 {
     Config->PositiveThreshold = ui->ledPosThresholdMin->text().toDouble();
+    ClearData();
 }
 
 void MainWindow::on_ledNegThresholdMin_editingFinished()
 {
     Config->NegativeThreshold = ui->ledNegThresholdMin->text().toDouble();
+    ClearData();
 }
 
 void MainWindow::on_cbIgnorePosThreshold_clicked(bool checked)
 {
     Config->bPositiveIgnore = checked;
+    ClearData();
 }
 
 void MainWindow::on_cbIgnoreNegThreshold_clicked(bool checked)
 {
     Config->bNegativeIgnore = checked;
+    ClearData();
 }
 
 void MainWindow::on_ledPosIgnoreMax_editingFinished()
 {
     Config->PositiveIgnore = ui->ledPosIgnoreMax->text().toDouble();
+    ClearData();
 }
 
 void MainWindow::on_ledNegIgnoreMax_editingFinished()
 {
     Config->NegativeIgnore = ui->ledNegIgnoreMax->text().toDouble();
+    ClearData();
+}
+
+void MainWindow::on_cbPosMaxSignalGate_clicked(bool checked)
+{
+    Config->bPosMaxGate = checked;
+    ClearData();
+}
+
+void MainWindow::on_cbNegMaxSignalGate_clicked(bool checked)
+{
+    Config->bNegMaxGate = checked;
+    ClearData();
+}
+
+void MainWindow::on_sbPosMaxFrom_editingFinished()
+{
+    Config->PosMaxGateFrom = ui->sbPosMaxFrom->value();
+    ClearData();
+}
+
+void MainWindow::on_sbPosMaxTo_editingFinished()
+{
+    Config->PosMaxGateTo = ui->sbPosMaxTo->value();
+    ClearData();
+}
+
+void MainWindow::on_sbNegMaxFrom_editingFinished()
+{
+    Config->NegMaxGateFrom = ui->sbNegMaxFrom->value();
+    ClearData();
+}
+
+void MainWindow::on_sbNegMaxTo_editingFinished()
+{
+    Config->NegMaxGateTo = ui->sbNegMaxTo->value();
+    ClearData();
 }

@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="twMain">
       <property name="currentIndex">
-       <number>0</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -329,19 +329,6 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_29">
           <item>
-           <spacer name="horizontalSpacer_36">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
            <widget class="QPushButton" name="pbAddListHardwChToIgnore">
             <property name="toolTip">
              <string>These channels will be always digitized as zero signal</string>
@@ -350,19 +337,6 @@
              <string>Add list of hardware channels to ignore</string>
             </property>
            </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_37">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
           </item>
          </layout>
         </item>
@@ -385,9 +359,22 @@
        <attribute name="title">
         <string>Configuration</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_16">
+       <layout class="QVBoxLayout" name="verticalLayout_18">
         <item>
-         <widget class="QGroupBox" name="gbPedestals">
+         <spacer name="verticalSpacer_21">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QFrame" name="gbPedestals">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>0</horstretch>
@@ -400,12 +387,36 @@
             <height>16777215</height>
            </size>
           </property>
-          <property name="title">
-           <string>Pedestal substraction</string>
+          <property name="frameShape">
+           <enum>QFrame::Box</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_14">
+           <property name="spacing">
+            <number>3</number>
+           </property>
+           <property name="leftMargin">
+            <number>3</number>
+           </property>
+           <property name="topMargin">
+            <number>3</number>
+           </property>
+           <property name="rightMargin">
+            <number>3</number>
+           </property>
+           <property name="bottomMargin">
+            <number>3</number>
+           </property>
            <item>
             <widget class="QCheckBox" name="cbSubstractPedestal">
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="text">
               <string>Substract pedestals</string>
              </property>
@@ -511,11 +522,29 @@
          </spacer>
         </item>
         <item>
-         <widget class="QGroupBox" name="gbSmoothing">
-          <property name="title">
-           <string>Waveform smoothing</string>
+         <widget class="QFrame" name="gbSmoothing">
+          <property name="frameShape">
+           <enum>QFrame::Box</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_8">
+           <property name="spacing">
+            <number>3</number>
+           </property>
+           <property name="leftMargin">
+            <number>3</number>
+           </property>
+           <property name="topMargin">
+            <number>3</number>
+           </property>
+           <property name="rightMargin">
+            <number>3</number>
+           </property>
+           <property name="bottomMargin">
+            <number>3</number>
+           </property>
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_24">
              <property name="topMargin">
@@ -523,6 +552,12 @@
              </property>
              <item>
               <widget class="QCheckBox" name="cbSmoothWaveforms">
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
                <property name="text">
                 <string>Smooth waveforms</string>
                </property>
@@ -653,36 +688,33 @@
          </spacer>
         </item>
         <item>
-         <widget class="QGroupBox" name="groupBox_2">
-          <property name="title">
-           <string>Signal extraction</string>
+         <widget class="QLabel" name="label_26">
+          <property name="font">
+           <font>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
           </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_28">
-           <item>
-            <widget class="QLabel" name="label_26">
-             <property name="text">
-              <string>Extraction method:</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QComboBox" name="cobSignalExtractionMethod">
-             <property name="toolTip">
-              <string>Separately for negative and positive channels. For negative channel, maximum of inverted waveform value.</string>
-             </property>
-             <item>
-              <property name="text">
-               <string>Maximum for each waveform independently</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Signal at common sample#, given by global maximum</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-          </layout>
+          <property name="text">
+           <string>Signal extraction method:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="cobSignalExtractionMethod">
+          <property name="toolTip">
+           <string>Separately for negative and positive channels. For negative channel, maximum of inverted waveform value.</string>
+          </property>
+          <item>
+           <property name="text">
+            <string>Maximum for each waveform independently</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Signal at common sample#, given by global maximum</string>
+           </property>
+          </item>
          </widget>
         </item>
         <item>
@@ -699,11 +731,42 @@
          </spacer>
         </item>
         <item>
-         <widget class="QGroupBox" name="gbSignalRejection">
-          <property name="title">
+         <widget class="QLabel" name="label_31">
+          <property name="font">
+           <font>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
            <string>Set signal=0 but keep the event if in a waveform:</string>
           </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QFrame" name="gbSignalRejection">
+          <property name="frameShape">
+           <enum>QFrame::Box</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
           <layout class="QVBoxLayout" name="verticalLayout_7">
+           <property name="spacing">
+            <number>3</number>
+           </property>
+           <property name="leftMargin">
+            <number>3</number>
+           </property>
+           <property name="topMargin">
+            <number>3</number>
+           </property>
+           <property name="rightMargin">
+            <number>3</number>
+           </property>
+           <property name="bottomMargin">
+            <number>3</number>
+           </property>
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_21">
              <item>
@@ -770,23 +833,16 @@
              </property>
              <item>
               <widget class="QLabel" name="label_24">
+               <property name="minimumSize">
+                <size>
+                 <width>130</width>
+                 <height>0</height>
+                </size>
+               </property>
                <property name="text">
                 <string>Positive channels:  </string>
                </property>
               </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer_27">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
              </item>
              <item>
               <widget class="QCheckBox" name="cbPosThreshold">
@@ -848,23 +904,16 @@
              </property>
              <item>
               <widget class="QLabel" name="label_25">
+               <property name="minimumSize">
+                <size>
+                 <width>130</width>
+                 <height>0</height>
+                </size>
+               </property>
                <property name="text">
                 <string>Negative channels:</string>
                </property>
               </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer_28">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
              </item>
              <item>
               <widget class="QCheckBox" name="cbNegThreshold">
@@ -936,139 +985,300 @@
          </spacer>
         </item>
         <item>
-         <widget class="QGroupBox" name="groupBox">
-          <property name="title">
+         <widget class="QLabel" name="label_32">
+          <property name="font">
+           <font>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
            <string>Ignore event if:</string>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_15">
+         </widget>
+        </item>
+        <item>
+         <widget class="QFrame" name="frame">
+          <property name="frameShape">
+           <enum>QFrame::Box</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_17">
+           <property name="spacing">
+            <number>3</number>
+           </property>
+           <property name="leftMargin">
+            <number>3</number>
+           </property>
+           <property name="topMargin">
+            <number>2</number>
+           </property>
+           <property name="rightMargin">
+            <number>3</number>
+           </property>
+           <property name="bottomMargin">
+            <number>2</number>
+           </property>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_11">
+            <layout class="QHBoxLayout" name="horizontalLayout_31">
              <item>
               <widget class="QLabel" name="label_28">
+               <property name="minimumSize">
+                <size>
+                 <width>120</width>
+                 <height>0</height>
+                </size>
+               </property>
                <property name="text">
                 <string>Positive channels:  </string>
                </property>
               </widget>
              </item>
              <item>
-              <spacer name="horizontalSpacer_31">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
+              <layout class="QVBoxLayout" name="verticalLayout_15">
+               <property name="spacing">
+                <number>3</number>
                </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item>
-              <widget class="QCheckBox" name="cbIgnorePosThreshold">
-               <property name="text">
-                <string>Any waveform signal exceeds             </string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLineEdit" name="ledPosIgnoreMax">
-               <property name="minimumSize">
-                <size>
-                 <width>75</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>75</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="text">
-                <string>1e10</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer_32">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_11">
+                 <item>
+                  <widget class="QCheckBox" name="cbIgnorePosThreshold">
+                   <property name="text">
+                    <string>Any waveform signal exceeds             </string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="ledPosIgnoreMax">
+                   <property name="minimumSize">
+                    <size>
+                     <width>75</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>75</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>1e10</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_31">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_30">
+                 <item>
+                  <widget class="QCheckBox" name="cbPosMaxSignalGate">
+                   <property name="text">
+                    <string>Max signal is in sample# &lt;</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QSpinBox" name="sbPosMaxFrom">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="maximum">
+                    <number>9999</number>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_27">
+                   <property name="text">
+                    <string>or &gt;</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QSpinBox" name="sbPosMaxTo">
+                   <property name="maximum">
+                    <number>9999</number>
+                   </property>
+                   <property name="value">
+                    <number>1000</number>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_32">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+              </layout>
              </item>
             </layout>
            </item>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_14">
+            <widget class="Line" name="line_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_33">
              <item>
               <widget class="QLabel" name="label_29">
+               <property name="minimumSize">
+                <size>
+                 <width>120</width>
+                 <height>0</height>
+                </size>
+               </property>
                <property name="text">
                 <string>Negative channels:</string>
                </property>
               </widget>
              </item>
              <item>
-              <spacer name="horizontalSpacer_33">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
+              <layout class="QVBoxLayout" name="verticalLayout_16">
+               <property name="spacing">
+                <number>3</number>
                </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item>
-              <widget class="QCheckBox" name="cbIgnoreNegThreshold">
-               <property name="text">
-                <string>Any waveform inverse signal exceeds</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLineEdit" name="ledNegIgnoreMax">
-               <property name="minimumSize">
-                <size>
-                 <width>75</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>75</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="text">
-                <string>1e10</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer_34">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_14">
+                 <item>
+                  <widget class="QCheckBox" name="cbIgnoreNegThreshold">
+                   <property name="text">
+                    <string>Any waveform inverse signal exceeds</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="ledNegIgnoreMax">
+                   <property name="minimumSize">
+                    <size>
+                     <width>75</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>75</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>1e10</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_33">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_32">
+                 <item>
+                  <widget class="QCheckBox" name="cbNegMaxSignalGate">
+                   <property name="text">
+                    <string>Max signal is in sample# &lt;</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QSpinBox" name="sbNegMaxFrom">
+                   <property name="maximum">
+                    <number>9999</number>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_30">
+                   <property name="text">
+                    <string>or &gt;</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QSpinBox" name="sbNegMaxTo">
+                   <property name="maximum">
+                    <number>9999</number>
+                   </property>
+                   <property name="value">
+                    <number>1000</number>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_34">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+              </layout>
              </item>
             </layout>
            </item>
           </layout>
          </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_20">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
         </item>
        </layout>
        <zorder>gbSmoothing</zorder>
@@ -1080,13 +1290,18 @@
        <zorder>horizontalSpacer_28</zorder>
        <zorder>cbPosThreshold</zorder>
        <zorder>ledPosThresholdMin</zorder>
-       <zorder>groupBox</zorder>
        <zorder>verticalSpacer_12</zorder>
        <zorder>verticalSpacer_13</zorder>
        <zorder>frSmoothing</zorder>
-       <zorder>groupBox_2</zorder>
        <zorder>verticalSpacer_11</zorder>
+       <zorder>frame</zorder>
+       <zorder>label_26</zorder>
+       <zorder>cobSignalExtractionMethod</zorder>
        <zorder>verticalSpacer_18</zorder>
+       <zorder>label_31</zorder>
+       <zorder>label_32</zorder>
+       <zorder>verticalSpacer_20</zorder>
+       <zorder>verticalSpacer_21</zorder>
       </widget>
       <widget class="QWidget" name="tab_2">
        <attribute name="title">
@@ -2234,19 +2449,45 @@
        <attribute name="title">
         <string>Test</string>
        </attribute>
-       <widget class="QPushButton" name="pbNegSignature">
-        <property name="geometry">
-         <rect>
-          <x>60</x>
-          <y>60</y>
-          <width>121</width>
-          <height>31</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Neg</string>
-        </property>
-       </widget>
+       <layout class="QVBoxLayout" name="verticalLayout_19">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_15">
+          <item>
+           <widget class="QLabel" name="label_33">
+            <property name="text">
+             <string>Draw wavefowm signature:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pbNegSignature">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Negative channels</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pbPosSignature">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Positive channels</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>
@@ -2351,22 +2592,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>cbAdjacentAveraging</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>cbAdjAvWeighted</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>141</x>
-     <y>291</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>472</x>
-     <y>306</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>cbAutoscaleY</sender>
    <signal>toggled(bool)</signal>
    <receiver>ledMaxPos</receiver>
@@ -2383,22 +2608,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>cbAdjacentAveraging</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>sbAdjAvPoints</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>141</x>
-     <y>291</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>374</x>
-     <y>295</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>cbAutoscaleY</sender>
    <signal>toggled(bool)</signal>
    <receiver>ledMaxNeg</receiver>
@@ -2411,54 +2620,6 @@
     <hint type="destinationlabel">
      <x>418</x>
      <y>574</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cbZeroSignalIfReverseMax</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>ledReverseMaxLimit</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>132</x>
-     <y>410</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>281</x>
-     <y>411</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cbSmoothWaveforms</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>frAdjAv</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>132</x>
-     <y>269</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>131</x>
-     <y>307</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cbSubstractPedestal</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>frSmoothing</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>131</x>
-     <y>133</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>131</x>
-     <y>169</y>
     </hint>
    </hints>
   </connection>

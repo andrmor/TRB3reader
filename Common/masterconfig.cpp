@@ -15,6 +15,7 @@ void MasterConfig::WriteToJson(QJsonObject &json)
     writePedestalsToJson(json);
     writeSmoothingToJson(json);
     writeSignalSuppressionToJson(json);
+    writeMaxGateToJson(json);
 }
 
 bool MasterConfig::ReadFromJson(QJsonObject &json)
@@ -25,6 +26,7 @@ bool MasterConfig::ReadFromJson(QJsonObject &json)
     readPedestalsFromJson(json);
     readSmoothingFromJson(json);
     readSignalSuppressionFromJson(json);
+    readMaxGateFromJson(json);
 
     return true;
 }
@@ -190,6 +192,35 @@ bool MasterConfig::readSignalSuppressionFromJson(QJsonObject &json)
 
     parseJson(js, "ApplyNegativeIgnore", bNegativeIgnore);
     parseJson(js, "NegativeIgnore", NegativeIgnore);
+
+    return true;
+}
+
+void MasterConfig::writeMaxGateToJson(QJsonObject &json)
+{
+    QJsonObject js;
+
+    js["ApplyNegative"] = bNegMaxGate;
+    js["NegativeMaxGateFrom"] = NegMaxGateFrom;
+    js["NegativeMaxGateTo"]   = NegMaxGateTo;
+    js["ApplyPositive"] = bPosMaxGate;
+    js["PositiveMaxGateFrom"] = PosMaxGateFrom;
+    js["PositiveMaxGateTo"]   = PosMaxGateTo;
+
+    json["MaxGate"] = js;
+}
+
+bool MasterConfig::readMaxGateFromJson(QJsonObject &json)
+{
+    if (!json.contains("MaxGate")) return false;
+
+    QJsonObject js = json["MaxGate"].toObject();
+    parseJson(js, "ApplyNegative",       bNegMaxGate);
+    parseJson(js, "NegativeMaxGateFrom", NegMaxGateFrom);
+    parseJson(js, "NegativeMaxGateTo",   NegMaxGateTo);
+    parseJson(js, "ApplyPositive",       bPosMaxGate);
+    parseJson(js, "PositiveMaxGateFrom", PosMaxGateFrom);
+    parseJson(js, "PositiveMaxGateTo",   PosMaxGateTo);
 
     return true;
 }
