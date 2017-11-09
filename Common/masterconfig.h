@@ -27,6 +27,7 @@ public:
         int PedestalTo = 0;
 
     int SignalExtractionMethod = 0; //0 - independent max, 1 - common sample, at global max
+    int CommonSampleNumber = 0;
 
     bool bZeroSignalIfReverse = false;
     double ReverseMaxThreshold = 0.25;
@@ -52,7 +53,7 @@ public:
     int  PosMaxGateTo = 1000;
 
 
-    std::string filename = "/home/andr/QtProjects/run191/te17081105154.hld";
+    std::string filename;
 
 
     void WriteToJson(QJsonObject& json);
@@ -74,8 +75,8 @@ private:
     void writeSmoothingToJson(QJsonObject& json);
     bool readSmoothingFromJson(QJsonObject& json);
 
-    void writeSignalSuppressionToJson(QJsonObject& json);
-    bool readSignalSuppressionFromJson(QJsonObject& json);
+    void writeSignalExtractionToJson(QJsonObject& json);
+    bool readSignalExtractionFromJson(QJsonObject& json);
 
     void writeMaxGateToJson(QJsonObject& json);
     bool readMaxGateFromJson(QJsonObject& json);

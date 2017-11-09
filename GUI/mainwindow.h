@@ -131,6 +131,10 @@ private slots:
 
     void on_pbPosSignature_clicked();
 
+    void on_sbExtractAllFromSampleNumber_editingFinished();
+
+    void on_cobSignalExtractionMethod_currentIndexChanged(int index);
+
 protected:
     void closeEvent(QCloseEvent* event);
 

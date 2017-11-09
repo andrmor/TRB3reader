@@ -8,14 +8,16 @@
 MasterConfig::MasterConfig() {}
 
 void MasterConfig::WriteToJson(QJsonObject &json)
-{
+{    
     writeSignalPolarityToJson(json);
     writeChannelMapToJson(json);
     writeIgnoreChannelsToJson(json);
     writePedestalsToJson(json);
     writeSmoothingToJson(json);
-    writeSignalSuppressionToJson(json);
+    writeSignalExtractionToJson(json);
     writeMaxGateToJson(json);
+
+    json["FileName"] = QString(filename.data());
 }
 
 bool MasterConfig::ReadFromJson(QJsonObject &json)
@@ -25,8 +27,13 @@ bool MasterConfig::ReadFromJson(QJsonObject &json)
     readIgnoreChannelsFromJson(json);
     readPedestalsFromJson(json);
     readSmoothingFromJson(json);
-    readSignalSuppressionFromJson(json);
+    readSignalExtractionFromJson(json);
     readMaxGateFromJson(json);
+
+    QString tmp;
+    parseJson(json, "FileName", tmp);
+    if (!tmp.isEmpty())
+        filename = std::string(tmp.toLatin1().data());
 
     return true;
 }
@@ -145,10 +152,11 @@ bool MasterConfig::readPedestalsFromJson(QJsonObject &json)
     return true;
 }
 
-void MasterConfig::writeSignalSuppressionToJson(QJsonObject &json)
+void MasterConfig::writeSignalExtractionToJson(QJsonObject &json)
 {
     QJsonObject js;
         js["ExtractionMethod"] = SignalExtractionMethod;
+        js["CommonSample"] = CommonSampleNumber;
 
         QJsonObject rm_js;
             rm_js["On"] = bZeroSignalIfReverse;
@@ -169,7 +177,7 @@ void MasterConfig::writeSignalSuppressionToJson(QJsonObject &json)
     json["SignalExtraction"] = js;
 }
 
-bool MasterConfig::readSignalSuppressionFromJson(QJsonObject &json)
+bool MasterConfig::readSignalExtractionFromJson(QJsonObject &json)
 {    
     QJsonObject js;
 
@@ -180,6 +188,7 @@ bool MasterConfig::readSignalSuppressionFromJson(QJsonObject &json)
         ReverseMaxThreshold = rm_js["Threshold"].toDouble();
 
     parseJson(js, "ExtractionMethod", SignalExtractionMethod);
+    parseJson(js, "CommonSample", CommonSampleNumber);
 
     parseJson(js, "ApplyPositiveThreshold", bPositiveThreshold);
     parseJson(js, "PositiveThreshold", PositiveThreshold);

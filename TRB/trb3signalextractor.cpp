@@ -88,11 +88,21 @@ bool Trb3signalExtractor::IsRejectedEvent(int ievent) const
 void Trb3signalExtractor::ExtractAllSignals()
 {
     //qDebug() << "Method:"<< Config.SignalExtractionMethod;
-    int numEvents = reader->GetNumEvents();
+    const int numEvents = reader->GetNumEvents();
     signalData.resize(numEvents);
+
+    //clear -> fill all with false
     RejectedEvents.clear();
     RejectedEvents.resize(numEvents, false);
-    if (reader->GetNumSamples() == 0) return;
+
+    const int numSamples = reader->GetNumSamples();
+    if (numSamples == 0) return;
+
+    if (Config.SignalExtractionMethod == 2 &&  (Config.CommonSampleNumber<0 || Config.CommonSampleNumber>=numSamples) )
+    {
+        qWarning() << "Common sample number "<< Config.CommonSampleNumber<<"is not valid. Number of samples in the data:"<< numSamples;
+        return;
+    }
 
     for (std::size_t ievent=0; ievent<signalData.size(); ievent++)
     {
@@ -131,21 +141,37 @@ void Trb3signalExtractor::ExtractAllSignals()
             }
         }
 
-        // for this method reading signal value at the same channel
-        if ( Config.SignalExtractionMethod == 1 )
+        // for methods 1 and 2 reading signal value at the same sample #
+        switch (Config.SignalExtractionMethod)
         {
+        case 0: break; //already done
+        case 1:
             //qDebug() << "max samples are at: -:"<<iNegMaxSample<<NegMax<<"   +:"<<iPosMaxSample<<PosMax;
             for (int ichannel=0; ichannel<numChannels; ichannel++)
-            {
+              {
                 if (signalData.at(ievent).at(ichannel) == 0) continue; //respect suppression - applicable since it operates with max of waveform
                 if ( IsNegative(ichannel) )
                     signalData[ievent][ichannel] = -reader->GetValueFast(ievent, ichannel, iNegMaxSample);
                 else
                     signalData[ievent][ichannel] = reader->GetValueFast(ievent, ichannel, iPosMaxSample);
-            }
+              }
+            break;
+        case 2:
+            for (int ichannel=0; ichannel<numChannels; ichannel++)
+              {
+                if (signalData.at(ievent).at(ichannel) == 0) continue; //respect suppression - applicable since it operates with max of waveform
+                if ( IsNegative(ichannel) )
+                    signalData[ievent][ichannel] = -reader->GetValueFast(ievent, ichannel, Config.CommonSampleNumber);
+                else
+                    signalData[ievent][ichannel] = reader->GetValueFast(ievent, ichannel, Config.CommonSampleNumber);
+              }
+            break;
+        default:
+            qWarning() << "Unknown signal extraction method!";
+            break;
         }
 
-        //next event
+        //go to next event
     }
 
 

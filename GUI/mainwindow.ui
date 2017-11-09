@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="twMain">
       <property name="currentIndex">
-       <number>4</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -701,21 +701,40 @@
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="cobSignalExtractionMethod">
-          <property name="toolTip">
-           <string>Separately for negative and positive channels. For negative channel, maximum of inverted waveform value.</string>
+         <layout class="QHBoxLayout" name="horizontalLayout_28">
+          <property name="topMargin">
+           <number>0</number>
           </property>
           <item>
-           <property name="text">
-            <string>Maximum for each waveform independently</string>
-           </property>
+           <widget class="QComboBox" name="cobSignalExtractionMethod">
+            <property name="toolTip">
+             <string>Separately for negative and positive channels. For negative channel, maximum of inverted waveform value.</string>
+            </property>
+            <item>
+             <property name="text">
+              <string>Maximum for each waveform independently</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Signal at common sample#, given by global maximum</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>All signals at the sample#:</string>
+             </property>
+            </item>
+           </widget>
           </item>
           <item>
-           <property name="text">
-            <string>Signal at common sample#, given by global maximum</string>
-           </property>
+           <widget class="QSpinBox" name="sbExtractAllFromSampleNumber">
+            <property name="maximum">
+             <number>10000</number>
+            </property>
+           </widget>
           </item>
-         </widget>
+         </layout>
         </item>
         <item>
          <spacer name="verticalSpacer_12">
@@ -1296,12 +1315,12 @@
        <zorder>verticalSpacer_11</zorder>
        <zorder>frame</zorder>
        <zorder>label_26</zorder>
-       <zorder>cobSignalExtractionMethod</zorder>
        <zorder>verticalSpacer_18</zorder>
        <zorder>label_31</zorder>
        <zorder>label_32</zorder>
        <zorder>verticalSpacer_20</zorder>
        <zorder>verticalSpacer_21</zorder>
+       <zorder>horizontalLayoutWidget_2</zorder>
       </widget>
       <widget class="QWidget" name="tab_2">
        <attribute name="title">
@@ -1324,7 +1343,7 @@
         <item>
          <widget class="QLineEdit" name="leFileName">
           <property name="text">
-           <string>/home/andr/QtProjects/run191/te17081105154.hld</string>
+           <string/>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -2453,6 +2472,19 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_15">
           <item>
+           <spacer name="horizontalSpacer_28">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
            <widget class="QLabel" name="label_33">
             <property name="text">
              <string>Draw wavefowm signature:</string>
@@ -2484,6 +2516,19 @@
              <string>Positive channels</string>
             </property>
            </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_27">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
         </item>

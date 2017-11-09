@@ -80,6 +80,8 @@ void MainWindow::writeGUItoJson(QJsonObject &json)
 {
     QJsonObject jsgui;
 
+    jsgui["HardOrLog"] = ui->cobHardwareOrLogical->currentIndex();
+
     QJsonObject ja;
         ja["AutoY"] = ui->cbAutoscaleY->isChecked();
         ja["Sort"] = ui->cobSortBy->currentIndex();
@@ -105,6 +107,8 @@ void MainWindow::readGUIfromJson(QJsonObject &json)
     if (!json.contains("GUI")) return;
 
     QJsonObject jsgui = json["GUI"].toObject();
+
+    JsonToComboBox(jsgui, "HardOrLog", ui->cobHardwareOrLogical);
 
     QJsonObject ja = jsgui["GraphScale"].toObject();
         JsonToCheckbox(ja, "AutoY", ui->cbAutoscaleY);
@@ -160,6 +164,8 @@ void MainWindow::readWindowsFromJson(QJsonObject &json)
 // --- Update GUI controls on Config change ---
 void MainWindow::UpdateGui()
 {
+    ui->leFileName->setText(Config->filename.data());
+
     ui->ptePolarity->clear();
     QString s;
     for (int i: Config->NegativeChannels) s += QString::number(i)+" ";
@@ -189,6 +195,7 @@ void MainWindow::UpdateGui()
             ui->cbAdjAvWeighted->setChecked(Config->AdjacentAveraging_bWeighted);
 
     ui->cobSignalExtractionMethod->setCurrentIndex(Config->SignalExtractionMethod);
+    ui->sbExtractAllFromSampleNumber->setValue(Config->CommonSampleNumber);
 
     ui->cbZeroSignalIfReverseMax->setChecked(Config->bZeroSignalIfReverse);
         ui->ledReverseMaxLimit->setText(QString::number(Config->ReverseMaxThreshold));
@@ -361,5 +368,11 @@ void MainWindow::on_sbNegMaxFrom_editingFinished()
 void MainWindow::on_sbNegMaxTo_editingFinished()
 {
     Config->NegMaxGateTo = ui->sbNegMaxTo->value();
+    ClearData();
+}
+
+void MainWindow::on_sbExtractAllFromSampleNumber_editingFinished()
+{
+    Config->CommonSampleNumber = ui->sbExtractAllFromSampleNumber->value();
     ClearData();
 }

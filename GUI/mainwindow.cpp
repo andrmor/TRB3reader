@@ -54,6 +54,7 @@ MainWindow::MainWindow(QWidget *parent) :
 #endif
 
     ui->cbAutoscaleY->setChecked(true);
+    on_cobSignalExtractionMethod_currentIndexChanged(ui->cobSignalExtractionMethod->currentIndex());
 
     //finding the config dir
     ConfigDir = QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation) + "/TRBreader";
@@ -109,7 +110,7 @@ void MainWindow::on_pbProcessData_clicked()
 
 void MainWindow::ProcessData()
 {
-    if (Config->filename == std::string(""))
+    if (Config->filename.empty())
     {
         QMessageBox::warning(this, "TRB3 reader", "Eneter file name!", QMessageBox::Ok, QMessageBox::Ok);
         Log("Interrupted!");
@@ -745,4 +746,9 @@ void MainWindow::on_pbPosSignature_clicked()
 #else
     QMessageBox::information(this, "", "Cern ROOT module was not configured!", QMessageBox::Ok, QMessageBox::Ok);
 #endif
+}
+
+void MainWindow::on_cobSignalExtractionMethod_currentIndexChanged(int index)
+{
+    ui->sbExtractAllFromSampleNumber->setVisible(index == 2);
 }
