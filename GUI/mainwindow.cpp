@@ -93,49 +93,45 @@ void MainWindow::on_pbSelectFile_clicked()
 
     ui->leFileName->setText(FileName);
     Config->filename = FileName.toLocal8Bit().data();
-    Log("New file selected");
+    LogMessage("New file selected");
 }
 
 void MainWindow::on_pbProcessData_clicked()
 {
     ui->twMain->setEnabled(false);
-    Log("");
-    ProcessData();
-    Log("Processing complete");
+    LogMessage("");
+    const QString error = ProcessData();
+
+    if (error.isEmpty()) LogMessage("Processing complete");
+    else
+    {
+        LogMessage(error);
+        QMessageBox::warning(this, "TRB reader", error, QMessageBox::Ok, QMessageBox::Ok);
+    }
+
     ui->twMain->setEnabled(true);
     ui->pbSaveTotextFile->setEnabled(true);
 
     OnEventOrChannelChanged();
 }
 
-void MainWindow::ProcessData()
+const QString MainWindow::ProcessData()
 {
-    if (Config->filename.empty())
-    {
-        QMessageBox::warning(this, "TRB3 reader", "Eneter file name!", QMessageBox::Ok, QMessageBox::Ok);
-        Log("Interrupted!");
-        //ui->twMain->setEnabled(true);
-        return;
-    }
+    if (Config->filename.empty()) return "File name not defined!";
 
-    Log("Reading hld file...");
+    LogMessage("Reading hld file...");
     Reader->UpdateConfig(Config);
     bool ok = Reader->Read();
-    if (!ok)
-    {
-        QMessageBox::warning(this, "TRB3 reader", "File read failed!", QMessageBox::Ok, QMessageBox::Ok);
-        Log("Interrupted!");
-        ui->twMain->setEnabled(true);
-        return;
-    }
+    if (!ok) return "File read failed!";
 
-    Log("Extracting signals...");
+    LogMessage("Extracting signals...");
     Extractor->UpdateConfig(Config);
     Extractor->ExtractSignals();
-    Log("Done!");
+    LogMessage("Done!");
+    return "";
 }
 
-void MainWindow::Log(QString message)
+void MainWindow::LogMessage(QString message)
 {
     ui->leLog->setText(message);
     qApp->processEvents();
@@ -153,7 +149,7 @@ void MainWindow::on_pbLoadPolarities_clicked()
         Config->NegativeChannels.push_back(i+shift);
 
     Extractor->ClearData();
-    Log("Polarities updated");
+    LogMessage("Polarities updated");
 
     UpdateGui();
 }
@@ -172,7 +168,7 @@ void MainWindow::on_pbAddMapping_clicked()
 
     Map->SetChannels_OrderedByLogical(Config->ChannelMap);
     Map->Validate(Reader->GetNumChannels(), true);
-    Log("Mapping updated");
+    LogMessage("Mapping updated");
 
     UpdateGui();
 }
@@ -187,7 +183,7 @@ void MainWindow::on_pbAddListHardwChToIgnore_clicked()
 
     for (int i : arr) Config->IgnoreHardwareChannels.insert(i);
 
-    Log("Ignored channels were updated");
+    LogMessage("Ignored channels were updated");
 
     UpdateGui();
 }
@@ -297,8 +293,8 @@ bool MainWindow::saveSignalsToFile(QString FileName, bool bUseHardware)
 
     QTextStream outStream(&outputFile);    
     sendSignalData(outStream, bUseHardware);
-    if (bUseHardware) Log("Signals saved using HARDWARE channels!");
-    else Log("Signals saved");
+    if (bUseHardware) LogMessage("Signals saved using HARDWARE channels!");
+    else LogMessage("Signals saved");
     outputFile.close();
     return true;
 }
@@ -345,11 +341,20 @@ void MainWindow::on_pbBulkProcess_clicked()
     QDirIterator it(dir, QStringList() << "*.hld", QDir::Files, QDirIterator::Subdirectories);
     while (it.hasNext())
     {
+        qApp->processEvents();
+        if (bStopFlag) break;
+
         QString fileName = it.next();
         Config->filename = fileName.toLocal8Bit().data();
         ui->pteBulkLog->appendPlainText("Processing " + QFileInfo(fileName).fileName());
 
-        ProcessData();
+        QString error = ProcessData();
+        if (!error.isEmpty())
+        {
+            LogMessage(error);
+            continue;
+        }
+
         int numEvents = Extractor->GetNumEvents();
         int numChannels = Extractor->GetNumChannels();
         if (numEvents == 0 || numChannels == 0 || numEvents != Reader->GetNumEvents() || numChannels != Reader->GetNumChannels())
@@ -367,10 +372,8 @@ void MainWindow::on_pbBulkProcess_clicked()
         QString nameSave = fi.path() + "/" + fi.completeBaseName() + ui->leAddToProcessed->text();
         saveSignalsToFile(nameSave, false);
         qDebug() << "Saved to:"<<nameSave;
-
-        qApp->processEvents();
-        if (bStopFlag) break;
     }
+
     ui->twMain->setEnabled(true);
     ui->pbStop->setVisible(false);
     ui->pbStop->setChecked(false);
@@ -387,7 +390,7 @@ void MainWindow::on_pbShowWaveform_toggled(bool checked)
 {
 #ifdef CERN_ROOT
     RootModule->ShowSingleWaveWindow(checked);
-    Log("");
+    LogMessage("");
     if (!checked) return;
     if (!Reader->isValid()) return;
 
@@ -554,7 +557,7 @@ void MainWindow::showOverlay(bool checked, bool bNeg)
 {
 #ifdef CERN_ROOT
     bNeg ? RootModule->ShowOverNegWaveWindow(checked) : RootModule->ShowOverPosWaveWindow(checked);
-    Log("");
+    LogMessage("");
     if (!checked) return;
     if (!Reader->isValid()) return;
 
@@ -599,7 +602,7 @@ void MainWindow::showAllWave(bool checked, bool bNeg)
 #ifdef CERN_ROOT
     if (!RootModule) return;
     bNeg ? RootModule->ShowAllNegWaveWindow(checked) : RootModule->ShowAllPosWaveWindow(checked);
-    Log("");
+    LogMessage("");
     if (!checked) return;
     if (!Reader->isValid()) return;
 
@@ -724,7 +727,7 @@ void MainWindow::on_pbNegSignature_clicked()
 {
 #ifdef CERN_ROOT
     if (!RootModule) return;
-    Log("");
+    LogMessage("");
     if (!Reader->isValid()) return;
 
     RootModule->DrawSignature(true);
@@ -738,7 +741,7 @@ void MainWindow::on_pbPosSignature_clicked()
 {
 #ifdef CERN_ROOT
     if (!RootModule) return;
-    Log("");
+    LogMessage("");
     if (!Reader->isValid()) return;
 
     RootModule->DrawSignature(false);

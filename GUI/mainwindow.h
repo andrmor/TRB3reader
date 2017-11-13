@@ -162,8 +162,8 @@ private:
     void readWindowsFromJson(QJsonObject &json);
 
     void UpdateGui();
-    void ProcessData();
-    void Log(QString message);
+    const QString ProcessData(); //returns error message if any
+    void LogMessage(QString message);
     bool saveSignalsToFile(QString FileName, bool bUseHardware);
     bool sendSignalData(QTextStream& outStream, bool bUseHardware = false);
 
