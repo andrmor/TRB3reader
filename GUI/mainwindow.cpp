@@ -339,6 +339,8 @@ void MainWindow::on_pbBulkProcess_clicked()
     ui->pbStop->setVisible(true);
     ui->pbStop->setChecked(false);
     QDirIterator it(dir, QStringList() << "*.hld", QDir::Files, QDirIterator::Subdirectories);
+
+    int numErrors = 0;
     while (it.hasNext())
     {
         qApp->processEvents();
@@ -352,6 +354,8 @@ void MainWindow::on_pbBulkProcess_clicked()
         if (!error.isEmpty())
         {
             LogMessage(error);
+            ui->pteBulkLog->appendPlainText("---- File reading error");
+            numErrors++;
             continue;
         }
 
@@ -360,11 +364,13 @@ void MainWindow::on_pbBulkProcess_clicked()
         if (numEvents == 0 || numChannels == 0 || numEvents != Reader->GetNumEvents() || numChannels != Reader->GetNumChannels())
         {
             ui->pteBulkLog->appendPlainText("---- Data not valid, skipped");
+            numErrors++;
             continue;
         }
         if (!Map->Validate(numChannels))
         {
             ui->pteBulkLog->appendPlainText("---- Channel map not valid, skipped");
+            numErrors++;
             continue;
         }
 
@@ -373,6 +379,9 @@ void MainWindow::on_pbBulkProcess_clicked()
         saveSignalsToFile(nameSave, false);
         qDebug() << "Saved to:"<<nameSave;
     }
+
+    if (numErrors > 0) ui->pteBulkLog->appendPlainText("============= There were errors! =============");
+    else ui->pteBulkLog->appendPlainText("Done - no errors");
 
     ui->twMain->setEnabled(true);
     ui->pbStop->setVisible(false);
