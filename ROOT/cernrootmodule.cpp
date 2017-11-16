@@ -4,6 +4,7 @@
 #include "channelmapper.h"
 #include "agraphwindow.h"
 #include "ajsontools.h"
+#include "tmpobjhubclass.h"
 
 #include <QTimer>
 #include <QDebug>
@@ -17,6 +18,7 @@
 #include "TMultiGraph.h"
 #include "TList.h"
 #include "TPaveText.h"
+#include "TH2D.h"
 
 CernRootModule::CernRootModule(Trb3dataReader *Reader, Trb3signalExtractor *Extractor, ChannelMapper *Map, MasterConfig *Config, int refreshInterval) :
     Reader(Reader), Extractor(Extractor), Map(Map), Config(Config)
@@ -41,6 +43,8 @@ CernRootModule::CernRootModule(Trb3dataReader *Reader, Trb3signalExtractor *Extr
     NormalColor = 4;
     RejectedColor = 2;
     LineWidth = 2;
+
+    TmpHub = new TmpObjHubClass();
 }
 
 const QJsonObject saveWindowProperties(AGraphWindow* w)
@@ -91,7 +95,6 @@ void CernRootModule::ResetPositionOfWindows()
     WAllPos->setGeometry(140,140,1000,700);
 }
 
-#include "TH2D.h"
 void CernRootModule::DrawSignature(bool bNeg)
 {
     WOne->ShowAndFocus();
@@ -150,6 +153,21 @@ void CernRootModule::DrawSignature(bool bNeg)
     WOne->UpdateRootCanvas();
 }
 
+void CernRootModule::onDrawRequested(TObject *obj, QString opt, bool bDoUpdate)
+{
+    //WOne->SetAsActiveRootWindow();
+    WOne->ShowAndFocus();
+
+    if (!obj)
+    {
+        WOne->UpdateRootCanvas();
+        return;
+    }
+
+    obj->Draw(opt.toLatin1().data());
+    if (bDoUpdate) WOne->UpdateRootCanvas();
+}
+
 void CernRootModule::StartGraphWindows()
 {
     QList<AGraphWindow**> ws;
@@ -176,6 +194,8 @@ CernRootModule::~CernRootModule()
 
     clearNegGraphVectors();
     clearPosGraphVectors();
+
+    delete TmpHub;
 
     delete RootApp;
 }

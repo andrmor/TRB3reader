@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>536</width>
+    <width>546</width>
     <height>680</height>
    </rect>
   </property>
@@ -1303,15 +1303,8 @@
        <zorder>gbSmoothing</zorder>
        <zorder>gbSignalRejection</zorder>
        <zorder>gbPedestals</zorder>
-       <zorder>cbNegThreshold</zorder>
-       <zorder>ledNegThresholdMin</zorder>
-       <zorder>horizontalSpacer_27</zorder>
-       <zorder>horizontalSpacer_28</zorder>
-       <zorder>cbPosThreshold</zorder>
-       <zorder>ledPosThresholdMin</zorder>
        <zorder>verticalSpacer_12</zorder>
        <zorder>verticalSpacer_13</zorder>
-       <zorder>frSmoothing</zorder>
        <zorder>verticalSpacer_11</zorder>
        <zorder>frame</zorder>
        <zorder>label_26</zorder>
@@ -1320,7 +1313,6 @@
        <zorder>label_32</zorder>
        <zorder>verticalSpacer_20</zorder>
        <zorder>verticalSpacer_21</zorder>
-       <zorder>horizontalLayoutWidget_2</zorder>
       </widget>
       <widget class="QWidget" name="tab_2">
        <attribute name="title">
@@ -2564,7 +2556,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>536</width>
+     <width>546</width>
      <height>19</height>
     </rect>
    </property>
@@ -2582,8 +2574,15 @@
     </property>
     <addaction name="actionReset_positions_of_all_windows"/>
    </widget>
+   <widget class="QMenu" name="menuScript">
+    <property name="title">
+     <string>Script</string>
+    </property>
+    <addaction name="actionOpen_script_window"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
+   <addaction name="menuScript"/>
   </widget>
   <action name="actionLoad_config">
    <property name="text">
@@ -2598,6 +2597,11 @@
   <action name="actionReset_positions_of_all_windows">
    <property name="text">
     <string>Reset positions of all windows</string>
+   </property>
+  </action>
+  <action name="actionOpen_script_window">
+   <property name="text">
+    <string>Open script window</string>
    </property>
   </action>
  </widget>

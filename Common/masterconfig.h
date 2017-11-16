@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 #include <QSet>
+#include <QList>
+#include <QJsonObject>
 
 class QJsonObject;
 
@@ -55,6 +57,14 @@ public:
 
     std::string filename;
 
+    QString GlobScript;
+    QJsonObject ScriptWindowJson;
+    int DefaultFontSize_ScriptWindow = 10;
+    QString DefaultFontFamily_ScriptWindow;
+    bool DefaultFontWeight_ScriptWindow;
+    bool DefaultFontItalic_ScriptWindow;
+    QList<int> MainSplitterSizes_ScriptWindow;
+
 
     void WriteToJson(QJsonObject& json);
     bool ReadFromJson(QJsonObject& json);
@@ -80,6 +90,9 @@ private:
 
     void writeMaxGateToJson(QJsonObject& json);
     bool readMaxGateFromJson(QJsonObject& json);
+
+    void writeScriptSettingsToJson(QJsonObject& json);
+    bool readScriptSettingsFromJson(QJsonObject& json);
 };
 
 #endif // MASTERCONFIG_H

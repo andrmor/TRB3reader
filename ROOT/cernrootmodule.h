@@ -13,6 +13,8 @@ class Trb3signalExtractor;
 class MasterConfig;
 class TGraph;
 class ChannelMapper;
+class TmpObjHubClass;
+class TObject;
 
 class CernRootModule : public QObject
 {
@@ -42,6 +44,11 @@ public:
 
     void DrawSignature(bool bNeg);
 
+    TmpObjHubClass* GetTmpHub() {return TmpHub;}
+
+public slots:
+    void onDrawRequested(TObject* obj, QString opt, bool bDoUpdate);
+
 private:
     Trb3dataReader* Reader;
     Trb3signalExtractor* Extractor;
@@ -49,6 +56,8 @@ private:
     MasterConfig* Config;
 
     TApplication* RootApp;
+
+    TmpObjHubClass* TmpHub;
 
     TMultiGraph *multiGraph;
     TGraph* gSingle;

@@ -10,6 +10,7 @@ class Trb3signalExtractor;
 class ChannelMapper;
 class QTextStream;
 class CernRootModule;
+class AScriptWindow;
 
 namespace Ui {
 class MainWindow;
@@ -25,6 +26,9 @@ public:
 
     void ClearData();
 
+public slots:
+    void onGlobalScriptStarted();
+    void onGlobalScriptFinished();
 private slots:
     //right-click menus
     void on_ptePolarity_customContextMenuRequested(const QPoint &pos);
@@ -135,6 +139,8 @@ private slots:
 
     void on_cobSignalExtractionMethod_currentIndexChanged(int index);
 
+    void on_actionOpen_script_window_triggered();
+
 protected:
     void closeEvent(QCloseEvent* event);
 
@@ -142,6 +148,7 @@ private:
     Ui::MainWindow *ui;
     MasterConfig* Config;
     QString ConfigDir;
+    AScriptWindow* ScriptWindow;
 
     Trb3dataReader* Reader;
     Trb3signalExtractor* Extractor;
@@ -173,6 +180,7 @@ private:
     void showAllWave(bool checked, bool bNeg);
     void updateSmoothAfterPedeEnableStatus();
 
+    void CreateScriptWindow();
 };
 
 #endif // MAINWINDOW_H

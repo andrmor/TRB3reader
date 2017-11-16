@@ -3,6 +3,7 @@
 #include "masterconfig.h"
 #include "afiletools.h"
 #include "channelmapper.h"
+#include "ascriptwindow.h"
 
 #ifdef CERN_ROOT
 #include "cernrootmodule.h"
@@ -53,6 +54,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QMessageBox::warning(this, "TRB3 reader", "Graph module was not configured!", QMessageBox::Ok, QMessageBox::Ok);
 #endif
 
+    //Creating script window, registering script units, and setting up QObject connections
+    CreateScriptWindow();
+
     ui->cbAutoscaleY->setChecked(true);
     on_cobSignalExtractionMethod_currentIndexChanged(ui->cobSignalExtractionMethod->currentIndex());
 
@@ -75,6 +79,8 @@ MainWindow::~MainWindow()
 #ifdef CERN_ROOT
     delete RootModule;
 #endif
+
+    delete ScriptWindow;
 
     delete ui;
 }
