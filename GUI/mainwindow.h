@@ -141,6 +141,8 @@ private slots:
 
     void on_actionOpen_script_window_triggered();
 
+    void on_pbSelectNewDir_clicked();
+
 protected:
     void closeEvent(QCloseEvent* event);
 

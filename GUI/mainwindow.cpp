@@ -5,6 +5,7 @@
 #include "ajsontools.h"
 #include "channelmapper.h"
 #include "ascriptwindow.h"
+#include "amessage.h"
 
 #ifdef CERN_ROOT
 #include "cernrootmodule.h"
@@ -342,12 +343,30 @@ bool MainWindow::sendSignalData(QTextStream &outStream, bool bUseHardware)
     return true;
 }
 
+void MainWindow::on_pbSelectNewDir_clicked()
+{
+    QString dir = QFileDialog::getExistingDirectory(this, "Select directory with hld files to convert", "", 0);
+    if (dir.isEmpty()) return;
+
+    ui->leDirForBulk->setText(dir);
+}
+
 void MainWindow::on_pbBulkProcess_clicked()
 {
-    ui->pteBulkLog->clear();
-    QString dir = QFileDialog::getExistingDirectory(this, "Select directory with hld files to convert", "", 0);
-    if (dir.isEmpty()) return;    
-    qDebug() << "Dir selected:"<<dir;
+    QString dir = ui->leDirForBulk->text();
+    if (dir.isEmpty())
+    {
+        message("Directory not selected!", this);
+        return;
+    }
+
+    if (!QDir(dir).exists())
+    {
+        message("This directory does not exist!", this);
+        return;
+    }
+
+    ui->pteBulkLog->clear();    
 
     ui->twMain->setEnabled(false);
     ui->pbStop->setVisible(true);
@@ -388,10 +407,21 @@ void MainWindow::on_pbBulkProcess_clicked()
             continue;
         }
 
-        QFileInfo fi(fileName);
-        QString nameSave = fi.path() + "/" + fi.completeBaseName() + ui->leAddToProcessed->text();
-        saveSignalsToFile(nameSave, false);
-        qDebug() << "Saved to:"<<nameSave;
+        if (ui->cbAutoExecuteScript->isChecked())
+        {
+            qDebug() << "Auto-executing script";
+            ScriptWindow->OpenFirstTab();
+            ScriptWindow->on_pbRunScript_clicked();
+        }
+
+        if (ui->cbSaveSignalsToFiles->isChecked())
+        {
+            QFileInfo fi(fileName);
+            QString nameSave = fi.path() + "/" + fi.completeBaseName() + ui->leAddToProcessed->text();
+            qDebug() << "Saving to file:"<< nameSave;
+            saveSignalsToFile(nameSave, false);
+        }
+
     }
 
     if (numErrors > 0) ui->pteBulkLog->appendPlainText("============= There were errors! =============");

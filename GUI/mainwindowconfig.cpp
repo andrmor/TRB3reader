@@ -89,6 +89,10 @@ void MainWindow::writeGUItoJson(QJsonObject &json)
 
     jsgui["HardOrLog"] = ui->cobHardwareOrLogical->currentIndex();
 
+    jsgui["BulkDir"] = ui->leDirForBulk->text();
+    jsgui["AutoRunScript"] = ui->cbAutoExecuteScript->isChecked();
+    jsgui["SaveFiles"] = ui->cbSaveSignalsToFiles->isChecked();
+
     QJsonObject ja;
         ja["AutoY"] = ui->cbAutoscaleY->isChecked();
         ja["Sort"] = ui->cobSortBy->currentIndex();
@@ -116,6 +120,10 @@ void MainWindow::readGUIfromJson(QJsonObject &json)
     QJsonObject jsgui = json["GUI"].toObject();
 
     JsonToComboBox(jsgui, "HardOrLog", ui->cobHardwareOrLogical);
+
+    JsonToLineEdit(jsgui, "BulkDir", ui->leDirForBulk);
+    JsonToCheckbox(jsgui, "AutoRunScript", ui->cbAutoExecuteScript);
+    JsonToCheckbox(jsgui, "SaveFiles", ui->cbSaveSignalsToFiles);
 
     QJsonObject ja = jsgui["GraphScale"].toObject();
         JsonToCheckbox(ja, "AutoY", ui->cbAutoscaleY);

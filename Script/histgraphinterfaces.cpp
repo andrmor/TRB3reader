@@ -27,7 +27,7 @@ AInterfaceToHist::AInterfaceToHist(TmpObjHubClass* TmpHub)
 
 bool AInterfaceToHist::InitOnRun()
 {
-  TmpHub->ScriptDrawObjects.clear();
+  //TmpHub->ScriptDrawObjects.clear();
   return true;
 }
 
@@ -272,6 +272,12 @@ void AInterfaceToHist::DeleteAllHist()
     TmpHub->ScriptDrawObjects.removeAllHists();
 }
 
+bool AInterfaceToHist::isHistExists(QString HistName)
+{
+    int index = TmpHub->ScriptDrawObjects.findIndexOf(HistName);
+    return (index != -1);
+}
+
 void AInterfaceToHist::Draw(QString HistName, QString options)
 {
   int index = TmpHub->ScriptDrawObjects.findIndexOf(HistName);
@@ -324,7 +330,7 @@ AInterfaceToGraph::AInterfaceToGraph(TmpObjHubClass *TmpHub)
 
 bool AInterfaceToGraph::InitOnRun()
 {
-  TmpHub->ScriptDrawObjects.clear();
+  //TmpHub->ScriptDrawObjects.clear();
   return true;
 }
 
@@ -545,6 +551,12 @@ bool AInterfaceToGraph::Delete(QString GraphName)
 void AInterfaceToGraph::DeleteAllGraph()
 {
     TmpHub->ScriptDrawObjects.removeAllGraphs();
+}
+
+bool AInterfaceToGraph::isGraphExists(QString GraphName)
+{
+    int index = TmpHub->ScriptDrawObjects.findIndexOf(GraphName);
+    return (index != -1);
 }
 
 // ------------------ END of GRAPH --------------------

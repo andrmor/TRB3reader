@@ -39,6 +39,8 @@ public slots:
   bool Delete(QString HistName);
   void DeleteAllHist();
 
+  bool isHistExists(QString HistName);
+
 signals:
   void RequestDraw(TObject* obj, QString options, bool fFocus);
 
@@ -71,6 +73,8 @@ public slots:
 
   bool Delete(QString GraphName);
   void DeleteAllGraph();
+
+  bool isGraphExists(QString GraphName);
 
 signals:
   void RequestDraw(TObject* obj, QString options, bool fFocus);

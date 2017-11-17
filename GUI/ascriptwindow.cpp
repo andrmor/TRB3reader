@@ -1169,6 +1169,11 @@ void AScriptWindow::AddNewTab()
     twScriptTabs->setCurrentIndex(CurrentTab);
 }
 
+void AScriptWindow::OpenFirstTab()
+{
+    twScriptTabs->setCurrentIndex(0);
+}
+
 QString AScriptWindow::createNewTabName()
 {
     int counter = 1;

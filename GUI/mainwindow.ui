@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="twMain">
       <property name="currentIndex">
-       <number>1</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -2415,6 +2415,30 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_5">
         <item>
+         <widget class="QLineEdit" name="leDirForBulk"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pbSelectNewDir">
+          <property name="text">
+           <string>Select new directory</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="cbAutoExecuteScript">
+          <property name="text">
+           <string>Execute script in the first script tab after processing of each file</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="cbSaveSignalsToFiles">
+          <property name="text">
+           <string>Save extracted signals to files</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <layout class="QHBoxLayout" name="horizontalLayout_20">
           <item>
            <widget class="QLabel" name="label_13">
@@ -2447,7 +2471,7 @@
            </font>
           </property>
           <property name="text">
-           <string>Select dir and convert all hld files</string>
+           <string>Process hld files</string>
           </property>
          </widget>
         </item>

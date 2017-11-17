@@ -40,6 +40,7 @@ public:
     void SetShowEvaluationResult(bool flag) {ShowEvalResult = flag;} //if false, window only reports "success", ptherwise eval result is shown
 
     void AddNewTab();
+    void OpenFirstTab();
 
     void ReportError(QString error, int line = 0);   //0 - no line is highligted
     void HighlightErrorLine(int line);
