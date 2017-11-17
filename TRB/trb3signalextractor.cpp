@@ -47,7 +47,7 @@ bool Trb3signalExtractor::ExtractSignals()
 double Trb3signalExtractor::GetSignal(int ievent, int ichannel) const
 {
     if (ievent<0 || ievent>=signalData.size()) return NaN;
-    if (ichannel<0 || ichannel>=signalData[ievent].size()) return NaN;
+    if (ichannel<0 || ichannel>=signalData.at(ievent).size()) return NaN;
 
     return signalData[ievent][ichannel];
 }
@@ -67,6 +67,34 @@ const std::vector<double>* Trb3signalExtractor::GetSignals(int ievent) const
 const std::vector<double> *Trb3signalExtractor::GetSignalsFast(int ievent) const
 {
     return &(signalData.at(ievent));
+}
+
+bool Trb3signalExtractor::SetSignal(int ievent, int ichannel, double value)
+{
+    if (ievent<0 || ievent>=signalData.size()) return false;
+    if (ichannel<0 || ichannel>=signalData.at(ievent).size()) return false;
+
+    signalData[ievent][ichannel] = value;
+    return true;
+}
+
+void Trb3signalExtractor::SetSignalFast(int ievent, int ichannel, double value)
+{
+    signalData[ievent][ichannel] = value;
+}
+
+bool Trb3signalExtractor::SetSignals(int ievent, const std::vector<double> &values)
+{
+    if (ievent<0 || ievent>=signalData.size()) return false;
+    if (values.size() != numChannels) return false;
+
+    for (size_t i=0; i<numChannels; i++) signalData[ievent][i] = values.at(i);
+    return true;
+}
+
+void Trb3signalExtractor::SetSignalsFast(int ievent, const std::vector<double> &values)
+{
+    for (size_t i=0; i<values.size(); i++) signalData[ievent][i] = values.at(i);
 }
 
 void Trb3signalExtractor::ClearData()

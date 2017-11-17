@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "masterconfig.h"
 #include "afiletools.h"
+#include "ajsontools.h"
 #include "channelmapper.h"
 #include "ascriptwindow.h"
 
@@ -63,7 +64,14 @@ MainWindow::MainWindow(QWidget *parent) :
     //finding the config dir
     ConfigDir = QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation) + "/TRBreader";
     if (!QDir(ConfigDir).exists()) QDir().mkdir(ConfigDir);
-    else loadConfig(ConfigDir+"/autosave.json");
+    else
+    {
+        loadConfig(ConfigDir+"/autosave.json");
+
+        QJsonObject jsS;
+        LoadJsonFromFile(jsS, ConfigDir+"/scripting.json");
+        if (!jsS.isEmpty()) ScriptWindow->ReadFromJson(jsS);
+    }
     qDebug() << "-> Config dir:" << ConfigDir;
 
     OnEventOrChannelChanged(); // to update channel mapping indication

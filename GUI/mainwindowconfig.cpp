@@ -5,6 +5,7 @@
 #include "channelmapper.h"
 #include "trb3signalextractor.h"
 #include "trb3datareader.h"
+#include "ascriptwindow.h"
 
 #include <QJsonObject>
 #include <QJsonArray>
@@ -25,6 +26,12 @@ void MainWindow::closeEvent(QCloseEvent *event)
     delete RootModule; RootModule = 0;
 #endif
     saveConfig(ConfigDir+"/autosave.json", js);
+
+    //save script-related config
+    QJsonObject jsS;
+    ScriptWindow->WriteToJson(jsS);
+    SaveJsonToFile(jsS, ConfigDir+"/scripting.json");
+
     QMainWindow::closeEvent(event);
 }
 

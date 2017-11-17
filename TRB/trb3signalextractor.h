@@ -21,6 +21,12 @@ public:
     const std::vector <double>* GetSignals(int ievent) const; // safe
     const std::vector <double>* GetSignalsFast(int ievent) const; // no argument validity check!
 
+    bool SetSignal(int ievent, int ichannel, double value);
+    void SetSignalFast(int ievent, int ichannel, double value); // no argument validity check!
+
+    bool SetSignals(int ievent, const std::vector <double>& values);
+    void SetSignalsFast(int ievent, const std::vector <double>& values); // no argument validity check! no size check!
+
     void ClearData();
 
     std::size_t GetNumEvents() const;

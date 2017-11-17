@@ -27,6 +27,8 @@ public:
 
     std::size_t GetNumLogicalChannels() const {return ToHardware.size();}
 
+    const std::vector<std::size_t>& GetMapToHardware() {return ToHardware;}
+
 private:
     std::vector<std::size_t> ToLogical;
     std::vector<std::size_t> ToHardware;
