@@ -7,6 +7,7 @@
 #include "histgraphinterfaces.h"
 #include "ainterfacetomessagewindow.h"
 #include "ainterfacetosignals.h"
+#include "ainterfacetowaveforms.h"
 
 #ifdef CERN_ROOT
   #include "cernrootmodule.h"
@@ -23,6 +24,10 @@ void MainWindow::CreateScriptWindow()
 
     qDebug() << "-> main...";
     ScriptWindow->SetInterfaceObject(0); //initialization
+
+    qDebug() << "-> waveforms...";
+    AInterfaceToWaveforms* wav = new AInterfaceToWaveforms(Reader, Map);
+    ScriptWindow->SetInterfaceObject(wav, "wav");
 
     qDebug() << "-> signals...";
     AInterfaceToSignals* sig = new AInterfaceToSignals(Extractor, Map);

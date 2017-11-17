@@ -60,7 +60,8 @@ SOURCES += main.cpp \
     Common/amessage.cpp \
     Common/completingtexteditclass.cpp \
     Common/tmpobjhubclass.cpp \
-    Script/ainterfacetosignals.cpp
+    Script/ainterfacetosignals.cpp \
+    Script/ainterfacetowaveforms.cpp
 
 HEADERS  += GUI/mainwindow.h \    
     TRB/trb3datareader.h \
@@ -79,7 +80,8 @@ HEADERS  += GUI/mainwindow.h \
     Common/amessage.h \
     Common/completingtexteditclass.h \
     Common/tmpobjhubclass.h \
-    Script/ainterfacetosignals.h
+    Script/ainterfacetosignals.h \
+    Script/ainterfacetowaveforms.h
 
 FORMS    += GUI/mainwindow.ui \
     GUI/ascriptwindow.ui

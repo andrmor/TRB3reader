@@ -3,6 +3,8 @@
 #include "hadaq/defines.h"
 #include "hadaq/api.h"
 
+const double NaN = std::numeric_limits<int>::quiet_NaN();
+
 Trb3dataReader::Trb3dataReader() :
     numSamples(0), numChannels(0) {}
 
@@ -52,6 +54,28 @@ bool Trb3dataReader::Read()
     //std::cout << "--> Done!\n" << std::flush;
 
     return true;
+}
+
+int Trb3dataReader::GetValue(int ievent, int ichannel, int isample) const
+{
+    if (ievent<0 || ievent>=waveData.size()) return NaN;
+    if (ichannel<0 || ichannel>=numChannels) return NaN;
+    if (isample<0 || isample>=numSamples) return NaN;
+
+    return waveData.at(ievent).at(ichannel).at(isample);
+}
+
+const std::vector<int> *Trb3dataReader::GetWaveformPtr(int ievent, int ichannel) const
+{
+    if (ievent<0 || ievent>=waveData.size()) return 0;
+    if (ichannel<0 || ichannel>=numChannels) return 0;
+
+    return &(waveData.at(ievent).at(ichannel));
+}
+
+const std::vector<int>* Trb3dataReader::GetWaveformPtrFast(int ievent, int ichannel) const
+{
+    return &(waveData.at(ievent).at(ichannel));
 }
 
 void Trb3dataReader::substractPedestals()
@@ -223,11 +247,6 @@ void Trb3dataReader::doAdjacentWeightedAverage(std::vector<int> &arr, int numPoi
         }
         arr[is] = sum/sumWeights;
     }
-}
-
-const std::vector<int>* Trb3dataReader::GetWaveformPtrFast(int ievent, int ichannel) const
-{
-    return &(waveData[ievent][ichannel]);
 }
 
 void Trb3dataReader::ClearData()

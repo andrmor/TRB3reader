@@ -16,6 +16,7 @@ void MasterConfig::WriteToJson(QJsonObject &json)
     writeSmoothingToJson(json);
     writeSignalExtractionToJson(json);
     writeMaxGateToJson(json);
+    writeScriptSettingsToJson(json);
 
     json["FileName"] = QString(filename.data());
 }
@@ -29,6 +30,7 @@ bool MasterConfig::ReadFromJson(QJsonObject &json)
     readSmoothingFromJson(json);
     readSignalExtractionFromJson(json);
     readMaxGateFromJson(json);
+    readScriptSettingsFromJson(json);
 
     QString tmp;
     parseJson(json, "FileName", tmp);

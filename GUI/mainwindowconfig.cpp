@@ -150,6 +150,7 @@ void MainWindow::writeWindowsToJson(QJsonObject& json, const QJsonObject jsW)
     QJsonObject js;
 
     js["Main"] = SaveWindowToJson(x(), y(), width(), height(), true);
+    js["ScriptWindow"] = SaveWindowToJson(ScriptWindow->x(), ScriptWindow->y(), ScriptWindow->width(), ScriptWindow->height(), ScriptWindow->isVisible());
     js["GraphWindows"] = jsW;
 
     json["WindowGeometries"] = js;
@@ -166,6 +167,16 @@ void MainWindow::readWindowsFromJson(QJsonObject &json)
         bool bVis=true;
         LoadWindowFromJson(jsMain, x, y, w, h, bVis);
         setGeometry(x, y, w, h);
+
+        QJsonObject jsScript;
+        parseJson(js, "ScriptWindow", jsScript);
+        if (!jsScript.isEmpty())
+        {
+            LoadWindowFromJson(jsScript, x, y, w, h, bVis);
+            ScriptWindow->setGeometry(x, y, w, h);
+            ScriptWindow->setVisible(bVis);
+        }
+
 #ifdef CERN_ROOT
         QJsonObject jsW;
         parseJson(js, "GraphWindows", jsW);

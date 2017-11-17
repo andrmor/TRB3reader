@@ -770,6 +770,7 @@ void MainWindow::updateSmoothAfterPedeEnableStatus()
 void MainWindow::on_actionReset_positions_of_all_windows_triggered()
 {
     setGeometry(10,10,600,800);
+    ScriptWindow->setGeometry(670,10,600,800);
 
 #ifdef CERN_ROOT
     RootModule->ResetPositionOfWindows();

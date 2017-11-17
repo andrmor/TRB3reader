@@ -59,7 +59,7 @@ public:
 
     QString GlobScript;
     QJsonObject ScriptWindowJson;
-    int DefaultFontSize_ScriptWindow = 10;
+    int DefaultFontSize_ScriptWindow = 12;
     QString DefaultFontFamily_ScriptWindow;
     bool DefaultFontWeight_ScriptWindow;
     bool DefaultFontItalic_ScriptWindow;
