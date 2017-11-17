@@ -118,3 +118,15 @@ void AInterfaceToSignals::setSignal_logical(int ievent, int ichannel, double val
 
     setSignal_hardware(ievent, ihardw, value);
 }
+
+void AInterfaceToSignals::setAllRejected(bool flag)
+{
+    Extractor->SetAllRejected(flag);
+}
+
+void AInterfaceToSignals::setRejected(int ievent, bool flag)
+{
+    bool bOK = Extractor->SetRejected(ievent, flag);
+    if (!bOK)
+        abort("Failed to modify rejected status for event #"+QString::number(ievent));
+}

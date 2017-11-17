@@ -27,6 +27,9 @@ public:
     bool SetSignals(int ievent, const std::vector <double>& values);
     void SetSignalsFast(int ievent, const std::vector <double>& values); // no argument validity check! no size check!
 
+    bool SetRejected(int ievent, bool flag);
+    void SetAllRejected(bool flag);
+
     void ClearData();
 
     std::size_t GetNumEvents() const;

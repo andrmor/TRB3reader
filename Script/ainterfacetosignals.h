@@ -33,6 +33,10 @@ public slots:
     void setSignals_hardware(int ievent, QVariant arrayOfValues);
     void setSignal_logical(int ievent, int ichannel, double value);
 
+    //rejection of events
+    void setAllRejected(bool flag);
+    void setRejected(int ievent, bool flag);
+
 private:
     Trb3signalExtractor* Extractor;
     ChannelMapper* Map;

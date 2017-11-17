@@ -97,6 +97,17 @@ void Trb3signalExtractor::SetSignalsFast(int ievent, const std::vector<double> &
     for (size_t i=0; i<values.size(); i++) signalData[ievent][i] = values.at(i);
 }
 
+bool Trb3signalExtractor::SetRejected(int ievent, bool flag)
+{
+    if (ievent<0 || ievent>=RejectedEvents.size()) return false;
+    RejectedEvents[ievent] = flag;
+}
+
+void Trb3signalExtractor::SetAllRejected(bool flag)
+{
+    for (bool b : RejectedEvents) b = flag;
+}
+
 void Trb3signalExtractor::ClearData()
 {
     signalData.clear();
