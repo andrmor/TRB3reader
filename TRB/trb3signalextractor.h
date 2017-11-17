@@ -18,6 +18,9 @@ public:
     double GetSignal(int ievent, int ichannel) const; // slow but safe
     double GetSignalFast(int ievent, int ichannel) const; // no argument validity check!
 
+    const std::vector <double>* GetSignals(int ievent) const; // safe
+    const std::vector <double>* GetSignalsFast(int ievent) const; // no argument validity check!
+
     void ClearData();
 
     std::size_t GetNumEvents() const;

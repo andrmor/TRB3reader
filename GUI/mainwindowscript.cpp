@@ -6,6 +6,7 @@
 #include "coreinterfaces.h"
 #include "histgraphinterfaces.h"
 #include "ainterfacetomessagewindow.h"
+#include "ainterfacetosignals.h"
 
 #ifdef CERN_ROOT
   #include "cernrootmodule.h"
@@ -22,6 +23,10 @@ void MainWindow::CreateScriptWindow()
 
     qDebug() << "-> main...";
     ScriptWindow->SetInterfaceObject(0); //initialization
+
+    qDebug() << "-> signals...";
+    AInterfaceToSignals* sig = new AInterfaceToSignals(Extractor, Map);
+    ScriptWindow->SetInterfaceObject(sig, "sig");
 
 #ifdef CERN_ROOT
     qDebug() << "-> graph...";
