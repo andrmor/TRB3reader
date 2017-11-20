@@ -32,11 +32,11 @@ void MainWindow::CreateScriptWindow()
     ScriptWindow->SetInterfaceObject(conf, "config");
 
     qDebug() << "-> waveforms...";
-    AInterfaceToWaveforms* wav = new AInterfaceToWaveforms(Reader, Map);
+    AInterfaceToWaveforms* wav = new AInterfaceToWaveforms(Config, Reader);
     ScriptWindow->SetInterfaceObject(wav, "wav");
 
     qDebug() << "-> signals...";
-    AInterfaceToSignals* sig = new AInterfaceToSignals(Extractor, Map);
+    AInterfaceToSignals* sig = new AInterfaceToSignals(Config, Extractor);
     ScriptWindow->SetInterfaceObject(sig, "sig");
 
 #ifdef CERN_ROOT

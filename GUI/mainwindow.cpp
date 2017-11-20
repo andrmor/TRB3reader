@@ -45,10 +45,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     Reader = new Trb3dataReader(Config);
     Extractor = new Trb3signalExtractor(Config, Reader);
-    Map = new ChannelMapper();
 
 #ifdef CERN_ROOT
-    RootModule = new CernRootModule(Reader, Extractor, Map, Config);
+    RootModule = new CernRootModule(Reader, Extractor, Config);
     connect(RootModule, &CernRootModule::WOneHidden, [=](){ui->pbShowWaveform->setChecked(false);});
     connect(RootModule, &CernRootModule::WOverNegHidden, [=](){ui->pbShowOverlayNeg->setChecked(false);});
     connect(RootModule, &CernRootModule::WOverPosHidden, [=](){ui->pbShowOverlayPos->setChecked(false);});
@@ -58,7 +57,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMessageBox::warning(this, "TRB3 reader", "Graph module was not configured!", QMessageBox::Ok, QMessageBox::Ok);
 #endif
 
-    Dispatcher = new ADispatcher(Config, Map, Reader, Extractor, this); //also loads config if autosave exists
+    Dispatcher = new ADispatcher(Config, Reader, Extractor, this); //also loads config if autosave exists
 
     //Creating script window, registering script units, and setting up QObject connections
     CreateScriptWindow();
@@ -85,7 +84,6 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete Config;
-    delete Map;
     delete Extractor;
     delete Reader;
 
@@ -154,9 +152,8 @@ void MainWindow::on_pbLoadPolarities_clicked()
     QVector<int> pos;
     LoadIntVectorsFromFile(FileName, &pos);
 
-    int shift = ui->sbShiftNegatives->value();
     std::vector<int> List;
-    for (int i : pos) List.push_back(i+shift);
+    for (int i : pos) List.push_back(i);
     Config->SetNegativeChannels(List);
 
     Extractor->ClearData();
@@ -172,13 +169,20 @@ void MainWindow::on_pbAddMapping_clicked()
 
     QVector<int> arr;
     LoadIntVectorsFromFile(FileName, &arr);
-    int shift = ui->sbShift->value();
 
+    std::vector<size_t> List;
     for (int i : arr)
-        Config->ChannelMap.push_back(i+shift);
+    {
+        if (i<0)
+        {
+            message("Only positive channel numbers are allowed!", this);
+            return;
+        }
+        List.push_back(i);
+    }
+    Config->SetMapping(List);
 
-    Map->SetChannels_OrderedByLogical(Config->ChannelMap);
-    Map->Validate(Reader->GetNumChannels(), true);
+    Config->Map->Validate(Reader->GetNumChannels(), true);
     LogMessage("Mapping updated");
 
     UpdateGui();
@@ -231,7 +235,7 @@ void MainWindow::on_pteMapping_customContextMenuRequested(const QPoint &pos)
               return;
           }
 
-          bool ok = Map->Validate(Reader->GetNumChannels());
+          bool ok = Config->Map->Validate(Reader->GetNumChannels());
           if (ok) QMessageBox::information(this, "TRB3 reader", "Mapping is valid", QMessageBox::Ok, QMessageBox::Ok);
           else    QMessageBox::warning(this, "TRB3 reader", "mapping is NOT valid!", QMessageBox::Ok, QMessageBox::Ok);
           qDebug() << "Validation result: Map is good?"<<ok;
@@ -265,7 +269,7 @@ void MainWindow::on_pbSaveTotextFile_clicked()
     }
 
     bool bUseHardware = false;
-    if (!Map->Validate(numChannels))
+    if (!Config->Map->Validate(numChannels))
     {
         int ret = QMessageBox::warning(this, "TRB3reader", "Channel map not valid!\nSave data without mapping (use hardware channels)?", QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
         if (ret == QMessageBox::Cancel) return;
@@ -314,12 +318,12 @@ bool MainWindow::sendSignalData(QTextStream &outStream, bool bUseHardware)
     }
     else
     {
-        numChannels = Map->GetNumLogicalChannels();
+        numChannels = Config->Map->GetNumLogicalChannels();
         for (int ie=0; ie<numEvents; ie++)
             if (!Extractor->IsRejectedEventFast(ie))
             {
                 for (int ic=0; ic<numChannels; ic++)
-                    outStream << Extractor->GetSignalFast(ie, Map->LogicalToHardwareFast(ic)) << " ";
+                    outStream << Extractor->GetSignalFast(ie, Config->Map->LogicalToHardwareFast(ic)) << " ";
                 outStream << "\r\n";
             }
     }
@@ -383,7 +387,7 @@ void MainWindow::on_pbBulkProcess_clicked()
             numErrors++;
             continue;
         }
-        if (!Map->Validate(numChannels))
+        if (!Config->Map->Validate(numChannels))
         {
             ui->pteBulkLog->appendPlainText("---- Channel map not valid, skipped");
             numErrors++;
@@ -502,7 +506,7 @@ int MainWindow::getCurrentlySelectedHardwareChannel()
 
     int iHardwChan;
 
-    if (bUseLogical)                          iHardwChan = Map->LogicalToHardware(val);
+    if (bUseLogical)                          iHardwChan = Config->Map->LogicalToHardware(val);
     else
     {
         if (val >= Reader->GetNumChannels())  iHardwChan = std::numeric_limits<size_t>::quiet_NaN();
@@ -532,7 +536,7 @@ void MainWindow::OnEventOrChannelChanged(bool bOnlyChannel)
     {
         ui->leLogic->setText(QString::number(val));
 
-        iHardwChan = Map->LogicalToHardware(val);
+        iHardwChan = Config->Map->LogicalToHardware(val);
         if (std::isnan(iHardwChan)) ui->leHardw->setText("Not mapped");
         else ui->leHardw->setText(QString::number(iHardwChan));
     }
@@ -541,7 +545,7 @@ void MainWindow::OnEventOrChannelChanged(bool bOnlyChannel)
         iHardwChan = val;
         ui->leHardw->setText(QString::number(val));
 
-        std::size_t ilogical = Map->HardwareToLogical(val);
+        std::size_t ilogical = Config->Map->HardwareToLogical(val);
         QString s;
         if (std::isnan(ilogical)) s = "Not mapped";
         else s = QString::number(ilogical);

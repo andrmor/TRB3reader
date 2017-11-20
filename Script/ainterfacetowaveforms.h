@@ -6,15 +6,15 @@
 #include <QObject>
 #include <QVariant>
 
+class MasterConfig;
 class Trb3dataReader;
-class ChannelMapper;
 
 class AInterfaceToWaveforms : public AScriptInterface
 {
     Q_OBJECT
 
 public:
-    AInterfaceToWaveforms(Trb3dataReader* Reader, ChannelMapper* Map);
+    AInterfaceToWaveforms(MasterConfig* Config, Trb3dataReader* Reader);
 
 public slots:
 
@@ -29,8 +29,8 @@ public slots:
 
 
 private:
+    MasterConfig* Config;
     Trb3dataReader* Reader;
-    ChannelMapper* Map;
 };
 
 #endif // AINTERFACETOWAVEFORMS_H

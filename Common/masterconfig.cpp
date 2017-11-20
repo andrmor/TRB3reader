@@ -1,13 +1,22 @@
 #include "masterconfig.h"
 #include "ajsontools.h"
+#include "channelmapper.h"
 
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QDebug>
 
-MasterConfig::MasterConfig() {}
+MasterConfig::MasterConfig()
+{
+    Map = new ChannelMapper();
+}
 
-void MasterConfig::SetNegativeChannels(std::vector<int> listOfChannels)
+MasterConfig::~MasterConfig()
+{
+    delete Map;
+}
+
+void MasterConfig::SetNegativeChannels(const std::vector<int> &listOfChannels)
 {
     ListNegativeChannels = listOfChannels;
     updatePolarityQuickAccessData();
@@ -114,6 +123,9 @@ bool MasterConfig::readChannelMapFromJson(QJsonObject &json)
     QJsonArray arr = json["ChannelMap"].toArray();
     for (int i=0; i<arr.size(); i++)
         ChannelMap.push_back(arr[i].toInt());
+
+    Map->Clear();
+    Map->SetChannels_OrderedByLogical(ChannelMap);
 
     return true;
 }
@@ -292,4 +304,13 @@ bool MasterConfig::IsNegative(int ichannel) const
 {
     if (ichannel>=NegPol.size() || ichannel<0) return false;
     return NegPol.at(ichannel);
+}
+
+void MasterConfig::SetMapping(const std::vector<size_t> &mapping)
+{
+    Map->Clear();
+    ChannelMap.clear();
+
+    ChannelMap = mapping;
+    Map->SetChannels_OrderedByLogical(ChannelMap);
 }

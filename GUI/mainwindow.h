@@ -7,7 +7,6 @@
 class MasterConfig;
 class Trb3dataReader;
 class Trb3signalExtractor;
-class ChannelMapper;
 class QTextStream;
 class CernRootModule;
 class AScriptWindow;
@@ -159,7 +158,6 @@ private:
 
     Trb3dataReader* Reader;
     Trb3signalExtractor* Extractor;
-    ChannelMapper* Map;
 
     ADispatcher* Dispatcher;
 

@@ -174,7 +174,7 @@ void MainWindow::UpdateGui()
 
     ui->pteMapping->clear();
     s.clear();
-    for (int i: Config->ChannelMap) s += QString::number(i)+" ";
+    for (int i: Config->GetMapping()) s += QString::number(i)+" ";
     ui->pteMapping->appendPlainText(s);
 
     ui->pteIgnoreHardwareChannels->clear();

@@ -8,17 +8,23 @@
 #include <QJsonObject>
 
 class QJsonObject;
+class ChannelMapper;
 
 class MasterConfig
 {
 public:
     MasterConfig();
+    ~MasterConfig();
 
+    //negative/positive channels
     const std::vector<int>& GetListOfNegativeChannels() const {return ListNegativeChannels;}
-    void SetNegativeChannels(std::vector<int> listOfChannels);
+    void SetNegativeChannels(const std::vector<int> &listOfChannels);
     bool IsNegative(int ichannel) const;
 
-    std::vector<std::size_t> ChannelMap;
+    //channel map (hardware / logical)
+    ChannelMapper* Map;  //use this class to access convertion methods!
+    void SetMapping(const std::vector<size_t> &mapping);
+    const std::vector<size_t>& GetMapping() {return ChannelMap;}
 
     QSet<int> IgnoreHardwareChannels;
 
@@ -75,6 +81,9 @@ public:
 private:
     std::vector<int> ListNegativeChannels;
     std::vector<bool> NegPol; //Quick access
+
+    std::vector<std::size_t> ChannelMap;
+
 
 private:
     void updatePolarityQuickAccessData();

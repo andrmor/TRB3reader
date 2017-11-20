@@ -5,7 +5,6 @@
 #include <QString>
 
 class MasterConfig;
-class ChannelMapper;
 class Trb3dataReader;
 class Trb3signalExtractor;
 
@@ -16,8 +15,8 @@ class QJsonObject;
 class ADispatcher
 {
 public:
-    //ADispatcher(MasterConfig* Config, ChannelMapper* Map, Trb3dataReader* Reader, Trb3signalExtractor* Extractor); //No GUI
-    ADispatcher(MasterConfig* Config, ChannelMapper* Map, Trb3dataReader* Reader, Trb3signalExtractor* Extractor, MainWindow* MW); //With GUI
+    //ADispatcher(MasterConfig* Config, Trb3dataReader* Reader, Trb3signalExtractor* Extractor); //No GUI
+    ADispatcher(MasterConfig* Config, Trb3dataReader* Reader, Trb3signalExtractor* Extractor, MainWindow* MW); //With GUI
 
     void ClearData();
 
@@ -36,7 +35,6 @@ public:
 
 private:
     MasterConfig* Config;
-    ChannelMapper* Map;
     Trb3dataReader* Reader;
     Trb3signalExtractor* Extractor;
 

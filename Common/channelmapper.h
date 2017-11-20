@@ -5,15 +5,10 @@
 
 class ChannelMapper
 {
+friend class MasterConfig;
+
 public:
     ChannelMapper();
-
-      //Set channel map: vector should contain logical channel numbers for consequitive hardware channels
-    void SetChannels_OrderedByHardware(std::vector<std::size_t> ToLogicalChannelMap);
-      //Set channel map: vector should contain hardware channel numbers for consequitive logical channels
-    void SetChannels_OrderedByLogical(std::vector<std::size_t> ToHardwareChannelMap);
-
-    void Clear();
 
       //checks the channel map for any desynchronization, or repetitions
     bool Validate(std::size_t numChannels, bool ensureLogicalChannelContinuity = true) const;
@@ -28,6 +23,16 @@ public:
     std::size_t GetNumLogicalChannels() const {return ToHardware.size();}
 
     const std::vector<std::size_t>& GetMapToHardware() {return ToHardware;}
+
+protected:
+    //Set channel map: vector should contain logical channel numbers for consequitive hardware channels
+  void SetChannels_OrderedByHardware(std::vector<std::size_t> ToLogicalChannelMap);
+    //Set channel map: vector should contain hardware channel numbers for consequitive logical channels
+  void SetChannels_OrderedByLogical(std::vector<std::size_t> ToHardwareChannelMap);
+
+  void Clear();
+
+
 
 private:
     std::vector<std::size_t> ToLogical;

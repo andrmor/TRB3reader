@@ -21,8 +21,8 @@
 #include "TPaveText.h"
 #include "TH2D.h"
 
-CernRootModule::CernRootModule(Trb3dataReader *Reader, Trb3signalExtractor *Extractor, ChannelMapper *Map, MasterConfig *Config, int refreshInterval) :
-    Reader(Reader), Extractor(Extractor), Map(Map), Config(Config)
+CernRootModule::CernRootModule(Trb3dataReader *Reader, Trb3signalExtractor *Extractor, MasterConfig *Config, int refreshInterval) :
+    Reader(Reader), Extractor(Extractor), Config(Config)
 {
     //create ROOT application
     int rootargc=1;
@@ -106,13 +106,13 @@ void CernRootModule::DrawSignature(bool bNeg)
                        100, -0.05, 1.05);
 
     int numEvents = Reader->GetNumEvents();
-    int numChan = Map->GetNumLogicalChannels();
+    int numChan = Config->Map->GetNumLogicalChannels();
 
     for (int ievent=0; ievent<numEvents; ievent++)
         if (!Extractor->IsRejectedEventFast(ievent))
         for (int ilc=0; ilc<numChan; ilc++)
         {
-            int iHardwCh = Map->LogicalToHardware(ilc);
+            int iHardwCh = Config->Map->LogicalToHardware(ilc);
             if (std::isnan(iHardwCh)) continue;
             if (Config->IgnoreHardwareChannels.contains(iHardwCh)) continue;
             if (bNeg != Config->IsNegative(iHardwCh)) continue;
@@ -288,7 +288,7 @@ void CernRootModule::DrawSingle(int ievent, int iHardwChan, bool autoscale, doub
     WOne->SetAsActiveRootWindow();
     gSingle->Draw("AL");
     WOne->UpdateRootCanvas();
-    WOne->SetTitle("Event: "+ QString::number(ievent) + "  LogicalChannel: "+QString::number(Map->HardwareToLogical(iHardwChan)));
+    WOne->SetTitle("Event: "+ QString::number(ievent) + "  LogicalChannel: "+QString::number(Config->Map->HardwareToLogical(iHardwChan)));
 }
 
 void CernRootModule::DrawOverlay(int ievent, bool bNeg, bool bAutoscale, double Min, double Max, int SortBy_0Logic1Hardw)
@@ -299,14 +299,14 @@ void CernRootModule::DrawOverlay(int ievent, bool bNeg, bool bAutoscale, double 
     if (multiGraph) delete multiGraph;
     multiGraph = new TMultiGraph();
 
-    int numChan = ( SortBy_0Logic1Hardw==0 ? Map->GetNumLogicalChannels() : Reader->GetNumChannels() );
+    int numChan = ( SortBy_0Logic1Hardw==0 ? Config->Map->GetNumLogicalChannels() : Reader->GetNumChannels() );
 
     for (int iCh=0; iCh<numChan; ++iCh)
     {
         int iHardwCh;
         if (SortBy_0Logic1Hardw == 0)
         {
-            iHardwCh = Map->LogicalToHardware(iCh);
+            iHardwCh = Config->Map->LogicalToHardware(iCh);
             if (std::isnan(iHardwCh)) continue;
         }
         else iHardwCh = iCh;
@@ -373,7 +373,7 @@ void CernRootModule::DrawAll(int ievent, bool bNeg, int padsX, int padsY, bool b
     c->Divide(padsX, padsY, 0, 0.000001);
     gPad->Modified();
 
-    int numChannels = ( SortBy_0Logic1Hardw==0 ? Map->GetNumLogicalChannels() : Reader->GetNumChannels() );
+    int numChannels = ( SortBy_0Logic1Hardw==0 ? Config->Map->GetNumLogicalChannels() : Reader->GetNumChannels() );
     if (bAutoscale)
     {
         Min = 1e20;
@@ -383,7 +383,7 @@ void CernRootModule::DrawAll(int ievent, bool bNeg, int padsX, int padsY, bool b
             int iHardwCh;
             if (SortBy_0Logic1Hardw == 0)
             {
-                iHardwCh = Map->LogicalToHardware(iCh);
+                iHardwCh = Config->Map->LogicalToHardware(iCh);
                 if (std::isnan(iHardwCh)) continue;
             }
             else iHardwCh = iCh;
@@ -411,7 +411,7 @@ void CernRootModule::DrawAll(int ievent, bool bNeg, int padsX, int padsY, bool b
         int iHardwCh;
         if (SortBy_0Logic1Hardw == 0)
         {
-            iHardwCh = Map->LogicalToHardware(iCh);
+            iHardwCh = Config->Map->LogicalToHardware(iCh);
             if (std::isnan(iHardwCh)) continue;
         }
         else iHardwCh = iCh;

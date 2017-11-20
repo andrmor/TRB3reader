@@ -19,8 +19,8 @@
 //    onStart();
 //}
 
-ADispatcher::ADispatcher(MasterConfig* Config, ChannelMapper* Map, Trb3dataReader* Reader, Trb3signalExtractor* Extractor, MainWindow *MW) :
-    Config(Config), Map(Map), Reader(Reader), Extractor(Extractor), MW(MW)
+ADispatcher::ADispatcher(MasterConfig* Config, Trb3dataReader* Reader, Trb3signalExtractor* Extractor, MainWindow *MW) :
+    Config(Config),Reader(Reader), Extractor(Extractor), MW(MW)
 {
     onStart();
 }
@@ -54,9 +54,6 @@ void ADispatcher::LoadConfig(QString FileName)
 bool ADispatcher::LoadConfig(QJsonObject &json)
 {
     Config->ReadFromJson(json);
-
-    Map->Clear();
-    Map->SetChannels_OrderedByLogical(Config->ChannelMap);
     ClearData();
 
     MW->readGUIfromJson(json);
@@ -86,8 +83,7 @@ void ADispatcher::ClearNegativeChannels()
 
 void ADispatcher::ClearMapping()
 {
-    Config->ChannelMap.clear();
-    Map->SetChannels_OrderedByLogical(std::vector<std::size_t>(0));
+    Config->SetMapping(std::vector<std::size_t>());
     ClearData();
 
     MW->UpdateGui();

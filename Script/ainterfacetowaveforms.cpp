@@ -1,12 +1,13 @@
 #include "ainterfacetowaveforms.h"
 #include "trb3datareader.h"
+#include "masterconfig.h"
 #include "channelmapper.h"
 
 #include <QJsonArray>
 #include <QJsonValue>
 
-AInterfaceToWaveforms::AInterfaceToWaveforms(Trb3dataReader *Reader, ChannelMapper *Map) :
-    Reader(Reader), Map(Map) {}
+AInterfaceToWaveforms::AInterfaceToWaveforms(MasterConfig* Config, Trb3dataReader* Reader) :
+    Config(Config), Reader(Reader) {}
 
 double AInterfaceToWaveforms::getValue_hardware(int ievent, int ichannel, int isample)
 {
@@ -48,7 +49,7 @@ QVariant AInterfaceToWaveforms::getWaveformFast_hardware(int ievent, int ichanne
 
 QVariant AInterfaceToWaveforms::getWaveform_logical(int ievent, int ichannel)
 {
-    int ihardw = Map->LogicalToHardware(ichannel);
+    int ihardw = Config->Map->LogicalToHardware(ichannel);
     if (std::isnan(ihardw))
     {
         abort("Invalid channel number in get waveform");
@@ -60,6 +61,6 @@ QVariant AInterfaceToWaveforms::getWaveform_logical(int ievent, int ichannel)
 
 QVariant AInterfaceToWaveforms::getWaveformFast_logical(int ievent, int ichannel)
 {
-    return getWaveformFast_hardware(ievent, Map->LogicalToHardware(ichannel));
+    return getWaveformFast_hardware(ievent, Config->Map->LogicalToHardware(ichannel));
 }
 

@@ -6,15 +6,15 @@
 #include <QObject>
 #include <QVariant>
 
+class MasterConfig;
 class Trb3signalExtractor;
-class ChannelMapper;
 
 class AInterfaceToSignals : public AScriptInterface
 {
     Q_OBJECT
 
 public:
-    AInterfaceToSignals(Trb3signalExtractor *Extractor, ChannelMapper* Map);
+    AInterfaceToSignals(MasterConfig *Config, Trb3signalExtractor *Extractor);
 
 public slots:
     // info
@@ -38,8 +38,8 @@ public slots:
     void setRejected(int ievent, bool flag);
 
 private:
+    MasterConfig *Config;
     Trb3signalExtractor* Extractor;
-    ChannelMapper* Map;
 
 };
 

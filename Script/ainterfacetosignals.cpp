@@ -1,6 +1,7 @@
 #include "ainterfacetosignals.h"
 #include "trb3signalextractor.h"
 #include "channelmapper.h"
+#include "masterconfig.h"
 
 #include <QVariantList>
 #include <QJsonArray>
@@ -9,8 +10,8 @@
 
 const size_t NaN = std::numeric_limits<size_t>::quiet_NaN();
 
-AInterfaceToSignals::AInterfaceToSignals(Trb3signalExtractor* Extractor, ChannelMapper *Map) :
-    Extractor(Extractor), Map(Map)
+AInterfaceToSignals::AInterfaceToSignals(MasterConfig* Config, Trb3signalExtractor* Extractor) :
+    Config(Config), Extractor(Extractor)
 {
 
 }
@@ -27,7 +28,7 @@ int AInterfaceToSignals::countHardwareChannels()
 
 int AInterfaceToSignals::countLogicalChannels()
 {
-    return Map->GetNumLogicalChannels();
+    return Config->Map->GetNumLogicalChannels();
 }
 
 double AInterfaceToSignals::getSignal_hardware(int ievent, int ichannel)
@@ -48,7 +49,7 @@ QVariant AInterfaceToSignals::getSignals_hardware(int ievent)
 
 double AInterfaceToSignals::getSignal_logical(int ievent, int ichannel)
 {
-    size_t ihardw = Map->LogicalToHardware(ichannel);
+    size_t ihardw = Config->Map->LogicalToHardware(ichannel);
     if (std::isnan(ihardw)) return NaN;
 
     return Extractor->GetSignal(ievent, ihardw);
@@ -59,7 +60,7 @@ QVariant AInterfaceToSignals::getSignals_logical(int ievent)
     const std::vector<double>* vec = Extractor->GetSignals(ievent);
     if (!vec) return QVariantList();
 
-    const std::vector<std::size_t>& map = Map->GetMapToHardware();
+    const std::vector<std::size_t>& map = Config->Map->GetMapToHardware();
 
     QJsonArray ar;
     for (int ihardw : map) ar << vec->at(ihardw);
@@ -109,7 +110,7 @@ void AInterfaceToSignals::setSignals_hardware(int ievent, QVariant arrayOfValues
 
 void AInterfaceToSignals::setSignal_logical(int ievent, int ichannel, double value)
 {
-    int ihardw = Map->LogicalToHardware(ichannel);
+    int ihardw = Config->Map->LogicalToHardware(ichannel);
     if (std::isnan(ihardw))
     {
         abort("Failed to set signal of a logical channel - wrong channel number");
