@@ -11,6 +11,7 @@ class ChannelMapper;
 class QTextStream;
 class CernRootModule;
 class AScriptWindow;
+class ADispatcher;
 
 namespace Ui {
 class MainWindow;
@@ -24,7 +25,12 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    void ClearData();
+    void writeGUItoJson(QJsonObject& json);
+    void readGUIfromJson(QJsonObject& json);
+    void writeWindowsToJson(QJsonObject &json, const QJsonObject jsW);
+    void readWindowsFromJson(QJsonObject &json);
+
+    void UpdateGui();
 
 public slots:
     void onGlobalScriptStarted();
@@ -148,13 +154,14 @@ protected:
 
 private:
     Ui::MainWindow *ui;
-    MasterConfig* Config;
-    QString ConfigDir;
+    MasterConfig* Config;    
     AScriptWindow* ScriptWindow;
 
     Trb3dataReader* Reader;
     Trb3signalExtractor* Extractor;
     ChannelMapper* Map;
+
+    ADispatcher* Dispatcher;
 
 #ifdef CERN_ROOT
     CernRootModule* RootModule;
@@ -162,15 +169,7 @@ private:
 
     bool bStopFlag;
 
-    void loadConfig(QString FileName);
-    void saveConfig(QString FileName, QJsonObject js);
 
-    void writeGUItoJson(QJsonObject& json);
-    void readGUIfromJson(QJsonObject& json);
-    void writeWindowsToJson(QJsonObject &json, const QJsonObject jsW);
-    void readWindowsFromJson(QJsonObject &json);
-
-    void UpdateGui();
     const QString ProcessData(); //returns error message if any
     void LogMessage(QString message);
     bool saveSignalsToFile(QString FileName, bool bUseHardware);
@@ -182,7 +181,9 @@ private:
     void showAllWave(bool checked, bool bNeg);
     void updateSmoothAfterPedeEnableStatus();
 
+    void ClearData();
     void CreateScriptWindow();
+
 };
 
 #endif // MAINWINDOW_H

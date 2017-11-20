@@ -14,8 +14,12 @@ class MasterConfig
 public:
     MasterConfig();
 
-    std::vector<int> NegativeChannels;
+    const std::vector<int>& GetListOfNegativeChannels() const {return ListNegativeChannels;}
+    void SetNegativeChannels(std::vector<int> listOfChannels);
+    bool IsNegative(int ichannel) const;
+
     std::vector<std::size_t> ChannelMap;
+
     QSet<int> IgnoreHardwareChannels;
 
     bool bSmoothWaveforms = false;
@@ -54,7 +58,6 @@ public:
     int  PosMaxGateFrom = 0;
     int  PosMaxGateTo = 1000;
 
-
     std::string filename;
 
     QString GlobScript;
@@ -70,6 +73,12 @@ public:
     bool ReadFromJson(QJsonObject& json);
 
 private:
+    std::vector<int> ListNegativeChannels;
+    std::vector<bool> NegPol; //Quick access
+
+private:
+    void updatePolarityQuickAccessData();
+
     void writeSignalPolarityToJson(QJsonObject& json);
     bool readSignalPolarityFromJson(QJsonObject& json);
 

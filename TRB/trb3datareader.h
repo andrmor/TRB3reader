@@ -1,16 +1,15 @@
 #ifndef TRB3READER_H
 #define TRB3READER_H
 
-#include "masterconfig.h"
 #include <vector>
 #include <string>
+
+class MasterConfig;
 
 class Trb3dataReader
 {
 public:
-    Trb3dataReader();
-
-    void UpdateConfig(MasterConfig* config) {Config = *config;}
+    Trb3dataReader(const MasterConfig* Config);
 
       // Reading waveform data from the file, optional - substract pedestals and apply smoothing
     bool Read();
@@ -32,7 +31,7 @@ public:
     void ClearData();
 
 private:
-    MasterConfig Config;
+    const MasterConfig* Config;
     std::vector < std::vector < std::vector <int> > > waveData;  // format:  [event] [hardware chanel] [sample]
 
     int numSamples;

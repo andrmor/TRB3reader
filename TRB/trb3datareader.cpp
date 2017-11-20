@@ -1,16 +1,17 @@
 #include "trb3datareader.h"
+#include "masterconfig.h"
 
 #include "hadaq/defines.h"
 #include "hadaq/api.h"
 
 const double NaN = std::numeric_limits<int>::quiet_NaN();
 
-Trb3dataReader::Trb3dataReader() :
-    numSamples(0), numChannels(0) {}
+Trb3dataReader::Trb3dataReader(const MasterConfig *Config) :
+    Config(Config), numSamples(0), numChannels(0) {}
 
 bool Trb3dataReader::Read()
 {
-    if (Config.filename == "")
+    if (Config->filename == "")
     {
         std::cout << "--- File name is not set!\n" << std::flush;
         return false;
@@ -24,14 +25,14 @@ bool Trb3dataReader::Read()
         return false;
     }
 
-    if (Config.bSmoothingBeforePedestals)
+    if (Config->bSmoothingBeforePedestals)
     {
-        if (Config.bSmoothWaveforms)
+        if (Config->bSmoothWaveforms)
         {
             std::cout << "--> Smoothing waveforms...\n" << std::flush;
             smoothData();
         }
-        if (Config.bPedestalSubstraction)
+        if (Config->bPedestalSubstraction)
         {
             std::cout << "--> Substracting pedestals...\n" << std::flush;
             substractPedestals();
@@ -39,12 +40,12 @@ bool Trb3dataReader::Read()
     }
     else
     {
-        if (Config.bPedestalSubstraction)
+        if (Config->bPedestalSubstraction)
         {
             std::cout << "--> Substracting pedestals...\n" << std::flush;
             substractPedestals();
         }
-        if (Config.bSmoothWaveforms)
+        if (Config->bSmoothWaveforms)
         {
             std::cout << "--> Smoothing waveforms...\n" << std::flush;
             smoothData();
@@ -84,9 +85,9 @@ void Trb3dataReader::substractPedestals()
         for (int ichannel=0; ichannel<numChannels; ichannel++)
         {
             double pedestal = 0;
-            for (int isample = Config.PedestalFrom; isample <= Config.PedestalTo; isample++)
+            for (int isample = Config->PedestalFrom; isample <= Config->PedestalTo; isample++)
                 pedestal += waveData.at(ievent).at(ichannel).at(isample);
-            pedestal /= ( Config.PedestalTo + 1 - Config.PedestalFrom );
+            pedestal /= ( Config->PedestalTo + 1 - Config->PedestalFrom );
 
             for (int isample = 0; isample < numSamples; isample++)
                 waveData[ievent][ichannel][isample] -= pedestal;
@@ -99,7 +100,7 @@ void Trb3dataReader::readRawData()
     numChannels = 0;
     numSamples = 0;
 
-    hadaq::ReadoutHandle ref = hadaq::ReadoutHandle::Connect(Config.filename);
+    hadaq::ReadoutHandle ref = hadaq::ReadoutHandle::Connect(Config->filename);
     hadaq::RawEvent* evnt = 0;
     //evnt = ref.NextEvent(1.0);
     //evnt = ref.NextEvent(1.0);
@@ -200,12 +201,12 @@ void Trb3dataReader::smoothData()
     for (int ievent=0; ievent<waveData.size(); ievent++)
         for (int ichannel=0; ichannel<numChannels; ichannel++)
         {
-            if (Config.AdjacentAveraging_bOn)
+            if (Config->AdjacentAveraging_bOn)
             {
-                if (Config.AdjacentAveraging_bWeighted)
-                    doAdjacentWeightedAverage(waveData[ievent][ichannel], Config.AdjacentAveraging_NumPoints);
+                if (Config->AdjacentAveraging_bWeighted)
+                    doAdjacentWeightedAverage(waveData[ievent][ichannel], Config->AdjacentAveraging_NumPoints);
                 else
-                    doAdjacentAverage        (waveData[ievent][ichannel], Config.AdjacentAveraging_NumPoints);
+                    doAdjacentAverage        (waveData[ievent][ichannel], Config->AdjacentAveraging_NumPoints);
             }
         }
 }

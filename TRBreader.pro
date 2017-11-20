@@ -61,7 +61,9 @@ SOURCES += main.cpp \
     Common/completingtexteditclass.cpp \
     Common/tmpobjhubclass.cpp \
     Script/ainterfacetosignals.cpp \
-    Script/ainterfacetowaveforms.cpp
+    Script/ainterfacetowaveforms.cpp \
+    Script/ainterfacetoconfig.cpp \
+    Common/adispatcher.cpp
 
 HEADERS  += GUI/mainwindow.h \    
     TRB/trb3datareader.h \
@@ -81,7 +83,9 @@ HEADERS  += GUI/mainwindow.h \
     Common/completingtexteditclass.h \
     Common/tmpobjhubclass.h \
     Script/ainterfacetosignals.h \
-    Script/ainterfacetowaveforms.h
+    Script/ainterfacetowaveforms.h \
+    Script/ainterfacetoconfig.h \
+    Common/adispatcher.h
 
 FORMS    += GUI/mainwindow.ui \
     GUI/ascriptwindow.ui

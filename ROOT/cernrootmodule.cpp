@@ -5,6 +5,7 @@
 #include "agraphwindow.h"
 #include "ajsontools.h"
 #include "tmpobjhubclass.h"
+#include "masterconfig.h"
 
 #include <QTimer>
 #include <QDebug>
@@ -114,7 +115,7 @@ void CernRootModule::DrawSignature(bool bNeg)
             int iHardwCh = Map->LogicalToHardware(ilc);
             if (std::isnan(iHardwCh)) continue;
             if (Config->IgnoreHardwareChannels.contains(iHardwCh)) continue;
-            if (bNeg != Extractor->IsNegative(iHardwCh)) continue;
+            if (bNeg != Config->IsNegative(iHardwCh)) continue;
 
             bool bRejected;
             int sig = Extractor->extractSignalFromWaveform(ievent, iHardwCh, &bRejected);
@@ -310,7 +311,7 @@ void CernRootModule::DrawOverlay(int ievent, bool bNeg, bool bAutoscale, double 
         }
         else iHardwCh = iCh;
 
-        if (bNeg != Extractor->IsNegative(iHardwCh)) continue;
+        if (bNeg != Config->IsNegative(iHardwCh)) continue;
 
         TGraph* g = new TGraph();
 
@@ -387,7 +388,7 @@ void CernRootModule::DrawAll(int ievent, bool bNeg, int padsX, int padsY, bool b
             }
             else iHardwCh = iCh;
 
-            if (bNeg != Extractor->IsNegative(iHardwCh)) continue;
+            if (bNeg != Config->IsNegative(iHardwCh)) continue;
 
             for (int isam=0; isam<numSamples; isam++)
             {
@@ -415,7 +416,7 @@ void CernRootModule::DrawAll(int ievent, bool bNeg, int padsX, int padsY, bool b
         }
         else iHardwCh = iCh;
 
-        if (bNeg != Extractor->IsNegative(iHardwCh)) continue;
+        if (bNeg != Config->IsNegative(iHardwCh)) continue;
 
         TGraph* g = new TGraph();
 

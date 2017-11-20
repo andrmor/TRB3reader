@@ -27,6 +27,7 @@ public slots:
     QVariant getWaveform_logical(int ievent, int ichannel);
     QVariant getWaveformFast_logical(int ievent, int ichannel);
 
+
 private:
     Trb3dataReader* Reader;
     ChannelMapper* Map;

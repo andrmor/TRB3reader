@@ -1,17 +1,15 @@
 #ifndef TRB3SIGNALEXTRACTOR_H
 #define TRB3SIGNALEXTRACTOR_H
 
-#include "masterconfig.h"
 #include <vector>
 
 class Trb3dataReader;
+class MasterConfig;
 
 class Trb3signalExtractor
 {
 public:
-    Trb3signalExtractor(const Trb3dataReader* reader);
-
-    void UpdateConfig(const MasterConfig *config);
+    Trb3signalExtractor(const MasterConfig *Config, const Trb3dataReader* Reader);
 
     bool ExtractSignals();
 
@@ -35,22 +33,18 @@ public:
     std::size_t GetNumEvents() const;
     std::size_t GetNumChannels() const;
 
-    bool IsNegative(std::size_t channel) const;
     bool IsRejectedEvent(int ievent) const;
     bool IsRejectedEventFast(int ievent) const {return RejectedEvents.at(ievent);}
 
     double extractSignalFromWaveform(int ievent, int ichannel, bool *Rejected = 0);
 
 private:
-    const Trb3dataReader* reader;
-    MasterConfig Config;
+    const MasterConfig* Config;
+    const Trb3dataReader* Reader;
     std::vector < std::vector <double> > signalData;  // format:  [ievent] [ichanel]            this is (peak - pedestal)
-    std::vector<bool> NegPolChannels;
     std::vector<bool> RejectedEvents;
 
     int numChannels;
-
-    void setPolarity(std::vector<int> negativeChannels);
 
     void ExtractAllSignals(); // extact signals = peak - pedestal
 

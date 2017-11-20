@@ -7,6 +7,12 @@
 
 MasterConfig::MasterConfig() {}
 
+void MasterConfig::SetNegativeChannels(std::vector<int> listOfChannels)
+{
+    ListNegativeChannels = listOfChannels;
+    updatePolarityQuickAccessData();
+}
+
 void MasterConfig::WriteToJson(QJsonObject &json)
 {    
     writeSignalPolarityToJson(json);
@@ -76,7 +82,7 @@ bool MasterConfig::readSmoothingFromJson(QJsonObject &json)
 void MasterConfig::writeSignalPolarityToJson(QJsonObject &json)
 {
     QJsonArray arr;
-    for (int i: NegativeChannels) arr << i;
+    for (int i: ListNegativeChannels) arr << i;
     json["NegativeChannels"] = arr;
 }
 
@@ -84,11 +90,12 @@ bool MasterConfig::readSignalPolarityFromJson(QJsonObject &json)
 {    
     if (!json.contains("NegativeChannels")) return false;
 
-    NegativeChannels.clear();
+    ListNegativeChannels.clear();
     QJsonArray arr = json["NegativeChannels"].toArray();
     for (int i=0; i<arr.size(); i++)
-        NegativeChannels.push_back(arr[i].toInt());
+        ListNegativeChannels.push_back(arr[i].toInt());
 
+    updatePolarityQuickAccessData();
     return true;
 }
 
@@ -269,4 +276,20 @@ bool MasterConfig::readScriptSettingsFromJson(QJsonObject &json)
         for (int imsa=0; imsa<mspAr.size(); imsa++)
             MainSplitterSizes_ScriptWindow << mspAr[imsa].toInt(50);
     }
+}
+
+void MasterConfig::updatePolarityQuickAccessData()
+{
+    for (int ichannel : ListNegativeChannels)
+    {
+        if (ichannel >= NegPol.size())
+            NegPol.resize(ichannel+1, false);
+        NegPol[ichannel] = true;
+    }
+}
+
+bool MasterConfig::IsNegative(int ichannel) const
+{
+    if (ichannel>=NegPol.size() || ichannel<0) return false;
+    return NegPol.at(ichannel);
 }

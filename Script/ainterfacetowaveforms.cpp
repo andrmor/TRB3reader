@@ -62,3 +62,4 @@ QVariant AInterfaceToWaveforms::getWaveformFast_logical(int ievent, int ichannel
 {
     return getWaveformFast_hardware(ievent, Map->LogicalToHardware(ichannel));
 }
+

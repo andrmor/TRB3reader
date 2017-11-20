@@ -6,6 +6,7 @@
 #include "trb3signalextractor.h"
 #include "trb3datareader.h"
 #include "ascriptwindow.h"
+#include "adispatcher.h"
 
 #include <QJsonObject>
 #include <QJsonArray>
@@ -25,12 +26,12 @@ void MainWindow::closeEvent(QCloseEvent *event)
     js = RootModule->SaveGraphWindows();
     delete RootModule; RootModule = 0;
 #endif
-    saveConfig(ConfigDir+"/autosave.json", js);
+    Dispatcher->SaveConfig(Dispatcher->AutosaveFile, js);
 
     //save script-related config
     QJsonObject jsS;
     ScriptWindow->WriteToJson(jsS);
-    SaveJsonToFile(jsS, ConfigDir+"/scripting.json");
+    SaveJsonToFile(jsS, Dispatcher->ConfigDir+"/scripting.json");
 
     QMainWindow::closeEvent(event);
 }
@@ -40,8 +41,7 @@ void MainWindow::on_actionLoad_config_triggered()
     QString FileName = QFileDialog::getOpenFileName(this, "Load configuration", "", "Json files (*.json)");
     if (FileName.isEmpty()) return;
 
-    ClearData();
-    loadConfig(FileName);
+    Dispatcher->LoadConfig(FileName);
 }
 
 void MainWindow::on_actionSave_config_triggered()
@@ -55,32 +55,7 @@ void MainWindow::on_actionSave_config_triggered()
     jsW = RootModule->SaveGraphWindows();
 #endif
 
-    saveConfig(FileName, jsW);
-}
-
-void MainWindow::saveConfig(QString FileName, QJsonObject js)
-{
-    QJsonObject json;
-    Config->WriteToJson(json);
-    writeGUItoJson(json);
-    writeWindowsToJson(json, js);
-
-    SaveJsonToFile(json, FileName);
-}
-
-void MainWindow::loadConfig(QString FileName)
-{
-    QJsonObject json;
-    LoadJsonFromFile(json, FileName);
-    Config->ReadFromJson(json);
-    readGUIfromJson(json);
-    UpdateGui();
-    readWindowsFromJson(json);
-
-    Map->Clear();
-    Map->SetChannels_OrderedByLogical(Config->ChannelMap);
-
-    ClearData();
+    Dispatcher->SaveConfig(FileName, jsW);
 }
 
 void MainWindow::writeGUItoJson(QJsonObject &json)
@@ -194,7 +169,7 @@ void MainWindow::UpdateGui()
 
     ui->ptePolarity->clear();
     QString s;
-    for (int i: Config->NegativeChannels) s += QString::number(i)+" ";
+    for (int i: Config->GetListOfNegativeChannels()) s += QString::number(i)+" ";
     ui->ptePolarity->appendPlainText(s);
 
     ui->pteMapping->clear();

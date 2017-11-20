@@ -6,6 +6,7 @@
 #include "channelmapper.h"
 #include "ascriptwindow.h"
 #include "amessage.h"
+#include "adispatcher.h"
 
 #ifdef CERN_ROOT
 #include "cernrootmodule.h"
@@ -17,8 +18,8 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QMessageBox>
-#include <QStandardPaths>
-#include <QDir>
+//#include <QStandardPaths>
+//#include <QDir>
 #include <QDirIterator>
 
 #include <vector>
@@ -28,6 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    Dispatcher = 0;
     ui->setupUi(this);    
     bStopFlag = false;
     ui->pbStop->setVisible(false);    
@@ -38,12 +40,12 @@ MainWindow::MainWindow(QWidget *parent) :
     QList<QLineEdit*> list = this->findChildren<QLineEdit *>();
     foreach(QLineEdit *w, list) if (w->objectName().startsWith("led")) w->setValidator(dv);
 
-    Reader = new Trb3dataReader();
-    Extractor = new Trb3signalExtractor(Reader);
-    Map = new ChannelMapper();
-
     //creating master config object
     Config = new MasterConfig();
+
+    Reader = new Trb3dataReader(Config);
+    Extractor = new Trb3signalExtractor(Config, Reader);
+    Map = new ChannelMapper();
 
 #ifdef CERN_ROOT
     RootModule = new CernRootModule(Reader, Extractor, Map, Config);
@@ -56,25 +58,27 @@ MainWindow::MainWindow(QWidget *parent) :
     QMessageBox::warning(this, "TRB3 reader", "Graph module was not configured!", QMessageBox::Ok, QMessageBox::Ok);
 #endif
 
+    Dispatcher = new ADispatcher(Config, Map, Reader, Extractor, this); //also loads config if autosave exists
+
     //Creating script window, registering script units, and setting up QObject connections
     CreateScriptWindow();
 
-    ui->cbAutoscaleY->setChecked(true);
-    on_cobSignalExtractionMethod_currentIndexChanged(ui->cobSignalExtractionMethod->currentIndex());
-
-    //finding the config dir
-    ConfigDir = QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation) + "/TRBreader";
-    if (!QDir(ConfigDir).exists()) QDir().mkdir(ConfigDir);
-    else
+    //Loading window settings
+    QJsonObject json;
+    LoadJsonFromFile(json, Dispatcher->AutosaveFile);
+    if (!json.isEmpty())
     {
-        loadConfig(ConfigDir+"/autosave.json");
+        readWindowsFromJson(json);
 
         QJsonObject jsS;
-        LoadJsonFromFile(jsS, ConfigDir+"/scripting.json");
-        if (!jsS.isEmpty()) ScriptWindow->ReadFromJson(jsS);
+        LoadJsonFromFile(jsS, Dispatcher->ConfigDir+"/scripting.json");
+        if (!jsS.isEmpty())
+            ScriptWindow->ReadFromJson(jsS);
     }
-    qDebug() << "-> Config dir:" << ConfigDir;
 
+    //misc gui settings
+    ui->cbAutoscaleY->setChecked(true);
+    on_cobSignalExtractionMethod_currentIndexChanged(ui->cobSignalExtractionMethod->currentIndex());
     OnEventOrChannelChanged(); // to update channel mapping indication
 }
 
@@ -92,13 +96,6 @@ MainWindow::~MainWindow()
     delete ScriptWindow;
 
     delete ui;
-}
-
-void MainWindow::ClearData()
-{
-    Reader->ClearData();
-    Extractor->ClearData();
-    ui->pbSaveTotextFile->setEnabled(false);
 }
 
 void MainWindow::on_pbSelectFile_clicked()
@@ -135,12 +132,10 @@ const QString MainWindow::ProcessData()
     if (Config->filename.empty()) return "File name not defined!";
 
     LogMessage("Reading hld file...");
-    Reader->UpdateConfig(Config);
     bool ok = Reader->Read();
     if (!ok) return "File read failed!";
 
     LogMessage("Extracting signals...");
-    Extractor->UpdateConfig(Config);
     Extractor->ExtractSignals();
     LogMessage("Done!");
     return "";
@@ -160,8 +155,9 @@ void MainWindow::on_pbLoadPolarities_clicked()
     LoadIntVectorsFromFile(FileName, &pos);
 
     int shift = ui->sbShiftNegatives->value();
-    for (int i : pos)
-        Config->NegativeChannels.push_back(i+shift);
+    std::vector<int> List;
+    for (int i : pos) List.push_back(i+shift);
+    Config->SetNegativeChannels(List);
 
     Extractor->ClearData();
     LogMessage("Polarities updated");
@@ -213,11 +209,7 @@ void MainWindow::on_ptePolarity_customContextMenuRequested(const QPoint &pos)
     if (!selectedItem) return;
 
     if (selectedItem == Clear)
-    {
-        Config->NegativeChannels.clear();
-        ClearData();
-        UpdateGui();
-    }
+        Dispatcher->ClearNegativeChannels();
 }
 
 void MainWindow::on_pteMapping_customContextMenuRequested(const QPoint &pos)
@@ -245,12 +237,7 @@ void MainWindow::on_pteMapping_customContextMenuRequested(const QPoint &pos)
           qDebug() << "Validation result: Map is good?"<<ok;
         }
       else if (selectedItem == Clear)
-      {
-          Config->ChannelMap.clear();
-          Map->SetChannels_OrderedByLogical(std::vector<std::size_t>(0));
-          ClearData();
-          UpdateGui();
-      }
+          Dispatcher->ClearMapping();
 }
 
 void MainWindow::on_pteIgnoreHardwareChannels_customContextMenuRequested(const QPoint &pos)
@@ -263,11 +250,7 @@ void MainWindow::on_pteIgnoreHardwareChannels_customContextMenuRequested(const Q
     if (!selectedItem) return;
 
     if (selectedItem == Clear)
-    {
-        Config->IgnoreHardwareChannels.clear();
-        ClearData();
-        UpdateGui();
-    }
+        Dispatcher->ClearIgnoreChannels();
 }
 
 void MainWindow::on_pbSaveTotextFile_clicked()
@@ -454,7 +437,7 @@ void MainWindow::on_pbShowWaveform_toggled(bool checked)
         return;
     }
 
-    bool bNegative = Extractor->IsNegative(iHardwChan);
+    bool bNegative = Config->IsNegative(iHardwChan);
     QString s = ( bNegative ? "Neg" : "Pos");
     ui->lePolar->setText(s);
 
@@ -765,6 +748,11 @@ void MainWindow::on_cbSmoothWaveforms_toggled(bool)
 void MainWindow::updateSmoothAfterPedeEnableStatus()
 {
     ui->cbSmoothBeforePedestal->setEnabled(ui->cbSubstractPedestal->isChecked() && ui->cbSmoothWaveforms->isChecked());
+}
+
+void MainWindow::ClearData()
+{
+    Dispatcher->ClearData();
 }
 
 void MainWindow::on_actionReset_positions_of_all_windows_triggered()

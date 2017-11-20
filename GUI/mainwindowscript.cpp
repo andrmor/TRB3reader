@@ -8,6 +8,8 @@
 #include "ainterfacetomessagewindow.h"
 #include "ainterfacetosignals.h"
 #include "ainterfacetowaveforms.h"
+#include "ainterfacetoconfig.h"
+#include "adispatcher.h"
 
 #ifdef CERN_ROOT
   #include "cernrootmodule.h"
@@ -24,6 +26,10 @@ void MainWindow::CreateScriptWindow()
 
     qDebug() << "-> main...";
     ScriptWindow->SetInterfaceObject(0); //initialization
+
+    qDebug() << "-> config...";
+    AInterfaceToConfig* conf = new AInterfaceToConfig(Config, Dispatcher);
+    ScriptWindow->SetInterfaceObject(conf, "config");
 
     qDebug() << "-> waveforms...";
     AInterfaceToWaveforms* wav = new AInterfaceToWaveforms(Reader, Map);
