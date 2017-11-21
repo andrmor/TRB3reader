@@ -43,7 +43,7 @@ private:
     const MasterConfig* Config;
     const Trb3dataReader* Reader;
     std::vector < std::vector <double> > signalData;  // format:  [ievent] [ichanel]            this is (peak - pedestal)
-    std::vector<bool> RejectedEvents;
+    QVector<bool> RejectedEvents;
 
     int numChannels;
 

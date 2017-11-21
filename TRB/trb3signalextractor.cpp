@@ -121,8 +121,7 @@ void Trb3signalExtractor::ExtractAllSignals()
     signalData.resize(numEvents);
 
     //clear -> fill all with false
-    RejectedEvents.clear();
-    RejectedEvents.resize(numEvents, false);
+    RejectedEvents = QVector<bool>(numEvents, false);
 
     const int numSamples = Reader->GetNumSamples();
     if (numSamples == 0) return;
