@@ -18,15 +18,30 @@ public:
 
 public slots:
 
-    double getValue_hardware(int ievent, int ichannel, int isample);
-    double getValueFast_hardware(int ievent, int ichannel, int isample);
+    int      countSamples();
 
-    QVariant getWaveform_hardware(int ievent, int ichannel);
-    QVariant getWaveformFast_hardware(int ievent, int ichannel);
+    int      getValue(int ievent, int iHardwChannel, int isample);
+    int      getValueFast(int ievent, int iHardwChannel, int isample); // not safe - no argument check
 
-    QVariant getWaveform_logical(int ievent, int ichannel);
-    QVariant getWaveformFast_logical(int ievent, int ichannel);
+    QVariant getWaveform(int ievent, int iHardwChannel);
+    QVariant getWaveformFast(int ievent, int iHardwChannel); // not safe - no argument check
 
+    //max/min value over waveform
+    int      getMax(int ievent, int iHardwChannel);
+    int      getMaxFast(int ievent, int iHardwChannel); // not safe - no argument check
+    int      getMin(int ievent, int iHardwChannel);
+    int      getMinFast(int ievent, int iHardwChannel); // not safe - no argument check
+
+    //sample # where max/min is reached over waveform
+    int      getMaxSample(int ievent, int iHardwChannel);
+    int      getMaxSampleFast(int ievent, int iHardwChannel); // not safe - no argument check
+    int      getMinSample(int ievent, int iHardwChannel);
+    int      getMinSampleFast(int ievent, int iHardwChannel); // not safe - no argument check
+
+    int      getSampleWhereFirstAbove(int ievent, int iHardwChannel, int threshold);
+    int      getSampleWhereFirstAboveFast(int ievent, int iHardwChannel, int threshold);
+    int      getSampleWhereFirstBelow(int ievent, int iHardwChannel, int threshold);
+    int      getSampleWhereFirstBelowFast(int ievent, int iHardwChannel, int threshold);
 
 private:
     MasterConfig* Config;

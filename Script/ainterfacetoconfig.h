@@ -17,10 +17,18 @@ public:
 
 public slots:
     QVariant getConfigJson();
-    void setConfigJson(QVariant configJson);
+    void     setConfigJson(QVariant configJson);
 
-    bool isNegative_hardware(int ichannel);
-    bool isNegative_logical(int ichannel);
+    int      countLogicalChannels();
+
+    bool     isNegative_hardware(int ichannel);
+    bool     isNegative_logical(int ichannel);
+
+    bool     isIgnoredChannel_hardware(int ichannel);
+    bool     isIgnoredChannel_logical(int ichannel);
+
+    int      toHardware(int iLogicalChannel);
+    int      toLogical(int iHardwChannel);
 
 private:
     MasterConfig* Config;

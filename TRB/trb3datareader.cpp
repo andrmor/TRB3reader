@@ -79,6 +79,122 @@ const std::vector<int>* Trb3dataReader::GetWaveformPtrFast(int ievent, int ichan
     return &(waveData.at(ievent).at(ichannel));
 }
 
+int Trb3dataReader::GetMax(int ievent, int ichannel) const
+{
+    if (ievent<0 || ievent>=waveData.size()) return NaN;
+    if (ichannel<0 || ichannel>=numChannels) return NaN;
+
+    return GetMaxFast(ievent, ichannel);
+}
+
+int Trb3dataReader::GetMaxFast(int ievent, int ichannel) const
+{
+    const std::vector <int>& vec = waveData.at(ievent).at(ichannel);
+
+    double max = vec.at(0);
+    for (int i=1; i<vec.size(); i++)
+        if (vec.at(i)>max) max = vec.at(i);
+    return max;
+}
+
+int Trb3dataReader::GetMin(int ievent, int ichannel) const
+{
+    if (ievent<0 || ievent>=waveData.size()) return NaN;
+    if (ichannel<0 || ichannel>=numChannels) return NaN;
+
+    return GetMinFast(ievent, ichannel);
+}
+
+int Trb3dataReader::GetMinFast(int ievent, int ichannel) const
+{
+    const std::vector <int>& vec = waveData.at(ievent).at(ichannel);
+
+    double min = vec.at(0);
+    for (int i=1; i<vec.size(); i++)
+        if (vec.at(i)<min) min = vec.at(i);
+    return min;
+}
+
+int Trb3dataReader::GetMaxSample(int ievent, int ichannel) const
+{
+    if (ievent<0 || ievent>=waveData.size()) return NaN;
+    if (ichannel<0 || ichannel>=numChannels) return NaN;
+
+    return GetMaxSampleFast(ievent, ichannel);
+}
+
+int Trb3dataReader::GetMaxSampleFast(int ievent, int ichannel) const
+{
+    const std::vector <int>& vec = waveData.at(ievent).at(ichannel);
+
+    int max = vec.at(0);
+    int imax = 0;
+    for (int i=1; i<vec.size(); i++)
+        if (vec.at(i)>max)
+        {
+            imax = i;
+            max = vec.at(i);
+        }
+    return imax;
+}
+
+int Trb3dataReader::GetMinSample(int ievent, int ichannel) const
+{
+    if (ievent<0 || ievent>=waveData.size()) return NaN;
+    if (ichannel<0 || ichannel>=numChannels) return NaN;
+
+    return GetMinSampleFast(ievent, ichannel);
+}
+
+int Trb3dataReader::GetMinSampleFast(int ievent, int ichannel) const
+{
+    const std::vector <int>& vec = waveData.at(ievent).at(ichannel);
+
+    int min = vec.at(0);
+    int imin = 0;
+    for (int i=1; i<vec.size(); i++)
+        if (vec.at(i)<min)
+        {
+            imin = i;
+            min = vec.at(i);
+        }
+    return imin;
+}
+
+int Trb3dataReader::GetSampleWhereFirstBelow(int ievent, int ichannel, int threshold) const
+{
+    if (ievent<0 || ievent>=waveData.size()) return NaN;
+    if (ichannel<0 || ichannel>=numChannels) return NaN;
+
+    return GetSampleWhereFirstBelowFast(ievent, ichannel, threshold);
+}
+
+int Trb3dataReader::GetSampleWhereFirstBelowFast(int ievent, int ichannel, int threshold) const
+{
+    const std::vector <int>& vec = waveData.at(ievent).at(ichannel);
+
+    for (int i=0; i<vec.size(); i++)
+        if (vec.at(i)<threshold) return i;
+    return NaN;
+}
+
+int Trb3dataReader::GetSampleWhereFirstAbove(int ievent, int ichannel, int threshold) const
+{
+    if (ievent<0 || ievent>=waveData.size()) return NaN;
+    if (ichannel<0 || ichannel>=numChannels) return NaN;
+
+    return GetSampleWhereFirstAboveFast(ievent, ichannel, threshold);
+}
+
+int Trb3dataReader::GetSampleWhereFirstAboveFast(int ievent, int ichannel, int threshold) const
+{
+    const std::vector <int>& vec = waveData.at(ievent).at(ichannel);
+
+    for (int i=0; i<vec.size(); i++)
+        if (vec.at(i)>threshold) return i;
+    return NaN;
+}
+
 void Trb3dataReader::substractPedestals()
 {
     for (int ievent=0; ievent<waveData.size(); ievent++)

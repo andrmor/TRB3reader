@@ -19,6 +19,21 @@ public:
     const std::vector<int>* GetWaveformPtr(int ievent, int ichannel) const;
     const std::vector<int>* GetWaveformPtrFast(int ievent, int ichannel) const; //no argument validity check!
 
+    int  GetMax(int ievent, int ichannel) const;
+    int  GetMaxFast(int ievent, int ichannel) const;
+    int  GetMin(int ievent, int ichannel) const;
+    int  GetMinFast(int ievent, int ichannel) const;
+
+    int  GetMaxSample(int ievent, int ichannel) const;
+    int  GetMaxSampleFast(int ievent, int ichannel) const;
+    int  GetMinSample(int ievent, int ichannel) const;
+    int  GetMinSampleFast(int ievent, int ichannel) const;
+
+    int  GetSampleWhereFirstBelow(int ievent, int ichannel, int threshold) const;
+    int  GetSampleWhereFirstBelowFast(int ievent, int ichannel, int threshold) const;
+    int  GetSampleWhereFirstAbove(int ievent, int ichannel, int threshold) const;
+    int  GetSampleWhereFirstAboveFast(int ievent, int ichannel, int threshold) const;
+
     // processing successful?
     bool isValid() const {return (waveData.size()>0 && numChannels>0 && numSamples>0);}
 

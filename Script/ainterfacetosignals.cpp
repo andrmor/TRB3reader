@@ -21,22 +21,17 @@ int AInterfaceToSignals::countEvents()
     return Extractor->GetNumEvents();
 }
 
-int AInterfaceToSignals::countHardwareChannels()
+int AInterfaceToSignals::countChannels()
 {
     return Extractor->GetNumChannels();
 }
 
-int AInterfaceToSignals::countLogicalChannels()
+double AInterfaceToSignals::getSignal(int ievent, int iHardwChannel)
 {
-    return Config->Map->GetNumLogicalChannels();
+    return Extractor->GetSignal(ievent, iHardwChannel);
 }
 
-double AInterfaceToSignals::getSignal_hardware(int ievent, int ichannel)
-{
-    return Extractor->GetSignal(ievent, ichannel);
-}
-
-QVariant AInterfaceToSignals::getSignals_hardware(int ievent)
+QVariant AInterfaceToSignals::getSignals(int ievent)
 {
     const std::vector<double>* vec = Extractor->GetSignals(ievent);
     if (!vec) return QVariantList();
@@ -47,34 +42,34 @@ QVariant AInterfaceToSignals::getSignals_hardware(int ievent)
     return jv.toVariant();
 }
 
-double AInterfaceToSignals::getSignal_logical(int ievent, int ichannel)
+//double AInterfaceToSignals::getSignal_logical(int ievent, int ichannel)
+//{
+//    size_t ihardw = Config->Map->LogicalToHardware(ichannel);
+//    if (std::isnan(ihardw)) return NaN;
+
+//    return Extractor->GetSignal(ievent, ihardw);
+//}
+
+//QVariant AInterfaceToSignals::getSignals_logical(int ievent)
+//{
+//    const std::vector<double>* vec = Extractor->GetSignals(ievent);
+//    if (!vec) return QVariantList();
+
+//    const std::vector<std::size_t>& map = Config->Map->GetMapToHardware();
+
+//    QJsonArray ar;
+//    for (int ihardw : map) ar << vec->at(ihardw);
+//    QJsonValue jv = ar;
+//    return jv.toVariant();
+//}
+
+void AInterfaceToSignals::setSignal(int ievent, int iHardwChannel, double value)
 {
-    size_t ihardw = Config->Map->LogicalToHardware(ichannel);
-    if (std::isnan(ihardw)) return NaN;
-
-    return Extractor->GetSignal(ievent, ihardw);
-}
-
-QVariant AInterfaceToSignals::getSignals_logical(int ievent)
-{
-    const std::vector<double>* vec = Extractor->GetSignals(ievent);
-    if (!vec) return QVariantList();
-
-    const std::vector<std::size_t>& map = Config->Map->GetMapToHardware();
-
-    QJsonArray ar;
-    for (int ihardw : map) ar << vec->at(ihardw);
-    QJsonValue jv = ar;
-    return jv.toVariant();
-}
-
-void AInterfaceToSignals::setSignal_hardware(int ievent, int ichannel, double value)
-{
-    bool bOK = Extractor->SetSignal(ievent, ichannel, value);
+    bool bOK = Extractor->SetSignal(ievent, iHardwChannel, value);
     if (!bOK) abort("Failed to set signal value - wrong arguments");
 }
 
-void AInterfaceToSignals::setSignals_hardware(int ievent, QVariant arrayOfValues)
+void AInterfaceToSignals::setSignals(int ievent, QVariant arrayOfValues)
 {
     QString type = arrayOfValues.typeName();
     if (type != "QVariantList")
@@ -108,17 +103,17 @@ void AInterfaceToSignals::setSignals_hardware(int ievent, QVariant arrayOfValues
     if (!bOK) abort("Failed to set signal values - wrong arguments");
 }
 
-void AInterfaceToSignals::setSignal_logical(int ievent, int ichannel, double value)
-{
-    int ihardw = Config->Map->LogicalToHardware(ichannel);
-    if (std::isnan(ihardw))
-    {
-        abort("Failed to set signal of a logical channel - wrong channel number");
-        return;
-    }
+//void AInterfaceToSignals::setSignal_logical(int ievent, int ichannel, double value)
+//{
+//    int ihardw = Config->Map->LogicalToHardware(ichannel);
+//    if (std::isnan(ihardw))
+//    {
+//        abort("Failed to set signal of a logical channel - wrong channel number");
+//        return;
+//    }
 
-    setSignal_hardware(ievent, ihardw, value);
-}
+//    setSignal_hardware(ievent, ihardw, value);
+//}
 
 void AInterfaceToSignals::setAllRejected(bool flag)
 {
