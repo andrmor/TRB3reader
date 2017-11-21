@@ -19,8 +19,8 @@ public:
     void SetInterfaceObject(QObject* interfaceObject, QString name = "");
 
     //run
-    int FindSyntaxError(QString script); //returns line number of the first syntax error; -1 if no errors found
-    QString Evaluate(QString Script);
+    int     FindSyntaxError(const QString& script); //returns line number of the first syntax error; -1 if no errors found
+    QString Evaluate(const QString& Script);
 
     void CollectGarbage();
 

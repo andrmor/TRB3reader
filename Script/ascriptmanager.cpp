@@ -28,7 +28,7 @@ AScriptManager::~AScriptManager()
     }
 }
 
-QString AScriptManager::Evaluate(QString Script)
+QString AScriptManager::Evaluate(const QString& Script)
 {
     LastError = "";
     fAborted = false;
@@ -127,7 +127,7 @@ void AScriptManager::SetInterfaceObject(QObject *interfaceObject, QString name)
       }
 }
 
-int AScriptManager::FindSyntaxError(QString script)
+int AScriptManager::FindSyntaxError(const QString& script)
 {
     QScriptSyntaxCheckResult check = QScriptEngine::checkSyntax(script);
     if (check.state() == QScriptSyntaxCheckResult::Valid) return -1;

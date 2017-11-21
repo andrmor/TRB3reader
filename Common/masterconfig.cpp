@@ -33,7 +33,7 @@ void MasterConfig::WriteToJson(QJsonObject &json)
     writeMaxGateToJson(json);
     writeScriptSettingsToJson(json);
 
-    json["FileName"] = QString(filename.data());
+    json["FileName"] = FileName;
 }
 
 bool MasterConfig::ReadFromJson(QJsonObject &json)
@@ -47,10 +47,7 @@ bool MasterConfig::ReadFromJson(QJsonObject &json)
     readMaxGateFromJson(json);
     readScriptSettingsFromJson(json);
 
-    QString tmp;
-    parseJson(json, "FileName", tmp);
-    if (!tmp.isEmpty())
-        filename = std::string(tmp.toLatin1().data());
+    parseJson(json, "FileName", FileName);
 
     return true;
 }

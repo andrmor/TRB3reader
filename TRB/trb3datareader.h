@@ -1,8 +1,7 @@
 #ifndef TRB3READER_H
 #define TRB3READER_H
 
-#include <vector>
-#include <string>
+#include <QVector>
 
 class MasterConfig;
 
@@ -14,15 +13,15 @@ public:
       // Reading waveform data from the file, optional - substract pedestals and apply smoothing
     bool Read();
 
-    int  GetValue(int ievent, int ichannel, int isample) const;
-    int  GetValueFast(int ievent, int ichannel, int isample) const { return waveData.at(ievent).at(ichannel).at(isample);} //no argument validity check!
-    const std::vector<int>* GetWaveformPtr(int ievent, int ichannel) const;
-    const std::vector<int>* GetWaveformPtrFast(int ievent, int ichannel) const; //no argument validity check!
+    double  GetValue(int ievent, int ichannel, int isample) const;
+    double  GetValueFast(int ievent, int ichannel, int isample) const; //no argument validity check!
+    const QVector<double>* GetWaveformPtr(int ievent, int ichannel) const;
+    const QVector<double>* GetWaveformPtrFast(int ievent, int ichannel) const; //no argument validity check!
 
-    int  GetMax(int ievent, int ichannel) const;
-    int  GetMaxFast(int ievent, int ichannel) const;
-    int  GetMin(int ievent, int ichannel) const;
-    int  GetMinFast(int ievent, int ichannel) const;
+    double  GetMax(int ievent, int ichannel) const;
+    double  GetMaxFast(int ievent, int ichannel) const;
+    double  GetMin(int ievent, int ichannel) const;
+    double  GetMinFast(int ievent, int ichannel) const;
 
     int  GetMaxSample(int ievent, int ichannel) const;
     int  GetMaxSampleFast(int ievent, int ichannel) const;
@@ -47,7 +46,7 @@ public:
 
 private:
     const MasterConfig* Config;
-    std::vector < std::vector < std::vector <int> > > waveData;  // format:  [event] [hardware chanel] [sample]
+    QVector < QVector < QVector <double> > > waveData;  // format:  [event] [hardware chanel] [sample]
 
     int numSamples;
     int numChannels;    
@@ -56,8 +55,8 @@ private:
     void readRawData();    // read raw data from the hld file
     void smoothData();     // smooth raw data
 
-    void doAdjacentAverage(std::vector<int> &arr, int numPoints);
-    void doAdjacentWeightedAverage(std::vector<int> &arr, int numPoints);
+    void doAdjacentAverage(QVector<double> &arr, int numPoints);
+    void doAdjacentWeightedAverage(QVector<double> &arr, int numPoints);
 
     void substractPedestals();
 

@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="twMain">
       <property name="currentIndex">
-       <number>4</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -2647,6 +2647,38 @@
     <hint type="destinationlabel">
      <x>418</x>
      <y>574</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cbSaveSignalsToFiles</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>label_13</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>134</x>
+     <y>157</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>128</x>
+     <y>184</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cbSaveSignalsToFiles</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>leAddToProcessed</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>424</x>
+     <y>162</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>423</x>
+     <y>189</y>
     </hint>
    </hints>
   </connection>

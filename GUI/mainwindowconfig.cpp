@@ -96,7 +96,7 @@ void MainWindow::readGUIfromJson(QJsonObject &json)
 
     JsonToComboBox(jsgui, "HardOrLog", ui->cobHardwareOrLogical);
 
-    JsonToLineEdit(jsgui, "BulkDir", ui->leDirForBulk);
+    JsonToLineEditText(jsgui, "BulkDir", ui->leDirForBulk);
     JsonToCheckbox(jsgui, "AutoRunScript", ui->cbAutoExecuteScript);
     JsonToCheckbox(jsgui, "SaveFiles", ui->cbSaveSignalsToFiles);
 
@@ -165,7 +165,7 @@ void MainWindow::readWindowsFromJson(QJsonObject &json)
 // --- Update GUI controls on Config change ---
 void MainWindow::UpdateGui()
 {
-    ui->leFileName->setText(Config->filename.data());
+    ui->leFileName->setText(Config->FileName);
 
     ui->ptePolarity->clear();
     QString s;

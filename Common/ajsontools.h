@@ -20,6 +20,7 @@ bool parseJson(const QJsonObject &json, const QString &key, QJsonObject &var);
 void JsonToCheckbox(QJsonObject& json, QString key, QCheckBox* cb);
 void JsonToSpinBox(QJsonObject& json, QString key, QSpinBox* sb);
 void JsonToLineEdit(QJsonObject& json, QString key, QLineEdit* le);
+void JsonToLineEditText(QJsonObject& json, QString key, QLineEdit* le);
 void JsonToComboBox(QJsonObject& json, QString key, QComboBox* qb);
 
 bool writeTwoQVectorsToJArray(QVector<double> &x, QVector<double> &y, QJsonArray &ar);

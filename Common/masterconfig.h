@@ -1,7 +1,6 @@
 #ifndef MASTERCONFIG_H
 #define MASTERCONFIG_H
 
-#include <string>
 #include <vector>
 #include <QSet>
 #include <QList>
@@ -64,7 +63,7 @@ public:
     int  PosMaxGateFrom = 0;
     int  PosMaxGateTo = 1000;
 
-    std::string filename;
+    QString FileName;
 
     QString GlobScript;
     QJsonObject ScriptWindowJson;

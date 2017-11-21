@@ -123,7 +123,7 @@ void CernRootModule::DrawSignature(bool bNeg)
 
             if (bNeg) sig = -sig;
 
-            const std::vector<int>* wave = Reader->GetWaveformPtrFast(ievent, iHardwCh);
+            const QVector<double>* wave = Reader->GetWaveformPtrFast(ievent, iHardwCh);
 
             //int sum = 0;
             //for (int i=0; i<numSamples; i++) sum += wave->at(i);

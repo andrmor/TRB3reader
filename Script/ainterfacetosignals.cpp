@@ -50,18 +50,18 @@ QVariant AInterfaceToSignals::getSignals(int ievent)
 //    return Extractor->GetSignal(ievent, ihardw);
 //}
 
-//QVariant AInterfaceToSignals::getSignals_logical(int ievent)
-//{
-//    const std::vector<double>* vec = Extractor->GetSignals(ievent);
-//    if (!vec) return QVariantList();
+QVariant AInterfaceToSignals::getSignals_logical(int ievent)
+{
+    const std::vector<double>* vec = Extractor->GetSignals(ievent);
+    if (!vec) return QVariantList();
 
-//    const std::vector<std::size_t>& map = Config->Map->GetMapToHardware();
+    const std::vector<std::size_t>& map = Config->Map->GetMapToHardware();
 
-//    QJsonArray ar;
-//    for (int ihardw : map) ar << vec->at(ihardw);
-//    QJsonValue jv = ar;
-//    return jv.toVariant();
-//}
+    QJsonArray ar;
+    for (int ihardw : map) ar << vec->at(ihardw);
+    QJsonValue jv = ar;
+    return jv.toVariant();
+}
 
 void AInterfaceToSignals::setSignal(int ievent, int iHardwChannel, double value)
 {

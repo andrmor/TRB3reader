@@ -24,6 +24,7 @@ public slots:
     //get signals
     double   getSignal(int ievent, int iHardwChannel);
     QVariant getSignals(int ievent);
+    QVariant getSignals_logical(int ievent); // array of signal values ordered according to the map of logical channels
 
     //set signals
     void     setSignal(int ievent, int iHardwChannel, double value);
@@ -32,6 +33,7 @@ public slots:
     //rejection of events
     void     setAllRejected(bool flag);
     void     setRejected(int ievent, bool flag);
+
 
 private:
     MasterConfig *Config;

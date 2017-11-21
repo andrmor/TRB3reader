@@ -2,6 +2,7 @@
 #define TRB3SIGNALEXTRACTOR_H
 
 #include <vector>
+#include <QVector>
 
 class Trb3dataReader;
 class MasterConfig;
@@ -48,8 +49,8 @@ private:
 
     void ExtractAllSignals(); // extact signals = peak - pedestal
 
-    double extractMax(const std::vector<int>* arr);
-    double extractMin(const std::vector<int>* arr);
+    double extractMax(const QVector<double> *arr);
+    double extractMin(const QVector<double> *arr);
 
     int iNegMaxSample, iPosMaxSample;
     int iMax, iMin;

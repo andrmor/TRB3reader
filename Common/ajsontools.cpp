@@ -92,6 +92,12 @@ void JsonToLineEdit(QJsonObject &json, QString key, QLineEdit *le)
     le->setText( QString::number(json[key].toDouble()) );
 }
 
+void JsonToLineEditText(QJsonObject &json, QString key, QLineEdit *le)
+{
+  if (json.contains(key))
+      le->setText( json[key].toString() );
+}
+
 void JsonToComboBox(QJsonObject &json, QString key, QComboBox *qb)
 {
   if (json.contains(key))

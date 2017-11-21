@@ -5,6 +5,9 @@
 
 #include <QJsonArray>
 #include <QJsonValue>
+#include <QDebug>
+
+#include <limits>
 
 AInterfaceToWaveforms::AInterfaceToWaveforms(MasterConfig* Config, Trb3dataReader* Reader) :
     Config(Config), Reader(Reader) {}
@@ -31,7 +34,7 @@ int AInterfaceToWaveforms::getValueFast(int ievent, int iHardwChannel, int isamp
 
 QVariant AInterfaceToWaveforms::getWaveform(int ievent, int iHardwChannel)
 {
-    const std::vector<int> *wave = Reader->GetWaveformPtr(ievent, iHardwChannel);
+    const QVector<double> *wave = Reader->GetWaveformPtr(ievent, iHardwChannel);
     if (!wave)
     {
         abort("Failed to get waveform");
@@ -46,7 +49,7 @@ QVariant AInterfaceToWaveforms::getWaveform(int ievent, int iHardwChannel)
 
 QVariant AInterfaceToWaveforms::getWaveformFast(int ievent, int iHardwChannel)
 {
-    const std::vector<int> *wave = Reader->GetWaveformPtrFast(ievent, iHardwChannel);
+    const QVector<double> *wave = Reader->GetWaveformPtrFast(ievent, iHardwChannel);
 
     QJsonArray ar;
     for (int val : *wave) ar << val;
@@ -100,7 +103,7 @@ int AInterfaceToWaveforms::getMinFast(int ievent, int iHardwChannel)
 int AInterfaceToWaveforms::getMaxSample(int ievent, int iHardwChannel)
 {
     int val = Reader->GetMaxSample(ievent, iHardwChannel);
-    if (std::isnan(val)) abort("Failed to get sample number!");
+    if (val < 0) abort("Failed to get sample number!");
 
     return val;
 }
@@ -113,7 +116,7 @@ int AInterfaceToWaveforms::getMaxSampleFast(int ievent, int iHardwChannel)
 int AInterfaceToWaveforms::getMinSample(int ievent, int iHardwChannel)
 {
     int val = Reader->GetMinSample(ievent, iHardwChannel);
-    if (std::isnan(val)) abort("Failed to get sample number!");
+    if (val < 0) abort("Failed to get sample number!");
 
     return val;
 }
@@ -125,8 +128,8 @@ int AInterfaceToWaveforms::getMinSampleFast(int ievent, int iHardwChannel)
 
 int AInterfaceToWaveforms::getSampleWhereFirstAbove(int ievent, int iHardwChannel, int threshold)
 {
-    int isample = Reader->GetSampleWhereFirstAboveFast(ievent, iHardwChannel, threshold);
-    if (std::isnan(isample)) abort("Failed to get sample number!");
+    int isample = Reader->GetSampleWhereFirstAbove(ievent, iHardwChannel, threshold);
+    if (isample < 0) abort("Failed to get sample number!");
 
     return isample;
 }
@@ -138,8 +141,8 @@ int AInterfaceToWaveforms::getSampleWhereFirstAboveFast(int ievent, int iHardwCh
 
 int AInterfaceToWaveforms::getSampleWhereFirstBelow(int ievent, int iHardwChannel, int threshold)
 {
-    int isample = Reader->GetSampleWhereFirstBelowFast(ievent, iHardwChannel, threshold);
-    if (std::isnan(isample)) abort("Failed to get sample number!");
+    int isample = Reader->GetSampleWhereFirstBelow(ievent, iHardwChannel, threshold);
+    if (isample < 0) abort("Failed to get sample number!");
 
     return isample;
 }

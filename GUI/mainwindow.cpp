@@ -102,7 +102,7 @@ void MainWindow::on_pbSelectFile_clicked()
     if (FileName.isEmpty()) return;
 
     ui->leFileName->setText(FileName);
-    Config->filename = FileName.toLocal8Bit().data();
+    Config->FileName = FileName;
     LogMessage("New file selected");
 }
 
@@ -127,7 +127,7 @@ void MainWindow::on_pbProcessData_clicked()
 
 const QString MainWindow::ProcessData()
 {
-    if (Config->filename.empty()) return "File name not defined!";
+    if (Config->FileName.isEmpty()) return "File name not defined!";
 
     LogMessage("Reading hld file...");
     bool ok = Reader->Read();
@@ -353,7 +353,12 @@ void MainWindow::on_pbBulkProcess_clicked()
         return;
     }
 
-    ui->pteBulkLog->clear();    
+    ui->pteBulkLog->clear();
+    if (ui->cbAutoExecuteScript->isChecked())
+    {
+        ScriptWindow->show();
+        ScriptWindow->OpenFirstTab();
+    }
 
     ui->twMain->setEnabled(false);
     ui->pbStop->setVisible(true);
@@ -366,9 +371,8 @@ void MainWindow::on_pbBulkProcess_clicked()
         qApp->processEvents();
         if (bStopFlag) break;
 
-        QString fileName = it.next();
-        Config->filename = fileName.toLocal8Bit().data();
-        ui->pteBulkLog->appendPlainText("Processing " + QFileInfo(fileName).fileName());
+        Config->FileName = it.next();
+        ui->pteBulkLog->appendPlainText("Processing " + QFileInfo(Config->FileName).fileName());
 
         QString error = ProcessData();
         if (!error.isEmpty())
@@ -397,13 +401,21 @@ void MainWindow::on_pbBulkProcess_clicked()
         if (ui->cbAutoExecuteScript->isChecked())
         {
             qDebug() << "Auto-executing script";
-            ScriptWindow->OpenFirstTab();
-            ScriptWindow->on_pbRunScript_clicked();
+            //ScriptWindow->on_pbRunScript_clicked();
+            const QString& Script = ScriptWindow->GetScriptOfFirstTab();
+            qDebug() << Script;
+            bool bOK = ScriptWindow->ExecuteScript(Script);
+            if (!bOK)
+            {
+                ui->pteBulkLog->appendPlainText("---- Script execution error");
+                numErrors++;
+                break;
+            }
         }
 
         if (ui->cbSaveSignalsToFiles->isChecked())
         {
-            QFileInfo fi(fileName);
+            QFileInfo fi(Config->FileName);
             QString nameSave = fi.path() + "/" + fi.completeBaseName() + ui->leAddToProcessed->text();
             qDebug() << "Saving to file:"<< nameSave;
             saveSignalsToFile(nameSave, false);

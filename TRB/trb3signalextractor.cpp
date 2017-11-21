@@ -283,7 +283,7 @@ double Trb3signalExtractor::extractSignalFromWaveform(int ievent, int ichannel, 
     return sig;
 }
 
-double Trb3signalExtractor::extractMax(const std::vector<int> *arr)
+double Trb3signalExtractor::extractMax(const QVector<double> *arr)
 {
     int max = (*arr)[0];
     for (int i=1; i<arr->size(); i++)
@@ -295,7 +295,7 @@ double Trb3signalExtractor::extractMax(const std::vector<int> *arr)
     return max;
 }
 
-double Trb3signalExtractor::extractMin(const std::vector<int> *arr)
+double Trb3signalExtractor::extractMin(const QVector<double> *arr)
 {
     int min = (*arr)[0];
     for (int i=1; i<arr->size(); i++)

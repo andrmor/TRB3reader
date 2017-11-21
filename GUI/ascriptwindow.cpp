@@ -374,6 +374,12 @@ void AScriptWindow::SetMainSplitterSizes(QList<int> values)
     splMain->setSizes(values);
 }
 
+const QString &AScriptWindow::GetScriptOfFirstTab() const
+{
+     QString script = ScriptTabs.at(CurrentTab)->TextEdit->document()->toPlainText();
+     return script;
+}
+
 void AScriptWindow::ShowText(QString text)
 {
   pteOut->appendHtml(text);
@@ -388,11 +394,16 @@ void AScriptWindow::ClearText()
 
 void AScriptWindow::on_pbRunScript_clicked()
 {
-   //WriteToJson(Config->ScriptWindowJson);
-   //Config->SaveANTSconfiguration();
+    //WriteToJson(Config->ScriptWindowJson);
+    //Config->SaveANTSconfiguration();
+    QString Script = ScriptTabs[CurrentTab]->TextEdit->document()->toPlainText();
 
-   QString Script = ScriptTabs[CurrentTab]->TextEdit->document()->toPlainText();
+    ExecuteScript(Script);
+}
 
+bool AScriptWindow::ExecuteScript(const QString& Script)
+{
+   bool bErrorState = false;
    //qDebug() << "Init on Start done";
    pteOut->clear();
    AScriptWindow::ShowText("Processing script");
@@ -402,7 +413,7 @@ void AScriptWindow::on_pbRunScript_clicked()
    if (errorLineNum > -1)
      {
        AScriptWindow::ReportError("Syntax error!", errorLineNum);
-       return;
+       return false;
      }
 
    ui->pbStop->setVisible(true);
@@ -417,6 +428,7 @@ void AScriptWindow::on_pbRunScript_clicked()
    if (!ScriptManager->LastError.isEmpty())
    {
        AScriptWindow::ReportError("Script error: "+ScriptManager->LastError, -1);
+       bErrorState = true;
    }
    else if (ScriptManager->engine->hasUncaughtException())
    {   //Script has uncaught exception
@@ -426,6 +438,7 @@ void AScriptWindow::on_pbRunScript_clicked()
        //QString backtrace = engine.uncaughtExceptionBacktrace().join('\n');
        //qDebug() << "backtrace:" << backtrace;
        AScriptWindow::ReportError("Script error: "+message, lineNum);
+       bErrorState = true;
    }
    else
    {   //success
@@ -443,6 +456,8 @@ void AScriptWindow::on_pbRunScript_clicked()
      }
 
    ScriptManager->CollectGarbage();
+
+   return bErrorState;
 }
 
 //void AScriptWindow::abortEvaluation(QString message)

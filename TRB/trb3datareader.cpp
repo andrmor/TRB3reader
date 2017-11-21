@@ -4,14 +4,14 @@
 #include "hadaq/defines.h"
 #include "hadaq/api.h"
 
-const double NaN = std::numeric_limits<int>::quiet_NaN();
+const double NaN = std::numeric_limits<double>::quiet_NaN();
 
 Trb3dataReader::Trb3dataReader(const MasterConfig *Config) :
     Config(Config), numSamples(0), numChannels(0) {}
 
 bool Trb3dataReader::Read()
 {
-    if (Config->filename == "")
+    if (Config->FileName.isEmpty())
     {
         std::cout << "--- File name is not set!\n" << std::flush;
         return false;
@@ -57,7 +57,7 @@ bool Trb3dataReader::Read()
     return true;
 }
 
-int Trb3dataReader::GetValue(int ievent, int ichannel, int isample) const
+double Trb3dataReader::GetValue(int ievent, int ichannel, int isample) const
 {
     if (ievent<0 || ievent>=waveData.size()) return NaN;
     if (ichannel<0 || ichannel>=numChannels) return NaN;
@@ -66,7 +66,12 @@ int Trb3dataReader::GetValue(int ievent, int ichannel, int isample) const
     return waveData.at(ievent).at(ichannel).at(isample);
 }
 
-const std::vector<int> *Trb3dataReader::GetWaveformPtr(int ievent, int ichannel) const
+double Trb3dataReader::GetValueFast(int ievent, int ichannel, int isample) const
+{
+    return waveData.at(ievent).at(ichannel).at(isample);
+}
+
+const QVector<double> *Trb3dataReader::GetWaveformPtr(int ievent, int ichannel) const
 {
     if (ievent<0 || ievent>=waveData.size()) return 0;
     if (ichannel<0 || ichannel>=numChannels) return 0;
@@ -74,12 +79,12 @@ const std::vector<int> *Trb3dataReader::GetWaveformPtr(int ievent, int ichannel)
     return &(waveData.at(ievent).at(ichannel));
 }
 
-const std::vector<int>* Trb3dataReader::GetWaveformPtrFast(int ievent, int ichannel) const
+const QVector<double> *Trb3dataReader::GetWaveformPtrFast(int ievent, int ichannel) const
 {
     return &(waveData.at(ievent).at(ichannel));
 }
 
-int Trb3dataReader::GetMax(int ievent, int ichannel) const
+double Trb3dataReader::GetMax(int ievent, int ichannel) const
 {
     if (ievent<0 || ievent>=waveData.size()) return NaN;
     if (ichannel<0 || ichannel>=numChannels) return NaN;
@@ -87,9 +92,9 @@ int Trb3dataReader::GetMax(int ievent, int ichannel) const
     return GetMaxFast(ievent, ichannel);
 }
 
-int Trb3dataReader::GetMaxFast(int ievent, int ichannel) const
+double Trb3dataReader::GetMaxFast(int ievent, int ichannel) const
 {
-    const std::vector <int>& vec = waveData.at(ievent).at(ichannel);
+    const QVector <double>& vec = waveData.at(ievent).at(ichannel);
 
     double max = vec.at(0);
     for (int i=1; i<vec.size(); i++)
@@ -97,7 +102,7 @@ int Trb3dataReader::GetMaxFast(int ievent, int ichannel) const
     return max;
 }
 
-int Trb3dataReader::GetMin(int ievent, int ichannel) const
+double Trb3dataReader::GetMin(int ievent, int ichannel) const
 {
     if (ievent<0 || ievent>=waveData.size()) return NaN;
     if (ichannel<0 || ichannel>=numChannels) return NaN;
@@ -105,9 +110,9 @@ int Trb3dataReader::GetMin(int ievent, int ichannel) const
     return GetMinFast(ievent, ichannel);
 }
 
-int Trb3dataReader::GetMinFast(int ievent, int ichannel) const
+double Trb3dataReader::GetMinFast(int ievent, int ichannel) const
 {
-    const std::vector <int>& vec = waveData.at(ievent).at(ichannel);
+    const QVector <double>& vec = waveData.at(ievent).at(ichannel);
 
     double min = vec.at(0);
     for (int i=1; i<vec.size(); i++)
@@ -117,15 +122,15 @@ int Trb3dataReader::GetMinFast(int ievent, int ichannel) const
 
 int Trb3dataReader::GetMaxSample(int ievent, int ichannel) const
 {
-    if (ievent<0 || ievent>=waveData.size()) return NaN;
-    if (ichannel<0 || ichannel>=numChannels) return NaN;
+    if (ievent<0 || ievent>=waveData.size()) return -1;
+    if (ichannel<0 || ichannel>=numChannels) return -1;
 
     return GetMaxSampleFast(ievent, ichannel);
 }
 
 int Trb3dataReader::GetMaxSampleFast(int ievent, int ichannel) const
 {
-    const std::vector <int>& vec = waveData.at(ievent).at(ichannel);
+    const QVector <double>& vec = waveData.at(ievent).at(ichannel);
 
     int max = vec.at(0);
     int imax = 0;
@@ -140,15 +145,15 @@ int Trb3dataReader::GetMaxSampleFast(int ievent, int ichannel) const
 
 int Trb3dataReader::GetMinSample(int ievent, int ichannel) const
 {
-    if (ievent<0 || ievent>=waveData.size()) return NaN;
-    if (ichannel<0 || ichannel>=numChannels) return NaN;
+    if (ievent<0 || ievent>=waveData.size()) return -1;
+    if (ichannel<0 || ichannel>=numChannels) return -1;
 
     return GetMinSampleFast(ievent, ichannel);
 }
 
 int Trb3dataReader::GetMinSampleFast(int ievent, int ichannel) const
 {
-    const std::vector <int>& vec = waveData.at(ievent).at(ichannel);
+    const QVector <double>& vec = waveData.at(ievent).at(ichannel);
 
     int min = vec.at(0);
     int imin = 0;
@@ -163,15 +168,15 @@ int Trb3dataReader::GetMinSampleFast(int ievent, int ichannel) const
 
 int Trb3dataReader::GetSampleWhereFirstBelow(int ievent, int ichannel, int threshold) const
 {
-    if (ievent<0 || ievent>=waveData.size()) return NaN;
-    if (ichannel<0 || ichannel>=numChannels) return NaN;
+    if (ievent<0 || ievent>=waveData.size()) return -1;
+    if (ichannel<0 || ichannel>=numChannels) return -1;
 
     return GetSampleWhereFirstBelowFast(ievent, ichannel, threshold);
 }
 
 int Trb3dataReader::GetSampleWhereFirstBelowFast(int ievent, int ichannel, int threshold) const
 {
-    const std::vector <int>& vec = waveData.at(ievent).at(ichannel);
+    const QVector <double>& vec = waveData.at(ievent).at(ichannel);
 
     for (int i=0; i<vec.size(); i++)
         if (vec.at(i)<threshold) return i;
@@ -180,15 +185,15 @@ int Trb3dataReader::GetSampleWhereFirstBelowFast(int ievent, int ichannel, int t
 
 int Trb3dataReader::GetSampleWhereFirstAbove(int ievent, int ichannel, int threshold) const
 {
-    if (ievent<0 || ievent>=waveData.size()) return NaN;
-    if (ichannel<0 || ichannel>=numChannels) return NaN;
+    if (ievent<0 || ievent>=waveData.size()) return -1;
+    if (ichannel<0 || ichannel>=numChannels) return -1;
 
     return GetSampleWhereFirstAboveFast(ievent, ichannel, threshold);
 }
 
 int Trb3dataReader::GetSampleWhereFirstAboveFast(int ievent, int ichannel, int threshold) const
 {
-    const std::vector <int>& vec = waveData.at(ievent).at(ichannel);
+    const QVector <double>& vec = waveData.at(ievent).at(ichannel);
 
     for (int i=0; i<vec.size(); i++)
         if (vec.at(i)>threshold) return i;
@@ -216,7 +221,7 @@ void Trb3dataReader::readRawData()
     numChannels = 0;
     numSamples = 0;
 
-    hadaq::ReadoutHandle ref = hadaq::ReadoutHandle::Connect(Config->filename);
+    hadaq::ReadoutHandle ref = hadaq::ReadoutHandle::Connect(Config->FileName.toLocal8Bit().data());
     hadaq::RawEvent* evnt = 0;
     //evnt = ref.NextEvent(1.0);
     //evnt = ref.NextEvent(1.0);
@@ -226,7 +231,7 @@ void Trb3dataReader::readRawData()
     while ( (evnt = ref.NextEvent(1.0)) )
     {
         bool bBadEvent = false;
-        std::vector < std::vector <int> > thisEventData;  //format: [channel] [sample]
+        QVector < QVector <double> > thisEventData;  //format: [channel] [sample]
 
         // loop over sections
         hadaq::RawSubevent* sub = 0;
@@ -301,7 +306,7 @@ void Trb3dataReader::readRawData()
         }
         else
         {
-            waveData.push_back( thisEventData );
+            waveData << thisEventData;
             //std::cout << "New data size: "<<data.size()<<"\n"<<std::flush;
         }
         bReportOnStart = false;
@@ -327,13 +332,13 @@ void Trb3dataReader::smoothData()
         }
 }
 
-void Trb3dataReader::doAdjacentAverage(std::vector<int> &arr, int numPoints)
+void Trb3dataReader::doAdjacentAverage(QVector<double> &arr, int numPoints)
 {
-   std::vector<int> arrOriginal = arr;
+   QVector<double> arrOriginal = arr;
    for (int is=0; is<numSamples; is++)
    {
        int num = 0;
-       int sum = 0;
+       double sum = 0;
        for (int id=-numPoints; id<numPoints+1; id++)
        {
            int i = is + id;
@@ -345,9 +350,9 @@ void Trb3dataReader::doAdjacentAverage(std::vector<int> &arr, int numPoints)
    }
 }
 
-void Trb3dataReader::doAdjacentWeightedAverage(std::vector<int> &arr, int numPoints)
+void Trb3dataReader::doAdjacentWeightedAverage(QVector<double> &arr, int numPoints)
 {
-    std::vector<int> arrOriginal = arr;
+    QVector<double> arrOriginal = arr;
     for (int is=0; is<numSamples; is++)
     {
         double sum = 0;
