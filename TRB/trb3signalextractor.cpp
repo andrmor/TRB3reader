@@ -41,14 +41,14 @@ double Trb3signalExtractor::GetSignalFast(int ievent, int ichannel) const
     return signalData[ievent][ichannel];
 }
 
-const std::vector<double>* Trb3signalExtractor::GetSignals(int ievent) const
+const QVector<double>* Trb3signalExtractor::GetSignals(int ievent) const
 {
     if (ievent<0 || ievent>=signalData.size()) return 0;
 
     return &(signalData.at(ievent));
 }
 
-const std::vector<double> *Trb3signalExtractor::GetSignalsFast(int ievent) const
+const QVector<double> *Trb3signalExtractor::GetSignalsFast(int ievent) const
 {
     return &(signalData.at(ievent));
 }

@@ -17,8 +17,8 @@ public:
     double GetSignal(int ievent, int ichannel) const; // slow but safe
     double GetSignalFast(int ievent, int ichannel) const; // no argument validity check!
 
-    const std::vector <double>* GetSignals(int ievent) const; // safe
-    const std::vector <double>* GetSignalsFast(int ievent) const; // no argument validity check!
+    const QVector <double>* GetSignals(int ievent) const; // safe
+    const QVector <double>* GetSignalsFast(int ievent) const; // no argument validity check!
 
     bool SetSignal(int ievent, int ichannel, double value);
     void SetSignalFast(int ievent, int ichannel, double value); // no argument validity check!
@@ -42,7 +42,7 @@ public:
 private:
     const MasterConfig* Config;
     const Trb3dataReader* Reader;
-    std::vector < std::vector <double> > signalData;  // format:  [ievent] [ichanel]            this is (peak - pedestal)
+    QVector < QVector <double> > signalData;  // format:  [ievent] [ichanel]            this is (peak - pedestal)
     QVector<bool> RejectedEvents;
 
     int numChannels;

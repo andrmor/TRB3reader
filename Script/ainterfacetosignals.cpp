@@ -33,7 +33,7 @@ double AInterfaceToSignals::getSignal(int ievent, int iHardwChannel)
 
 QVariant AInterfaceToSignals::getSignals(int ievent)
 {
-    const std::vector<double>* vec = Extractor->GetSignals(ievent);
+    const QVector<double>* vec = Extractor->GetSignals(ievent);
     if (!vec) return QVariantList();
 
     QJsonArray ar;
@@ -52,7 +52,7 @@ QVariant AInterfaceToSignals::getSignals(int ievent)
 
 QVariant AInterfaceToSignals::getSignals_logical(int ievent)
 {
-    const std::vector<double>* vec = Extractor->GetSignals(ievent);
+    const QVector<double>* vec = Extractor->GetSignals(ievent);
     if (!vec) return QVariantList();
 
     const std::vector<std::size_t>& map = Config->Map->GetMapToHardware();
