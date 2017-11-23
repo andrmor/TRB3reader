@@ -442,6 +442,32 @@ void AInterfaceToHist::Draw(QString HistName, QString options)
     {
       abort("Object "+HistName+": unknown histogram type!");
       return;
+  }
+}
+
+void AInterfaceToHist::Save(QString HistName, QString FileName)
+{
+    int index = TmpHub->ScriptDrawObjects.findIndexOf(HistName);
+    if (index == -1)
+      {
+        abort("Histogram "+HistName+" not found!");
+        return;
+      }
+
+    RootDrawObj& r = TmpHub->ScriptDrawObjects.List[index];
+    if (r.type == "TH1D")
+      {
+        TH1D* h = static_cast<TH1D*>(r.Obj);
+        h->SaveAs(FileName.toLocal8Bit().data());
+      }
+    else if (r.type == "TH2D")
+      {
+        TH2D* h = static_cast<TH2D*>(r.Obj);
+        h->SaveAs(FileName.toLocal8Bit().data());
+      }
+    else
+    {
+        abort("Histogram not found!");
     }
 }
 
@@ -670,6 +696,23 @@ void AInterfaceToGraph::Draw(QString GraphName, QString options)
       abort("Graph "+GraphName+" not found!");
       return;
   }
+}
+
+void AInterfaceToGraph::Save(QString GraphName, QString FileName)
+{
+    int index = TmpHub->ScriptDrawObjects.findIndexOf(GraphName);
+    if (index == -1)
+      {
+        abort("Graph "+GraphName+" not found!");
+        return;
+      }
+
+    RootDrawObj& r = TmpHub->ScriptDrawObjects.List[index];
+    if (r.type == "TGraph")
+    {
+        TGraph* gr = static_cast<TGraph*>(r.Obj);
+        gr->SaveAs(FileName.toLocal8Bit().data());
+    }
 }
 
 bool AInterfaceToGraph::Delete(QString GraphName)

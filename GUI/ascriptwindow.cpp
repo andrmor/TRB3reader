@@ -351,8 +351,10 @@ void AScriptWindow::ReadFromJson(QJsonObject &json)
            {
                QTextEdit te;
                te.append(ScriptInFile);
-               if (te.document()->toPlainText() == st->TextEdit->document()->toPlainText())
-                   twScriptTabs->setTabText(twScriptTabs->count()-1, QFileInfo(st->FileName).fileName());
+               twScriptTabs->setTabText(twScriptTabs->count()-1, QFileInfo(st->FileName).fileName());
+
+               twScriptTabs->tabBar()->setTabTextColor( twScriptTabs->count()-1,
+                                                        (te.document()->toPlainText() == st->TextEdit->document()->toPlainText() ? Qt::black : Qt::red) );
            }
         }
     }
@@ -573,6 +575,7 @@ void AScriptWindow::on_pbSave_clicked()
     outputFile.close();
 
     twScriptTabs->setTabText(CurrentTab, QFileInfo(SavedName).fileName());
+    twScriptTabs->tabBar()->setTabTextColor( twScriptTabs->count()-1, Qt::black );
 
     //ui->pbSave->setEnabled(true);
 }

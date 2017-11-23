@@ -35,6 +35,8 @@ public slots:
 
   void Draw(QString HistName, QString options);
 
+  void Save(QString HistName, QString FileName);
+
   void Smooth(QString HistName, int times);
   QVariant FitGauss(QString HistName, QString options="");
   QVariant FitGaussWithInit(QString HistName, QVariant InitialParValues, QString options="");
@@ -75,6 +77,8 @@ public slots:
   void AddPoints(QString GraphName, QVariant xyArray);
 
   void Draw(QString GraphName, QString options);
+
+  void Save(QString GraphName, QString FileName);
 
   bool Delete(QString GraphName);
   void DeleteAllGraph();
