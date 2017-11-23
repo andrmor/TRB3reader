@@ -40,37 +40,37 @@ int AInterfaceToConfig::countLogicalChannels()
     Config->Map->GetNumLogicalChannels();
 }
 
-bool AInterfaceToConfig::isNegative_hardware(int ichannel)
+bool AInterfaceToConfig::isNegative(int iHardwChannel)
 {
-    return Config->IsNegative(ichannel);
+    return Config->IsNegative(iHardwChannel);
 }
 
-bool AInterfaceToConfig::isNegative_logical(int ichannel)
+//bool AInterfaceToConfig::isNegative_logical(int ichannel)
+//{
+//    int ihardw = Config->Map->LogicalToHardware(ichannel);
+//    if (std::isnan(ihardw))
+//    {
+//        abort("Unmapped logical channel: "+QString::number(ichannel));
+//        return false;
+//    }
+//    return Config->IsNegative(ihardw);
+//}
+
+bool AInterfaceToConfig::isIgnoredChannel(int iHardwChannel)
 {
-    int ihardw = Config->Map->LogicalToHardware(ichannel);
-    if (std::isnan(ihardw))
-    {
-        abort("Unmapped logical channel: "+QString::number(ichannel));
-        return false;
-    }
-    return Config->IsNegative(ihardw);
+    return Config->IgnoreHardwareChannels.contains(iHardwChannel);
 }
 
-bool AInterfaceToConfig::isIgnoredChannel_hardware(int ichannel)
-{
-    return Config->IgnoreHardwareChannels.contains(ichannel);
-}
-
-bool AInterfaceToConfig::isIgnoredChannel_logical(int ichannel)
-{
-    int ihardw = Config->Map->LogicalToHardware(ichannel);
-    if (std::isnan(ihardw))
-    {
-        abort("Unmapped logical channel: "+QString::number(ichannel));
-        return false;
-    }
-    return Config->IgnoreHardwareChannels.contains(ihardw);
-}
+//bool AInterfaceToConfig::isIgnoredChannel_logical(int ichannel)
+//{
+//    int ihardw = Config->Map->LogicalToHardware(ichannel);
+//    if (std::isnan(ihardw))
+//    {
+//        abort("Unmapped logical channel: "+QString::number(ichannel));
+//        return false;
+//    }
+//    return Config->IgnoreHardwareChannels.contains(ihardw);
+//}
 
 int AInterfaceToConfig::toHardware(int iLogicalChannel)
 {

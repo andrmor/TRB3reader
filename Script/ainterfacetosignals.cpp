@@ -120,6 +120,16 @@ void AInterfaceToSignals::setAllRejected(bool flag)
     Extractor->SetAllRejected(flag);
 }
 
+bool AInterfaceToSignals::isRejectedEvent(int ievent)
+{
+    return Extractor->IsRejectedEvent(ievent);
+}
+
+bool AInterfaceToSignals::isRejectedEventFast(int ievent)
+{
+    return Extractor->IsRejectedEventFast(ievent);
+}
+
 void AInterfaceToSignals::setRejected(int ievent, bool flag)
 {
     bool bOK = Extractor->SetRejected(ievent, flag);

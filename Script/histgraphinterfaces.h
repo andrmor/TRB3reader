@@ -30,6 +30,9 @@ public slots:
   void Fill(QString HistName, double val, double weight);
   void Fill2D(QString HistName, double x, double y, double weight);
 
+  void FillArr(QString HistName, QVariant Array);
+  void Fill2DArr(QString HistName, QVariant Array);
+
   void Draw(QString HistName, QString options);
 
   void Smooth(QString HistName, int times);
@@ -39,7 +42,9 @@ public slots:
   bool Delete(QString HistName);
   void DeleteAllHist();
 
-  bool isHistExists(QString HistName);
+  bool isHistExist(QString HistName);
+
+  void SetOptStat(QString opt);
 
 signals:
   void RequestDraw(TObject* obj, QString options, bool fFocus);

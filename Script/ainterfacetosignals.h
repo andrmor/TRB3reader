@@ -32,6 +32,8 @@ public slots:
 
     //rejection of events
     void     setAllRejected(bool flag);
+    bool     isRejectedEvent(int ievent);
+    bool     isRejectedEventFast(int ievent);
     void     setRejected(int ievent, bool flag);
 
 

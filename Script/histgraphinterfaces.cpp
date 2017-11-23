@@ -13,6 +13,7 @@
 #include "TF2.h"
 #include "TGraph.h"
 #include "TF1.h"
+#include "TStyle.h"
 
 //----------------- HIST  -----------------
 AInterfaceToHist::AInterfaceToHist(TmpObjHubClass* TmpHub)
@@ -23,6 +24,22 @@ AInterfaceToHist::AInterfaceToHist(TmpObjHubClass* TmpHub)
     H["FitGaussWithInit"] = "Fit histogram with a Gaussian. The returned result (is successful) contains an array [Constant,Mean,Sigma,ErrConstant,ErrMean,ErrSigma]"
                             "\nInitialParValues is an array of initial parameters of the values [Constant,Mean,Sigma]"
                             "\nOptional 'options' parameter is directly forwarded to TH1::Fit()";
+    H["SetOptStat"] =
+            "k : kurtosis printed\n"
+            "K : kurtosis and kurtosis error printed\n"
+            "s : skewness printed\n"
+            "S : skewness and skewness error printed\n"
+            "i : integral of bins printed\n"
+            "I : integral of bins with option \"width\" printed\n"
+            "o : number of overflows printed\n"
+            "u : number of underflows printed\n"
+            "r : rms printed\n"
+            "R : rms and rms error printed\n"
+            "m : mean value printed\n"
+            "M : mean value mean error values printed\n"
+            "e : number of entries printed\n"
+            "n : name of histogram is printed\n"
+            "Example: SetOptStat(\"ne\"); print only name of histogram and number of entries.";
 }
 
 bool AInterfaceToHist::InitOnRun()
@@ -130,6 +147,113 @@ void AInterfaceToHist::Fill2D(QString HistName, double x, double y, double weigh
     {
       abort("TH2D histogram "+HistName+" not found!");
       return;
+  }
+}
+
+void AInterfaceToHist::FillArr(QString HistName, QVariant Array)
+{
+    int index = TmpHub->ScriptDrawObjects.findIndexOf(HistName);
+    if (index == -1)
+      {
+        abort("Histogram "+HistName+" not found!");
+        return;
+      }
+    RootDrawObj& r = TmpHub->ScriptDrawObjects.List[index];
+    if (r.type != "TH1D")
+    {
+        abort("This is not a 1D histogram!");
+        return;
+    }
+    TH1D* h = static_cast<TH1D*>(r.Obj);
+
+    QString typeArr = Array.typeName();
+    if (typeArr != "QVariantList")
+    {
+        abort("Array is expected as second argument in hist.FillArr");
+        return;
+    }
+
+    QVariantList vl = Array.toList();
+    QJsonArray arr = QJsonArray::fromVariantList(vl);
+    for (int i=0; i<arr.size(); i++)
+    {
+        if (arr[i].isDouble()) h->Fill(arr[i].toDouble(), 1.0);
+        else
+        {
+            QJsonArray el = arr[i].toArray();
+            double val, weight;
+            switch (el.size())
+            {
+            case 1:
+                weight = 1.0;
+                break;
+            case 2:
+                weight = el[1].toDouble();
+                break;
+            default:
+                abort("hist.FillArr: second argument has to be array of values (then weight=1) or of arrays of [val, weight]");
+                return;
+            }
+            val = el[0].toDouble();
+
+            h->Fill(val, weight);
+        }
+    }
+}
+
+void AInterfaceToHist::Fill2DArr(QString HistName, QVariant Array)
+{
+    int index = TmpHub->ScriptDrawObjects.findIndexOf(HistName);
+    if (index == -1)
+      {
+        abort("Histogram "+HistName+" not found!");
+        return;
+      }
+    RootDrawObj& r = TmpHub->ScriptDrawObjects.List[index];
+    if (r.type != "TH2D")
+    {
+        abort("This is not a 2D histogram!");
+        return;
+    }
+    TH2D* h = static_cast<TH2D*>(r.Obj);
+
+    QString typeArr = Array.typeName();
+    if (typeArr != "QVariantList")
+    {
+        abort("Array is expected as second argument in hist.Fill2DArr");
+        return;
+    }
+
+    QVariantList vl = Array.toList();
+    QJsonArray arr = QJsonArray::fromVariantList(vl);
+    for (int i=0; i<arr.size(); i++)
+    {
+        if (!arr[i].isArray())
+        {
+            abort("Fill2DArr expect the second argument to be array of arrays [x, y] (or [x, y, weight])");
+            return;
+        }
+        else
+        {
+            QJsonArray el = arr[i].toArray();
+            double x, y, weight;
+            switch (el.size())
+            {
+            case 2:
+                weight = 1.0;
+                break;
+            case 3:
+                weight = el[2].toDouble();
+                break;
+            default:
+                abort("hist.FillArr: second argument has to be array of values (then weight=1) or of arrays of [val, weight]");
+                return;
+            }
+            x = el[0].toDouble();
+            y = el[1].toDouble();
+
+            h->Fill(x, y, weight);
+        }
     }
 }
 
@@ -272,10 +396,15 @@ void AInterfaceToHist::DeleteAllHist()
     TmpHub->ScriptDrawObjects.removeAllHists();
 }
 
-bool AInterfaceToHist::isHistExists(QString HistName)
+bool AInterfaceToHist::isHistExist(QString HistName)
 {
     int index = TmpHub->ScriptDrawObjects.findIndexOf(HistName);
     return (index != -1);
+}
+
+void AInterfaceToHist::SetOptStat(QString opt)
+{
+    gStyle->SetOptStat(opt.toLocal8Bit().data());
 }
 
 void AInterfaceToHist::Draw(QString HistName, QString options)

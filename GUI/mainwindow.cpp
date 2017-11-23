@@ -401,10 +401,7 @@ void MainWindow::on_pbBulkProcess_clicked()
         if (ui->cbAutoExecuteScript->isChecked())
         {
             qDebug() << "Auto-executing script";
-            //ScriptWindow->on_pbRunScript_clicked();
-            const QString& Script = ScriptWindow->GetScriptOfFirstTab();
-            qDebug() << Script;
-            bool bOK = ScriptWindow->ExecuteScript(Script);
+            bool bOK = ScriptWindow->ExecuteScriptInFirstTab();
             if (!bOK)
             {
                 ui->pteBulkLog->appendPlainText("---- Script execution error");

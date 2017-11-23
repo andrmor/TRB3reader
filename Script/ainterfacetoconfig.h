@@ -21,11 +21,8 @@ public slots:
 
     int      countLogicalChannels();
 
-    bool     isNegative_hardware(int ichannel);
-    bool     isNegative_logical(int ichannel);
-
-    bool     isIgnoredChannel_hardware(int ichannel);
-    bool     isIgnoredChannel_logical(int ichannel);
+    bool     isNegative(int iHardwChannel);
+    bool     isIgnoredChannel(int iHardwChannel);
 
     int      toHardware(int iLogicalChannel);
     int      toLogical(int iHardwChannel);

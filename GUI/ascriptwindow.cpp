@@ -374,12 +374,6 @@ void AScriptWindow::SetMainSplitterSizes(QList<int> values)
     splMain->setSizes(values);
 }
 
-const QString &AScriptWindow::GetScriptOfFirstTab() const
-{
-     QString script = ScriptTabs.at(CurrentTab)->TextEdit->document()->toPlainText();
-     return script;
-}
-
 void AScriptWindow::ShowText(QString text)
 {
   pteOut->appendHtml(text);
@@ -403,7 +397,7 @@ void AScriptWindow::on_pbRunScript_clicked()
 
 bool AScriptWindow::ExecuteScript(const QString& Script)
 {
-   bool bErrorState = false;
+   bool bSuccessFlag = false;
    //qDebug() << "Init on Start done";
    pteOut->clear();
    AScriptWindow::ShowText("Processing script");
@@ -413,7 +407,7 @@ bool AScriptWindow::ExecuteScript(const QString& Script)
    if (errorLineNum > -1)
      {
        AScriptWindow::ReportError("Syntax error!", errorLineNum);
-       return false;
+       return bSuccessFlag;
      }
 
    ui->pbStop->setVisible(true);
@@ -428,7 +422,6 @@ bool AScriptWindow::ExecuteScript(const QString& Script)
    if (!ScriptManager->LastError.isEmpty())
    {
        AScriptWindow::ReportError("Script error: "+ScriptManager->LastError, -1);
-       bErrorState = true;
    }
    else if (ScriptManager->engine->hasUncaughtException())
    {   //Script has uncaught exception
@@ -438,7 +431,6 @@ bool AScriptWindow::ExecuteScript(const QString& Script)
        //QString backtrace = engine.uncaughtExceptionBacktrace().join('\n');
        //qDebug() << "backtrace:" << backtrace;
        AScriptWindow::ReportError("Script error: "+message, lineNum);
-       bErrorState = true;
    }
    else
    {   //success
@@ -447,6 +439,7 @@ bool AScriptWindow::ExecuteScript(const QString& Script)
          {
             if (ShowEvalResult && result!="undefined") ShowText("Script evaluation result:\n"+result);
             else ShowText("Script evaluation: success");
+            bSuccessFlag = true;
          }
        else
          {
@@ -457,7 +450,14 @@ bool AScriptWindow::ExecuteScript(const QString& Script)
 
    ScriptManager->CollectGarbage();
 
-   return bErrorState;
+   return bSuccessFlag;
+}
+
+bool AScriptWindow::ExecuteScriptInFirstTab()
+{
+    if (ScriptTabs.isEmpty()) return false;
+    QString Script = ScriptTabs[0]->TextEdit->document()->toPlainText();
+    return ExecuteScript(Script);
 }
 
 //void AScriptWindow::abortEvaluation(QString message)

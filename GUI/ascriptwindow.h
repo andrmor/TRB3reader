@@ -55,8 +55,8 @@ public:
     AScriptManager* ScriptManager;
     QStringList functions;
 
-    const QString& GetScriptOfFirstTab() const;
     bool ExecuteScript(const QString &Script);
+    bool ExecuteScriptInFirstTab();
 
 public slots:
     void updateJsonTree();
