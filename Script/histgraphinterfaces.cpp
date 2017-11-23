@@ -19,6 +19,8 @@
 AInterfaceToHist::AInterfaceToHist(TmpObjHubClass* TmpHub)
   : TmpHub(TmpHub)
 {
+    H["Draw"] = "Draw the histogram. The second arguments defines how it will be drawn.\nFor available options see:\n"
+                "https://root.cern.ch/doc/master/classTHistPainter.html";
     H["FitGauss"] = "Fit histogram with a Gaussian. The returned result (is successful) contains an array [Constant,Mean,Sigma,ErrConstant,ErrMean,ErrSigma]"
             "\nOptional 'options' parameter is directly forwarded to TH1::Fit()";
     H["FitGaussWithInit"] = "Fit histogram with a Gaussian. The returned result (is successful) contains an array [Constant,Mean,Sigma,ErrConstant,ErrMean,ErrSigma]"
