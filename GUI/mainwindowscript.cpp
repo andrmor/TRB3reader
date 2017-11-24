@@ -59,6 +59,7 @@ void MainWindow::CreateScriptWindow()
 
     QObject::connect(ScriptWindow, SIGNAL(onStart()), this, SLOT(onGlobalScriptStarted()));
     QObject::connect(ScriptWindow, SIGNAL(success(QString)), this, SLOT(onGlobalScriptFinished()));
+    QObject::connect(ScriptWindow, &AScriptWindow::RequestStateSave, this, &MainWindow::saveCompleteState);
 
 #ifdef CERN_ROOT
     QObject::connect(ScriptWindow, SIGNAL(RequestDraw(TObject*,QString,bool)), RootModule, SLOT(onDrawRequested(TObject*,QString,bool)));

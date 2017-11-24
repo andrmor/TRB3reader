@@ -392,6 +392,9 @@ void AScriptWindow::on_pbRunScript_clicked()
 {
     //WriteToJson(Config->ScriptWindowJson);
     //Config->SaveANTSconfiguration();
+
+    emit RequestStateSave();
+
     QString Script = ScriptTabs[CurrentTab]->TextEdit->document()->toPlainText();
 
     ExecuteScript(Script);
@@ -575,7 +578,7 @@ void AScriptWindow::on_pbSave_clicked()
     outputFile.close();
 
     twScriptTabs->setTabText(CurrentTab, QFileInfo(SavedName).fileName());
-    twScriptTabs->tabBar()->setTabTextColor( twScriptTabs->count()-1, Qt::black );
+    twScriptTabs->tabBar()->setTabTextColor( CurrentTab, Qt::black );
 
     //ui->pbSave->setEnabled(true);
 }

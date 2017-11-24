@@ -153,6 +153,7 @@ signals:
     void onStart();
     void onAbort();
     void success(QString eval);
+    void RequestStateSave();
 
 public slots:
     void receivedOnStart() {emit onStart();}

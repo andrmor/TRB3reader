@@ -21,10 +21,18 @@
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+#ifdef CERN_ROOT
+    delete RootModule; RootModule = 0;
+#endif
+
+    QMainWindow::closeEvent(event);
+}
+
+void MainWindow::saveCompleteState()
+{
     QJsonObject js;
 #ifdef CERN_ROOT
     js = RootModule->SaveGraphWindows();
-    delete RootModule; RootModule = 0;
 #endif
     Dispatcher->SaveConfig(Dispatcher->AutosaveFile, js);
 
@@ -32,8 +40,6 @@ void MainWindow::closeEvent(QCloseEvent *event)
     QJsonObject jsS;
     ScriptWindow->WriteToJson(jsS);
     SaveJsonToFile(jsS, Dispatcher->ConfigDir+"/scripting.json");
-
-    QMainWindow::closeEvent(event);
 }
 
 void MainWindow::on_actionLoad_config_triggered()

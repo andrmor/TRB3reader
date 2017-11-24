@@ -34,6 +34,8 @@ public:
 public slots:
     void onGlobalScriptStarted();
     void onGlobalScriptFinished();
+    void saveCompleteState();
+
 private slots:
     //right-click menus
     void on_ptePolarity_customContextMenuRequested(const QPoint &pos);
