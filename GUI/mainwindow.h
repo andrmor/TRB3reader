@@ -150,6 +150,8 @@ private slots:
 
     void on_pbSelectNewDir_clicked();
 
+    void on_pbEditListOfNegatives_clicked();
+
 protected:
     void closeEvent(QCloseEvent* event);
 
@@ -184,6 +186,8 @@ private:
     void ClearData();
     void CreateScriptWindow();
 
+    QString PackChannelList(QVector<int> vec);
+    bool ExtractNumbersFromQString(const QString input, QList<int> *ToAdd);
 };
 
 #endif // MAINWINDOW_H

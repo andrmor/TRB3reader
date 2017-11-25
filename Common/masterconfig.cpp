@@ -16,7 +16,7 @@ MasterConfig::~MasterConfig()
     delete Map;
 }
 
-void MasterConfig::SetNegativeChannels(const std::vector<int> &listOfChannels)
+void MasterConfig::SetNegativeChannels(const QVector<int> &listOfChannels)
 {
     ListNegativeChannels = listOfChannels;
     updatePolarityQuickAccessData();

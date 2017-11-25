@@ -75,7 +75,7 @@ void ADispatcher::SaveConfig(QString FileName, QJsonObject js)
 
 void ADispatcher::ClearNegativeChannels()
 {
-    Config->SetNegativeChannels(std::vector<int>());
+    Config->SetNegativeChannels(QVector<int>());
     ClearData();
 
     MW->UpdateGui();

@@ -7,6 +7,7 @@
 #include "ascriptwindow.h"
 #include "amessage.h"
 #include "adispatcher.h"
+#include "aeditchannelsdialog.h"
 
 #ifdef CERN_ROOT
 #include "cernrootmodule.h"
@@ -149,12 +150,11 @@ void MainWindow::on_pbLoadPolarities_clicked()
 {
     QString FileName = QFileDialog::getOpenFileName(this, "Add channel polarity data.\n"
                                                     "The file should contain hardware channel numbers which have negative polarity");
-    QVector<int> pos;
-    LoadIntVectorsFromFile(FileName, &pos);
+    QVector<int> negList;
+    LoadIntVectorsFromFile(FileName, &negList);
 
-    std::vector<int> List;
-    for (int i : pos) List.push_back(i);
-    Config->SetNegativeChannels(List);
+
+    Config->SetNegativeChannels(negList);
 
     Extractor->ClearData();
     LogMessage("Polarities updated");
@@ -807,4 +807,128 @@ void MainWindow::on_pbPosSignature_clicked()
 void MainWindow::on_cobSignalExtractionMethod_currentIndexChanged(int index)
 {
     ui->sbExtractAllFromSampleNumber->setVisible(index == 2);
+}
+
+bool MainWindow::ExtractNumbersFromQString(const QString input, QList<int> *ToAdd)
+{
+  ToAdd->clear();
+
+  QRegExp rx("(\\,|\\-)"); //RegEx for ' ' and '-'
+
+  QStringList fields = input.split(rx, QString::SkipEmptyParts);
+
+  if (fields.size() == 0 )
+    {
+      //message("Nothing to add!");
+      return false;
+    }
+
+  fields = input.split(",", QString::SkipEmptyParts);
+  //  qDebug()<<"found "<<fields.size()<<" records";
+
+  for (int i=0; i<fields.size(); i++)
+    {
+      QString thisField = fields[i];
+
+      //are there "-" separated fields?
+      QStringList subFields = thisField.split("-", QString::SkipEmptyParts);
+
+      if (subFields.size() > 2 || subFields.size() == 0) return false;
+      else if (subFields.size() == 1)
+        {
+          //just one number
+          bool ok;
+          int pm;
+          pm = subFields[0].toInt(&ok);
+
+          if (ok) ToAdd->append(pm);
+          else return false;
+        }
+      else //range - two subFields
+        {
+          bool ok1, ok2;
+          int pm1, pm2;
+          pm1 = subFields[0].toInt(&ok1);
+          pm2 = subFields[1].toInt(&ok2);
+          if (ok1 && ok2)
+            {
+               if (pm2<pm1) return false;//error = true;
+               else
+                 {
+                   for (int j=pm1; j<=pm2; j++) ToAdd->append(j);
+                 }
+            }
+          else return false;
+        }
+    }
+
+  return true;
+}
+
+QString MainWindow::PackChannelList(QVector<int> vec)
+{
+    if (vec.isEmpty()) return "";
+
+    std::sort(vec.begin(), vec.end());
+
+    QString out;
+    int prevVal = vec.first();
+    int rangeStart = prevVal;
+    for (int i=0; i<=vec.size(); ++i)        //includes the invalid index!
+    {
+        int thisVal;
+        if ( i == vec.size() )               //last in the vector
+        {
+            thisVal = prevVal;
+        }
+        else
+        {
+            thisVal = vec.at(i);
+            if ( i == 0 )                    // first but not the only
+            {
+                continue;
+            }
+            else if ( thisVal == prevVal+1 ) //continuing range
+            {
+                prevVal++;
+                continue;
+            }
+        }
+
+        //adding to output
+        if (!out.isEmpty()) out += ", ";
+
+        if (prevVal == rangeStart)             //single val
+            out += QString::number(prevVal);
+        else                                //range ended
+            out += QString::number(rangeStart) + "-" + QString::number(prevVal);
+
+        prevVal = thisVal;
+        rangeStart = thisVal;
+    }
+
+    return out;
+}
+
+void MainWindow::on_pbEditListOfNegatives_clicked()
+{
+    QString old =  PackChannelList(Config->GetListOfNegativeChannels());
+    AEditChannelsDialog* D = new AEditChannelsDialog("List of negative channels", old);
+    int res = D->exec();
+
+    const QString str = D->GetText();
+    delete D;
+    qDebug() << res << str;
+
+    QList<int> rawList;
+    ExtractNumbersFromQString(str, &rawList);
+    qDebug() << rawList;
+    QSet<int> set;
+    for (int i : rawList) set << i;
+
+    QVector<int> vec;
+    for (int i: set) vec << i;
+
+    Config->SetNegativeChannels(vec);
+    UpdateGui();
 }

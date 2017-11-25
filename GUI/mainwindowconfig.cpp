@@ -174,8 +174,8 @@ void MainWindow::UpdateGui()
     ui->leFileName->setText(Config->FileName);
 
     ui->ptePolarity->clear();
-    QString s;
-    for (int i: Config->GetListOfNegativeChannels()) s += QString::number(i)+" ";
+    QString s = PackChannelList(Config->GetListOfNegativeChannels());
+    //for (int i: Config->GetListOfNegativeChannels()) s += QString::number(i)+" ";
     ui->ptePolarity->appendPlainText(s);
 
     ui->pteMapping->clear();
