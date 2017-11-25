@@ -83,7 +83,7 @@ void ADispatcher::ClearNegativeChannels()
 
 void ADispatcher::ClearMapping()
 {
-    Config->SetMapping(std::vector<std::size_t>());
+    Config->SetMapping(QVector<int>());
     ClearData();
 
     MW->UpdateGui();

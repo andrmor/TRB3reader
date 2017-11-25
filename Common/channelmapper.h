@@ -1,7 +1,7 @@
 #ifndef CHANNELMAPPER_H
 #define CHANNELMAPPER_H
 
-#include <vector>
+#include <QVector>
 
 class ChannelMapper
 {
@@ -11,32 +11,30 @@ public:
     ChannelMapper();
 
       //checks the channel map for any desynchronization, or repetitions
-    bool Validate(std::size_t numChannels, bool ensureLogicalChannelContinuity = true) const;
+    bool Validate(int numChannels, bool ensureLogicalChannelContinuity = true) const;
 
       //safe requests
-    std::size_t HardwareToLogical(std::size_t HardwareChannel) const;
-    std::size_t LogicalToHardware(std::size_t LogicalChannel) const;
+    int HardwareToLogical(int iHardwareChannel) const;
+    int LogicalToHardware(int iLogicalChannel) const;
       //fast requests, no checks for validity
-    std::size_t HardwareToLogicalFast(std::size_t HardwareChannel) const;
-    std::size_t LogicalToHardwareFast(std::size_t LogicalChannel) const;
+    int HardwareToLogicalFast(int iHardwareChannel) const;
+    int LogicalToHardwareFast(int iLogicalChannel) const;
 
-    std::size_t GetNumLogicalChannels() const {return ToHardware.size();}
+    int GetNumLogicalChannels() const {return ToHardware.size();}
 
-    const std::vector<std::size_t>& GetMapToHardware() {return ToHardware;}
+    const QVector<int>& GetMapToHardware() const {return ToHardware;}
 
 protected:
     //Set channel map: vector should contain logical channel numbers for consequitive hardware channels
-  void SetChannels_OrderedByHardware(std::vector<std::size_t> ToLogicalChannelMap);
+  void SetChannels_OrderedByHardware(QVector<int> ToLogicalChannelMap);
     //Set channel map: vector should contain hardware channel numbers for consequitive logical channels
-  void SetChannels_OrderedByLogical(std::vector<std::size_t> ToHardwareChannelMap);
+  void SetChannels_OrderedByLogical(QVector<int> ToHardwareChannelMap);
 
   void Clear();
 
-
-
 private:
-    std::vector<std::size_t> ToLogical;
-    std::vector<std::size_t> ToHardware;
+    QVector<int> ToLogical;
+    QVector<int> ToHardware;
 
     void update_ToHardware();
     void update_ToLogical();

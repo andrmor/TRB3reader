@@ -170,7 +170,6 @@ void MainWindow::on_pbAddMapping_clicked()
     QVector<int> arr;
     LoadIntVectorsFromFile(FileName, &arr);
 
-    std::vector<size_t> List;
     for (int i : arr)
     {
         if (i<0)
@@ -178,9 +177,8 @@ void MainWindow::on_pbAddMapping_clicked()
             message("Only positive channel numbers are allowed!", this);
             return;
         }
-        List.push_back(i);
     }
-    Config->SetMapping(List);
+    Config->SetMapping(arr);
 
     Config->Map->Validate(Reader->GetNumChannels(), true);
     LogMessage("Mapping updated");

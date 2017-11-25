@@ -22,8 +22,8 @@ public:
 
     //channel map (hardware / logical)
     ChannelMapper* Map;  //use this class to access convertion methods!
-    void SetMapping(const std::vector<size_t> &mapping);
-    const std::vector<size_t>& GetMapping() {return ChannelMap;}
+    void SetMapping(const QVector<int> &mapping);
+    const QVector<int>& GetMapping() {return ChannelMap;}
 
     QSet<int> IgnoreHardwareChannels;
 
@@ -81,8 +81,7 @@ private:
     std::vector<int> ListNegativeChannels;
     std::vector<bool> NegPol; //Quick access
 
-    std::vector<std::size_t> ChannelMap;
-
+    QVector<int> ChannelMap;
 
 private:
     void updatePolarityQuickAccessData();

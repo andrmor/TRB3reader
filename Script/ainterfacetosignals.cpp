@@ -55,7 +55,7 @@ QVariant AInterfaceToSignals::getSignals_logical(int ievent)
     const QVector<double>* vec = Extractor->GetSignals(ievent);
     if (!vec) return QVariantList();
 
-    const std::vector<std::size_t>& map = Config->Map->GetMapToHardware();
+    const QVector<int>& map = Config->Map->GetMapToHardware();
 
     QJsonArray ar;
     for (int ihardw : map) ar << vec->at(ihardw);

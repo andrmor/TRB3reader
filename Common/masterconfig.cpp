@@ -119,7 +119,7 @@ bool MasterConfig::readChannelMapFromJson(QJsonObject &json)
     ChannelMap.clear();
     QJsonArray arr = json["ChannelMap"].toArray();
     for (int i=0; i<arr.size(); i++)
-        ChannelMap.push_back(arr[i].toInt());
+        ChannelMap << arr[i].toInt();
 
     Map->Clear();
     Map->SetChannels_OrderedByLogical(ChannelMap);
@@ -285,6 +285,7 @@ bool MasterConfig::readScriptSettingsFromJson(QJsonObject &json)
         for (int imsa=0; imsa<mspAr.size(); imsa++)
             MainSplitterSizes_ScriptWindow << mspAr[imsa].toInt(50);
     }
+    return true;
 }
 
 void MasterConfig::updatePolarityQuickAccessData()
@@ -303,7 +304,7 @@ bool MasterConfig::IsNegative(int ichannel) const
     return NegPol.at(ichannel);
 }
 
-void MasterConfig::SetMapping(const std::vector<size_t> &mapping)
+void MasterConfig::SetMapping(const QVector<int> &mapping)
 {
     Map->Clear();
     ChannelMap.clear();
