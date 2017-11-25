@@ -915,14 +915,13 @@ void MainWindow::on_pbEditListOfNegatives_clicked()
     QString old =  PackChannelList(Config->GetListOfNegativeChannels());
     AEditChannelsDialog* D = new AEditChannelsDialog("List of negative channels", old);
     int res = D->exec();
+    if (res != 1) return;
 
     const QString str = D->GetText();
     delete D;
-    qDebug() << res << str;
 
     QList<int> rawList;
     ExtractNumbersFromQString(str, &rawList);
-    qDebug() << rawList;
     QSet<int> set;
     for (int i : rawList) set << i;
 

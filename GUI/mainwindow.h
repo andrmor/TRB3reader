@@ -171,7 +171,6 @@ private:
 
     bool bStopFlag;
 
-
     const QString ProcessData(); //returns error message if any
     void LogMessage(QString message);
     bool saveSignalsToFile(QString FileName, bool bUseHardware);

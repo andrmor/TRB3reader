@@ -21,6 +21,8 @@
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+    saveCompleteState();
+
 #ifdef CERN_ROOT
     delete RootModule; RootModule = 0;
 #endif
