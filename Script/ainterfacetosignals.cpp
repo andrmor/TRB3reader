@@ -79,7 +79,7 @@ void AInterfaceToSignals::setSignals(int ievent, QVariant arrayOfValues)
         return;
     }
 
-    std::vector<double> vec;
+    QVector<double> vec;
     vec.reserve(numChannels);
     for (int i=0; i<ar.size(); ++i)
     {
@@ -88,7 +88,7 @@ void AInterfaceToSignals::setSignals(int ievent, QVariant arrayOfValues)
             abort("Failed to set signal values - array contains non-numerical data");
             return;
         }
-        vec.push_back( ar[i].toDouble() );
+        vec << ar[i].toDouble();
     }
 
     bool bOK = Extractor->SetSignals(ievent, vec);

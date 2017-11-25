@@ -184,7 +184,7 @@ int Trb3dataReader::GetSampleWhereFirstBelowFast(int ievent, int ichannel, int t
 
     for (int i=0; i<vec.size(); i++)
         if (vec.at(i)<threshold) return i;
-    return NaN;
+    return -1;
 }
 
 int Trb3dataReader::GetSampleWhereFirstAbove(int ievent, int ichannel, int threshold) const
@@ -201,7 +201,7 @@ int Trb3dataReader::GetSampleWhereFirstAboveFast(int ievent, int ichannel, int t
 
     for (int i=0; i<vec.size(); i++)
         if (vec.at(i)>threshold) return i;
-    return NaN;
+    return -1;
 }
 
 void Trb3dataReader::substractPedestals()
