@@ -113,7 +113,7 @@ void CernRootModule::DrawSignature(bool bNeg)
         for (int ilc=0; ilc<numChan; ilc++)
         {
             int iHardwCh = Config->Map->LogicalToHardware(ilc);
-            if (std::isnan(iHardwCh)) continue;
+            if ( iHardwCh < 0 ) continue;
             if (Config->IgnoreHardwareChannels.contains(iHardwCh)) continue;
             if (bNeg != Config->IsNegative(iHardwCh)) continue;
 
@@ -307,7 +307,7 @@ void CernRootModule::DrawOverlay(int ievent, bool bNeg, bool bAutoscale, double 
         if (SortBy_0Logic1Hardw == 0)
         {
             iHardwCh = Config->Map->LogicalToHardware(iCh);
-            if (std::isnan(iHardwCh)) continue;
+            if ( iHardwCh < 0 ) continue;
         }
         else iHardwCh = iCh;
 
@@ -384,7 +384,7 @@ void CernRootModule::DrawAll(int ievent, bool bNeg, int padsX, int padsY, bool b
             if (SortBy_0Logic1Hardw == 0)
             {
                 iHardwCh = Config->Map->LogicalToHardware(iCh);
-                if (std::isnan(iHardwCh)) continue;
+                if ( iHardwCh < 0 ) continue;
             }
             else iHardwCh = iCh;
 
@@ -412,7 +412,7 @@ void CernRootModule::DrawAll(int ievent, bool bNeg, int padsX, int padsY, bool b
         if (SortBy_0Logic1Hardw == 0)
         {
             iHardwCh = Config->Map->LogicalToHardware(iCh);
-            if (std::isnan(iHardwCh)) continue;
+            if ( iHardwCh < 0 ) continue;
         }
         else iHardwCh = iCh;
 

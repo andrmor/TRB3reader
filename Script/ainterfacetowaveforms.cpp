@@ -19,15 +19,15 @@ int AInterfaceToWaveforms::countSamples()
     return Reader->GetNumSamples();
 }
 
-int AInterfaceToWaveforms::getValue(int ievent, int iHardwChannel, int isample)
+double AInterfaceToWaveforms::getValue(int ievent, int iHardwChannel, int isample)
 {
-    int val = Reader->GetValue(ievent, iHardwChannel, isample);
-    if (std::isnan(val)) abort("Failed to get waveform value!");
+    double val = Reader->GetValue(ievent, iHardwChannel, isample);
+    if ( std::isnan(val) ) abort("Failed to get waveform value!");
 
     return val;
 }
 
-int AInterfaceToWaveforms::getValueFast(int ievent, int iHardwChannel, int isample)
+double AInterfaceToWaveforms::getValueFast(int ievent, int iHardwChannel, int isample)
 {
     return Reader->GetValueFast(ievent, iHardwChannel, isample);
 }
@@ -57,45 +57,28 @@ QVariant AInterfaceToWaveforms::getWaveformFast(int ievent, int iHardwChannel)
     return jv.toVariant();
 }
 
-//QVariant AInterfaceToWaveforms::getWaveform_logical(int ievent, int ichannel)
-//{
-//    int ihardw = Config->Map->LogicalToHardware(ichannel);
-//    if (std::isnan(ihardw))
-//    {
-//        abort("Invalid channel number in get waveform");
-//        return QVariant();
-//    }
-
-//    return getWaveform(ievent, ihardw);
-//}
-
-//QVariant AInterfaceToWaveforms::getWaveformFast_logical(int ievent, int ichannel)
-//{
-//    return getWaveformFast(ievent, Config->Map->LogicalToHardware(ichannel));
-//}
-
-int AInterfaceToWaveforms::getMax(int ievent, int iHardwChannel)
+double AInterfaceToWaveforms::getMax(int ievent, int iHardwChannel)
 {
-    int val = Reader->GetMax(ievent, iHardwChannel);
-    if (std::isnan(val)) abort("Failed to get waveform value!");
+    double val = Reader->GetMax(ievent, iHardwChannel);
+    if ( std::isnan(val) ) abort("Failed to get waveform value!");
 
     return val;
 }
 
-int AInterfaceToWaveforms::getMaxFast(int ievent, int iHardwChannel)
+double AInterfaceToWaveforms::getMaxFast(int ievent, int iHardwChannel)
 {
     return Reader->GetMaxFast(ievent, iHardwChannel);
 }
 
-int AInterfaceToWaveforms::getMin(int ievent, int iHardwChannel)
+double AInterfaceToWaveforms::getMin(int ievent, int iHardwChannel)
 {
-    int val = Reader->GetMin(ievent, iHardwChannel);
-    if (std::isnan(val)) abort("Failed to get waveform value!");
+    double val = Reader->GetMin(ievent, iHardwChannel);
+    if ( std::isnan(val) ) abort("Failed to get waveform value!");
 
     return val;
 }
 
-int AInterfaceToWaveforms::getMinFast(int ievent, int iHardwChannel)
+double AInterfaceToWaveforms::getMinFast(int ievent, int iHardwChannel)
 {
     return Reader->GetMinFast(ievent, iHardwChannel);
 }

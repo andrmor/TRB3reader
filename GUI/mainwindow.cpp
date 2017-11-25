@@ -442,7 +442,7 @@ void MainWindow::on_pbShowWaveform_toggled(bool checked)
     if (!Reader->isValid()) return;
 
     int iHardwChan = getCurrentlySelectedHardwareChannel();
-    if (std::isnan(iHardwChan))
+    if ( iHardwChan < 0 )
     {
         RootModule->ClearSingleWaveWindow();
         return;
@@ -516,7 +516,7 @@ int MainWindow::getCurrentlySelectedHardwareChannel()
     if (bUseLogical)                          iHardwChan = Config->Map->LogicalToHardware(val);
     else
     {
-        if (val >= Reader->GetNumChannels())  iHardwChan = std::numeric_limits<size_t>::quiet_NaN();
+        if (val >= Reader->GetNumChannels())  iHardwChan = -1;
         else                                  iHardwChan = val;
     }
     return iHardwChan;
@@ -544,7 +544,7 @@ void MainWindow::OnEventOrChannelChanged(bool bOnlyChannel)
         ui->leLogic->setText(QString::number(val));
 
         iHardwChan = Config->Map->LogicalToHardware(val);
-        if (std::isnan(iHardwChan)) ui->leHardw->setText("Not mapped");
+        if ( iHardwChan < 0 ) ui->leHardw->setText("Not mapped");
         else ui->leHardw->setText(QString::number(iHardwChan));
     }
     else
@@ -552,9 +552,9 @@ void MainWindow::OnEventOrChannelChanged(bool bOnlyChannel)
         iHardwChan = val;
         ui->leHardw->setText(QString::number(val));
 
-        std::size_t ilogical = Config->Map->HardwareToLogical(val);
+        int ilogical = Config->Map->HardwareToLogical(val);
         QString s;
-        if (std::isnan(ilogical)) s = "Not mapped";
+        if ( ilogical < 0 ) s = "Not mapped";
         else s = QString::number(ilogical);
         ui->leLogic->setText(s);
     }
@@ -569,11 +569,11 @@ void MainWindow::OnEventOrChannelChanged(bool bOnlyChannel)
     if (Extractor->IsRejectedEventFast(ievent)) ss = "Rejected event";
     else
     {
-        if (std::isnan(iHardwChan)) ss = "n.a.";
+        if ( iHardwChan < 0 ) ss = "n.a.";
         else
         {
             double signal = Extractor->GetSignalFast(ievent, iHardwChan);
-            if (std::isnan(signal)) ss = "n.a.";
+            if ( std::isnan(signal) ) ss = "n.a.";
             else ss = QString::number(signal);
         }
     }

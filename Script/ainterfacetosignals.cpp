@@ -42,14 +42,6 @@ QVariant AInterfaceToSignals::getSignals(int ievent)
     return jv.toVariant();
 }
 
-//double AInterfaceToSignals::getSignal_logical(int ievent, int ichannel)
-//{
-//    size_t ihardw = Config->Map->LogicalToHardware(ichannel);
-//    if (std::isnan(ihardw)) return NaN;
-
-//    return Extractor->GetSignal(ievent, ihardw);
-//}
-
 QVariant AInterfaceToSignals::getSignals_logical(int ievent)
 {
     const QVector<double>* vec = Extractor->GetSignals(ievent);
@@ -102,18 +94,6 @@ void AInterfaceToSignals::setSignals(int ievent, QVariant arrayOfValues)
     bool bOK = Extractor->SetSignals(ievent, vec);
     if (!bOK) abort("Failed to set signal values - wrong arguments");
 }
-
-//void AInterfaceToSignals::setSignal_logical(int ievent, int ichannel, double value)
-//{
-//    int ihardw = Config->Map->LogicalToHardware(ichannel);
-//    if (std::isnan(ihardw))
-//    {
-//        abort("Failed to set signal of a logical channel - wrong channel number");
-//        return;
-//    }
-
-//    setSignal_hardware(ievent, ihardw, value);
-//}
 
 void AInterfaceToSignals::setAllRejected(bool flag)
 {

@@ -1,8 +1,12 @@
 #include "trb3datareader.h"
 #include "masterconfig.h"
 
+#ifdef DABC
 #include "hadaq/defines.h"
 #include "hadaq/api.h"
+#endif
+
+#include <QDebug>
 
 const double NaN = std::numeric_limits<double>::quiet_NaN();
 
@@ -13,15 +17,15 @@ bool Trb3dataReader::Read()
 {
     if (Config->FileName.isEmpty())
     {
-        std::cout << "--- File name is not set!\n" << std::flush;
+        qDebug() << "--- File name is not set!";
         return false;
     }
 
-    std::cout << "--> Reading hld file...\n" << std::flush;
+    qDebug() << "--> Reading hld file...";
     readRawData();
     if (!isValid())
     {
-        std::cout << "--- Read of hld file failed!\n" << std::flush;
+        qDebug() << "--- Read of hld file failed!";
         return false;
     }
 
@@ -29,12 +33,12 @@ bool Trb3dataReader::Read()
     {
         if (Config->bSmoothWaveforms)
         {
-            std::cout << "--> Smoothing waveforms...\n" << std::flush;
+            qDebug() << "--> Smoothing waveforms...";
             smoothData();
         }
         if (Config->bPedestalSubstraction)
         {
-            std::cout << "--> Substracting pedestals...\n" << std::flush;
+            qDebug() << "--> Substracting pedestals...";
             substractPedestals();
         }
     }
@@ -42,17 +46,17 @@ bool Trb3dataReader::Read()
     {
         if (Config->bPedestalSubstraction)
         {
-            std::cout << "--> Substracting pedestals...\n" << std::flush;
+            qDebug() << "--> Substracting pedestals...";
             substractPedestals();
         }
         if (Config->bSmoothWaveforms)
         {
-            std::cout << "--> Smoothing waveforms...\n" << std::flush;
+            qDebug() << "--> Smoothing waveforms...";
             smoothData();
         }
     }
 
-    //std::cout << "--> Done!\n" << std::flush;
+    //qDebug() << "--> Done!";
 
     return true;
 }
@@ -217,6 +221,7 @@ void Trb3dataReader::substractPedestals()
 
 void Trb3dataReader::readRawData()
 {
+#ifdef DABC
     waveData.clear();
     numChannels = 0;
     numSamples = 0;
@@ -238,7 +243,7 @@ void Trb3dataReader::readRawData()
         while ( (sub=evnt->NextSubevent(sub)) )
         {
             unsigned trbSubEvSize = sub->GetSize() / 4 - 4;
-            //std::cout << "--> Section found, size: "<< trbSubEvSize << "\n";
+            //qDebug() << "--> Section found, size: "<< trbSubEvSize << "\n";
 
             unsigned ix = 0;            
 
@@ -250,7 +255,7 @@ void Trb3dataReader::readRawData()
                 unsigned datalen = (hadata >> 16) & 0xFFFF;
                 unsigned datakind = hadata & 0xFFFF;
 
-                if (bReportOnStart) std::cout << "--> Data block found with datakind: " << datakind << "\n"<<std::flush;
+                if (bReportOnStart) qDebug() << "--> Data block found with datakind: " << datakind;
 
                 unsigned ixTmp = ix;
 
@@ -267,7 +272,7 @@ void Trb3dataReader::readRawData()
                     if (channels > 0)
                     {
                         int samples = datalen/channels;
-                        if (bReportOnStart) std::cout << "--> This is an ADC block. Channels: "<<channels<<"   Samples: "<< samples << "\n"<<std::flush;
+                        if (bReportOnStart) qDebug() << "--> This is an ADC block. Channels: "<<channels<<"   Samples: "<< samples;
 
                         // reserve the necessary vectors for the waveforms and fill the data
                         int oldSize = thisEventData.size();
@@ -282,7 +287,7 @@ void Trb3dataReader::readRawData()
                         if (numSamples!=0 && numSamples!=samples)
                         {                            
                             bBadEvent = true;
-                            if (numBadEvents<500) std::cout << "----- Event #" << waveData.size()-1 << " has wrong number of samples ("<< samples <<")\n"<<std::flush;
+                            if (numBadEvents<500) qDebug() << "----- Event #" << waveData.size()-1 << " has wrong number of samples ("<< samples <<")\n";
                         }
                         else
                         {
@@ -294,27 +299,28 @@ void Trb3dataReader::readRawData()
 
                 //else ix+=datalen;
                 ix = ixTmp + datalen;  //more general (and safer) way to do the same
-                //std::cout << "ix:"<< ix <<"\n"<<std::flush;
+                //qDebug() << "ix:"<< ix;
             }            
         }
 
-        //std::cout << "Event processed.\n";
+        //qDebug() << "Event processed.\n";
         if (bBadEvent)
         {
             numBadEvents++;
-            //std::cout << "Ignored!"<<"\n"<<std::flush;
+            //qDebug() << "Ignored!";
         }
         else
         {
             waveData << thisEventData;
-            //std::cout << "New data size: "<<data.size()<<"\n"<<std::flush;
+            //qDebug() << "New data size: "<<data.size();
         }
         bReportOnStart = false;
     }
 
     ref.Disconnect();
-    std::cout << "--> Data read completed\n--> Events: "<< waveData.size() <<" Channels: "<<numChannels << "  Samples: "<<numSamples<<"\n"<< std::flush;
-    if (numBadEvents > 0) std::cout << "--> " << numBadEvents << " bad events were disreguarded!\n"<< std::flush;
+    qDebug() << "--> Data read completed\n--> Events: "<< waveData.size() <<" Channels: "<<numChannels << "  Samples: "<<numSamples;
+    if (numBadEvents > 0) qDebug() << "--> " << numBadEvents << " bad events were disreguarded!";
+#endif
 }
 
 void Trb3dataReader::smoothData()
