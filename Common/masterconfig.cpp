@@ -298,10 +298,10 @@ void MasterConfig::updatePolarityQuickAccessData()
     }
 }
 
-bool MasterConfig::IsNegative(int ichannel) const
+bool MasterConfig::IsNegative(int iHardwChannel) const
 {
-    if (ichannel>=NegPol.size() || ichannel<0) return false;
-    return NegPol.at(ichannel);
+    if ( iHardwChannel >= NegPol.size() || iHardwChannel < 0 ) return false;
+    return NegPol.at(iHardwChannel);
 }
 
 void MasterConfig::SetMapping(const QVector<int> &mapping)
@@ -312,3 +312,19 @@ void MasterConfig::SetMapping(const QVector<int> &mapping)
     ChannelMap = mapping;
     Map->SetChannels_OrderedByLogical(ChannelMap);
 }
+
+QVector<int> MasterConfig::GetListOfIgnoreChannels() const
+{
+    QVector<int> vec;
+    for (int i : IgnoreHardwareChannels) vec << i;
+    std::sort(vec.begin(), vec.end());
+    return vec;
+}
+
+void MasterConfig::SetListOfIgnoreChannels(const QVector<int> &list)
+{
+    IgnoreHardwareChannels.clear();
+    for (int i : list) IgnoreHardwareChannels << i;
+}
+
+

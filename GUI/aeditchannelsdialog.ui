@@ -25,9 +25,9 @@
     <widget class="QPlainTextEdit" name="pteEdit"/>
    </item>
    <item>
-    <widget class="QLabel" name="label_2">
+    <widget class="QLabel" name="labExample">
      <property name="text">
-      <string>Example: 0, 2, 5-15, 7, 30-45</string>
+      <string>Example:</string>
      </property>
     </widget>
    </item>

@@ -152,6 +152,10 @@ private slots:
 
     void on_pbEditListOfNegatives_clicked();
 
+    void on_pbEditMap_clicked();
+
+    void on_pbEditIgnoreChannelList_clicked();
+
 protected:
     void closeEvent(QCloseEvent* event);
 
@@ -186,7 +190,7 @@ private:
     void CreateScriptWindow();
 
     QString PackChannelList(QVector<int> vec);
-    bool ExtractNumbersFromQString(const QString input, QList<int> *ToAdd);
+    bool ExtractNumbersFromQString(const QString input, QVector<int>* ToAdd);
 };
 
 #endif // MAINWINDOW_H

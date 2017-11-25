@@ -47,7 +47,7 @@ bool AInterfaceToConfig::isNegative(int iHardwChannel)
 
 bool AInterfaceToConfig::isIgnoredChannel(int iHardwChannel)
 {
-    return Config->IgnoreHardwareChannels.contains(iHardwChannel);
+    return Config->IsIgnoredChannel(iHardwChannel);
 }
 
 int AInterfaceToConfig::toHardware(int iLogicalChannel)

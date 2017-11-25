@@ -13,7 +13,7 @@ class AEditChannelsDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit AEditChannelsDialog(QString Title, QString OldText, QWidget *parent = 0);
+    explicit AEditChannelsDialog(QString Title, QString OldText, QString Example, QWidget *parent = 0);
     ~AEditChannelsDialog();
 
     const QString GetText() const;

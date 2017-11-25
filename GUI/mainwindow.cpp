@@ -194,7 +194,7 @@ void MainWindow::on_pbAddListHardwChToIgnore_clicked()
     QVector<int> arr;
     LoadIntVectorsFromFile(FileName, &arr);
 
-    for (int i : arr) Config->IgnoreHardwareChannels.insert(i);
+    Config->SetListOfIgnoreChannels(arr);
 
     LogMessage("Ignored channels were updated");
 
@@ -544,7 +544,7 @@ void MainWindow::OnEventOrChannelChanged(bool bOnlyChannel)
         ui->leLogic->setText(QString::number(val));
 
         iHardwChan = Config->Map->LogicalToHardware(val);
-        if ( iHardwChan < 0 ) ui->leHardw->setText("Not mapped");
+        if ( iHardwChan < 0 ) ui->leHardw->setText("n.a.");
         else ui->leHardw->setText(QString::number(iHardwChan));
     }
     else
@@ -554,7 +554,7 @@ void MainWindow::OnEventOrChannelChanged(bool bOnlyChannel)
 
         int ilogical = Config->Map->HardwareToLogical(val);
         QString s;
-        if ( ilogical < 0 ) s = "Not mapped";
+        if ( ilogical < 0 ) s = "n.a.";
         else s = QString::number(ilogical);
         ui->leLogic->setText(s);
     }
@@ -809,7 +809,7 @@ void MainWindow::on_cobSignalExtractionMethod_currentIndexChanged(int index)
     ui->sbExtractAllFromSampleNumber->setVisible(index == 2);
 }
 
-bool MainWindow::ExtractNumbersFromQString(const QString input, QList<int> *ToAdd)
+bool MainWindow::ExtractNumbersFromQString(const QString input, QVector<int> *ToAdd)
 {
   ToAdd->clear();
 
@@ -913,21 +913,71 @@ QString MainWindow::PackChannelList(QVector<int> vec)
 void MainWindow::on_pbEditListOfNegatives_clicked()
 {
     QString old =  PackChannelList(Config->GetListOfNegativeChannels());
-    AEditChannelsDialog* D = new AEditChannelsDialog("List of negative channels", old);
+    AEditChannelsDialog* D = new AEditChannelsDialog("List of negative channels", old, "Example: 0, 2, 5-15, 7, 30-45");
     int res = D->exec();
     if (res != 1) return;
-
     const QString str = D->GetText();
     delete D;
 
-    QList<int> rawList;
-    ExtractNumbersFromQString(str, &rawList);
-    QSet<int> set;
-    for (int i : rawList) set << i;
-
     QVector<int> vec;
+    ExtractNumbersFromQString(str, &vec);
+    QSet<int> set;
+    for (int i : vec) set << i;
+
+    vec.clear();
     for (int i: set) vec << i;
 
     Config->SetNegativeChannels(vec);
+    UpdateGui();
+}
+
+void MainWindow::on_pbEditMap_clicked()
+{
+    QString old;
+    for (int i : Config->GetMapping()) old += QString::number(i) + " ";
+
+    AEditChannelsDialog* D = new AEditChannelsDialog("Hardware channels sorted by logical number", old, "Example: 5 4 3 2 1 0 10 11 12");
+    int res = D->exec();
+    if (res != 1) return;
+    const QString str = D->GetText().simplified();
+    delete D;
+
+    QRegExp rx("(\\ |\\,|\\:|\\t|\\n)");
+    QStringList fields = str.split(rx, QString::SkipEmptyParts);
+    QVector<int> vec;
+    for (QString str : fields)
+    {
+        bool bOK;
+        int i = str.toInt(&bOK);
+        if (!bOK || i<0)
+        {
+            message("Error in format: only integers (>=0) are accepted", this);
+            return;
+        }
+        vec << i;
+    }
+
+    Config->SetMapping(vec);
+    UpdateGui();
+}
+
+void MainWindow::on_pbEditIgnoreChannelList_clicked()
+{
+    QString old =  PackChannelList(Config->GetListOfIgnoreChannels());
+    AEditChannelsDialog* D = new AEditChannelsDialog("List of ignored hardware channels", old, "Example: 2, 5-15, 30-45");
+    int res = D->exec();
+    if (res != 1) return;
+    const QString str = D->GetText();
+    delete D;
+
+    QVector<int> vec;
+    ExtractNumbersFromQString(str, &vec);
+    QSet<int> set;
+    for (int i : vec) set << i;
+
+    vec.clear();
+    for (int i: set) vec << i;
+
+    Config->SetListOfIgnoreChannels(vec);
     UpdateGui();
 }

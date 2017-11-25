@@ -91,7 +91,7 @@ void ADispatcher::ClearMapping()
 
 void ADispatcher::ClearIgnoreChannels()
 {
-    Config->IgnoreHardwareChannels.clear();
+    Config->ClearListOfIgnoreChannels();
     ClearData();
 
     MW->UpdateGui();

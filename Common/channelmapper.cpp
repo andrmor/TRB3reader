@@ -6,17 +6,17 @@ ChannelMapper::ChannelMapper() {}
 
 int ChannelMapper::HardwareToLogical(int iHardwareChannel) const
 {
-    if (iHardwareChannel>=0 && iHardwareChannel<ToLogical.size()) return ToLogical[iHardwareChannel];
+    if ( iHardwareChannel>=0 && iHardwareChannel<ToLogical.size() ) return ToLogical.at(iHardwareChannel);
 
-    qDebug() << "--- Invalid hardware channel!";
+    //qDebug() << "--- Invalid hardware channel!";
     return -1;
 }
 
 int ChannelMapper::LogicalToHardware(int iLogicalChannel) const
 {
-    if (iLogicalChannel>=0 && iLogicalChannel<ToLogical.size()) return ToHardware[iLogicalChannel];
+    if ( iLogicalChannel>=0 && iLogicalChannel<ToLogical.size() ) return ToHardware.at(iLogicalChannel);
 
-    qDebug() << "--- Invalid logical channel";
+    //qDebug() << "--- Invalid logical channel";
     return -1;
 }
 

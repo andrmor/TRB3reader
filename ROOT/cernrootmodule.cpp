@@ -114,7 +114,7 @@ void CernRootModule::DrawSignature(bool bNeg)
         {
             int iHardwCh = Config->Map->LogicalToHardware(ilc);
             if ( iHardwCh < 0 ) continue;
-            if (Config->IgnoreHardwareChannels.contains(iHardwCh)) continue;
+            if (Config->IsIgnoredChannel(iHardwCh)) continue;
             if (bNeg != Config->IsNegative(iHardwCh)) continue;
 
             bool bRejected;
@@ -281,7 +281,7 @@ void CernRootModule::DrawSingle(int ievent, int iHardwChan, bool autoscale, doub
     bool bRejected;
     Extractor->extractSignalFromWaveform(ievent, iHardwChan, &bRejected);
 
-    bool bIgnoredChannel = Config->IgnoreHardwareChannels.contains(iHardwChan);
+    bool bIgnoredChannel = Config->IsIgnoredChannel(iHardwChan);
     gSingle->SetLineColor( (bIgnoredChannel || Extractor->IsRejectedEvent(ievent) || bRejected) ? RejectedColor : NormalColor);
     if (bIgnoredChannel) gSingle->SetLineStyle(7);
 
@@ -325,7 +325,7 @@ void CernRootModule::DrawOverlay(int ievent, bool bNeg, bool bAutoscale, double 
         bool bRejected;
         Extractor->extractSignalFromWaveform(ievent, iHardwCh, &bRejected);
 
-        bool bIgnoredChannel = Config->IgnoreHardwareChannels.contains(iHardwCh);
+        bool bIgnoredChannel = Config->IsIgnoredChannel(iHardwCh);
         g->SetLineColor( (bIgnoredChannel || Extractor->IsRejectedEvent(ievent) || bRejected) ? RejectedColor : NormalColor);
         if (bIgnoredChannel) g->SetLineStyle(7);
 
@@ -433,7 +433,7 @@ void CernRootModule::DrawAll(int ievent, bool bNeg, int padsX, int padsY, bool b
         bool bRejected;
         Extractor->extractSignalFromWaveform(ievent, iHardwCh, &bRejected);
 
-        bool bIgnoredChannel = Config->IgnoreHardwareChannels.contains(iHardwCh);
+        bool bIgnoredChannel = Config->IsIgnoredChannel(iHardwCh);
         g->SetLineColor( (bIgnoredChannel || Extractor->IsRejectedEvent(ievent) || bRejected) ? RejectedColor : NormalColor);
         if (bIgnoredChannel) g->SetLineStyle(7);
 

@@ -175,9 +175,9 @@ void MainWindow::UpdateGui()
 {
     ui->leFileName->setText(Config->FileName);
 
-    ui->ptePolarity->clear();
-    QString s = PackChannelList(Config->GetListOfNegativeChannels());
+    ui->ptePolarity->clear();    
     //for (int i: Config->GetListOfNegativeChannels()) s += QString::number(i)+" ";
+    QString s = PackChannelList(Config->GetListOfNegativeChannels());
     ui->ptePolarity->appendPlainText(s);
 
     ui->pteMapping->clear();
@@ -186,11 +186,12 @@ void MainWindow::UpdateGui()
     ui->pteMapping->appendPlainText(s);
 
     ui->pteIgnoreHardwareChannels->clear();
-    s.clear();
-    std::vector<int> ign;
-    for (int i: Config->IgnoreHardwareChannels) ign.push_back(i);
-    std::sort(ign.begin(), ign.end());
-    for (int i: ign) s += QString::number(i)+" ";
+//    s.clear();
+//    std::vector<int> ign;
+//    for (int i: Config->IgnoreHardwareChannels) ign.push_back(i);
+//    std::sort(ign.begin(), ign.end());
+//    for (int i: ign) s += QString::number(i)+" ";
+    s = PackChannelList(Config->GetListOfIgnoreChannels());
     ui->pteIgnoreHardwareChannels->appendPlainText(s);
 
     ui->cbSubstractPedestal->setChecked(Config->bPedestalSubstraction);

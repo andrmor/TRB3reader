@@ -132,7 +132,7 @@ void Trb3signalExtractor::ExtractAllSignals()
         return;
     }
 
-    for (std::size_t ievent=0; ievent<signalData.size(); ievent++)
+    for (int ievent=0; ievent<signalData.size(); ievent++)
     {
         signalData[ievent].resize(numChannels);
 
@@ -141,7 +141,7 @@ void Trb3signalExtractor::ExtractAllSignals()
         NegMaxValue = PosMaxValue = -1.0e10;
         for (int ichannel=0; ichannel<numChannels; ichannel++)
         {
-            if (Config->IgnoreHardwareChannels.contains(ichannel) )
+            if (Config->IsIgnoredChannel(ichannel) )
             {
                 signalData[ievent][ichannel] = 0;
                 continue;

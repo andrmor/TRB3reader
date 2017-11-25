@@ -61,7 +61,7 @@
               <property name="maximumSize">
                <size>
                 <width>16777215</width>
-                <height>150</height>
+                <height>120</height>
                </size>
               </property>
               <property name="contextMenuPolicy">
@@ -104,7 +104,7 @@
             </property>
             <property name="minimumSize">
              <size>
-              <width>125</width>
+              <width>0</width>
               <height>30</height>
              </size>
             </property>
@@ -194,7 +194,7 @@
               <property name="maximumSize">
                <size>
                 <width>16777215</width>
-                <height>150</height>
+                <height>120</height>
                </size>
               </property>
               <property name="contextMenuPolicy">
@@ -215,24 +215,40 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <item>
+           <widget class="QPushButton" name="pbEditMap">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Edit map</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="pbAddMapping">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
             <property name="minimumSize">
              <size>
-              <width>125</width>
+              <width>0</width>
               <height>30</height>
              </size>
             </property>
             <property name="font">
              <font>
-              <weight>75</weight>
-              <bold>true</bold>
+              <weight>50</weight>
+              <bold>false</bold>
              </font>
+            </property>
+            <property name="toolTip">
+             <string>One column of channel numbers</string>
             </property>
             <property name="text">
              <string>Load mapping from file</string>
@@ -292,6 +308,13 @@
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_29">
+          <item>
+           <widget class="QPushButton" name="pbEditIgnoreChannelList">
+            <property name="text">
+             <string>Edit list</string>
+            </property>
+           </widget>
+          </item>
           <item>
            <widget class="QPushButton" name="pbAddListHardwChToIgnore">
             <property name="toolTip">

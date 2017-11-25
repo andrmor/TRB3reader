@@ -1,12 +1,13 @@
 #include "aeditchannelsdialog.h"
 #include "ui_aeditchannelsdialog.h"
 
-AEditChannelsDialog::AEditChannelsDialog(QString Title, QString OldText, QWidget *parent) :
+AEditChannelsDialog::AEditChannelsDialog(QString Title, QString OldText, QString Example, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::AEditChannelsDialog)
 {
     ui->setupUi(this);
     ui->labTitle->setText(Title);
+    ui->labExample->setText(Example);
     ui->pteEdit->appendPlainText(OldText);
 }
 
