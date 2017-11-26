@@ -19,11 +19,10 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QMessageBox>
-//#include <QStandardPaths>
-//#include <QDir>
 #include <QDirIterator>
+#include <QInputDialog>
 
-#include <vector>
+//#include <vector>
 #include <cmath>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -984,13 +983,38 @@ void MainWindow::on_pbEditIgnoreChannelList_clicked()
 
 void MainWindow::on_pbAddDatakind_clicked()
 {
-
+    bool bOK;
+    int datakind = QInputDialog::getInt(this, "TRBreader", "Input new datakind to add", 0, 0, 0xFFFF, 1, &bOK);
+    if (bOK)
+        Config->AddDatakind(datakind);
+    UpdateGui();
 }
 
 void MainWindow::on_pbRemoveDatakind_clicked()
 {
-    QSet<int> aa;
-    aa << 112233 << 225588;
-    aa.remove(112233);
-    qDebug() << aa;
+    int raw = ui->lwDatakinds->currentRow();
+    if (raw < 0)
+    {
+        message("Select datakind to remove by left-clicking on it in the list above", this);
+        return;
+    }
+    QString sel = ui->lwDatakinds->currentItem()->text();
+    QStringList sl = sel.split(" ");
+    if (sl.size()>1)
+    {
+        QString dk = sl.first();
+        int datakind = dk.toInt();
+        Config->RemoveDatakind(datakind);
+    }
+    UpdateGui();
+}
+
+void MainWindow::on_pbPrintHLDfileProperties_clicked()
+{
+    QString FileName = QFileDialog::getOpenFileName(this, "Select HLD file to inspect", "", "*.hld");
+    if (FileName.isEmpty()) return;
+
+    QString s = Reader->GetFileInfo(FileName);
+    ui->pteHLDfileProperties->clear();
+    ui->pteHLDfileProperties->appendPlainText(s);
 }

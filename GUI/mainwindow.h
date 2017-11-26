@@ -160,6 +160,8 @@ private slots:
 
     void on_pbRemoveDatakind_clicked();
 
+    void on_pbPrintHLDfileProperties_clicked();
+
 protected:
     void closeEvent(QCloseEvent* event);
 

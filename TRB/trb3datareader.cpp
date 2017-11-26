@@ -318,10 +318,81 @@ void Trb3dataReader::readRawData()
         bReportOnStart = false;
     }
 
-    ref.Disconnect();
+    if (ref) ref.Disconnect();
     qDebug() << "--> Data read completed\n--> Events: "<< waveData.size() <<" Channels: "<<numChannels << "  Samples: "<<numSamples;
     if (numBadEvents > 0) qDebug() << "--> " << numBadEvents << " bad events were disreguarded!";
 #endif
+}
+
+const QString Trb3dataReader::GetFileInfo(const QString FileName) const
+{
+    QString output;
+#ifdef DABC
+    bool bReportOnStart = true;
+    int numEvents = 0;
+
+    hadaq::ReadoutHandle ref = hadaq::ReadoutHandle::Connect(FileName.toLocal8Bit().data());
+    hadaq::RawEvent* evnt = 0;
+
+    while ( (evnt = ref.NextEvent(1.0)) )
+    {
+        // loop over sections
+        hadaq::RawSubevent* sub = 0;
+        while ( (sub=evnt->NextSubevent(sub)) )
+        {
+            unsigned trbSubEvSize = sub->GetSize() / 4 - 4;
+            //qDebug() << "--> Section found, size: "<< trbSubEvSize << "\n";
+
+            unsigned ix = 0;
+
+            while (ix < trbSubEvSize)
+            { // loop over subsubevents
+
+                unsigned hadata = sub->Data(ix++);
+
+                unsigned datalen = (hadata >> 16) & 0xFFFF;
+                int datakind = hadata & 0xFFFF;
+
+                if (bReportOnStart) output += "Data block with datakind: " + QString::number(datakind) + "\n";
+
+                unsigned ixTmp = ix;
+
+                if (Config->IsGoodDatakind(datakind))
+                {
+                    // last word in the data block identifies max. ADC# and max. channel
+                    // assuming they are written consecutively - seems to be the case so far
+                    unsigned lastword = sub->Data( ix + datalen - 1 );
+                    int ch_per_adc = ((lastword >> 16) & 0xF) + 1;
+                    int n_adcs = ((lastword >> 20) & 0xF) + 1;
+
+                    int channels = ch_per_adc * n_adcs;
+
+                    if (channels > 0)
+                    {
+                        int samples = datalen/channels;
+                        if (bReportOnStart) output += "--> This is an ADC block. Channels: " +QString::number(channels) +"   Samples: " +QString::number(samples) +"\n";
+                    }
+                    else
+                        if (bReportOnStart) output += "==> This is an ADC block. Error: number of channels is 0!\n";
+                }
+                ix = ixTmp + datalen;
+            }
+        }
+        bReportOnStart = false;
+        numEvents++;
+    }
+
+    if (output.isEmpty())
+    {
+        output = "Read failed or bad file format";
+    }
+    else
+        output += "Number of events: " + QString::number(numEvents);
+
+    if (ref) ref.Disconnect();
+#endif
+
+    return output;
 }
 
 void Trb3dataReader::smoothData()

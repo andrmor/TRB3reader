@@ -178,7 +178,6 @@ void MainWindow::UpdateGui()
     //datakinds
     ui->lwDatakinds->clear();
     QVector<int> datakinds = Config->GetListOfDatakinds();
-    qDebug() << datakinds;
     if ( datakinds.size() > 1 ) std::sort(datakinds.begin(), datakinds.end());
     for (int i : datakinds)
     {

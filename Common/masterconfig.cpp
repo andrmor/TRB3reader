@@ -32,6 +32,16 @@ void MasterConfig::SetListOfDatakinds(const QVector<int> &list)
     for (int i : list) Datakinds << i;
 }
 
+void MasterConfig::AddDatakind(int datakind)
+{
+    Datakinds << datakind;
+}
+
+void MasterConfig::RemoveDatakind(int datakind)
+{
+    Datakinds.remove(datakind);
+}
+
 void MasterConfig::SetNegativeChannels(const QVector<int> &list)
 {
     ListNegativeChannels = list;

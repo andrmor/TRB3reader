@@ -19,6 +19,8 @@ public:
     const QVector<int>  GetListOfDatakinds() const;
     void                SetListOfDatakinds(const QVector<int> &list);
     bool                IsGoodDatakind(int datakind) const {return Datakinds.contains(datakind);}
+    void                AddDatakind(int datakind);
+    void                RemoveDatakind(int datakind);
 
     //negative/positive channels
     const QVector<int>& GetListOfNegativeChannels() const {return ListNegativeChannels;}

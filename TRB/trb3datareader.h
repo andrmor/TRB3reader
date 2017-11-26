@@ -2,6 +2,7 @@
 #define TRB3READER_H
 
 #include <QVector>
+#include <QString>
 
 class MasterConfig;
 
@@ -12,6 +13,7 @@ public:
 
       // Reading waveform data from the file, optional - substract pedestals and apply smoothing
     bool    Read();
+    const QString GetFileInfo(const QString FileName) const;
 
     double  GetValue(int ievent, int ichannel, int isample) const;
     double  GetValueFast(int ievent, int ichannel, int isample) const; //no argument validity check!
