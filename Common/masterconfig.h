@@ -15,9 +15,14 @@ public:
     MasterConfig();
     ~MasterConfig();
 
+    //recognized datakinds
+    const QVector<int>  GetListOfDatakinds() const;
+    void                SetListOfDatakinds(const QVector<int> &list);
+    bool                IsGoodDatakind(int datakind) const {return Datakinds.contains(datakind);}
+
     //negative/positive channels
     const QVector<int>& GetListOfNegativeChannels() const {return ListNegativeChannels;}
-    void                SetNegativeChannels(const QVector<int> &listOfChannels);
+    void                SetNegativeChannels(const QVector<int> &list);
     bool                IsNegative(int iHardwChannel) const;
 
     //channel map (hardware / logical)
@@ -82,6 +87,8 @@ public:
     bool                ReadFromJson(QJsonObject& json);
 
 private:
+    QSet<int>           Datakinds;
+
     QVector<int>        ListNegativeChannels;
     std::vector<bool>   NegPol; //Quick access
 

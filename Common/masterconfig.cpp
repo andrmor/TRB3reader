@@ -9,6 +9,8 @@
 MasterConfig::MasterConfig()
 {
     Map = new ChannelMapper();
+
+    Datakinds << 0xc313 << 49152 << 49155;
 }
 
 MasterConfig::~MasterConfig()
@@ -16,9 +18,23 @@ MasterConfig::~MasterConfig()
     delete Map;
 }
 
-void MasterConfig::SetNegativeChannels(const QVector<int> &listOfChannels)
+const QVector<int> MasterConfig::GetListOfDatakinds() const
 {
-    ListNegativeChannels = listOfChannels;
+    QVector<int> vec;
+    for (int i : Datakinds) vec << i;
+    if ( vec.size() > 1 ) std::sort(vec.begin(), vec.end());
+    return vec;
+}
+
+void MasterConfig::SetListOfDatakinds(const QVector<int> &list)
+{
+    Datakinds.clear();
+    for (int i : list) Datakinds << i;
+}
+
+void MasterConfig::SetNegativeChannels(const QVector<int> &list)
+{
+    ListNegativeChannels = list;
     updatePolarityQuickAccessData();
 }
 
@@ -34,6 +50,10 @@ void MasterConfig::WriteToJson(QJsonObject &json)
     writeScriptSettingsToJson(json);
 
     json["FileName"] = FileName;
+
+    QJsonArray ar;
+    for (int i : Datakinds) ar << i;
+    json["Datakinds"] = ar;
 }
 
 bool MasterConfig::ReadFromJson(QJsonObject &json)
@@ -48,6 +68,13 @@ bool MasterConfig::ReadFromJson(QJsonObject &json)
     readScriptSettingsFromJson(json);
 
     parseJson(json, "FileName", FileName);
+
+    if (json.contains("Datakinds"))
+    {
+        QJsonArray ar = json["Datakinds"].toArray();
+        Datakinds.clear();
+        for (int i=0; i<ar.size(); i++) Datakinds << ar[i].toInt();
+    }
 
     return true;
 }

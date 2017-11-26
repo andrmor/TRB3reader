@@ -156,6 +156,10 @@ private slots:
 
     void on_pbEditIgnoreChannelList_clicked();
 
+    void on_pbAddDatakind_clicked();
+
+    void on_pbRemoveDatakind_clicked();
+
 protected:
     void closeEvent(QCloseEvent* event);
 

@@ -981,3 +981,16 @@ void MainWindow::on_pbEditIgnoreChannelList_clicked()
     Config->SetListOfIgnoreChannels(vec);
     UpdateGui();
 }
+
+void MainWindow::on_pbAddDatakind_clicked()
+{
+
+}
+
+void MainWindow::on_pbRemoveDatakind_clicked()
+{
+    QSet<int> aa;
+    aa << 112233 << 225588;
+    aa.remove(112233);
+    qDebug() << aa;
+}

@@ -173,6 +173,21 @@ void MainWindow::readWindowsFromJson(QJsonObject &json)
 // --- Update GUI controls on Config change ---
 void MainWindow::UpdateGui()
 {
+    qDebug() << "--- Updating GUI";
+
+    //datakinds
+    ui->lwDatakinds->clear();
+    QVector<int> datakinds = Config->GetListOfDatakinds();
+    qDebug() << datakinds;
+    if ( datakinds.size() > 1 ) std::sort(datakinds.begin(), datakinds.end());
+    for (int i : datakinds)
+    {
+        QString s = QString::number(i) + "   (hex: " + QString::number(i, 16) + ")";
+        QListWidgetItem* item = new QListWidgetItem(s);
+        item->setTextAlignment(Qt::AlignCenter);
+        ui->lwDatakinds->addItem(item);
+    }
+
     ui->leFileName->setText(Config->FileName);
 
     ui->ptePolarity->clear();    

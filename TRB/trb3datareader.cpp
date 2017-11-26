@@ -253,13 +253,14 @@ void Trb3dataReader::readRawData()
                 unsigned hadata = sub->Data(ix++);
 
                 unsigned datalen = (hadata >> 16) & 0xFFFF;
-                unsigned datakind = hadata & 0xFFFF;
+                int datakind = hadata & 0xFFFF;
 
                 if (bReportOnStart) qDebug() << "--> Data block found with datakind: " << datakind;
 
                 unsigned ixTmp = ix;
 
-                if (datakind == 0xc313 || datakind == 49152 || datakind == 49155)
+                //if (datakind == 0xc313 || datakind == 49152 || datakind == 49155)
+                if (Config->IsGoodDatakind(datakind))
                 {
                     // last word in the data block identifies max. ADC# and max. channel
                     // assuming they are written consecutively - seems to be the case so far
