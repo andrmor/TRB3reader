@@ -65,7 +65,8 @@ SOURCES += main.cpp \
     Script/ainterfacetowaveforms.cpp \
     Script/ainterfacetoconfig.cpp \
     Common/adispatcher.cpp \
-    GUI/aeditchannelsdialog.cpp
+    GUI/aeditchannelsdialog.cpp \
+    Common/adatahub.cpp
 
 HEADERS  += GUI/mainwindow.h \    
     TRB/trb3datareader.h \
@@ -88,7 +89,8 @@ HEADERS  += GUI/mainwindow.h \
     Script/ainterfacetowaveforms.h \
     Script/ainterfacetoconfig.h \
     Common/adispatcher.h \
-    GUI/aeditchannelsdialog.h
+    GUI/aeditchannelsdialog.h \
+    Common/adatahub.h
 
 FORMS    += GUI/mainwindow.ui \
     GUI/ascriptwindow.ui \
