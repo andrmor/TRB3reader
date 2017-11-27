@@ -1,7 +1,7 @@
 #ifndef MASTERCONFIG_H
 #define MASTERCONFIG_H
 
-#include <vector>
+#include <QVector>
 #include <QSet>
 #include <QList>
 #include <QJsonObject>

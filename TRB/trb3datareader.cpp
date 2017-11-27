@@ -318,7 +318,7 @@ void Trb3dataReader::readRawData()
         bReportOnStart = false;
     }
 
-    if (ref) ref.Disconnect();
+    ref.Disconnect();
     qDebug() << "--> Data read completed\n--> Events: "<< waveData.size() <<" Channels: "<<numChannels << "  Samples: "<<numSamples;
     if (numBadEvents > 0) qDebug() << "--> " << numBadEvents << " bad events were disreguarded!";
 #endif
@@ -389,7 +389,7 @@ const QString Trb3dataReader::GetFileInfo(const QString FileName) const
     else
         output += "Number of events: " + QString::number(numEvents);
 
-    if (ref) ref.Disconnect();
+    ref.Disconnect();
 #endif
 
     return output;

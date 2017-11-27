@@ -370,6 +370,7 @@ void MainWindow::on_pbBulkProcess_clicked()
 
         Config->FileName = it.next();
         ui->pteBulkLog->appendPlainText("Processing " + QFileInfo(Config->FileName).fileName());
+        qDebug() << "Processing" <<  Config->FileName;
 
         QString error = ProcessData();
         if (!error.isEmpty())
