@@ -6,7 +6,7 @@
 
 #include <QDebug>
 
-const double NaN = std::numeric_limits<double>::quiet_NaN();
+const float NaN = std::numeric_limits<float>::quiet_NaN();
 
 Trb3signalExtractor::Trb3signalExtractor(const MasterConfig *Config, const Trb3dataReader* Reader) :
     Config(Config), Reader(Reader), numChannels(0) {}
@@ -27,7 +27,17 @@ bool Trb3signalExtractor::ExtractSignals()
     return true;
 }
 
-double Trb3signalExtractor::GetSignal(int ievent, int ichannel) const
+void Trb3signalExtractor::GenerateDummyData()
+{
+    int numEvents = Reader->GetNumEvents();
+    numChannels = Reader->GetNumChannels();
+
+    signalData.resize(numEvents);
+    for (int i=0; i<numEvents; i++) signalData[i] = QVector<float>(numChannels, 0);
+    RejectedEvents = QVector<bool>(numEvents, false);
+}
+
+float Trb3signalExtractor::GetSignal(int ievent, int ichannel) const
 {
     if (ievent<0 || ievent>=signalData.size()) return NaN;
     if (ichannel<0 || ichannel>=signalData.at(ievent).size()) return NaN;
@@ -35,24 +45,24 @@ double Trb3signalExtractor::GetSignal(int ievent, int ichannel) const
     return signalData.at(ievent).at(ichannel);
 }
 
-double Trb3signalExtractor::GetSignalFast(int ievent, int ichannel) const
+float Trb3signalExtractor::GetSignalFast(int ievent, int ichannel) const
 {
     return signalData.at(ievent).at(ichannel);
 }
 
-const QVector<double>* Trb3signalExtractor::GetSignals(int ievent) const
+const QVector<float>* Trb3signalExtractor::GetSignals(int ievent) const
 {
     if (ievent<0 || ievent>=signalData.size()) return 0;
 
     return &(signalData.at(ievent));
 }
 
-const QVector<double> *Trb3signalExtractor::GetSignalsFast(int ievent) const
+const QVector<float> *Trb3signalExtractor::GetSignalsFast(int ievent) const
 {
     return &(signalData.at(ievent));
 }
 
-bool Trb3signalExtractor::SetSignal(int ievent, int ichannel, double value)
+bool Trb3signalExtractor::SetSignal(int ievent, int ichannel, float value)
 {
     if (ievent<0 || ievent>=signalData.size()) return false;
     if (ichannel<0 || ichannel>=signalData.at(ievent).size()) return false;
@@ -61,12 +71,12 @@ bool Trb3signalExtractor::SetSignal(int ievent, int ichannel, double value)
     return true;
 }
 
-void Trb3signalExtractor::SetSignalFast(int ievent, int ichannel, double value)
+void Trb3signalExtractor::SetSignalFast(int ievent, int ichannel, float value)
 {
     signalData[ievent][ichannel] = value;
 }
 
-bool Trb3signalExtractor::SetSignals(int ievent, const QVector<double> &values)
+bool Trb3signalExtractor::SetSignals(int ievent, const QVector<float> &values)
 {
     if (ievent<0 || ievent>=signalData.size()) return false;
     if (values.size() != numChannels) return false;
@@ -75,7 +85,7 @@ bool Trb3signalExtractor::SetSignals(int ievent, const QVector<double> &values)
     return true;
 }
 
-void Trb3signalExtractor::SetSignalsFast(int ievent, const QVector<double> &values)
+void Trb3signalExtractor::SetSignalsFast(int ievent, const QVector<float> &values)
 {
     for (int i=0; i<values.size(); i++) signalData[ievent][i] = values.at(i);
 }
@@ -204,9 +214,9 @@ void Trb3signalExtractor::ExtractAllSignals()
     qDebug() << "Rejected"<<rejected<<"events from total"<<signalData.size();
 }
 
-double Trb3signalExtractor::extractSignalFromWaveform(int ievent, int ichannel, bool *WasSetToZero)
+float Trb3signalExtractor::extractSignalFromWaveform(int ievent, int ichannel, bool *WasSetToZero)
 {
-    double sig;
+    float sig;
 
     if ( Config->IsNegative(ichannel) )
     {
@@ -275,7 +285,7 @@ double Trb3signalExtractor::extractSignalFromWaveform(int ievent, int ichannel, 
     return sig;
 }
 
-double Trb3signalExtractor::extractMax(const QVector<double> *arr)
+float Trb3signalExtractor::extractMax(const QVector<float> *arr)
 {
     int max = (*arr)[0];
     for (int i=1; i<arr->size(); i++)
@@ -287,7 +297,7 @@ double Trb3signalExtractor::extractMax(const QVector<double> *arr)
     return max;
 }
 
-double Trb3signalExtractor::extractMin(const QVector<double> *arr)
+float Trb3signalExtractor::extractMin(const QVector<float> *arr)
 {
     int min = (*arr)[0];
     for (int i=1; i<arr->size(); i++)

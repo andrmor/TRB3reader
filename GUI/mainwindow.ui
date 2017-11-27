@@ -2497,38 +2497,87 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_5">
         <item>
-         <widget class="QLineEdit" name="leDirForBulk"/>
+         <widget class="QLabel" name="label_34">
+          <property name="text">
+           <string>Process multiple files:</string>
+          </property>
+         </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pbSelectNewDir">
+         <layout class="QHBoxLayout" name="horizontalLayout_37">
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QPushButton" name="pbProcessAllFromDir">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Select directory with hld files</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pbProcessSelectedFiles">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Select hld files</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_15">
           <property name="text">
-           <string>Select new directory</string>
+           <string>Execute the following actions for each file (in this order)</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="cbBulkExtract">
+          <property name="text">
+           <string>Extract signals</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QCheckBox" name="cbAutoExecuteScript">
           <property name="text">
-           <string>Execute script in the first script tab after processing of each file</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="cbSaveSignalsToFiles">
-          <property name="text">
-           <string>Save extracted signals to files</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
+           <string>Execute the script in the first tab of the Script Window</string>
           </property>
          </widget>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_20">
           <item>
-           <widget class="QLabel" name="label_13">
+           <widget class="QCheckBox" name="cbSaveSignalsToFiles">
             <property name="text">
-             <string>Processed file names: remove the suffix and add:</string>
+             <string>Save signals to files with names: remove suffix +</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -2542,26 +2591,80 @@
          </layout>
         </item>
         <item>
-         <widget class="QPushButton" name="pbBulkProcess">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>30</height>
-           </size>
+         <layout class="QHBoxLayout" name="horizontalLayout_34">
+          <property name="topMargin">
+           <number>0</number>
           </property>
-          <property name="font">
-           <font>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string>Process hld files</string>
-          </property>
-         </widget>
+          <item>
+           <widget class="QCheckBox" name="cbBulkCopyToDatahub">
+            <property name="text">
+             <string>Copy data to DataHub</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="cbBulkAlsoCopyWaveforms">
+            <property name="text">
+             <string>including waveforms for non-0 channels </string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
         <item>
          <widget class="QPlainTextEdit" name="pteBulkLog"/>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_40">
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="labDatahubEvents">
+            <property name="text">
+             <string>DataHub contains 0 events</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pbClearDataHub">
+            <property name="text">
+             <string>Clear DataHub</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_41">
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="label_13">
+            <property name="text">
+             <string>DataHub events:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton_4">
+            <property name="text">
+             <string>Save signals</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton_5">
+            <property name="text">
+             <string>Save reconstructed positions</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>
@@ -2784,32 +2887,32 @@
   <connection>
    <sender>cbSaveSignalsToFiles</sender>
    <signal>toggled(bool)</signal>
-   <receiver>label_13</receiver>
-   <slot>setVisible(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>134</x>
-     <y>157</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>128</x>
-     <y>184</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cbSaveSignalsToFiles</sender>
-   <signal>toggled(bool)</signal>
    <receiver>leAddToProcessed</receiver>
    <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>424</x>
-     <y>162</y>
+     <x>342</x>
+     <y>238</y>
     </hint>
     <hint type="destinationlabel">
-     <x>423</x>
-     <y>189</y>
+     <x>524</x>
+     <y>239</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cbBulkCopyToDatahub</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>cbBulkAlsoCopyWaveforms</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>118</x>
+     <y>255</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>322</x>
+     <y>260</y>
     </hint>
    </hints>
   </connection>

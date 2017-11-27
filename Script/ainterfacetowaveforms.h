@@ -20,17 +20,17 @@ public slots:
 
     int      countSamples();
 
-    double   getValue(int ievent, int iHardwChannel, int isample);
-    double   getValueFast(int ievent, int iHardwChannel, int isample); // not safe - no argument check
+    float    getValue(int ievent, int iHardwChannel, int isample);
+    float    getValueFast(int ievent, int iHardwChannel, int isample); // not safe - no argument check
 
     QVariant getWaveform(int ievent, int iHardwChannel);
     QVariant getWaveformFast(int ievent, int iHardwChannel); // not safe - no argument check
 
     //max/min value over waveform
-    double   getMax(int ievent, int iHardwChannel);
-    double   getMaxFast(int ievent, int iHardwChannel); // not safe - no argument check
-    double   getMin(int ievent, int iHardwChannel);
-    double   getMinFast(int ievent, int iHardwChannel); // not safe - no argument check
+    float    getMax(int ievent, int iHardwChannel);
+    float    getMaxFast(int ievent, int iHardwChannel); // not safe - no argument check
+    float    getMin(int ievent, int iHardwChannel);
+    float    getMinFast(int ievent, int iHardwChannel); // not safe - no argument check
 
     //sample # where max/min is reached over waveform
     int      getMaxSample(int ievent, int iHardwChannel);

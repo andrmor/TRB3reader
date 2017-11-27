@@ -7,6 +7,7 @@
 #include "trb3datareader.h"
 #include "ascriptwindow.h"
 #include "adispatcher.h"
+#include "adatahub.h"
 
 #include <QJsonObject>
 #include <QJsonArray>
@@ -72,7 +73,6 @@ void MainWindow::writeGUItoJson(QJsonObject &json)
 
     jsgui["HardOrLog"] = ui->cobHardwareOrLogical->currentIndex();
 
-    jsgui["BulkDir"] = ui->leDirForBulk->text();
     jsgui["AutoRunScript"] = ui->cbAutoExecuteScript->isChecked();
     jsgui["SaveFiles"] = ui->cbSaveSignalsToFiles->isChecked();
 
@@ -104,7 +104,6 @@ void MainWindow::readGUIfromJson(QJsonObject &json)
 
     JsonToComboBox(jsgui, "HardOrLog", ui->cobHardwareOrLogical);
 
-    JsonToLineEditText(jsgui, "BulkDir", ui->leDirForBulk);
     JsonToCheckbox(jsgui, "AutoRunScript", ui->cbAutoExecuteScript);
     JsonToCheckbox(jsgui, "SaveFiles", ui->cbSaveSignalsToFiles);
 
@@ -242,6 +241,13 @@ void MainWindow::UpdateGui()
     ui->cbPosMaxSignalGate->setChecked(Config->bPosMaxGate);
     ui->sbPosMaxFrom->setValue(Config->PosMaxGateFrom);
     ui->sbPosMaxTo->setValue(Config->PosMaxGateTo);
+
+    updateNumEventsIndication();
+}
+
+void MainWindow::updateNumEventsIndication()
+{
+    ui->labDatahubEvents->setText("DataHub contains " + QString::number(DataHub->CountEvents()) + " events");
 }
 
 // --- update Config on GUI operated by user ---

@@ -11,6 +11,7 @@ class QTextStream;
 class CernRootModule;
 class AScriptWindow;
 class ADispatcher;
+class ADataHub;
 
 namespace Ui {
 class MainWindow;
@@ -21,7 +22,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(ADataHub* DataHub, QWidget *parent = 0);
     ~MainWindow();
 
     void writeGUItoJson(QJsonObject& json);
@@ -59,7 +60,6 @@ private slots:
     void on_pbSelectFile_clicked();
     void on_pbProcessData_clicked();
     void on_pbSaveTotextFile_clicked();
-    void on_pbBulkProcess_clicked();
     void on_pbStop_toggled(bool checked);
 
     //event / channel changed
@@ -148,8 +148,6 @@ private slots:
 
     void on_actionOpen_script_window_triggered();
 
-    void on_pbSelectNewDir_clicked();
-
     void on_pbEditListOfNegatives_clicked();
 
     void on_pbEditMap_clicked();
@@ -162,11 +160,18 @@ private slots:
 
     void on_pbPrintHLDfileProperties_clicked();
 
+    void on_pbProcessAllFromDir_clicked();
+
+    void on_pbProcessSelectedFiles_clicked();
+
+    void on_pbClearDataHub_clicked();
+
 protected:
     void closeEvent(QCloseEvent* event);
 
 private:
-    Ui::MainWindow *ui;
+    ADataHub* DataHub;
+    Ui::MainWindow* ui;
     MasterConfig* Config;    
     AScriptWindow* ScriptWindow;
 
@@ -197,6 +202,9 @@ private:
 
     QString PackChannelList(QVector<int> vec);
     bool ExtractNumbersFromQString(const QString input, QVector<int>* ToAdd);
+    bool bulkProcessCore();
+    void bulkProcessorEnvelope(QStringList FileNames);
+    void updateNumEventsIndication();
 };
 
 #endif // MAINWINDOW_H
