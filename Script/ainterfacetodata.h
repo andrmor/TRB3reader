@@ -20,24 +20,31 @@ public slots:
     int      countEvents();
     int      countChannels();
 
-    //get signals
+    // signals
     float    getSignal(int ievent, int iLogicalChannel);
     float    getSignalFast(int ievent, int iLogicalChannel);
     QVariant getSignals(int ievent);
     QVariant getSignalsFast(int ievent);
-
-    //set signals
     void     setSignal(int ievent, int iLogicalChannel, float value);
     void     setSignalFast(int ievent, int iLogicalChannel, float value);
     void     setSignals(int ievent, QVariant arrayOfValues);
     void     setSignalsFast(int ievent, QVariant arrayOfValues);
 
-    //rejection of events
+    // rejection of events
     bool     isRejectedEvent(int ievent);
     bool     isRejectedEventFast(int ievent);
     void     setRejected(int ievent, bool flag);
     void     setRejectedFast(int ievent, bool flag);
     void     setAllRejected(bool flag);
+
+    // positions
+    QVariant getPosition(int ievent);
+    QVariant getPositionFast(int ievent);
+    void     setPosition(int ievent, float x, float y, float z);
+    void     setPositionFast(int ievent, float x, float y, float z);
+
+    //waveforms
+    QVariant getWaveforms(int ievent);
 
     void     Clear();
 

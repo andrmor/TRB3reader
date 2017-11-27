@@ -28,10 +28,9 @@ bool AOneEvent::SetSignal(int ichannel, float value)
     return true;
 }
 
-void AOneEvent::SetSignals(const QVector<float> *vector)
-{
-    _Signals = QVector<float>(*vector);
-}
+
+
+
 
 void AOneEvent::ClearWaveforms()
 {
@@ -132,6 +131,47 @@ void ADataHub::SetRejectedFlagFast(int ievent, bool flag)
 void ADataHub::SetAllRejectedFlag(bool flag)
 {
     for (AOneEvent* event : _Events) event->SetRejectedFlag(flag);
+}
+
+const float *ADataHub::GetPosition(int ievent) const
+{
+    if (ievent<0 || ievent>=_Events.size()) return 0;
+    return _Events.at(ievent)->GetPosition();
+}
+
+const float *ADataHub::GetPositionFast(int ievent) const
+{
+    return _Events.at(ievent)->GetPosition();
+}
+
+bool ADataHub::SetPosition(int ievent, const float *XYZ)
+{
+    if (ievent<0 || ievent>=_Events.size()) return false;
+    _Events[ievent]->SetPosition(XYZ);
+    return true;
+}
+
+bool ADataHub::SetPosition(int ievent, float x, float y, float z)
+{
+    if (ievent<0 || ievent>=_Events.size()) return false;
+    _Events[ievent]->SetPosition(x, y, z);
+    return true;
+}
+
+void ADataHub::SetPositionFast(int ievent, const float *XYZ)
+{
+    _Events[ievent]->SetPosition(XYZ);
+}
+
+void ADataHub::SetPositionFast(int ievent, float x, float y, float z)
+{
+    _Events[ievent]->SetPosition(x, y, z);
+}
+
+const QVector<QVector<float> *>* ADataHub::GetWaveforms(int ievent) const
+{
+    if (ievent<0 || ievent>=_Events.size()) return 0;
+    return _Events.at(ievent)->GetWaveforms();
 }
 
 void ADataHub::RemoveEvent(int ievent)

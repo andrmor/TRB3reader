@@ -1085,7 +1085,18 @@ bool MainWindow::bulkProcessCore()
             //waveforms
             if (ui->cbBulkAlsoCopyWaveforms->isChecked())
             {
-                // to do!!!
+                QVector< QVector<float>* > vec;
+                for (int ihardw : map)
+                {
+                    if (Extractor->GetSignalFast(iev, ihardw) == 0) vec << 0;
+                    else
+                    {
+                        QVector<float>* wave = new QVector<float>();
+                        *wave = *Reader->GetWaveformPtrFast(iev, ihardw);
+                        vec << wave;
+                    }
+                }
+                ev->SetWaveforms(&vec);
             }
 
             DataHub->AddEvent(ev);

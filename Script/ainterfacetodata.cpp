@@ -140,6 +140,63 @@ void AInterfaceToData::setAllRejected(bool flag)
     DataHub->SetAllRejectedFlag(flag);
 }
 
+QVariant AInterfaceToData::getPosition(int ievent)
+{
+    const float* pos = DataHub->GetPosition(ievent);
+    if (!pos) return QVariantList();
+
+    QJsonArray ar;
+    for (int i=0; i<3; i++) ar << pos[i];
+    QJsonValue jv = ar;
+    return jv.toVariant();
+}
+
+QVariant AInterfaceToData::getPositionFast(int ievent)
+{
+    const float* pos = DataHub->GetPosition(ievent);
+
+    QJsonArray ar;
+    for (int i=0; i<3; i++) ar << pos[i];
+    QJsonValue jv = ar;
+    return jv.toVariant();
+}
+
+void AInterfaceToData::setPosition(int ievent, float x, float y, float z)
+{
+    bool bOK = DataHub->SetPosition(ievent, x, y, z);
+    if (!bOK)
+    {
+        abort("Bad event number in position set");
+    }
+}
+
+void AInterfaceToData::setPositionFast(int ievent, float x, float y, float z)
+{
+    DataHub->SetPositionFast(ievent, x, y, z);
+}
+
+QVariant AInterfaceToData::getWaveforms(int ievent)
+{
+    const QVector< QVector<float>* >* vec = DataHub->GetWaveforms(ievent);
+    if (!vec)
+    {
+        abort("Cannot get waveforms for event: "+QString::number(ievent));
+        return QVariantList();
+    }
+
+    QJsonArray ar;
+    for (int ich=0; ich<vec->size(); ich++)
+    {
+        QJsonArray arEl;
+        const QVector<float>* wave = vec->at(ich);
+        if (wave)
+            for (int isam=0; isam<wave->size(); isam++) arEl << wave->at(isam);
+        ar.append(arEl);
+    }
+    QJsonValue jv = ar;
+    return jv.toVariant();
+}
+
 void AInterfaceToData::Clear()
 {
     DataHub->Clear();
