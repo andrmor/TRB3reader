@@ -73,8 +73,14 @@ void MainWindow::writeGUItoJson(QJsonObject &json)
 
     jsgui["HardOrLog"] = ui->cobHardwareOrLogical->currentIndex();
 
+    jsgui["KeepEventsOnStart"] = ui->cbKeepEvents->isChecked();
+    jsgui["BulkExtract"] = ui->cbBulkExtract->isChecked();
     jsgui["AutoRunScript"] = ui->cbAutoExecuteScript->isChecked();
     jsgui["SaveFiles"] = ui->cbSaveSignalsToFiles->isChecked();
+    jsgui["SuffixReplacement"] = ui->leAddToProcessed->text();
+    jsgui["BulkCopy"] = ui->cbBulkCopyToDatahub->isChecked();
+    jsgui["BulkCopyWaveforms"] = ui->cbBulkAlsoCopyWaveforms->isChecked();
+    jsgui["SaveAddPositions"] = ui->cbAddReconstructedPositions->isChecked();
 
     QJsonObject ja;
         ja["AutoY"] = ui->cbAutoscaleY->isChecked();
@@ -104,8 +110,14 @@ void MainWindow::readGUIfromJson(QJsonObject &json)
 
     JsonToComboBox(jsgui, "HardOrLog", ui->cobHardwareOrLogical);
 
+    JsonToCheckbox(jsgui, "KeepEventsOnStart", ui->cbKeepEvents);
+    JsonToCheckbox(jsgui, "BulkExtract", ui->cbBulkExtract);
     JsonToCheckbox(jsgui, "AutoRunScript", ui->cbAutoExecuteScript);
     JsonToCheckbox(jsgui, "SaveFiles", ui->cbSaveSignalsToFiles);
+    JsonToLineEditText(jsgui, "SuffixReplacement", ui->leAddToProcessed);
+    JsonToCheckbox(jsgui, "BulkCopy", ui->cbBulkCopyToDatahub);
+    JsonToCheckbox(jsgui, "BulkCopyWaveforms", ui->cbBulkAlsoCopyWaveforms);
+    JsonToCheckbox(jsgui, "SaveAddPositions", ui->cbAddReconstructedPositions);
 
     QJsonObject ja = jsgui["GraphScale"].toObject();
         JsonToCheckbox(ja, "AutoY", ui->cbAutoscaleY);

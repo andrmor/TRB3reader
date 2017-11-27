@@ -164,7 +164,7 @@ private slots:
 
     void on_pbProcessSelectedFiles_clicked();
 
-    void on_pbClearDataHub_clicked();
+    void on_pbSaveSignalsFromDataHub_clicked();
 
 protected:
     void closeEvent(QCloseEvent* event);

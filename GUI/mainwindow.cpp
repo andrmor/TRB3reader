@@ -99,8 +99,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pbSelectFile_clicked()
 {
-    QString FileName = QFileDialog::getOpenFileName(this, "Select TRB file", "", "HLD files (*.hld)");
+    QString FileName = QFileDialog::getOpenFileName(this, "Select TRB file", Config->WorkingDir, "HLD files (*.hld)");
     if (FileName.isEmpty()) return;
+    Config->WorkingDir = QFileInfo(FileName).absolutePath();
 
     ui->leFileName->setText(FileName);
     Config->FileName = FileName;
@@ -914,8 +915,9 @@ void MainWindow::on_pbRemoveDatakind_clicked()
 
 void MainWindow::on_pbPrintHLDfileProperties_clicked()
 {
-    QString FileName = QFileDialog::getOpenFileName(this, "Select HLD file to inspect", "", "*.hld");
+    QString FileName = QFileDialog::getOpenFileName(this, "Select HLD file to inspect", Config->WorkingDir, "*.hld");
     if (FileName.isEmpty()) return;
+    Config->WorkingDir = QFileInfo(FileName).absolutePath();
 
     QString s = Reader->GetFileInfo(FileName);
     ui->pteHLDfileProperties->clear();
@@ -924,8 +926,9 @@ void MainWindow::on_pbPrintHLDfileProperties_clicked()
 
 void MainWindow::on_pbProcessAllFromDir_clicked()
 {
-    QString dir = QFileDialog::getExistingDirectory(this, "Select directory with hld files to convert", "", 0);
+    QString dir = QFileDialog::getExistingDirectory(this, "Select directory with hld files to convert", Config->WorkingDir, 0);
     if (dir.isEmpty()) return;
+    Config->WorkingDir = QFileInfo(dir).absolutePath();
 
     if (!QDir(dir).exists())
     {
@@ -942,14 +945,16 @@ void MainWindow::on_pbProcessAllFromDir_clicked()
 
 void MainWindow::on_pbProcessSelectedFiles_clicked()
 {
-    QStringList names = QFileDialog::getOpenFileNames(this, "Select hld files to be processed", "", "*.hld");
+    QStringList names = QFileDialog::getOpenFileNames(this, "Select hld files to be processed", Config->WorkingDir, "*.hld");
     if (names.isEmpty()) return;
+    Config->WorkingDir = QFileInfo(names.first()).absolutePath();
+
     bulkProcessorEnvelope(names);
 }
 
 void MainWindow::bulkProcessorEnvelope(QStringList FileNames)
 {
-    DataHub->Clear();
+    if (!ui->cbKeepEvents->isChecked()) DataHub->Clear();
     ui->pteBulkLog->clear();
     if (ui->cbAutoExecuteScript->isChecked())
     {
@@ -1090,9 +1095,34 @@ bool MainWindow::bulkProcessCore()
     return true;
 }
 
-
-void MainWindow::on_pbClearDataHub_clicked()
+void MainWindow::on_pbSaveSignalsFromDataHub_clicked()
 {
-    DataHub->Clear();
-    UpdateGui();
+    int numEvents = DataHub->CountEvents();
+    if ( numEvents == 0)
+    {
+        message("There are no events in the DataHub", this);
+        return;
+    }
+
+    QString FileName = QFileDialog::getSaveFileName(this, "Save events from DataHub", Config->WorkingDir, "*.dat,*.txt");
+    if (FileName.isEmpty()) return;
+    Config->WorkingDir = QFileInfo(FileName).absolutePath();
+
+    QFile outFile( FileName );
+    outFile.open(QIODevice::WriteOnly);
+    if(!outFile.isOpen())
+      {
+        message("Unable to open file " +FileName+ " for writing!", this);
+        return;
+      }
+    QTextStream outStream(&outFile);
+
+    for (int iev=0; iev<numEvents; iev++)
+    {
+        const QVector<float>* vec = DataHub->GetSignalsFast(iev);
+        for (float val : *vec) outStream << QString::number(val) << " ";
+        //if (ui->cbAddReconstructedPositions->isChecked())
+        // *** !!!
+        outStream << "\r\n";
+    }
 }

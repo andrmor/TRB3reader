@@ -1398,7 +1398,7 @@
       </widget>
       <widget class="QWidget" name="tab_2">
        <attribute name="title">
-        <string>Processing</string>
+        <string>Explore</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_10">
         <item>
@@ -2497,11 +2497,25 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_5">
         <item>
-         <widget class="QLabel" name="label_34">
-          <property name="text">
-           <string>Process multiple files:</string>
+         <layout class="QHBoxLayout" name="horizontalLayout_42">
+          <property name="topMargin">
+           <number>0</number>
           </property>
-         </widget>
+          <item>
+           <widget class="QLabel" name="label_34">
+            <property name="text">
+             <string>Process multiple files:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="cbKeepEvents">
+            <property name="text">
+             <string>Keep events in DataHub</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_37">
@@ -2560,6 +2574,9 @@
           <property name="text">
            <string>Extract signals</string>
           </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
          </widget>
         </item>
         <item>
@@ -2574,10 +2591,17 @@
           <item>
            <widget class="QCheckBox" name="cbSaveSignalsToFiles">
             <property name="text">
-             <string>Save signals to files with names: remove suffix +</string>
+             <string>Save signals to files</string>
             </property>
             <property name="checked">
              <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_35">
+            <property name="text">
+             <string>Name: remove suffix, add</string>
             </property>
            </widget>
           </item>
@@ -2629,13 +2653,6 @@
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="QPushButton" name="pbClearDataHub">
-            <property name="text">
-             <string>Clear DataHub</string>
-            </property>
-           </widget>
-          </item>
          </layout>
         </item>
         <item>
@@ -2645,22 +2662,34 @@
           </property>
           <item>
            <widget class="QLabel" name="label_13">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="text">
              <string>DataHub events:</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_4">
+           <widget class="QPushButton" name="pbSaveSignalsFromDataHub">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="text">
              <string>Save signals</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_5">
+           <widget class="QCheckBox" name="cbAddReconstructedPositions">
             <property name="text">
-             <string>Save reconstructed positions</string>
+             <string>Add reconstructed positions</string>
             </property>
            </widget>
           </item>
@@ -2891,12 +2920,12 @@
    <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>342</x>
-     <y>238</y>
+     <x>165</x>
+     <y>222</y>
     </hint>
     <hint type="destinationlabel">
-     <x>524</x>
-     <y>239</y>
+     <x>509</x>
+     <y>223</y>
     </hint>
    </hints>
   </connection>
@@ -2908,11 +2937,27 @@
    <hints>
     <hint type="sourcelabel">
      <x>118</x>
-     <y>255</y>
+     <y>239</y>
     </hint>
     <hint type="destinationlabel">
      <x>322</x>
-     <y>260</y>
+     <y>244</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cbSaveSignalsToFiles</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>label_35</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>124</x>
+     <y>210</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>219</x>
+     <y>207</y>
     </hint>
    </hints>
   </connection>

@@ -60,6 +60,7 @@ void MasterConfig::WriteToJson(QJsonObject &json)
     writeScriptSettingsToJson(json);
 
     json["FileName"] = FileName;
+    json["WorkingDir"] = WorkingDir;
 
     QJsonArray ar;
     for (int i : Datakinds) ar << i;
@@ -78,6 +79,7 @@ bool MasterConfig::ReadFromJson(QJsonObject &json)
     readScriptSettingsFromJson(json);
 
     parseJson(json, "FileName", FileName);
+    parseJson(json, "WorkingDir", WorkingDir);
 
     if (json.contains("Datakinds"))
     {
