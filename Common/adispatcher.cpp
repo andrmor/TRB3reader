@@ -75,7 +75,7 @@ void ADispatcher::SaveConfig(QString FileName, QJsonObject js)
 
 void ADispatcher::ClearNegativeChannels()
 {
-    Config->SetNegativeChannels(std::vector<int>());
+    Config->SetNegativeChannels(QVector<int>());
     ClearData();
 
     MW->UpdateGui();
@@ -83,7 +83,7 @@ void ADispatcher::ClearNegativeChannels()
 
 void ADispatcher::ClearMapping()
 {
-    Config->SetMapping(std::vector<std::size_t>());
+    Config->SetMapping(QVector<int>());
     ClearData();
 
     MW->UpdateGui();
@@ -91,7 +91,7 @@ void ADispatcher::ClearMapping()
 
 void ADispatcher::ClearIgnoreChannels()
 {
-    Config->IgnoreHardwareChannels.clear();
+    Config->ClearListOfIgnoreChannels();
     ClearData();
 
     MW->UpdateGui();

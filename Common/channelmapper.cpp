@@ -1,63 +1,64 @@
 #include "channelmapper.h"
 
-#include <iostream>
-#include <limits>
-#include <cmath>
-
-using namespace std;
-
-const size_t NaN = std::numeric_limits<size_t>::quiet_NaN();
+#include <QDebug>
 
 ChannelMapper::ChannelMapper() {}
 
-size_t ChannelMapper::HardwareToLogical(size_t HardwareChannel) const
+int ChannelMapper::HardwareToLogical(int iHardwareChannel) const
 {
-    if (HardwareChannel<ToLogical.size())
-        return ToLogical[HardwareChannel];
-    std::cout << "--- Invalid hardware channel!\n"<<std::flush;
-    return NaN;
+    if ( iHardwareChannel>=0 && iHardwareChannel<ToLogical.size() ) return ToLogical.at(iHardwareChannel);
+
+    //qDebug() << "--- Invalid hardware channel!";
+    return -1;
 }
 
-size_t ChannelMapper::LogicalToHardware(size_t LogicalChannel) const
+int ChannelMapper::LogicalToHardware(int iLogicalChannel) const
 {
-    if (LogicalChannel<ToLogical.size())
-        return ToHardware[LogicalChannel];
-    std::cout << "--- Invalid logical channel!\n"<<std::flush;
-    return NaN;
+    if ( iLogicalChannel>=0 && iLogicalChannel<ToLogical.size() ) return ToHardware.at(iLogicalChannel);
+
+    //qDebug() << "--- Invalid logical channel";
+    return -1;
 }
 
-size_t ChannelMapper::HardwareToLogicalFast(size_t HardwareChannel) const
+int ChannelMapper::HardwareToLogicalFast(int iHardwareChannel) const
 {
-    return ToLogical[HardwareChannel];
+    return ToLogical.at(iHardwareChannel);
 }
 
-size_t ChannelMapper::LogicalToHardwareFast(size_t LogicalChannel) const
+int ChannelMapper::LogicalToHardwareFast(int iLogicalChannel) const
 {
-    return ToHardware[LogicalChannel];
+    return ToHardware.at(iLogicalChannel);
 }
 
-void ChannelMapper::SetChannels_OrderedByHardware(std::vector<size_t> ToLogicalChannelMap)
+void ChannelMapper::SetChannels_OrderedByHardware(QVector<int> ToLogicalChannelMap)
 {
     Clear();
+    if (ToLogicalChannelMap.isEmpty()) return;
 
-    for (size_t iHardware=0; iHardware<ToLogicalChannelMap.size(); iHardware++)
+    int imax = -1;
+    for (int ich : ToLogicalChannelMap) if (ich > imax) imax = ich;
+    ToLogical = QVector<int>(imax+1, -1);
+
+    for (int iHardware=0; iHardware<ToLogicalChannelMap.size(); iHardware++)
     {
-        size_t iLogical = ToLogicalChannelMap[iHardware];
-        if (iHardware >= ToLogical.size()) ToLogical.resize(iHardware + 1, NaN);
+        const int iLogical = ToLogicalChannelMap.at(iHardware);
         ToLogical[iHardware] = iLogical;
     }
 
     update_ToHardware();
 }
 
-void ChannelMapper::SetChannels_OrderedByLogical(std::vector<size_t> ToHardwareChannelMap)
+void ChannelMapper::SetChannels_OrderedByLogical(QVector<int> ToHardwareChannelMap)
 {
     Clear();
 
-    for (size_t iLogical=0; iLogical<ToHardwareChannelMap.size(); iLogical++)
+    int imax = -1;
+    for (int ich : ToHardwareChannelMap) if (ich > imax) imax = ich;
+    ToHardware = QVector<int>(imax+1, -1);
+
+    for (int iLogical=0; iLogical<ToHardwareChannelMap.size(); iLogical++)
     {
-        size_t iHardware = ToHardwareChannelMap[iLogical];
-        if (iLogical >= ToHardware.size()) ToHardware.resize(iLogical + 1, NaN);
+        const int iHardware = ToHardwareChannelMap.at(iLogical);
         ToHardware[iLogical] = iHardware;
     }
 
@@ -74,11 +75,14 @@ void ChannelMapper::update_ToHardware()
 {
     ToHardware.clear();
 
-    for (size_t iHardware=0; iHardware<ToLogical.size(); iHardware++)
+    int imax = -1;
+    for (int ich : ToLogical) if (ich > imax) imax = ich;
+    ToHardware = QVector<int>(imax+1, -1);
+
+    for (int iHardware=0; iHardware<ToLogical.size(); iHardware++)
     {
-        size_t iLogical = ToLogical[iHardware];
-        if ( isnan(iLogical) ) continue;
-        if (iLogical>=ToHardware.size()) ToHardware.resize(iLogical+1, NaN);
+        const int iLogical = ToLogical.at(iHardware);
+        if ( iLogical < 0 ) continue;
         ToHardware[ iLogical ] = iHardware;
     }
 }
@@ -87,66 +91,78 @@ void ChannelMapper::update_ToLogical()
 {
     ToLogical.clear();
 
-    for (size_t iLogical=0; iLogical<ToHardware.size(); iLogical++)
+    int imax = -1;
+    for (int ich : ToHardware) if (ich > imax) imax = ich;
+    ToLogical = QVector<int>(imax+1, -1);
+
+    for (int iLogical=0; iLogical<ToHardware.size(); iLogical++)
     {
-        size_t iHardware = ToHardware[iLogical];
-        if ( isnan(iHardware) ) continue;
-        if (iHardware>=ToLogical.size()) ToLogical.resize(iHardware+1, NaN);
+        int iHardware = ToHardware.at(iLogical);
+        if ( iHardware < 0 ) continue;
         ToLogical[ iHardware ] = iLogical;
     }
 }
 
-bool ChannelMapper::Validate(size_t numChannels, bool ensureLogicalChannelContinuity) const
+bool ChannelMapper::Validate(int numChannels, bool ensureLogicalChannelContinuity) const
 {
+    if (ToHardware.isEmpty() || ToLogical.isEmpty())
+    {
+        qDebug() << "mapping is not defined!";
+        return false;
+    }
+
     if (ensureLogicalChannelContinuity)
         if ( ToHardware.size() != numChannels)
         {
-            std::cout << "--- ToHardware size ("<<ToHardware.size()<<") not consistent with requested number of channels ("<<numChannels<<")\n"<<std::flush;
+            qDebug() << "--- ToHardware size ("<<ToHardware.size()<<") not consistent with requested number of channels ("<<numChannels<<")";
             return false;
         }
 
-    std::vector<bool> check;
-    for (size_t iLogical=0; iLogical<ToHardware.size(); iLogical++)
+    int imax = -1;
+    for (int ich : ToHardware) if ( ich > imax ) imax = ich;
+    QVector<bool> check = QVector<bool>(imax+1, false);
+
+    for (int iLogical=0; iLogical<ToHardware.size(); iLogical++)
     {
-        size_t iHardware = ToHardware[iLogical];
-        if ( isnan(iHardware) )
+        int iHardware = ToHardware[iLogical];
+        if ( iHardware < 0 )
         {
             if (ensureLogicalChannelContinuity)
             {
-                std::cout << "--- Logical channel numbering is not continuous\n"<<std::flush;
+                qDebug() << "--- Logical channel numbering is not continuous";
                 return false;
             }
             else continue;
-
         }
-        if ( iHardware >= check.size()) check.resize(iHardware+1, false);
-        if (check[iHardware])
+        if ( check.at(iHardware) )
         {
-            std::cout << "--- Dublication found in ToLogical ("<<iHardware<<")\n"<<std::flush;
+            qDebug() << "--- Dublication found in ToLogical ("<<iHardware<<")";
             return false;
         }
         if ( (iHardware >= ToLogical.size()) || (ToLogical[iHardware] != iLogical) )
         {
-            std::cout << "--- Not consistent ToHardware and ToLogial (Logical at"<<iLogical<<" of "<<iHardware<<")\n"<<std::flush;
+            qDebug() << "--- Not consistent ToHardware and ToLogial (Logical at"<<iLogical<<" of "<<iHardware<<")";
             return false;
         }
+        check[iHardware] = true;
     }
 
-    check.resize(ToLogical.size(), false);
-    for (size_t iHardware=0; iHardware<ToLogical.size(); iHardware++)
+    check = QVector<bool>(ToLogical.size(), false);
+    for (int iHardware=0; iHardware<ToLogical.size(); iHardware++)
     {
-        size_t iLogical = ToLogical[iHardware];
-        if ( isnan(iLogical) ) continue;
-        if (check[iLogical])
+        int iLogical = ToLogical.at(iHardware);
+        if ( iLogical < 0 ) continue;
+        if ( check.at(iLogical) )
         {
-            std::cout << "--- Dublication found in ToHardware ("<<iLogical<<")\n"<<std::flush;
+            qDebug() << "--- Dublication found in ToHardware ("<<iLogical<<")";
+            return false;
+        }        
+        if ( (iLogical >= ToHardware.size()) || (ToHardware.at(iLogical) != iHardware) )
+        {
+            qDebug() << "--- Not consistent ToLogial and ToHardware (Hardware at"<<iHardware<<" of "<<iLogical<<")";
             return false;
         }
-        if ( (iLogical >= ToHardware.size()) || (ToHardware[iLogical] != iHardware) )
-        {
-            std::cout << "--- Not consistent ToLogial and ToHardware (Hardware at"<<iHardware<<" of "<<iLogical<<")\n"<<std::flush;
-            return false;
-        }
+        check[iLogical] = true;
     }
 
     return true;

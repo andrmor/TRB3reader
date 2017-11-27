@@ -2,7 +2,6 @@
 #include "trb3datareader.h"
 #include "masterconfig.h"
 
-#include <iostream>
 #include <limits>
 
 #include <QDebug>
@@ -14,17 +13,17 @@ Trb3signalExtractor::Trb3signalExtractor(const MasterConfig *Config, const Trb3d
 
 bool Trb3signalExtractor::ExtractSignals()
 {    
-    if (!Reader->isValid())
+    if ( !Reader->isValid() )
     {
-        std::cout << "--- Cannot start extraction, TRBreader reports not ready status\n"<< std::flush;
+        qDebug() << "--- Cannot start extraction, TRBreader reports not ready status";
         return false;
     }
 
     numChannels = Reader->GetNumChannels();
 
-    std::cout << "--> Extracting signals from waveforms...\n" << std::flush;
+    qDebug() << "--> Extracting signals from waveforms...";
     ExtractAllSignals();
-    std::cout << "--> Done!\n--> Trb3signalExtractor finished signal extraction.\n" << std::flush;
+    qDebug() << "--> Done!\n--> Trb3signalExtractor finished signal extraction.";
     return true;
 }
 
@@ -33,12 +32,12 @@ double Trb3signalExtractor::GetSignal(int ievent, int ichannel) const
     if (ievent<0 || ievent>=signalData.size()) return NaN;
     if (ichannel<0 || ichannel>=signalData.at(ievent).size()) return NaN;
 
-    return signalData[ievent][ichannel];
+    return signalData.at(ievent).at(ichannel);
 }
 
 double Trb3signalExtractor::GetSignalFast(int ievent, int ichannel) const
 {
-    return signalData[ievent][ichannel];
+    return signalData.at(ievent).at(ichannel);
 }
 
 const QVector<double>* Trb3signalExtractor::GetSignals(int ievent) const
@@ -67,18 +66,18 @@ void Trb3signalExtractor::SetSignalFast(int ievent, int ichannel, double value)
     signalData[ievent][ichannel] = value;
 }
 
-bool Trb3signalExtractor::SetSignals(int ievent, const std::vector<double> &values)
+bool Trb3signalExtractor::SetSignals(int ievent, const QVector<double> &values)
 {
     if (ievent<0 || ievent>=signalData.size()) return false;
     if (values.size() != numChannels) return false;
 
-    for (size_t i=0; i<numChannels; i++) signalData[ievent][i] = values.at(i);
+    for (int i=0; i<numChannels; i++) signalData[ievent][i] = values.at(i);
     return true;
 }
 
-void Trb3signalExtractor::SetSignalsFast(int ievent, const std::vector<double> &values)
+void Trb3signalExtractor::SetSignalsFast(int ievent, const QVector<double> &values)
 {
-    for (size_t i=0; i<values.size(); i++) signalData[ievent][i] = values.at(i);
+    for (int i=0; i<values.size(); i++) signalData[ievent][i] = values.at(i);
 }
 
 bool Trb3signalExtractor::SetRejected(int ievent, bool flag)
@@ -97,15 +96,10 @@ void Trb3signalExtractor::ClearData()
     signalData.clear();
 }
 
-std::size_t Trb3signalExtractor::GetNumEvents() const
-{
-    return signalData.size();
-}
-
-std::size_t Trb3signalExtractor::GetNumChannels() const
+int Trb3signalExtractor::GetNumChannels() const
 {
     if (signalData.size() == 0) return 0;
-    return signalData[0].size();
+    return signalData.at(0).size();
 }
 
 bool Trb3signalExtractor::IsRejectedEvent(int ievent) const
@@ -132,7 +126,7 @@ void Trb3signalExtractor::ExtractAllSignals()
         return;
     }
 
-    for (std::size_t ievent=0; ievent<signalData.size(); ievent++)
+    for (int ievent=0; ievent<signalData.size(); ievent++)
     {
         signalData[ievent].resize(numChannels);
 
@@ -141,7 +135,7 @@ void Trb3signalExtractor::ExtractAllSignals()
         NegMaxValue = PosMaxValue = -1.0e10;
         for (int ichannel=0; ichannel<numChannels; ichannel++)
         {
-            if (Config->IgnoreHardwareChannels.contains(ichannel) )
+            if (Config->IsIgnoredChannel(ichannel) )
             {
                 signalData[ievent][ichannel] = 0;
                 continue;
@@ -205,10 +199,9 @@ void Trb3signalExtractor::ExtractAllSignals()
 
     //statistics on rejected events:
     int rejected = 0;
-    for (std::size_t ievent=0; ievent<signalData.size(); ievent++)
+    for (int ievent=0; ievent<signalData.size(); ievent++)
         if (RejectedEvents.at(ievent)) rejected++;
     qDebug() << "Rejected"<<rejected<<"events from total"<<signalData.size();
-
 }
 
 double Trb3signalExtractor::extractSignalFromWaveform(int ievent, int ichannel, bool *WasSetToZero)

@@ -21,6 +21,8 @@
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+    saveCompleteState();
+
 #ifdef CERN_ROOT
     delete RootModule; RootModule = 0;
 #endif
@@ -171,11 +173,25 @@ void MainWindow::readWindowsFromJson(QJsonObject &json)
 // --- Update GUI controls on Config change ---
 void MainWindow::UpdateGui()
 {
+    qDebug() << "--- Updating GUI";
+
+    //datakinds
+    ui->lwDatakinds->clear();
+    QVector<int> datakinds = Config->GetListOfDatakinds();
+    if ( datakinds.size() > 1 ) std::sort(datakinds.begin(), datakinds.end());
+    for (int i : datakinds)
+    {
+        QString s = QString::number(i) + "   (hex: " + QString::number(i, 16) + ")";
+        QListWidgetItem* item = new QListWidgetItem(s);
+        item->setTextAlignment(Qt::AlignCenter);
+        ui->lwDatakinds->addItem(item);
+    }
+
     ui->leFileName->setText(Config->FileName);
 
-    ui->ptePolarity->clear();
-    QString s;
-    for (int i: Config->GetListOfNegativeChannels()) s += QString::number(i)+" ";
+    ui->ptePolarity->clear();    
+    //for (int i: Config->GetListOfNegativeChannels()) s += QString::number(i)+" ";
+    QString s = PackChannelList(Config->GetListOfNegativeChannels());
     ui->ptePolarity->appendPlainText(s);
 
     ui->pteMapping->clear();
@@ -184,11 +200,12 @@ void MainWindow::UpdateGui()
     ui->pteMapping->appendPlainText(s);
 
     ui->pteIgnoreHardwareChannels->clear();
-    s.clear();
-    std::vector<int> ign;
-    for (int i: Config->IgnoreHardwareChannels) ign.push_back(i);
-    std::sort(ign.begin(), ign.end());
-    for (int i: ign) s += QString::number(i)+" ";
+//    s.clear();
+//    std::vector<int> ign;
+//    for (int i: Config->IgnoreHardwareChannels) ign.push_back(i);
+//    std::sort(ign.begin(), ign.end());
+//    for (int i: ign) s += QString::number(i)+" ";
+    s = PackChannelList(Config->GetListOfIgnoreChannels());
     ui->pteIgnoreHardwareChannels->appendPlainText(s);
 
     ui->cbSubstractPedestal->setChecked(Config->bPedestalSubstraction);

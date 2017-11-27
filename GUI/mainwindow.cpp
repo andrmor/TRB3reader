@@ -7,6 +7,7 @@
 #include "ascriptwindow.h"
 #include "amessage.h"
 #include "adispatcher.h"
+#include "aeditchannelsdialog.h"
 
 #ifdef CERN_ROOT
 #include "cernrootmodule.h"
@@ -18,11 +19,10 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QMessageBox>
-//#include <QStandardPaths>
-//#include <QDir>
 #include <QDirIterator>
+#include <QInputDialog>
 
-#include <vector>
+//#include <vector>
 #include <cmath>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -149,12 +149,11 @@ void MainWindow::on_pbLoadPolarities_clicked()
 {
     QString FileName = QFileDialog::getOpenFileName(this, "Add channel polarity data.\n"
                                                     "The file should contain hardware channel numbers which have negative polarity");
-    QVector<int> pos;
-    LoadIntVectorsFromFile(FileName, &pos);
+    QVector<int> negList;
+    LoadIntVectorsFromFile(FileName, &negList);
 
-    std::vector<int> List;
-    for (int i : pos) List.push_back(i);
-    Config->SetNegativeChannels(List);
+
+    Config->SetNegativeChannels(negList);
 
     Extractor->ClearData();
     LogMessage("Polarities updated");
@@ -170,7 +169,6 @@ void MainWindow::on_pbAddMapping_clicked()
     QVector<int> arr;
     LoadIntVectorsFromFile(FileName, &arr);
 
-    std::vector<size_t> List;
     for (int i : arr)
     {
         if (i<0)
@@ -178,9 +176,8 @@ void MainWindow::on_pbAddMapping_clicked()
             message("Only positive channel numbers are allowed!", this);
             return;
         }
-        List.push_back(i);
     }
-    Config->SetMapping(List);
+    Config->SetMapping(arr);
 
     Config->Map->Validate(Reader->GetNumChannels(), true);
     LogMessage("Mapping updated");
@@ -196,7 +193,7 @@ void MainWindow::on_pbAddListHardwChToIgnore_clicked()
     QVector<int> arr;
     LoadIntVectorsFromFile(FileName, &arr);
 
-    for (int i : arr) Config->IgnoreHardwareChannels.insert(i);
+    Config->SetListOfIgnoreChannels(arr);
 
     LogMessage("Ignored channels were updated");
 
@@ -373,6 +370,7 @@ void MainWindow::on_pbBulkProcess_clicked()
 
         Config->FileName = it.next();
         ui->pteBulkLog->appendPlainText("Processing " + QFileInfo(Config->FileName).fileName());
+        qDebug() << "Processing" <<  Config->FileName;
 
         QString error = ProcessData();
         if (!error.isEmpty())
@@ -444,7 +442,7 @@ void MainWindow::on_pbShowWaveform_toggled(bool checked)
     if (!Reader->isValid()) return;
 
     int iHardwChan = getCurrentlySelectedHardwareChannel();
-    if (std::isnan(iHardwChan))
+    if ( iHardwChan < 0 )
     {
         RootModule->ClearSingleWaveWindow();
         return;
@@ -518,7 +516,7 @@ int MainWindow::getCurrentlySelectedHardwareChannel()
     if (bUseLogical)                          iHardwChan = Config->Map->LogicalToHardware(val);
     else
     {
-        if (val >= Reader->GetNumChannels())  iHardwChan = std::numeric_limits<size_t>::quiet_NaN();
+        if (val >= Reader->GetNumChannels())  iHardwChan = -1;
         else                                  iHardwChan = val;
     }
     return iHardwChan;
@@ -546,7 +544,7 @@ void MainWindow::OnEventOrChannelChanged(bool bOnlyChannel)
         ui->leLogic->setText(QString::number(val));
 
         iHardwChan = Config->Map->LogicalToHardware(val);
-        if (std::isnan(iHardwChan)) ui->leHardw->setText("Not mapped");
+        if ( iHardwChan < 0 ) ui->leHardw->setText("n.a.");
         else ui->leHardw->setText(QString::number(iHardwChan));
     }
     else
@@ -554,9 +552,9 @@ void MainWindow::OnEventOrChannelChanged(bool bOnlyChannel)
         iHardwChan = val;
         ui->leHardw->setText(QString::number(val));
 
-        std::size_t ilogical = Config->Map->HardwareToLogical(val);
+        int ilogical = Config->Map->HardwareToLogical(val);
         QString s;
-        if (std::isnan(ilogical)) s = "Not mapped";
+        if ( ilogical < 0 ) s = "n.a.";
         else s = QString::number(ilogical);
         ui->leLogic->setText(s);
     }
@@ -571,11 +569,11 @@ void MainWindow::OnEventOrChannelChanged(bool bOnlyChannel)
     if (Extractor->IsRejectedEventFast(ievent)) ss = "Rejected event";
     else
     {
-        if (std::isnan(iHardwChan)) ss = "n.a.";
+        if ( iHardwChan < 0 ) ss = "n.a.";
         else
         {
             double signal = Extractor->GetSignalFast(ievent, iHardwChan);
-            if (std::isnan(signal)) ss = "n.a.";
+            if ( std::isnan(signal) ) ss = "n.a.";
             else ss = QString::number(signal);
         }
     }
@@ -809,4 +807,215 @@ void MainWindow::on_pbPosSignature_clicked()
 void MainWindow::on_cobSignalExtractionMethod_currentIndexChanged(int index)
 {
     ui->sbExtractAllFromSampleNumber->setVisible(index == 2);
+}
+
+bool MainWindow::ExtractNumbersFromQString(const QString input, QVector<int> *ToAdd)
+{
+  ToAdd->clear();
+
+  QRegExp rx("(\\,|\\-)"); //RegEx for ' ' and '-'
+
+  QStringList fields = input.split(rx, QString::SkipEmptyParts);
+
+  if (fields.size() == 0 )
+    {
+      //message("Nothing to add!");
+      return false;
+    }
+
+  fields = input.split(",", QString::SkipEmptyParts);
+  //  qDebug()<<"found "<<fields.size()<<" records";
+
+  for (int i=0; i<fields.size(); i++)
+    {
+      QString thisField = fields[i];
+
+      //are there "-" separated fields?
+      QStringList subFields = thisField.split("-", QString::SkipEmptyParts);
+
+      if (subFields.size() > 2 || subFields.size() == 0) return false;
+      else if (subFields.size() == 1)
+        {
+          //just one number
+          bool ok;
+          int pm;
+          pm = subFields[0].toInt(&ok);
+
+          if (ok) ToAdd->append(pm);
+          else return false;
+        }
+      else //range - two subFields
+        {
+          bool ok1, ok2;
+          int pm1, pm2;
+          pm1 = subFields[0].toInt(&ok1);
+          pm2 = subFields[1].toInt(&ok2);
+          if (ok1 && ok2)
+            {
+               if (pm2<pm1) return false;//error = true;
+               else
+                 {
+                   for (int j=pm1; j<=pm2; j++) ToAdd->append(j);
+                 }
+            }
+          else return false;
+        }
+    }
+
+  return true;
+}
+
+QString MainWindow::PackChannelList(QVector<int> vec)
+{
+    if (vec.isEmpty()) return "";
+
+    std::sort(vec.begin(), vec.end());
+
+    QString out;
+    int prevVal = vec.first();
+    int rangeStart = prevVal;
+    for (int i=0; i<=vec.size(); ++i)        //includes the invalid index!
+    {
+        int thisVal;
+        if ( i == vec.size() )               //last in the vector
+        {
+            thisVal = prevVal;
+        }
+        else
+        {
+            thisVal = vec.at(i);
+            if ( i == 0 )                    // first but not the only
+            {
+                continue;
+            }
+            else if ( thisVal == prevVal+1 ) //continuing range
+            {
+                prevVal++;
+                continue;
+            }
+        }
+
+        //adding to output
+        if (!out.isEmpty()) out += ", ";
+
+        if (prevVal == rangeStart)             //single val
+            out += QString::number(prevVal);
+        else                                //range ended
+            out += QString::number(rangeStart) + "-" + QString::number(prevVal);
+
+        prevVal = thisVal;
+        rangeStart = thisVal;
+    }
+
+    return out;
+}
+
+void MainWindow::on_pbEditListOfNegatives_clicked()
+{
+    QString old =  PackChannelList(Config->GetListOfNegativeChannels());
+    AEditChannelsDialog* D = new AEditChannelsDialog("List of negative channels", old, "Example: 0, 2, 5-15, 7, 30-45");
+    int res = D->exec();
+    if (res != 1) return;
+    const QString str = D->GetText();
+    delete D;
+
+    QVector<int> vec;
+    ExtractNumbersFromQString(str, &vec);
+    QSet<int> set;
+    for (int i : vec) set << i;
+
+    vec.clear();
+    for (int i: set) vec << i;
+
+    Config->SetNegativeChannels(vec);
+    UpdateGui();
+}
+
+void MainWindow::on_pbEditMap_clicked()
+{
+    QString old;
+    for (int i : Config->GetMapping()) old += QString::number(i) + " ";
+
+    AEditChannelsDialog* D = new AEditChannelsDialog("Hardware channels sorted by logical number", old, "Example: 5 4 3 2 1 0 10 11 12");
+    int res = D->exec();
+    if (res != 1) return;
+    const QString str = D->GetText().simplified();
+    delete D;
+
+    QRegExp rx("(\\ |\\,|\\:|\\t|\\n)");
+    QStringList fields = str.split(rx, QString::SkipEmptyParts);
+    QVector<int> vec;
+    for (QString str : fields)
+    {
+        bool bOK;
+        int i = str.toInt(&bOK);
+        if (!bOK || i<0)
+        {
+            message("Error in format: only integers (>=0) are accepted", this);
+            return;
+        }
+        vec << i;
+    }
+
+    Config->SetMapping(vec);
+    UpdateGui();
+}
+
+void MainWindow::on_pbEditIgnoreChannelList_clicked()
+{
+    QString old =  PackChannelList(Config->GetListOfIgnoreChannels());
+    AEditChannelsDialog* D = new AEditChannelsDialog("List of ignored hardware channels", old, "Example: 2, 5-15, 30-45");
+    int res = D->exec();
+    if (res != 1) return;
+    const QString str = D->GetText();
+    delete D;
+
+    QVector<int> vec;
+    ExtractNumbersFromQString(str, &vec);
+    QSet<int> set;
+    for (int i : vec) set << i;
+
+    vec.clear();
+    for (int i: set) vec << i;
+
+    Config->SetListOfIgnoreChannels(vec);
+    UpdateGui();
+}
+
+void MainWindow::on_pbAddDatakind_clicked()
+{
+    bool bOK;
+    int datakind = QInputDialog::getInt(this, "TRBreader", "Input new datakind to add", 0, 0, 0xFFFF, 1, &bOK);
+    if (bOK)
+        Config->AddDatakind(datakind);
+    UpdateGui();
+}
+
+void MainWindow::on_pbRemoveDatakind_clicked()
+{
+    int raw = ui->lwDatakinds->currentRow();
+    if (raw < 0)
+    {
+        message("Select datakind to remove by left-clicking on it in the list above", this);
+        return;
+    }
+    QString sel = ui->lwDatakinds->currentItem()->text();
+    QStringList sl = sel.split(" ");
+    if (sl.size()>1)
+    {
+        QString dk = sl.first();
+        int datakind = dk.toInt();
+        Config->RemoveDatakind(datakind);
+    }
+    UpdateGui();
+}
+
+void MainWindow::on_pbPrintHLDfileProperties_clicked()
+{
+    QString FileName = QFileDialog::getOpenFileName(this, "Select HLD file to inspect", "", "*.hld");
+    if (FileName.isEmpty()) return;
+
+    QString s = Reader->GetFileInfo(FileName);
+    ui->pteHLDfileProperties->clear();
+    ui->pteHLDfileProperties->appendPlainText(s);
 }

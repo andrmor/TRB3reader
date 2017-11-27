@@ -9,6 +9,8 @@
 MasterConfig::MasterConfig()
 {
     Map = new ChannelMapper();
+
+    Datakinds << 0xc313 << 49152 << 49155;
 }
 
 MasterConfig::~MasterConfig()
@@ -16,9 +18,33 @@ MasterConfig::~MasterConfig()
     delete Map;
 }
 
-void MasterConfig::SetNegativeChannels(const std::vector<int> &listOfChannels)
+const QVector<int> MasterConfig::GetListOfDatakinds() const
 {
-    ListNegativeChannels = listOfChannels;
+    QVector<int> vec;
+    for (int i : Datakinds) vec << i;
+    if ( vec.size() > 1 ) std::sort(vec.begin(), vec.end());
+    return vec;
+}
+
+void MasterConfig::SetListOfDatakinds(const QVector<int> &list)
+{
+    Datakinds.clear();
+    for (int i : list) Datakinds << i;
+}
+
+void MasterConfig::AddDatakind(int datakind)
+{
+    Datakinds << datakind;
+}
+
+void MasterConfig::RemoveDatakind(int datakind)
+{
+    Datakinds.remove(datakind);
+}
+
+void MasterConfig::SetNegativeChannels(const QVector<int> &list)
+{
+    ListNegativeChannels = list;
     updatePolarityQuickAccessData();
 }
 
@@ -34,6 +60,10 @@ void MasterConfig::WriteToJson(QJsonObject &json)
     writeScriptSettingsToJson(json);
 
     json["FileName"] = FileName;
+
+    QJsonArray ar;
+    for (int i : Datakinds) ar << i;
+    json["Datakinds"] = ar;
 }
 
 bool MasterConfig::ReadFromJson(QJsonObject &json)
@@ -48,6 +78,13 @@ bool MasterConfig::ReadFromJson(QJsonObject &json)
     readScriptSettingsFromJson(json);
 
     parseJson(json, "FileName", FileName);
+
+    if (json.contains("Datakinds"))
+    {
+        QJsonArray ar = json["Datakinds"].toArray();
+        Datakinds.clear();
+        for (int i=0; i<ar.size(); i++) Datakinds << ar[i].toInt();
+    }
 
     return true;
 }
@@ -119,7 +156,7 @@ bool MasterConfig::readChannelMapFromJson(QJsonObject &json)
     ChannelMap.clear();
     QJsonArray arr = json["ChannelMap"].toArray();
     for (int i=0; i<arr.size(); i++)
-        ChannelMap.push_back(arr[i].toInt());
+        ChannelMap << arr[i].toInt();
 
     Map->Clear();
     Map->SetChannels_OrderedByLogical(ChannelMap);
@@ -285,6 +322,7 @@ bool MasterConfig::readScriptSettingsFromJson(QJsonObject &json)
         for (int imsa=0; imsa<mspAr.size(); imsa++)
             MainSplitterSizes_ScriptWindow << mspAr[imsa].toInt(50);
     }
+    return true;
 }
 
 void MasterConfig::updatePolarityQuickAccessData()
@@ -297,13 +335,13 @@ void MasterConfig::updatePolarityQuickAccessData()
     }
 }
 
-bool MasterConfig::IsNegative(int ichannel) const
+bool MasterConfig::IsNegative(int iHardwChannel) const
 {
-    if (ichannel>=NegPol.size() || ichannel<0) return false;
-    return NegPol.at(ichannel);
+    if ( iHardwChannel >= NegPol.size() || iHardwChannel < 0 ) return false;
+    return NegPol.at(iHardwChannel);
 }
 
-void MasterConfig::SetMapping(const std::vector<size_t> &mapping)
+void MasterConfig::SetMapping(const QVector<int> &mapping)
 {
     Map->Clear();
     ChannelMap.clear();
@@ -311,3 +349,19 @@ void MasterConfig::SetMapping(const std::vector<size_t> &mapping)
     ChannelMap = mapping;
     Map->SetChannels_OrderedByLogical(ChannelMap);
 }
+
+QVector<int> MasterConfig::GetListOfIgnoreChannels() const
+{
+    QVector<int> vec;
+    for (int i : IgnoreHardwareChannels) vec << i;
+    std::sort(vec.begin(), vec.end());
+    return vec;
+}
+
+void MasterConfig::SetListOfIgnoreChannels(const QVector<int> &list)
+{
+    IgnoreHardwareChannels.clear();
+    for (int i : list) IgnoreHardwareChannels << i;
+}
+
+

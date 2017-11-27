@@ -150,6 +150,18 @@ private slots:
 
     void on_pbSelectNewDir_clicked();
 
+    void on_pbEditListOfNegatives_clicked();
+
+    void on_pbEditMap_clicked();
+
+    void on_pbEditIgnoreChannelList_clicked();
+
+    void on_pbAddDatakind_clicked();
+
+    void on_pbRemoveDatakind_clicked();
+
+    void on_pbPrintHLDfileProperties_clicked();
+
 protected:
     void closeEvent(QCloseEvent* event);
 
@@ -169,7 +181,6 @@ private:
 
     bool bStopFlag;
 
-
     const QString ProcessData(); //returns error message if any
     void LogMessage(QString message);
     bool saveSignalsToFile(QString FileName, bool bUseHardware);
@@ -184,6 +195,8 @@ private:
     void ClearData();
     void CreateScriptWindow();
 
+    QString PackChannelList(QVector<int> vec);
+    bool ExtractNumbersFromQString(const QString input, QVector<int>* ToAdd);
 };
 
 #endif // MAINWINDOW_H
