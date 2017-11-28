@@ -22,6 +22,11 @@ int AInterfaceToData::countChannels()
     return DataHub->CountChannels();
 }
 
+void AInterfaceToData::Clear()
+{
+    DataHub->Clear();
+}
+
 float AInterfaceToData::getSignal(int ievent, int iLogicalChannel)
 {
     return DataHub->GetSignal(ievent, iLogicalChannel);
@@ -143,7 +148,11 @@ void AInterfaceToData::setAllRejected(bool flag)
 QVariant AInterfaceToData::getPosition(int ievent)
 {
     const float* pos = DataHub->GetPosition(ievent);
-    if (!pos) return QVariantList();
+    if (!pos)
+    {
+        abort("Get position: bad event number "+QString::number(ievent));
+        return QVariantList();
+    }
 
     QJsonArray ar;
     for (int i=0; i<3; i++) ar << pos[i];
@@ -197,7 +206,189 @@ QVariant AInterfaceToData::getWaveforms(int ievent)
     return jv.toVariant();
 }
 
-void AInterfaceToData::Clear()
+void AInterfaceToData::setMultiplicity(int ievent, QVariant px_py_pz_nx_ny_nz)
 {
-    DataHub->Clear();
+    QString type = px_py_pz_nx_ny_nz.typeName();
+    if (type != "QVariantList")
+    {
+        abort("Failed to set multiplicities - need array of 6 integers");
+        return;
+    }
+
+    QVariantList vl = px_py_pz_nx_ny_nz.toList();
+    QJsonArray ja = QJsonArray::fromVariantList(vl);
+    if (ja.size() != 6)
+    {
+        abort("Set multiplicities - require array of multPosX, multPosY, multPosZ, multNegX, multNegY, multNegZ");
+        return;
+    }
+    int arrPos[3];
+    int arrNeg[3];
+    for (int i=0; i<3; i++)
+    {
+        if (!ja[i].isDouble())  // ***!!! need isInt, but not available in this Qt version!
+        {
+            abort("Set multiplicities - require array of six integers");
+            return;
+        }
+        arrPos[i] = ja[i].toInt();
+    }
+    for (int i=3; i<6; i++)
+    {
+        if (!ja[i].isDouble())  // ***!!! need isInt, but not available in this Qt version!
+        {
+            abort("Set multiplicities - require array of six integers");
+            return;
+        }
+        arrNeg[i-3] = ja[i].toInt();
+    }
+
+    bool bOK = DataHub->SetMultiplicityPositive(ievent, arrPos);
+    if (!bOK)
+    {
+        abort("failed to set multiplicity for event " + QString::number(ievent));
+        return;
+    }
+    bOK = DataHub->SetMultiplicityNegative(ievent, arrNeg);
+    if (!bOK)
+    {
+        abort("failed to set multiplicity for event " + QString::number(ievent));
+        return;
+    }
 }
+
+void AInterfaceToData::setMultiplicityFast(int ievent, QVariant px_py_pz_nx_ny_nz)
+{
+    QVariantList vl = px_py_pz_nx_ny_nz.toList();
+    QJsonArray ja = QJsonArray::fromVariantList(vl);
+    int arrPos[3];
+    int arrNeg[3];
+    for (int i=0; i<3; i++) arrPos[i]   = ja[i].toInt();
+    for (int i=3; i<6; i++) arrNeg[i-3] = ja[i].toInt();
+
+    DataHub->SetMultiplicityPositiveFast(ievent, arrPos);
+    DataHub->SetMultiplicityNegativeFast(ievent, arrNeg);
+}
+
+QVariant AInterfaceToData::getMultiplicity(int ievent)
+{
+    const int* multPos = DataHub->GetMultiplicityPositive(ievent);
+    if (!multPos)
+    {
+        abort("Get position: bad event number "+QString::number(ievent));
+        return QVariantList();
+    }
+    const int* multNeg = DataHub->GetMultiplicityNegativeFast(ievent);
+
+    QJsonArray ar;
+    for (int i=0; i<3; i++) ar << multPos[i];
+    for (int i=0; i<3; i++) ar << multNeg[i];
+    QJsonValue jv = ar;
+    return jv.toVariant();
+}
+
+QVariant AInterfaceToData::getMultiplicityFast(int ievent)
+{
+    const int* multPos = DataHub->GetMultiplicityPositiveFast(ievent);
+    const int* multNeg = DataHub->GetMultiplicityNegativeFast(ievent);
+
+    QJsonArray ar;
+    for (int i=0; i<3; i++) ar << multPos[i];
+    for (int i=0; i<3; i++) ar << multNeg[i];
+    QJsonValue jv = ar;
+    return jv.toVariant();
+}
+
+void AInterfaceToData::setSumSignals(int ievent, QVariant px_py_pz_nx_ny_nz)
+{
+    QString type = px_py_pz_nx_ny_nz.typeName();
+    if (type != "QVariantList")
+    {
+        abort("Failed to set sum signals - need array of 6 real numbers");
+        return;
+    }
+
+    QVariantList vl = px_py_pz_nx_ny_nz.toList();
+    QJsonArray ja = QJsonArray::fromVariantList(vl);
+    if (ja.size() != 6)
+    {
+        abort("Set sum signals - require array of sumsigPosX, sumsigPosY, sumsigPosZ, sumsigNegX, sumsigNegY, sumsigNegZ");
+        return;
+    }
+    float arrPos[3];
+    float arrNeg[3];
+    for (int i=0; i<3; i++)
+    {
+        if (!ja[i].isDouble())
+        {
+            abort("Set sumsignals - require array of six real numbers");
+            return;
+        }
+        arrPos[i] = ja[i].toDouble();
+    }
+    for (int i=3; i<6; i++)
+    {
+        if (!ja[i].isDouble())
+        {
+            abort("Set sumsignals - require array of six real numbers");
+            return;
+        }
+        arrNeg[i-3] = ja[i].toDouble();
+    }
+
+    bool bOK = DataHub->SetSumSignalPositive(ievent, arrPos);
+    if (!bOK)
+    {
+        abort("failed to set sumsignals for event " + QString::number(ievent));
+        return;
+    }
+    bOK = DataHub->SetSumSignalNegative(ievent, arrNeg);
+    if (!bOK)
+    {
+        abort("failed to set sumsignals for event " + QString::number(ievent));
+        return;
+    }
+}
+
+void AInterfaceToData::setSumSignalsFast(int ievent, QVariant px_py_pz_nx_ny_nz)
+{
+    QVariantList vl = px_py_pz_nx_ny_nz.toList();
+    QJsonArray ja = QJsonArray::fromVariantList(vl);
+    float arrPos[3];
+    float arrNeg[3];
+    for (int i=0; i<3; i++) arrPos[i]   = ja[i].toDouble();
+    for (int i=3; i<6; i++) arrNeg[i-3] = ja[i].toDouble();
+
+    DataHub->SetSumSignalPositiveFast(ievent, arrPos);
+    DataHub->SetSumSignalNegativeFast(ievent, arrNeg);
+}
+
+QVariant AInterfaceToData::getSumSignals(int ievent)
+{
+    const float* sumPos = DataHub->GetSumSignalPositive(ievent);
+    if (!sumPos)
+    {
+        abort("Get sum signals: bad event number "+QString::number(ievent));
+        return QVariantList();
+    }
+    const float* sumNeg = DataHub->GetSumSignalNegativeFast(ievent);
+
+    QJsonArray ar;
+    for (int i=0; i<3; i++) ar << sumPos[i];
+    for (int i=0; i<3; i++) ar << sumNeg[i];
+    QJsonValue jv = ar;
+    return jv.toVariant();
+}
+
+QVariant AInterfaceToData::getSumSignalsFast(int ievent)
+{
+    const float* sumPos = DataHub->GetSumSignalPositiveFast(ievent);
+    const float* sumNeg = DataHub->GetSumSignalNegativeFast(ievent);
+
+    QJsonArray ar;
+    for (int i=0; i<3; i++) ar << sumPos[i];
+    for (int i=0; i<3; i++) ar << sumNeg[i];
+    QJsonValue jv = ar;
+    return jv.toVariant();
+}
+
