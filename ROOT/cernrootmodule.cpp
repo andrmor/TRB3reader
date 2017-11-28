@@ -123,14 +123,14 @@ void CernRootModule::DrawSignature(bool bNeg)
 
             if (bNeg) sig = -sig;
 
-            const QVector<double>* wave = Reader->GetWaveformPtrFast(ievent, iHardwCh);
+            const QVector<float>* wave = Reader->GetWaveformPtrFast(ievent, iHardwCh);
 
             //int sum = 0;
             //for (int i=0; i<numSamples; i++) sum += wave->at(i);
             //if (sum == 0) sum = 1.0;
             //else sum = fabs(sum);
 
-            double targetVal = 0.5*sig;
+            float targetVal = 0.5*sig;
             int iHalf = 0;
             for (; iHalf<numSamples; iHalf++)
             {
@@ -146,7 +146,7 @@ void CernRootModule::DrawSignature(bool bNeg)
 
             for (int i=0; i<numSamples; i++)
             {
-                const double val = 1.0*wave->at(i)/sig;// sum;
+                const float val = 1.0*wave->at(i)/sig;// sum;
                 h->Fill(i-iHalf, val);
             }
         }
@@ -261,7 +261,7 @@ void CernRootModule::ClearSingleWaveWindow()
     WOne->ClearRootCanvas();
 }
 
-void CernRootModule::DrawSingle(int ievent, int iHardwChan, bool autoscale, double MinY, double MaxY)
+void CernRootModule::DrawSingle(int ievent, int iHardwChan, bool autoscale, float MinY, float MaxY)
 {
     int numSamples = Reader->GetNumSamples();
     if (numSamples==0) return;
@@ -271,7 +271,7 @@ void CernRootModule::DrawSingle(int ievent, int iHardwChan, bool autoscale, doub
 
     for (int isam=0; isam<numSamples; isam++)
     {
-        const double val = Reader->GetValueFast(ievent, iHardwChan, isam);
+        const float val = Reader->GetValueFast(ievent, iHardwChan, isam);
         gSingle->SetPoint(isam, isam, val);
     }
 
@@ -291,7 +291,7 @@ void CernRootModule::DrawSingle(int ievent, int iHardwChan, bool autoscale, doub
     WOne->SetTitle("Event: "+ QString::number(ievent) + "  LogicalChannel: "+QString::number(Config->Map->HardwareToLogical(iHardwChan)));
 }
 
-void CernRootModule::DrawOverlay(int ievent, bool bNeg, bool bAutoscale, double Min, double Max, int SortBy_0Logic1Hardw)
+void CernRootModule::DrawOverlay(int ievent, bool bNeg, bool bAutoscale, float Min, float Max, int SortBy_0Logic1Hardw)
 {
     int numSamples = Reader->GetNumSamples();
     if (numSamples==0) return;
@@ -317,7 +317,7 @@ void CernRootModule::DrawOverlay(int ievent, bool bNeg, bool bAutoscale, double 
 
         for (int isam=0; isam<numSamples; isam++)
         {
-            const double val = Reader->GetValueFast(ievent, iHardwCh, isam);
+            const float val = Reader->GetValueFast(ievent, iHardwCh, isam);
             g->SetPoint(isam, isam, val);
         }
 
@@ -346,7 +346,7 @@ void CernRootModule::DrawOverlay(int ievent, bool bNeg, bool bAutoscale, double 
     win->SetTitle(title);
 }
 
-void CernRootModule::DrawAll(int ievent, bool bNeg, int padsX, int padsY, bool bAutoscale, double Min, double Max, int SortBy_0Logic1Hardw, bool bShowlabels)
+void CernRootModule::DrawAll(int ievent, bool bNeg, int padsX, int padsY, bool bAutoscale, float Min, float Max, int SortBy_0Logic1Hardw, bool bShowlabels)
 {
     int numSamples = Reader->GetNumSamples();
     if (numSamples==0) return;
@@ -392,14 +392,14 @@ void CernRootModule::DrawAll(int ievent, bool bNeg, int padsX, int padsY, bool b
 
             for (int isam=0; isam<numSamples; isam++)
             {
-                const double val = Reader->GetValueFast(ievent, iHardwCh, isam);
+                const float val = Reader->GetValueFast(ievent, iHardwCh, isam);
                 if (val < Min) Min = val;
                 if (val > Max) Max = val;
             }
         }
 
         //adding margins
-        double delta = 0.05* (Max - Min);
+        float delta = 0.05* (Max - Min);
         Max += delta;
         Min -= delta;
 
@@ -422,7 +422,7 @@ void CernRootModule::DrawAll(int ievent, bool bNeg, int padsX, int padsY, bool b
 
         for (int isam=0; isam<numSamples; isam++)
         {
-            const double val = Reader->GetValueFast(ievent, iHardwCh, isam);
+            const float val = Reader->GetValueFast(ievent, iHardwCh, isam);
             g->SetPoint(isam, isam, val);
         }
 
@@ -444,7 +444,7 @@ void CernRootModule::DrawAll(int ievent, bool bNeg, int padsX, int padsY, bool b
         //channel labels
         if (bShowlabels)
         {
-            double delta = fabs(0.25*(Max - Min));
+            float delta = fabs(0.25*(Max - Min));
             TPaveText* la = new TPaveText(0, Min+delta, numSamples, Max-delta);
             la->SetFillColor(0);
             la->SetFillStyle(0);

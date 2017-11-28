@@ -15,16 +15,16 @@ public:
     bool    Read();
     const QString GetFileInfo(const QString FileName) const;
 
-    double  GetValue(int ievent, int ichannel, int isample) const;
-    double  GetValueFast(int ievent, int ichannel, int isample) const; //no argument validity check!
+    float  GetValue(int ievent, int ichannel, int isample) const;
+    float  GetValueFast(int ievent, int ichannel, int isample) const; //no argument validity check!
 
-    const QVector<double>* GetWaveformPtr(int ievent, int ichannel) const;
-    const QVector<double>* GetWaveformPtrFast(int ievent, int ichannel) const; //no argument validity check!
+    const QVector<float>* GetWaveformPtr(int ievent, int ichannel) const;
+    const QVector<float>* GetWaveformPtrFast(int ievent, int ichannel) const; //no argument validity check!
 
-    double  GetMax(int ievent, int ichannel) const;
-    double  GetMaxFast(int ievent, int ichannel) const;
-    double  GetMin(int ievent, int ichannel) const;
-    double  GetMinFast(int ievent, int ichannel) const;
+    float  GetMax(int ievent, int ichannel) const;
+    float  GetMaxFast(int ievent, int ichannel) const;
+    float  GetMin(int ievent, int ichannel) const;
+    float  GetMinFast(int ievent, int ichannel) const;
 
     int     GetMaxSample(int ievent, int ichannel) const;
     int     GetMaxSampleFast(int ievent, int ichannel) const;
@@ -49,7 +49,7 @@ public:
 
 private:
     const MasterConfig* Config;
-    QVector < QVector < QVector <double> > > waveData;  // format:  [event] [hardware chanel] [sample]
+    QVector < QVector < QVector <float> > > waveData;  // format:  [event] [hardware chanel] [sample]
 
     int     numSamples;
     int     numChannels;
@@ -58,8 +58,8 @@ private:
     void    readRawData();    // read raw data from the hld file
     void    smoothData();     // smooth raw data
 
-    void    doAdjacentAverage(QVector<double> &arr, int numPoints);
-    void    doAdjacentWeightedAverage(QVector<double> &arr, int numPoints);
+    void    doAdjacentAverage(QVector<float> &arr, int numPoints);
+    void    doAdjacentWeightedAverage(QVector<float> &arr, int numPoints);
 
     void    substractPedestals();
 

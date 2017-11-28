@@ -6,10 +6,11 @@
 #include "coreinterfaces.h"
 #include "histgraphinterfaces.h"
 #include "ainterfacetomessagewindow.h"
-#include "ainterfacetosignals.h"
+#include "ainterfacetoextractor.h"
 #include "ainterfacetowaveforms.h"
 #include "ainterfacetoconfig.h"
 #include "adispatcher.h"
+#include "ainterfacetodata.h"
 
 #ifdef CERN_ROOT
   #include "cernrootmodule.h"
@@ -31,13 +32,17 @@ void MainWindow::CreateScriptWindow()
     AInterfaceToConfig* conf = new AInterfaceToConfig(Config, Dispatcher);
     ScriptWindow->SetInterfaceObject(conf, "config");
 
+    qDebug() << "-> data...";
+    AInterfaceToData* dat = new AInterfaceToData(DataHub);
+    ScriptWindow->SetInterfaceObject(dat, "events");
+
     qDebug() << "-> waveforms...";
     AInterfaceToWaveforms* wav = new AInterfaceToWaveforms(Config, Reader);
     ScriptWindow->SetInterfaceObject(wav, "wav");
 
-    qDebug() << "-> signals...";
-    AInterfaceToSignals* sig = new AInterfaceToSignals(Config, Extractor);
-    ScriptWindow->SetInterfaceObject(sig, "sig");
+    qDebug() << "-> extractor...";
+    AInterfaceToExtractor* ext = new AInterfaceToExtractor(Config, Extractor);
+    ScriptWindow->SetInterfaceObject(ext, "ext");
 
 #ifdef CERN_ROOT
     qDebug() << "-> graph...";

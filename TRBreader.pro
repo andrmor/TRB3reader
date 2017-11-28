@@ -61,12 +61,13 @@ SOURCES += main.cpp \
     Common/amessage.cpp \
     Common/completingtexteditclass.cpp \
     Common/tmpobjhubclass.cpp \
-    Script/ainterfacetosignals.cpp \
     Script/ainterfacetowaveforms.cpp \
     Script/ainterfacetoconfig.cpp \
     Common/adispatcher.cpp \
     GUI/aeditchannelsdialog.cpp \
-    Common/adatahub.cpp
+    Common/adatahub.cpp \
+    Script/ainterfacetodata.cpp \
+    Script/ainterfacetoextractor.cpp
 
 HEADERS  += GUI/mainwindow.h \    
     TRB/trb3datareader.h \
@@ -85,12 +86,13 @@ HEADERS  += GUI/mainwindow.h \
     Common/amessage.h \
     Common/completingtexteditclass.h \
     Common/tmpobjhubclass.h \
-    Script/ainterfacetosignals.h \
     Script/ainterfacetowaveforms.h \
     Script/ainterfacetoconfig.h \
     Common/adispatcher.h \
     GUI/aeditchannelsdialog.h \
-    Common/adatahub.h
+    Common/adatahub.h \
+    Script/ainterfacetodata.h \
+    Script/ainterfacetoextractor.h
 
 FORMS    += GUI/mainwindow.ui \
     GUI/ascriptwindow.ui \

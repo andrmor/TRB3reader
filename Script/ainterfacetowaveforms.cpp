@@ -19,22 +19,22 @@ int AInterfaceToWaveforms::countSamples()
     return Reader->GetNumSamples();
 }
 
-double AInterfaceToWaveforms::getValue(int ievent, int iHardwChannel, int isample)
+float AInterfaceToWaveforms::getValue(int ievent, int iHardwChannel, int isample)
 {
-    double val = Reader->GetValue(ievent, iHardwChannel, isample);
+    float val = Reader->GetValue(ievent, iHardwChannel, isample);
     if ( std::isnan(val) ) abort("Failed to get waveform value!");
 
     return val;
 }
 
-double AInterfaceToWaveforms::getValueFast(int ievent, int iHardwChannel, int isample)
+float AInterfaceToWaveforms::getValueFast(int ievent, int iHardwChannel, int isample)
 {
     return Reader->GetValueFast(ievent, iHardwChannel, isample);
 }
 
 QVariant AInterfaceToWaveforms::getWaveform(int ievent, int iHardwChannel)
 {
-    const QVector<double> *wave = Reader->GetWaveformPtr(ievent, iHardwChannel);
+    const QVector<float> *wave = Reader->GetWaveformPtr(ievent, iHardwChannel);
     if (!wave)
     {
         abort("Failed to get waveform");
@@ -49,7 +49,7 @@ QVariant AInterfaceToWaveforms::getWaveform(int ievent, int iHardwChannel)
 
 QVariant AInterfaceToWaveforms::getWaveformFast(int ievent, int iHardwChannel)
 {
-    const QVector<double> *wave = Reader->GetWaveformPtrFast(ievent, iHardwChannel);
+    const QVector<float> *wave = Reader->GetWaveformPtrFast(ievent, iHardwChannel);
 
     QJsonArray ar;
     for (int val : *wave) ar << val;
@@ -57,28 +57,28 @@ QVariant AInterfaceToWaveforms::getWaveformFast(int ievent, int iHardwChannel)
     return jv.toVariant();
 }
 
-double AInterfaceToWaveforms::getMax(int ievent, int iHardwChannel)
+float AInterfaceToWaveforms::getMax(int ievent, int iHardwChannel)
 {
-    double val = Reader->GetMax(ievent, iHardwChannel);
+    float val = Reader->GetMax(ievent, iHardwChannel);
     if ( std::isnan(val) ) abort("Failed to get waveform value!");
 
     return val;
 }
 
-double AInterfaceToWaveforms::getMaxFast(int ievent, int iHardwChannel)
+float AInterfaceToWaveforms::getMaxFast(int ievent, int iHardwChannel)
 {
     return Reader->GetMaxFast(ievent, iHardwChannel);
 }
 
-double AInterfaceToWaveforms::getMin(int ievent, int iHardwChannel)
+float AInterfaceToWaveforms::getMin(int ievent, int iHardwChannel)
 {
-    double val = Reader->GetMin(ievent, iHardwChannel);
+    float val = Reader->GetMin(ievent, iHardwChannel);
     if ( std::isnan(val) ) abort("Failed to get waveform value!");
 
     return val;
 }
 
-double AInterfaceToWaveforms::getMinFast(int ievent, int iHardwChannel)
+float AInterfaceToWaveforms::getMinFast(int ievent, int iHardwChannel)
 {
     return Reader->GetMinFast(ievent, iHardwChannel);
 }

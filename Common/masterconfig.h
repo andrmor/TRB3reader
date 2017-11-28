@@ -74,6 +74,7 @@ public:
     int                 PosMaxGateTo = 1000;
 
     QString             FileName;
+    QString             WorkingDir;
 
     QString             GlobScript;
     QJsonObject         ScriptWindowJson;

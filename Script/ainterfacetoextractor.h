@@ -1,5 +1,5 @@
-#ifndef AINTERFACETOSIGNALS_H
-#define AINTERFACETOSIGNALS_H
+#ifndef AINTERFACETOEXTRACTOR_H
+#define AINTERFACETOEXTRACTOR_H
 
 #include "ascriptinterface.h"
 
@@ -9,12 +9,12 @@
 class MasterConfig;
 class Trb3signalExtractor;
 
-class AInterfaceToSignals : public AScriptInterface
+class AInterfaceToExtractor : public AScriptInterface
 {
     Q_OBJECT
 
 public:
-    AInterfaceToSignals(MasterConfig *Config, Trb3signalExtractor *Extractor);
+    AInterfaceToExtractor(MasterConfig *Config, Trb3signalExtractor *Extractor);
 
 public slots:
 
@@ -22,12 +22,12 @@ public slots:
     int      countChannels();
 
     //get signals
-    double   getSignal(int ievent, int iHardwChannel);
+    float   getSignal(int ievent, int iHardwChannel);
     QVariant getSignals(int ievent);
     QVariant getSignals_logical(int ievent); // array of signal values ordered according to the map of logical channels
 
     //set signals
-    void     setSignal(int ievent, int iHardwChannel, double value);
+    void     setSignal(int ievent, int iHardwChannel, float value);
     void     setSignals(int ievent, QVariant arrayOfValues);
 
     //rejection of events
@@ -43,4 +43,4 @@ private:
 
 };
 
-#endif // AINTERFACETOSIGNALS_H
+#endif // AINTERFACETOEXTRACTOR_H

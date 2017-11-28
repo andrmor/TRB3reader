@@ -7,6 +7,7 @@
 #include "trb3datareader.h"
 #include "ascriptwindow.h"
 #include "adispatcher.h"
+#include "adatahub.h"
 
 #include <QJsonObject>
 #include <QJsonArray>
@@ -72,9 +73,14 @@ void MainWindow::writeGUItoJson(QJsonObject &json)
 
     jsgui["HardOrLog"] = ui->cobHardwareOrLogical->currentIndex();
 
-    jsgui["BulkDir"] = ui->leDirForBulk->text();
+    jsgui["KeepEventsOnStart"] = ui->cbKeepEvents->isChecked();
+    jsgui["BulkExtract"] = ui->cbBulkExtract->isChecked();
     jsgui["AutoRunScript"] = ui->cbAutoExecuteScript->isChecked();
     jsgui["SaveFiles"] = ui->cbSaveSignalsToFiles->isChecked();
+    jsgui["SuffixReplacement"] = ui->leAddToProcessed->text();
+    jsgui["BulkCopy"] = ui->cbBulkCopyToDatahub->isChecked();
+    jsgui["BulkCopyWaveforms"] = ui->cbBulkAlsoCopyWaveforms->isChecked();
+    jsgui["SaveAddPositions"] = ui->cbAddReconstructedPositions->isChecked();
 
     QJsonObject ja;
         ja["AutoY"] = ui->cbAutoscaleY->isChecked();
@@ -104,9 +110,14 @@ void MainWindow::readGUIfromJson(QJsonObject &json)
 
     JsonToComboBox(jsgui, "HardOrLog", ui->cobHardwareOrLogical);
 
-    JsonToLineEditText(jsgui, "BulkDir", ui->leDirForBulk);
+    JsonToCheckbox(jsgui, "KeepEventsOnStart", ui->cbKeepEvents);
+    JsonToCheckbox(jsgui, "BulkExtract", ui->cbBulkExtract);
     JsonToCheckbox(jsgui, "AutoRunScript", ui->cbAutoExecuteScript);
     JsonToCheckbox(jsgui, "SaveFiles", ui->cbSaveSignalsToFiles);
+    JsonToLineEditText(jsgui, "SuffixReplacement", ui->leAddToProcessed);
+    JsonToCheckbox(jsgui, "BulkCopy", ui->cbBulkCopyToDatahub);
+    JsonToCheckbox(jsgui, "BulkCopyWaveforms", ui->cbBulkAlsoCopyWaveforms);
+    JsonToCheckbox(jsgui, "SaveAddPositions", ui->cbAddReconstructedPositions);
 
     QJsonObject ja = jsgui["GraphScale"].toObject();
         JsonToCheckbox(ja, "AutoY", ui->cbAutoscaleY);
@@ -242,6 +253,13 @@ void MainWindow::UpdateGui()
     ui->cbPosMaxSignalGate->setChecked(Config->bPosMaxGate);
     ui->sbPosMaxFrom->setValue(Config->PosMaxGateFrom);
     ui->sbPosMaxTo->setValue(Config->PosMaxGateTo);
+
+    updateNumEventsIndication();
+}
+
+void MainWindow::updateNumEventsIndication()
+{
+    ui->labDatahubEvents->setText("DataHub contains " + QString::number(DataHub->CountEvents()) + " events");
 }
 
 // --- update Config on GUI operated by user ---

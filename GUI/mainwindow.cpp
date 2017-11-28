@@ -8,6 +8,7 @@
 #include "amessage.h"
 #include "adispatcher.h"
 #include "aeditchannelsdialog.h"
+#include "adatahub.h"
 
 #ifdef CERN_ROOT
 #include "cernrootmodule.h"
@@ -25,8 +26,8 @@
 //#include <vector>
 #include <cmath>
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
+MainWindow::MainWindow(ADataHub *DataHub, QWidget *parent) :
+    QMainWindow(parent), DataHub(DataHub),
     ui(new Ui::MainWindow)
 {
     Dispatcher = 0;
@@ -98,8 +99,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pbSelectFile_clicked()
 {
-    QString FileName = QFileDialog::getOpenFileName(this, "Select TRB file", "", "HLD files (*.hld)");
+    QString FileName = QFileDialog::getOpenFileName(this, "Select TRB file", Config->WorkingDir, "HLD files (*.hld)");
     if (FileName.isEmpty()) return;
+    Config->WorkingDir = QFileInfo(FileName).absolutePath();
 
     ui->leFileName->setText(FileName);
     Config->FileName = FileName;
@@ -325,105 +327,6 @@ bool MainWindow::sendSignalData(QTextStream &outStream, bool bUseHardware)
             }
     }
     return true;
-}
-
-void MainWindow::on_pbSelectNewDir_clicked()
-{
-    QString dir = QFileDialog::getExistingDirectory(this, "Select directory with hld files to convert", "", 0);
-    if (dir.isEmpty()) return;
-
-    ui->leDirForBulk->setText(dir);
-}
-
-void MainWindow::on_pbBulkProcess_clicked()
-{
-    QString dir = ui->leDirForBulk->text();
-    if (dir.isEmpty())
-    {
-        message("Directory not selected!", this);
-        return;
-    }
-
-    if (!QDir(dir).exists())
-    {
-        message("This directory does not exist!", this);
-        return;
-    }
-
-    ui->pteBulkLog->clear();
-    if (ui->cbAutoExecuteScript->isChecked())
-    {
-        ScriptWindow->show();
-        ScriptWindow->OpenFirstTab();
-    }
-
-    ui->twMain->setEnabled(false);
-    ui->pbStop->setVisible(true);
-    ui->pbStop->setChecked(false);
-    QDirIterator it(dir, QStringList() << "*.hld", QDir::Files, QDirIterator::Subdirectories);
-
-    int numErrors = 0;
-    while (it.hasNext())
-    {
-        qApp->processEvents();
-        if (bStopFlag) break;
-
-        Config->FileName = it.next();
-        ui->pteBulkLog->appendPlainText("Processing " + QFileInfo(Config->FileName).fileName());
-        qDebug() << "Processing" <<  Config->FileName;
-
-        QString error = ProcessData();
-        if (!error.isEmpty())
-        {
-            LogMessage(error);
-            ui->pteBulkLog->appendPlainText("---- File reading error");
-            numErrors++;
-            continue;
-        }
-
-        int numEvents = Extractor->GetNumEvents();
-        int numChannels = Extractor->GetNumChannels();
-        if (numEvents == 0 || numChannels == 0 || numEvents != Reader->GetNumEvents() || numChannels != Reader->GetNumChannels())
-        {
-            ui->pteBulkLog->appendPlainText("---- Data not valid, skipped");
-            numErrors++;
-            continue;
-        }
-        if (!Config->Map->Validate(numChannels))
-        {
-            ui->pteBulkLog->appendPlainText("---- Channel map not valid, skipped");
-            numErrors++;
-            continue;
-        }
-
-        if (ui->cbAutoExecuteScript->isChecked())
-        {
-            qDebug() << "Auto-executing script";
-            bool bOK = ScriptWindow->ExecuteScriptInFirstTab();
-            if (!bOK)
-            {
-                ui->pteBulkLog->appendPlainText("---- Script execution error");
-                numErrors++;
-                break;
-            }
-        }
-
-        if (ui->cbSaveSignalsToFiles->isChecked())
-        {
-            QFileInfo fi(Config->FileName);
-            QString nameSave = fi.path() + "/" + fi.completeBaseName() + ui->leAddToProcessed->text();
-            qDebug() << "Saving to file:"<< nameSave;
-            saveSignalsToFile(nameSave, false);
-        }
-
-    }
-
-    if (numErrors > 0) ui->pteBulkLog->appendPlainText("============= There were errors! =============");
-    else ui->pteBulkLog->appendPlainText("Done - no errors");
-
-    ui->twMain->setEnabled(true);
-    ui->pbStop->setVisible(false);
-    ui->pbStop->setChecked(false);
 }
 
 void MainWindow::on_pbStop_toggled(bool checked)
@@ -1012,10 +915,225 @@ void MainWindow::on_pbRemoveDatakind_clicked()
 
 void MainWindow::on_pbPrintHLDfileProperties_clicked()
 {
-    QString FileName = QFileDialog::getOpenFileName(this, "Select HLD file to inspect", "", "*.hld");
+    QString FileName = QFileDialog::getOpenFileName(this, "Select HLD file to inspect", Config->WorkingDir, "*.hld");
     if (FileName.isEmpty()) return;
+    Config->WorkingDir = QFileInfo(FileName).absolutePath();
 
     QString s = Reader->GetFileInfo(FileName);
     ui->pteHLDfileProperties->clear();
     ui->pteHLDfileProperties->appendPlainText(s);
+}
+
+void MainWindow::on_pbProcessAllFromDir_clicked()
+{
+    QString dir = QFileDialog::getExistingDirectory(this, "Select directory with hld files to convert", Config->WorkingDir, 0);
+    if (dir.isEmpty()) return;
+    Config->WorkingDir = QFileInfo(dir).absolutePath();
+
+    if (!QDir(dir).exists())
+    {
+        message("This directory does not exist!", this);
+        return;
+    }
+
+    QStringList names;
+    QDirIterator it(dir, QStringList() << "*.hld", QDir::Files, QDirIterator::Subdirectories);
+    while (it.hasNext()) names << it.next();
+
+    bulkProcessorEnvelope(names);
+}
+
+void MainWindow::on_pbProcessSelectedFiles_clicked()
+{
+    QStringList names = QFileDialog::getOpenFileNames(this, "Select hld files to be processed", Config->WorkingDir, "*.hld");
+    if (names.isEmpty()) return;
+    Config->WorkingDir = QFileInfo(names.first()).absolutePath();
+
+    bulkProcessorEnvelope(names);
+}
+
+void MainWindow::bulkProcessorEnvelope(QStringList FileNames)
+{
+    if (!ui->cbKeepEvents->isChecked()) DataHub->Clear();
+    ui->pteBulkLog->clear();
+    if (ui->cbAutoExecuteScript->isChecked())
+    {
+        ScriptWindow->show();
+        ScriptWindow->OpenFirstTab();
+    }
+
+    ui->twMain->setEnabled(false);
+    ui->pbStop->setVisible(true);
+    ui->pbStop->setChecked(false);
+
+    int numErrors = 0;
+    for (QString name : FileNames)
+    {
+        Config->FileName = name;
+
+        bool bOK = bulkProcessCore();
+        if (!bOK) numErrors++;
+
+        updateNumEventsIndication();
+        qApp->processEvents();
+        if (bStopFlag) break;
+    }
+
+    if (numErrors > 0) ui->pteBulkLog->appendPlainText("============= There were errors! =============");
+    else ui->pteBulkLog->appendPlainText("Done - no errors");
+
+    ui->twMain->setEnabled(true);
+    ui->pbStop->setVisible(false);
+    ui->pbStop->setChecked(false);
+
+    UpdateGui();
+}
+
+bool MainWindow::bulkProcessCore()
+{
+    if (Config->FileName.isEmpty())
+    {
+        ui->pteBulkLog->appendPlainText("---- File name not defined!");
+        return false;
+    }
+    LogMessage("Reading hld file...");
+    ui->pteBulkLog->appendPlainText("Processing " + QFileInfo(Config->FileName).fileName());
+    qDebug() << "Processing" <<  Config->FileName;
+
+    // Reading waveforms, pefroming optional smoothing/pedestal substraction
+    bool ok = Reader->Read();
+    if (!ok)
+    {
+        ui->pteBulkLog->appendPlainText("---- File read failed!");
+        return false;
+    }
+
+    // Extracting signals (or generating dummy data if disabled)
+    Extractor->ClearData();
+    if (ui->cbBulkExtract->isChecked())
+    {
+        LogMessage("Extracting signals...");
+        bool bOK = Extractor->ExtractSignals();
+        if (!bOK)
+        {
+            ui->pteBulkLog->appendPlainText("---- Signal extraction failed!");
+            return false;
+        }
+    }
+    else
+    {
+        qDebug() << "generatin gdefault data (all signals = 0) in extractor data";
+        Extractor->GenerateDummyData();
+    }
+
+    // Executing script
+    if (ui->cbAutoExecuteScript->isChecked())
+    {
+        LogMessage("Executing script...");
+        bool bOK = ScriptWindow->ExecuteScriptInFirstTab();
+        if (!bOK)
+        {
+            ui->pteBulkLog->appendPlainText("---- Script execution error");
+            return false;
+        }
+    }
+
+    // Checking that after extraction/script the data are consistent in num channels / mapping
+    int numEvents = Extractor->GetNumEvents();
+    int numChannels = Extractor->GetNumChannels();
+    if (numEvents == 0 || numChannels == 0 || numEvents != Reader->GetNumEvents() || numChannels != Reader->GetNumChannels())
+    {
+        ui->pteBulkLog->appendPlainText("---- Extractor data not valid -> ignoring this file");
+        return false;
+    }
+    if (!Config->Map->Validate(numChannels))
+    {
+        ui->pteBulkLog->appendPlainText("---- Conflict with channel map -> ignoring this file");
+        return false;
+    }
+
+    // saving to individual files
+    if (ui->cbSaveSignalsToFiles->isChecked())
+    {
+        QFileInfo fi(Config->FileName);
+        QString nameSave = fi.path() + "/" + fi.completeBaseName() + ui->leAddToProcessed->text();
+        qDebug() << "Saving to file:"<< nameSave;
+        saveSignalsToFile(nameSave, false);
+    }
+
+    //Coping data to DataHub
+    if (ui->cbBulkCopyToDatahub->isChecked())
+    {
+        qDebug() << "Copying to DataHub...";
+        const QVector<int>& map = Config->Map->GetMapToHardware();
+
+        for (int iev=0; iev<numEvents; iev++)
+        {
+            if (Extractor->IsRejectedEventFast(iev)) continue;
+
+            AOneEvent* ev = new AOneEvent;
+
+            //signals
+            const QVector<float>* vecHardw = Extractor->GetSignalsFast(iev);
+            QVector<float> vecLogical;
+            for (int ihardw : map) vecLogical << vecHardw->at(ihardw);
+            ev->SetSignals(&vecLogical);
+
+            //rejection status
+            ev->SetRejectedFlag(false);
+
+            //waveforms
+            if (ui->cbBulkAlsoCopyWaveforms->isChecked())
+            {
+                QVector< QVector<float>* > vec;
+                for (int ihardw : map)
+                {
+                    if (Extractor->GetSignalFast(iev, ihardw) == 0) vec << 0;
+                    else
+                    {
+                        QVector<float>* wave = new QVector<float>();
+                        *wave = *Reader->GetWaveformPtrFast(iev, ihardw);
+                        vec << wave;
+                    }
+                }
+                ev->SetWaveforms(&vec);
+            }
+
+            DataHub->AddEvent(ev);
+        }
+    }
+
+    return true;
+}
+
+void MainWindow::on_pbSaveSignalsFromDataHub_clicked()
+{
+    int numEvents = DataHub->CountEvents();
+    if ( numEvents == 0)
+    {
+        message("There are no events in the DataHub", this);
+        return;
+    }
+
+    QString FileName = QFileDialog::getSaveFileName(this, "Save events from DataHub", Config->WorkingDir, "*.dat,*.txt");
+    if (FileName.isEmpty()) return;
+    Config->WorkingDir = QFileInfo(FileName).absolutePath();
+
+    QFile outFile( FileName );
+    outFile.open(QIODevice::WriteOnly);
+    if(!outFile.isOpen())
+      {
+        message("Unable to open file " +FileName+ " for writing!", this);
+        return;
+      }
+    QTextStream outStream(&outFile);
+
+    for (int iev=0; iev<numEvents; iev++)
+    {
+        const QVector<float>* vec = DataHub->GetSignalsFast(iev);
+        for (float val : *vec) outStream << QString::number(val) << " ";
+        //if (ui->cbAddReconstructedPositions->isChecked())
+        // *** !!!
+        outStream << "\r\n";
+    }
 }

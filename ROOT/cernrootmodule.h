@@ -32,9 +32,9 @@ public:
 
     void ClearSingleWaveWindow();
 
-    void DrawSingle(int ievent, int iHardwChan, bool autoscale, double MinY, double MaxY);
-    void DrawOverlay(int ievent, bool bNeg, bool bAutoscale, double Min, double Max, int SortBy_0Logic1Hardw);
-    void DrawAll(int ievent, bool bNeg, int padsX, int padsY, bool bAutoscale, double Min, double Max, int SortBy_0Logic1Hardw, bool bShowlabels);
+    void DrawSingle(int ievent, int iHardwChan, bool autoscale, float MinY, float MaxY);
+    void DrawOverlay(int ievent, bool bNeg, bool bAutoscale, float Min, float Max, int SortBy_0Logic1Hardw);
+    void DrawAll(int ievent, bool bNeg, int padsX, int padsY, bool bAutoscale, float Min, float Max, int SortBy_0Logic1Hardw, bool bShowlabels);
 
     void StartGraphWindows();
     const QJsonObject SaveGraphWindows() const;
