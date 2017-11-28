@@ -47,6 +47,13 @@ public slots:
 
     // Waveforms
     QVariant getWaveforms(int ievent);
+        //utilities
+    float    getWaveformMax(int ievent, int ichannel);
+    float    getWaveformMin(int ievent, int ichannel);
+    int      getWaveformMaxSample(int ievent, int ichannel);
+    int      getWaveformMinSample(int ievent, int ichannel);
+    int      getWaveformSampleWhereFirstBelow(int ievent, int ichannel, float threshold);
+    int      getWaveformSampleWhereFirstAbove(int ievent, int ichannel, float threshold);
 
     // Optional
         // Multiplicities

@@ -27,6 +27,12 @@ public:
     const QVector< QVector<float>* >* GetWaveforms() const { return &Waveforms; }
     void    SetWaveforms(const QVector< QVector<float>* >* waveforms) { Waveforms = *waveforms;}
     void    ClearWaveforms();
+    float   GetWaveformMax(int ichannel) const;
+    float   GetWaveformMin(int ichannel) const;
+    int     GetWaveformMaxSample(int ichannel) const;
+    int     GetWaveformMinSample(int ichannel) const;
+    int     GetWaveformSampleWhereFirstBelow(int ichannel, float threshold) const;
+    int     GetWaveformSampleWhereFirstAbove(int ichannel, float threshold) const;
 
     void    SetMultiplicitiesPositive(const int* multi) {MultiplicityPos[0] = multi[0]; MultiplicityPos[1] = multi[1]; MultiplicityPos[2] = multi[2];}
     void    SetMultiplicitiesNegative(const int* multi) {MultiplicityNeg[0] = multi[0]; MultiplicityNeg[1] = multi[1]; MultiplicityNeg[2] = multi[2];}
@@ -101,6 +107,13 @@ public:
 
     // Waveforms
     const QVector< QVector<float>* >* GetWaveforms(int ievent) const;
+        //utilities
+    float            GetWaveformMax(int ievent, int ichannel) const;
+    float            GetWaveformMin(int ievent, int ichannel) const;
+    int              GetWaveformMaxSample(int ievent, int ichannel) const;
+    int              GetWaveformMinSample(int ievent, int ichannel) const;
+    int              GetWaveformSampleWhereFirstBelow(int ievent, int ichannel, float threshold) const;
+    int              GetWaveformSampleWhereFirstAbove(int ievent, int ichannel, float threshold) const;
 
     // Multiplicities
     const int*       GetMultiplicityPositive(int ievent) const;

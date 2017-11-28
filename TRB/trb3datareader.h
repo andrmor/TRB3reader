@@ -15,16 +15,16 @@ public:
     bool    Read();
     const QString GetFileInfo(const QString FileName) const;
 
-    float  GetValue(int ievent, int ichannel, int isample) const;
-    float  GetValueFast(int ievent, int ichannel, int isample) const; //no argument validity check!
+    float   GetValue(int ievent, int ichannel, int isample) const;
+    float   GetValueFast(int ievent, int ichannel, int isample) const; //no argument validity check!
 
     const QVector<float>* GetWaveformPtr(int ievent, int ichannel) const;
     const QVector<float>* GetWaveformPtrFast(int ievent, int ichannel) const; //no argument validity check!
 
-    float  GetMax(int ievent, int ichannel) const;
-    float  GetMaxFast(int ievent, int ichannel) const;
-    float  GetMin(int ievent, int ichannel) const;
-    float  GetMinFast(int ievent, int ichannel) const;
+    float   GetMax(int ievent, int ichannel) const;
+    float   GetMaxFast(int ievent, int ichannel) const;
+    float   GetMin(int ievent, int ichannel) const;
+    float   GetMinFast(int ievent, int ichannel) const;
 
     int     GetMaxSample(int ievent, int ichannel) const;
     int     GetMaxSampleFast(int ievent, int ichannel) const;
