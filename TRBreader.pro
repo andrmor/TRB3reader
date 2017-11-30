@@ -29,8 +29,8 @@ cern_root {
 
 #---DABC---
 DEFINES += DABC
-INCLUDEPATH += /home/andr/Soft/DABC/dabc-master/include
-LIBS += -L/home/andr/Soft/DABC/dabc-master/lib -lDabcBase -lDabcMbs -lDabcHadaq
+INCLUDEPATH += /home/andr/Soft/DABC/dabc_debug/include
+LIBS += -L/home/andr/Soft/DABC/dabc_debug/lib/ -lDabcBase -lDabcMbs -lDabcHadaq
 #-----------
 
 
