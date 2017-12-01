@@ -72,7 +72,11 @@ void setWinGeometry(AGraphWindow* win, QString name, const QJsonObject& props)
     if (!js.isEmpty())
     {
        LoadWindowFromJson(js, x, y, w, h, bVis);
-       win->setGeometry(x,y,w,h);
+
+       win->move(x, y);
+       win->resize(w, h);
+       //win->setGeometry(x,y,w,h);  // introduces a shift up on Windows7
+
        //if (bVis) win->show();
        //else win->hide();
     }

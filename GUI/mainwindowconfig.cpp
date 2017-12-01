@@ -34,11 +34,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::saveCompleteState()
 {
-    QJsonObject js;
-#ifdef CERN_ROOT
-    js = RootModule->SaveGraphWindows();
-#endif
-    Dispatcher->SaveConfig(Dispatcher->AutosaveFile, js);
+    Dispatcher->SaveConfig(Dispatcher->AutosaveFile);
 
     //save script-related config
     QJsonObject jsS;
@@ -60,15 +56,10 @@ void MainWindow::on_actionSave_config_triggered()
     if (FileName.isEmpty()) return;
     if (QFileInfo(FileName).suffix().isEmpty()) FileName += ".json";
 
-    QJsonObject jsW;
-#ifdef CERN_ROOT
-    jsW = RootModule->SaveGraphWindows();
-#endif
-
-    Dispatcher->SaveConfig(FileName, jsW);
+    Dispatcher->SaveConfig(FileName);
 }
 
-void MainWindow::writeGUItoJson(QJsonObject &json)
+void MainWindow::WriteGUItoJson(QJsonObject &json)
 {
     QJsonObject jsgui;
 
@@ -103,7 +94,7 @@ void MainWindow::writeGUItoJson(QJsonObject &json)
     json["GUI"] = jsgui;
 }
 
-void MainWindow::readGUIfromJson(QJsonObject &json)
+void MainWindow::ReadGUIfromJson(const QJsonObject& json)
 {
     if (!json.contains("GUI")) return;
 
@@ -140,44 +131,53 @@ void MainWindow::readGUIfromJson(QJsonObject &json)
     }
 }
 
-void MainWindow::writeWindowsToJson(QJsonObject& json, const QJsonObject jsW)
+void MainWindow::SaveWindowSettings()
 {
-    QJsonObject js;
+    QJsonObject json;
 
-    js["Main"] = SaveWindowToJson(x(), y(), width(), height(), true);
-    js["ScriptWindow"] = SaveWindowToJson(ScriptWindow->x(), ScriptWindow->y(), ScriptWindow->width(), ScriptWindow->height(), ScriptWindow->isVisible());
-    js["GraphWindows"] = jsW;
-
-    json["WindowGeometries"] = js;
-}
-
-void MainWindow::readWindowsFromJson(QJsonObject &json)
-{
-    QJsonObject js;
-    parseJson(json, "WindowGeometries", js);
-    if (!js.isEmpty())
-    {
-        QJsonObject jsMain = js["Main"].toObject();
-        int x=10, y=10, w=500, h=700;
-        bool bVis=true;
-        LoadWindowFromJson(jsMain, x, y, w, h, bVis);
-        setGeometry(x, y, w, h);
-
-        QJsonObject jsScript;
-        parseJson(js, "ScriptWindow", jsScript);
-        if (!jsScript.isEmpty())
-        {
-            LoadWindowFromJson(jsScript, x, y, w, h, bVis);
-            ScriptWindow->setGeometry(x, y, w, h);
-            ScriptWindow->setVisible(bVis);
-        }
+    json["Main"] = SaveWindowToJson(x(), y(), width(), height(), true);
+    json["ScriptWindow"] = SaveWindowToJson(ScriptWindow->x(), ScriptWindow->y(), ScriptWindow->width(), ScriptWindow->height(), ScriptWindow->isVisible());
 
 #ifdef CERN_ROOT
-        QJsonObject jsW;
-        parseJson(js, "GraphWindows", jsW);
-        RootModule->SetWindowGeometries(jsW);
+    json["GraphWindows"] = RootModule->SaveGraphWindows();
 #endif
+
+    SaveJsonToFile(json, Dispatcher->WinSetFile);
+}
+
+void MainWindow::LoadWindowSettings()
+{
+    QJsonObject js;
+    LoadJsonFromFile(js, Dispatcher->WinSetFile);
+    if (js.isEmpty()) return;
+
+    int x=10, y=10, w=500, h=700;
+    bool bVis=true;
+
+    if (js.contains("Main"))
+    {
+        QJsonObject jsMain = js["Main"].toObject();
+        LoadWindowFromJson(jsMain, x, y, w, h, bVis);
+        this->move(x, y);
+        this->resize(w, h);
+        //setGeometry(x, y, w, h); // introduces a shift up on Windows7
     }
+
+    if (js.contains("Main"))
+    {
+        QJsonObject jsScript = js["ScriptWindow"].toObject();
+        LoadWindowFromJson(jsScript, x, y, w, h, bVis);
+        ScriptWindow->move(x, y);
+        ScriptWindow->resize(w, h);
+        //ScriptWindow->setGeometry(x, y, w, h); // introduces a shift up on Windows7
+        ScriptWindow->setVisible(bVis);
+    }
+
+#ifdef CERN_ROOT
+    QJsonObject jsW;
+    parseJson(js, "GraphWindows", jsW);
+    RootModule->SetWindowGeometries(jsW);
+#endif
 }
 
 // --- Update GUI controls on Config change ---

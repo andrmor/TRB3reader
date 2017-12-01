@@ -26,12 +26,11 @@
 //#include <vector>
 #include <cmath>
 
-MainWindow::MainWindow(ADataHub* DataHub, MasterConfig* Config, Trb3dataReader* Reader, Trb3signalExtractor* Extractor, QWidget *parent) :
+MainWindow::MainWindow(MasterConfig* Config, ADispatcher *Dispatcher, ADataHub* DataHub, Trb3dataReader* Reader, Trb3signalExtractor* Extractor, QWidget *parent) :
     QMainWindow(parent),
-    DataHub(DataHub), Config(Config), Reader(Reader), Extractor(Extractor),
+    Config(Config), Dispatcher(Dispatcher), DataHub(DataHub), Reader(Reader), Extractor(Extractor),
     ui(new Ui::MainWindow)
 {
-    Dispatcher = 0;
     bStopFlag = false;
 
     ui->setupUi(this);
@@ -52,22 +51,14 @@ MainWindow::MainWindow(ADataHub* DataHub, MasterConfig* Config, Trb3dataReader* 
     QMessageBox::warning(this, "TRB3 reader", "Graph module was not configured!", QMessageBox::Ok, QMessageBox::Ok);
 #endif
 
-    Dispatcher = new ADispatcher(Config, Reader, Extractor, this); //also loads config if autosave exists
     //Creating script window, registering script units, and setting up QObject connections
     CreateScriptWindow();
 
     //Loading window settings
-    QJsonObject json;
-    LoadJsonFromFile(json, Dispatcher->AutosaveFile);
-    if (!json.isEmpty())
-    {
-        readWindowsFromJson(json);
-
-        QJsonObject jsS;
-        LoadJsonFromFile(jsS, Dispatcher->ConfigDir+"/scripting.json");
-        if (!jsS.isEmpty())
-            ScriptWindow->ReadFromJson(jsS);
-    }
+    LoadWindowSettings();
+    QJsonObject jsS;
+    LoadJsonFromFile(jsS, Dispatcher->ConfigDir+"/scripting.json");
+    if (!jsS.isEmpty()) ScriptWindow->ReadFromJson(jsS);
 
     //misc gui settings
     ui->cbAutoscaleY->setChecked(true);
@@ -660,8 +651,10 @@ void MainWindow::ClearData()
 
 void MainWindow::on_actionReset_positions_of_all_windows_triggered()
 {
-    setGeometry(10,10,600,800);
-    ScriptWindow->setGeometry(670,10,600,800);
+    //setGeometry(10,10,600,800);
+    this->move(10, 10); this->resize(600, 800);
+    //ScriptWindow->setGeometry(670,10,600,800);
+    ScriptWindow->move(670, 10); ScriptWindow->resize(600, 800);
 
 #ifdef CERN_ROOT
     RootModule->ResetPositionOfWindows();

@@ -295,7 +295,6 @@ void MasterConfig::writeScriptSettingsToJson(QJsonObject &json)
 {
     QJsonObject js;
 
-    js["GlobScript"] = GlobScript;
     js["ScriptWindowJson"] = ScriptWindowJson;
     js["DefaultFontSize_ScriptWindow"] = DefaultFontSize_ScriptWindow;
     js["DefaultFontFamily_ScriptWindow"] = DefaultFontFamily_ScriptWindow;

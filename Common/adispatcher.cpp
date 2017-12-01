@@ -13,29 +13,19 @@
 #include <QDir>
 #include <QJsonObject>
 
-//ADispatcher::ADispatcher(MasterConfig* Config, ChannelMapper* Map, Trb3dataReader* Reader, Trb3signalExtractor* Extractor) :
-//    Config(Config), Map(Map), Reader(Reader), Extractor(Extractor)
-//{
-//    onStart();
-//}
-
-ADispatcher::ADispatcher(MasterConfig* Config, Trb3dataReader* Reader, Trb3signalExtractor* Extractor, MainWindow *MW) :
-    Config(Config),Reader(Reader), Extractor(Extractor), MW(MW)
+ADispatcher::ADispatcher(MasterConfig* Config, Trb3dataReader* Reader, Trb3signalExtractor* Extractor) :
+    Config(Config),Reader(Reader), Extractor(Extractor)
 {
-    onStart();
-}
-
-void ADispatcher::onStart()
-{
-    //finding the config dir
     ConfigDir = QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation) + "/TRBreader";
     AutosaveFile = ConfigDir+"/autosave.json";
-    if (!QDir(ConfigDir).exists())
-        QDir().mkdir(ConfigDir);
-    else
-        LoadConfig(AutosaveFile);
-
+    WinSetFile = ConfigDir+"/winset.json";
     qDebug() << "-> Config dir:" << ConfigDir;
+}
+
+void ADispatcher::LoadAutosaveConfig()
+{
+    if (!QDir(ConfigDir).exists()) QDir().mkdir(ConfigDir);
+    else LoadConfig(AutosaveFile);
 }
 
 void ADispatcher::ClearData()
@@ -56,21 +46,21 @@ bool ADispatcher::LoadConfig(QJsonObject &json)
     Config->ReadFromJson(json);
     ClearData();
 
-    MW->readGUIfromJson(json);
-    MW->UpdateGui();
+    emit RequestReadGuiFromJson(json);
+    emit RequestUpdateGui();
 
     return true;
 }
 
-void ADispatcher::SaveConfig(QString FileName, QJsonObject js)
+void ADispatcher::SaveConfig(QString FileName)
 {
     QJsonObject json;
     Config->WriteToJson(json);
 
-    MW->writeGUItoJson(json);
-    MW->writeWindowsToJson(json, js);
-
+    emit RequestWriteGuiToJson(json);
     SaveJsonToFile(json, FileName);
+
+    emit RequestWriteWindowSettings();
 }
 
 void ADispatcher::ClearNegativeChannels()
@@ -78,7 +68,7 @@ void ADispatcher::ClearNegativeChannels()
     Config->SetNegativeChannels(QVector<int>());
     ClearData();
 
-    MW->UpdateGui();
+    emit RequestUpdateGui();
 }
 
 void ADispatcher::ClearMapping()
@@ -86,7 +76,7 @@ void ADispatcher::ClearMapping()
     Config->SetMapping(QVector<int>());
     ClearData();
 
-    MW->UpdateGui();
+    emit RequestUpdateGui();
 }
 
 void ADispatcher::ClearIgnoreChannels()
@@ -94,5 +84,5 @@ void ADispatcher::ClearIgnoreChannels()
     Config->ClearListOfIgnoreChannels();
     ClearData();
 
-    MW->UpdateGui();
+    emit RequestUpdateGui();
 }

@@ -22,17 +22,17 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(ADataHub* DataHub, MasterConfig* Config, Trb3dataReader* Reader, Trb3signalExtractor* Extractor, QWidget *parent = 0);
+    explicit MainWindow(MasterConfig* Config, ADispatcher* Dispatcher, ADataHub* DataHub, Trb3dataReader* Reader, Trb3signalExtractor* Extractor, QWidget *parent = 0);
     ~MainWindow();
 
-    void writeGUItoJson(QJsonObject& json);
-    void readGUIfromJson(QJsonObject& json);
-    void writeWindowsToJson(QJsonObject &json, const QJsonObject jsW);
-    void readWindowsFromJson(QJsonObject &json);
-
-    void UpdateGui();
-
 public slots:
+    void UpdateGui();                               // slot since used by Dispatcher
+
+    void ReadGUIfromJson(const QJsonObject &json);  // slot since used by Dispatcher
+    void WriteGUItoJson(QJsonObject& json);         // slot since used by Dispatcher
+    void SaveWindowSettings();                      // slot since used by Dispatcher
+    void LoadWindowSettings();                      // slot since used by Dispatcher
+
     void onGlobalScriptStarted();
     void onGlobalScriptFinished();
     void saveCompleteState();

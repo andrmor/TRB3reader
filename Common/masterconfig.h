@@ -78,7 +78,6 @@ public:
     QString             FileName;
     QString             WorkingDir;
 
-    QString             GlobScript;
     QJsonObject         ScriptWindowJson;
     int                 DefaultFontSize_ScriptWindow = 12;
     QString             DefaultFontFamily_ScriptWindow;
