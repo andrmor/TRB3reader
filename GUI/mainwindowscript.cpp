@@ -20,45 +20,45 @@
 
 void MainWindow::CreateScriptWindow()
 {
-    qDebug() << "Creating script window...";
+    //  qDebug() << "Creating script window...";
     ScriptWindow = new AScriptWindow(Config, this);
 
-    qDebug() << "Registering script units...";
+    //  qDebug() << "Registering script units...";
 
-    qDebug() << "-> main...";
+    //  qDebug() << "-> main...";
     ScriptWindow->SetInterfaceObject(0); //initialization
 
-    qDebug() << "-> config...";
+    //  qDebug() << "-> config...";
     AInterfaceToConfig* conf = new AInterfaceToConfig(Config, Dispatcher);
     ScriptWindow->SetInterfaceObject(conf, "config");
 
-    qDebug() << "-> data...";
+    //  qDebug() << "-> data...";
     AInterfaceToData* dat = new AInterfaceToData(DataHub);
     ScriptWindow->SetInterfaceObject(dat, "events");
 
-    qDebug() << "-> waveforms...";
+    //  qDebug() << "-> waveforms...";
     AInterfaceToWaveforms* wav = new AInterfaceToWaveforms(Config, Reader);
     ScriptWindow->SetInterfaceObject(wav, "wav");
 
-    qDebug() << "-> extractor...";
+    //  qDebug() << "-> extractor...";
     AInterfaceToExtractor* ext = new AInterfaceToExtractor(Config, Extractor);
     ScriptWindow->SetInterfaceObject(ext, "ext");
 
 #ifdef CERN_ROOT
-    qDebug() << "-> graph...";
+    //  qDebug() << "-> graph...";
     AInterfaceToGraph* graph = new AInterfaceToGraph(RootModule->GetTmpHub());
     ScriptWindow->SetInterfaceObject(graph, "graph");
 
-    qDebug() << "-> hist...";
+    //  qDebug() << "-> hist...";
     AInterfaceToHist* hist = new AInterfaceToHist(RootModule->GetTmpHub());
     ScriptWindow->SetInterfaceObject(hist, "hist");
 #endif
 
-    qDebug() << "-> msg...";
+    //  qDebug() << "-> msg...";
     AInterfaceToMessageWindow* txt = new AInterfaceToMessageWindow(ScriptWindow);
     ScriptWindow->SetInterfaceObject(txt, "msg");
 
-    qDebug() << "Done!";
+    //  qDebug() << "Done!";
 
     ScriptWindow->SetShowEvaluationResult(true);
 
@@ -71,7 +71,6 @@ void MainWindow::CreateScriptWindow()
 #endif
 
     ScriptWindow->UpdateHighlight();
-
 }
 
 void MainWindow::onGlobalScriptStarted()

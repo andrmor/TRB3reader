@@ -199,6 +199,20 @@ void Trb3signalExtractor::ExtractAllSignals()
                     signalData[ievent][ichannel] = Reader->GetValueFast(ievent, ichannel, Config->CommonSampleNumber);
               }
             break;
+        case 3:
+            for (int ichannel=0; ichannel<numChannels; ichannel++)
+            {
+                if (signalData.at(ievent).at(ichannel) == 0) continue; //respect suppression - applicable since it operates with max of waveform
+                const QVector<float>* wave = Reader->GetWaveformPtrFast(ievent, ichannel);
+                float val = 0;
+                for (int isam = Config->IntegrateFrom; isam<=Config->IntegrateTo; ++isam)
+                {
+                    if (isam < wave->size()) val += wave->at(isam);
+                    else break;
+                }
+                signalData[ievent][ichannel] = ( (Config->IsNegative(ichannel)) ? -val : val);
+            }
+            break;
         default:
             qWarning() << "Unknown signal extraction method!";
             break;

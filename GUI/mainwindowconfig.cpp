@@ -8,6 +8,7 @@
 #include "ascriptwindow.h"
 #include "adispatcher.h"
 #include "adatahub.h"
+#include "amessage.h"
 
 #include <QJsonObject>
 #include <QJsonArray>
@@ -179,12 +180,10 @@ void MainWindow::readWindowsFromJson(QJsonObject &json)
     }
 }
 
-
-
 // --- Update GUI controls on Config change ---
 void MainWindow::UpdateGui()
 {
-    qDebug() << "--- Updating GUI";
+    //qDebug() << "--- Updating GUI";
 
     //datakinds
     ui->lwDatakinds->clear();
@@ -229,8 +228,15 @@ void MainWindow::UpdateGui()
             ui->sbAdjAvPoints->setValue(Config->AdjacentAveraging_NumPoints);
             ui->cbAdjAvWeighted->setChecked(Config->AdjacentAveraging_bWeighted);
 
-    ui->cobSignalExtractionMethod->setCurrentIndex(Config->SignalExtractionMethod);
+    int method = Config->SignalExtractionMethod;
+    if (method <= 3) ui->cobSignalExtractionMethod->setCurrentIndex(method);
+    else
+        message("Signal extraction method in config file is not valid in this version of program", this);
+
+
     ui->sbExtractAllFromSampleNumber->setValue(Config->CommonSampleNumber);
+    ui->sbIntegrateFrom->setValue(Config->IntegrateFrom);
+    ui->sbIntegrateTo->setValue(Config->IntegrateTo);
 
     ui->cbZeroSignalIfReverseMax->setChecked(Config->bZeroSignalIfReverse);
         ui->ledReverseMaxLimit->setText(QString::number(Config->ReverseMaxThreshold));
@@ -416,5 +422,17 @@ void MainWindow::on_sbNegMaxTo_editingFinished()
 void MainWindow::on_sbExtractAllFromSampleNumber_editingFinished()
 {
     Config->CommonSampleNumber = ui->sbExtractAllFromSampleNumber->value();
+    ClearData();
+}
+
+void MainWindow::on_sbIntegrateFrom_editingFinished()
+{
+    Config->IntegrateFrom = ui->sbIntegrateFrom->value();
+    ClearData();
+}
+
+void MainWindow::on_sbIntegrateTo_editingFinished()
+{
+    Config->IntegrateTo = ui->sbIntegrateTo->value();
     ClearData();
 }

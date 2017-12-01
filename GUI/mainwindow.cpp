@@ -31,8 +31,10 @@ MainWindow::MainWindow(ADataHub *DataHub, QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     Dispatcher = 0;
-    ui->setupUi(this);    
     bStopFlag = false;
+
+    ui->setupUi(this);
+
     ui->pbStop->setVisible(false);    
     qApp->processEvents();
 
@@ -141,7 +143,7 @@ const QString MainWindow::ProcessData()
     return "";
 }
 
-void MainWindow::LogMessage(QString message)
+void MainWindow::LogMessage(const QString message)
 {
     ui->leLog->setText(message);
     qApp->processEvents();
@@ -282,7 +284,7 @@ void MainWindow::on_pbSaveTotextFile_clicked()
     saveSignalsToFile(FileName, bUseHardware);
 }
 
-bool MainWindow::saveSignalsToFile(QString FileName, bool bUseHardware)
+bool MainWindow::saveSignalsToFile(const QString FileName, bool bUseHardware)
 {
     QFile outputFile(FileName);
     outputFile.open(QIODevice::WriteOnly);
@@ -679,37 +681,10 @@ void MainWindow::on_actionReset_positions_of_all_windows_triggered()
 #endif
 }
 
-void MainWindow::on_pbNegSignature_clicked()
-{
-#ifdef CERN_ROOT
-    if (!RootModule) return;
-    LogMessage("");
-    if (!Reader->isValid()) return;
-
-    RootModule->DrawSignature(true);
-
-#else
-    QMessageBox::information(this, "", "Cern ROOT module was not configured!", QMessageBox::Ok, QMessageBox::Ok);
-#endif
-}
-
-void MainWindow::on_pbPosSignature_clicked()
-{
-#ifdef CERN_ROOT
-    if (!RootModule) return;
-    LogMessage("");
-    if (!Reader->isValid()) return;
-
-    RootModule->DrawSignature(false);
-
-#else
-    QMessageBox::information(this, "", "Cern ROOT module was not configured!", QMessageBox::Ok, QMessageBox::Ok);
-#endif
-}
-
 void MainWindow::on_cobSignalExtractionMethod_currentIndexChanged(int index)
 {
     ui->sbExtractAllFromSampleNumber->setVisible(index == 2);
+    ui->frIntegration->setVisible(index == 3);
 }
 
 bool MainWindow::ExtractNumbersFromQString(const QString input, QVector<int> *ToAdd)
@@ -768,7 +743,7 @@ bool MainWindow::ExtractNumbersFromQString(const QString input, QVector<int> *To
   return true;
 }
 
-QString MainWindow::PackChannelList(QVector<int> vec)
+const QString MainWindow::PackChannelList(QVector<int> vec)
 {
     if (vec.isEmpty()) return "";
 
@@ -952,7 +927,7 @@ void MainWindow::on_pbProcessSelectedFiles_clicked()
     bulkProcessorEnvelope(names);
 }
 
-void MainWindow::bulkProcessorEnvelope(QStringList FileNames)
+void MainWindow::bulkProcessorEnvelope(const QStringList FileNames)
 {
     if (!ui->cbKeepEvents->isChecked()) DataHub->Clear();
     ui->pteBulkLog->clear();
@@ -1132,8 +1107,11 @@ void MainWindow::on_pbSaveSignalsFromDataHub_clicked()
     {
         const QVector<float>* vec = DataHub->GetSignalsFast(iev);
         for (float val : *vec) outStream << QString::number(val) << " ";
-        //if (ui->cbAddReconstructedPositions->isChecked())
-        // *** !!!
+        if (ui->cbAddReconstructedPositions->isChecked())
+        {
+            const float* R = DataHub->GetPositionFast(iev);
+            outStream << "     " << R[0] << R[1] << R[2];
+        }
         outStream << "\r\n";
     }
 }

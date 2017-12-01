@@ -49,6 +49,8 @@ public:
 
     int                 SignalExtractionMethod = 0; //0 - independent max, 1 - common sample, at global max
     int                 CommonSampleNumber = 0;
+    int                 IntegrateFrom = 0;
+    int                 IntegrateTo = 100;
 
     bool                bZeroSignalIfReverse = false;
     double              ReverseMaxThreshold = 0.25;
