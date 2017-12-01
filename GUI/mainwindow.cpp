@@ -26,8 +26,9 @@
 //#include <vector>
 #include <cmath>
 
-MainWindow::MainWindow(ADataHub *DataHub, QWidget *parent) :
-    QMainWindow(parent), DataHub(DataHub),
+MainWindow::MainWindow(ADataHub* DataHub, MasterConfig* Config, Trb3dataReader* Reader, Trb3signalExtractor* Extractor, QWidget *parent) :
+    QMainWindow(parent),
+    DataHub(DataHub), Config(Config), Reader(Reader), Extractor(Extractor),
     ui(new Ui::MainWindow)
 {
     Dispatcher = 0;
@@ -35,19 +36,10 @@ MainWindow::MainWindow(ADataHub *DataHub, QWidget *parent) :
 
     ui->setupUi(this);
 
-    ui->pbStop->setVisible(false);    
-    qApp->processEvents();
-
     QDoubleValidator* dv = new QDoubleValidator(this);
     dv->setNotation(QDoubleValidator::ScientificNotation);
     QList<QLineEdit*> list = this->findChildren<QLineEdit *>();
     foreach(QLineEdit *w, list) if (w->objectName().startsWith("led")) w->setValidator(dv);
-
-    //creating master config object
-    Config = new MasterConfig();
-
-    Reader = new Trb3dataReader(Config);
-    Extractor = new Trb3signalExtractor(Config, Reader);
 
 #ifdef CERN_ROOT
     RootModule = new CernRootModule(Reader, Extractor, Config);
@@ -61,7 +53,6 @@ MainWindow::MainWindow(ADataHub *DataHub, QWidget *parent) :
 #endif
 
     Dispatcher = new ADispatcher(Config, Reader, Extractor, this); //also loads config if autosave exists
-
     //Creating script window, registering script units, and setting up QObject connections
     CreateScriptWindow();
 
@@ -80,22 +71,18 @@ MainWindow::MainWindow(ADataHub *DataHub, QWidget *parent) :
 
     //misc gui settings
     ui->cbAutoscaleY->setChecked(true);
+    ui->pbStop->setVisible(false);
     on_cobSignalExtractionMethod_currentIndexChanged(ui->cobSignalExtractionMethod->currentIndex());
     OnEventOrChannelChanged(); // to update channel mapping indication
 }
 
 MainWindow::~MainWindow()
 {
-    delete Config;
-    delete Extractor;
-    delete Reader;
-
 #ifdef CERN_ROOT
     delete RootModule;
 #endif
 
     delete ScriptWindow;
-
     delete ui;
 }
 

@@ -22,7 +22,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(ADataHub* DataHub, QWidget *parent = 0);
+    explicit MainWindow(ADataHub* DataHub, MasterConfig* Config, Trb3dataReader* Reader, Trb3signalExtractor* Extractor, QWidget *parent = 0);
     ~MainWindow();
 
     void writeGUItoJson(QJsonObject& json);
@@ -133,22 +133,25 @@ protected:
     void closeEvent(QCloseEvent* event);
 
 private:
-    ADataHub* DataHub;
-    Ui::MainWindow* ui;
-    MasterConfig* Config;    
-    AScriptWindow* ScriptWindow;
-
+    //aliases
+    ADataHub* DataHub;    
+    MasterConfig* Config;
     Trb3dataReader* Reader;
     Trb3signalExtractor* Extractor;
 
+    //owned objects
+    Ui::MainWindow* ui;
     ADispatcher* Dispatcher;
+    AScriptWindow* ScriptWindow;
 
 #ifdef CERN_ROOT
     CernRootModule* RootModule;
 #endif
 
+    //gui misc
     bool bStopFlag;
 
+private:
     const QString ProcessData(); //returns error message if any
     void LogMessage(const QString message);
     bool saveSignalsToFile(const QString FileName, bool bUseHardware);
