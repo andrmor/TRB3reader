@@ -94,11 +94,12 @@ bool Trb3signalExtractor::SetRejected(int ievent, bool flag)
 {
     if (ievent<0 || ievent>=RejectedEvents.size()) return false;
     RejectedEvents[ievent] = flag;
+    return true;
 }
 
 void Trb3signalExtractor::SetAllRejected(bool flag)
 {
-    for (bool b : RejectedEvents) b = flag;
+    for (bool& b : RejectedEvents) b = flag;
 }
 
 void Trb3signalExtractor::ClearData()

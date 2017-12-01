@@ -136,7 +136,7 @@ int Trb3dataReader::GetMaxSampleFast(int ievent, int ichannel) const
 {
     const QVector <float>& vec = waveData.at(ievent).at(ichannel);
 
-    int max = vec.at(0);
+    float max = vec.at(0);
     int imax = 0;
     for (int i=1; i<vec.size(); i++)
         if (vec.at(i)>max)
@@ -159,7 +159,7 @@ int Trb3dataReader::GetMinSampleFast(int ievent, int ichannel) const
 {
     const QVector <float>& vec = waveData.at(ievent).at(ichannel);
 
-    int min = vec.at(0);
+    float min = vec.at(0);
     int imin = 0;
     for (int i=1; i<vec.size(); i++)
         if (vec.at(i)<min)

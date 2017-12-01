@@ -39,6 +39,92 @@ void AOneEvent::ClearWaveforms()
     for (QVector<float>* vec : Waveforms) delete vec;
 }
 
+float AOneEvent::GetWaveformMax(int ichannel) const
+{
+    if (ichannel<0 || ichannel>=Waveforms.size()) return NaN;
+
+    const QVector <float>* vec = Waveforms.at(ichannel);
+    if (!vec || vec->isEmpty()) return NaN;
+
+    float max = vec->at(0);
+    for (int i=1; i<vec->size(); i++)
+        if ( vec->at(i) > max ) max = vec->at(i);
+    return max;
+}
+
+float AOneEvent::GetWaveformMin(int ichannel) const
+{
+    if (ichannel<0 || ichannel>=Waveforms.size()) return NaN;
+
+    const QVector <float>* vec = Waveforms.at(ichannel);
+    if (!vec || vec->isEmpty()) return NaN;
+
+    float min = vec->at(0);
+    for (int i=1; i<vec->size(); i++)
+        if ( vec->at(i) < min ) min = vec->at(i);
+    return min;
+}
+
+int AOneEvent::GetWaveformMaxSample(int ichannel) const
+{
+    if (ichannel<0 || ichannel>=Waveforms.size()) return -1;
+
+    const QVector <float>* vec = Waveforms.at(ichannel);
+    if (!vec || vec->isEmpty()) return -1;
+
+    int   imax = 0;
+    float max = vec->at(0);
+    for (int i=1; i<vec->size(); i++)
+        if (vec->at(i) > max)
+        {
+            imax = i;
+            max  = vec->at(i);
+        }
+    return imax;
+}
+
+int AOneEvent::GetWaveformMinSample(int ichannel) const
+{
+    if (ichannel<0 || ichannel>=Waveforms.size()) return -1;
+
+    const QVector <float>* vec = Waveforms.at(ichannel);
+    if (!vec || vec->isEmpty()) return -1;
+
+    int   imin = 0;
+    float min = vec->at(0);
+    for (int i=1; i<vec->size(); i++)
+        if (vec->at(i) < min)
+        {
+            imin = i;
+            min  = vec->at(i);
+        }
+    return imin;
+}
+
+int AOneEvent::GetWaveformSampleWhereFirstBelow(int ichannel, float threshold) const
+{
+    if (ichannel<0 || ichannel>=Waveforms.size()) return -1;
+
+    const QVector <float>* vec = Waveforms.at(ichannel);
+    if (!vec || vec->isEmpty()) return -1;
+
+    for (int i=0; i<vec->size(); i++)
+        if (vec->at(i) < threshold) return i;
+    return -1;
+}
+
+int AOneEvent::GetWaveformSampleWhereFirstAbove(int ichannel, float threshold) const
+{
+    if (ichannel<0 || ichannel>=Waveforms.size()) return -1;
+
+    const QVector <float>* vec = Waveforms.at(ichannel);
+    if (!vec || vec->isEmpty()) return -1;
+
+    for (int i=0; i<vec->size(); i++)
+        if (vec->at(i) > threshold) return i;
+    return -1;
+}
+
 ADataHub::~ADataHub()
 {
     Clear();
@@ -174,6 +260,42 @@ const QVector<QVector<float> *>* ADataHub::GetWaveforms(int ievent) const
 {
     if (ievent<0 || ievent>=Events.size()) return 0;
     return Events.at(ievent)->GetWaveforms();
+}
+
+float ADataHub::GetWaveformMax(int ievent, int ichannel) const
+{
+    if (ievent<0 || ievent>=Events.size()) return NaN;
+    return Events.at(ievent)->GetWaveformMax(ichannel);
+}
+
+float ADataHub::GetWaveformMin(int ievent, int ichannel) const
+{
+    if (ievent<0 || ievent>=Events.size()) return NaN;
+    return Events.at(ievent)->GetWaveformMin(ichannel);
+}
+
+int ADataHub::GetWaveformMaxSample(int ievent, int ichannel) const
+{
+    if (ievent<0 || ievent>=Events.size()) return -1;
+    return Events.at(ievent)->GetWaveformMaxSample(ichannel);
+}
+
+int ADataHub::GetWaveformMinSample(int ievent, int ichannel) const
+{
+    if (ievent<0 || ievent>=Events.size()) return -1;
+    return Events.at(ievent)->GetWaveformMinSample(ichannel);
+}
+
+int ADataHub::GetWaveformSampleWhereFirstBelow(int ievent, int ichannel, float threshold) const
+{
+    if (ievent<0 || ievent>=Events.size()) return -1;
+    return Events.at(ievent)->GetWaveformSampleWhereFirstBelow(ichannel, threshold);
+}
+
+int ADataHub::GetWaveformSampleWhereFirstAbove(int ievent, int ichannel, float threshold) const
+{
+    if (ievent<0 || ievent>=Events.size()) return -1;
+    return Events.at(ievent)->GetWaveformSampleWhereFirstAbove(ichannel, threshold);
 }
 
 const int *ADataHub::GetMultiplicityPositive(int ievent) const

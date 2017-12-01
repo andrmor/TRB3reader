@@ -206,6 +206,54 @@ QVariant AInterfaceToData::getWaveforms(int ievent)
     return jv.toVariant();
 }
 
+float AInterfaceToData::getWaveformMax(int ievent, int ichannel)
+{
+    float val = DataHub->GetWaveformMax(ievent, ichannel);
+    if (std::isnan(val))
+        abort("Error in getWaveformMax");
+    return val;
+}
+
+float AInterfaceToData::getWaveformMin(int ievent, int ichannel)
+{
+    float val = DataHub->GetWaveformMin(ievent, ichannel);
+    if (std::isnan(val))
+        abort("Error in getWaveformMin");
+    return val;
+}
+
+int AInterfaceToData::getWaveformMaxSample(int ievent, int ichannel)
+{
+    int val = DataHub->GetWaveformMaxSample(ievent, ichannel);
+    if (val < 0)
+        abort("Error in getWaveformMaxSample");
+    return val;
+}
+
+int AInterfaceToData::getWaveformMinSample(int ievent, int ichannel)
+{
+    int val = DataHub->GetWaveformMinSample(ievent, ichannel);
+    if (val < 0)
+        abort("Error in getWaveformMinSample");
+    return val;
+}
+
+int AInterfaceToData::getWaveformSampleWhereFirstBelow(int ievent, int ichannel, float threshold)
+{
+    int val = DataHub->GetWaveformSampleWhereFirstBelow(ievent, ichannel, threshold);
+    if (val < 0)
+        abort("Error in getWaveformSampleWhereFirstBelow");
+    return val;
+}
+
+int AInterfaceToData::getWaveformSampleWhereFirstAbove(int ievent, int ichannel, float threshold)
+{
+    int val = DataHub->GetWaveformSampleWhereFirstAbove(ievent, ichannel, threshold);
+    if (val < 0)
+        abort("Error in getWaveformSampleWhereFirstAbove");
+    return val;
+}
+
 void AInterfaceToData::setMultiplicity(int ievent, QVariant px_py_pz_nx_ny_nz)
 {
     QString type = px_py_pz_nx_ny_nz.typeName();

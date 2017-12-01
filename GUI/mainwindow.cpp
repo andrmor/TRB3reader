@@ -1088,7 +1088,7 @@ bool MainWindow::bulkProcessCore()
                 QVector< QVector<float>* > vec;
                 for (int ihardw : map)
                 {
-                    if (Extractor->GetSignalFast(iev, ihardw) == 0) vec << 0;
+                    if (Extractor->GetSignalFast(iev, ihardw) == 0 || Config->IsIgnoredChannel(ihardw)) vec << 0;
                     else
                     {
                         QVector<float>* wave = new QVector<float>();
