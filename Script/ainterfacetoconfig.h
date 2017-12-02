@@ -19,6 +19,9 @@ public slots:
     QVariant getConfigJson();
     void     setConfigJson(QVariant configJson);
 
+    bool     replaceKeyValue(QString Key, QVariant val);
+    QVariant getKeyValue(QString Key);
+
     int      countLogicalChannels();
 
     bool     isNegativeHardwareChannel(int iHardwChannel);
@@ -34,6 +37,12 @@ private:
     MasterConfig* Config;
     ADispatcher* Dispatcher;
 
+    QString LastError;
+
+    bool expandKey(QString &Key);
+    void find(const QJsonObject &obj, QStringList Keys, QStringList& Found, QString Path = "");
+    bool keyToNameAndIndex(QString Key, QString &Name, QVector<int> &Indexes);
+    bool modifyJsonValue(QJsonObject& obj, const QString& path, const QJsonValue& newValue);
 };
 
 #endif // AINTERFACETOCONFIG_H
