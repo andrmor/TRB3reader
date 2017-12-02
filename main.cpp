@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include <QApplication>
 #include <QObject>
+#include <QDebug>
 
 #include "adatahub.h"
 #include "masterconfig.h"

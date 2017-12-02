@@ -25,7 +25,8 @@ public:
     //negative/positive channels
     const QVector<int>& GetListOfNegativeChannels() const {return ListNegativeChannels;}
     void                SetNegativeChannels(const QVector<int> &list);
-    bool                IsNegative(int iHardwChannel) const;
+    bool                IsNegativeHardwareChannel(int iHardwChannel) const;
+    bool                IsNegativeLogicalChannel(int iLogical) const;
 
     //channel map (hardware / logical)
     ChannelMapper*      Map;  //use this class to access convertion methods!
@@ -36,7 +37,8 @@ public:
     QVector<int>        GetListOfIgnoreChannels() const;
     void                SetListOfIgnoreChannels(const QVector<int>& list);
     void                ClearListOfIgnoreChannels() {IgnoreHardwareChannels.clear();}
-    bool                IsIgnoredChannel(int iHardwChannel) const {return IgnoreHardwareChannels.contains(iHardwChannel); }
+    bool                IsIgnoredHardwareChannel(int iHardwChannel) const {return IgnoreHardwareChannels.contains(iHardwChannel); }
+    bool                IsIgnoredLogicalChannel(int iLogical) const;
 
     bool                bSmoothWaveforms = false;
     bool                AdjacentAveraging_bOn = false;
@@ -95,7 +97,7 @@ private:
     QSet<int>           Datakinds;
 
     QVector<int>        ListNegativeChannels;
-    std::vector<bool>   NegPol; //Quick access
+    QVector<bool>       NegPol; //Quick access
 
     QVector<int>        ChannelMap;
 

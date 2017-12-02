@@ -27,6 +27,8 @@ public:
     const QVector< QVector<float>* >* GetWaveforms() const { return &Waveforms; }
     void    SetWaveforms(const QVector< QVector<float>* >* waveforms) { Waveforms = *waveforms;}
     void    ClearWaveforms();
+    const QVector<float>* GetWaveform(int ichannel) const;
+    const QVector<float>* GetWaveformFast(int ichannel) const {return Waveforms.at(ichannel);}
     float   GetWaveformMax(int ichannel) const;
     float   GetWaveformMin(int ichannel) const;
     int     GetWaveformMaxSample(int ichannel) const;
@@ -107,6 +109,9 @@ public:
 
     // Waveforms
     const QVector< QVector<float>* >* GetWaveforms(int ievent) const;
+    const QVector<float>* GetWaveform(int ievent, int ichannel) const;
+    const QVector<float>* GetWaveformFast(int ievent, int ichannel) const;
+
         //utilities
     float            GetWaveformMax(int ievent, int ichannel) const;
     float            GetWaveformMin(int ievent, int ichannel) const;

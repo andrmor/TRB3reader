@@ -32,7 +32,6 @@ MainWindow::MainWindow(MasterConfig* Config, ADispatcher *Dispatcher, ADataHub* 
     ui(new Ui::MainWindow)
 {
     bStopFlag = false;
-
     ui->setupUi(this);
 
     QDoubleValidator* dv = new QDoubleValidator(this);
@@ -41,7 +40,7 @@ MainWindow::MainWindow(MasterConfig* Config, ADispatcher *Dispatcher, ADataHub* 
     foreach(QLineEdit *w, list) if (w->objectName().startsWith("led")) w->setValidator(dv);
 
 #ifdef CERN_ROOT
-    RootModule = new CernRootModule(Reader, Extractor, Config);
+    RootModule = new CernRootModule(Reader, Extractor, Config, DataHub);
     connect(RootModule, &CernRootModule::WOneHidden, [=](){ui->pbShowWaveform->setChecked(false);});
     connect(RootModule, &CernRootModule::WOverNegHidden, [=](){ui->pbShowOverlayNeg->setChecked(false);});
     connect(RootModule, &CernRootModule::WOverPosHidden, [=](){ui->pbShowOverlayPos->setChecked(false);});
@@ -161,7 +160,7 @@ void MainWindow::on_pbAddMapping_clicked()
     }
     Config->SetMapping(arr);
 
-    Config->Map->Validate(Reader->GetNumChannels(), true);
+    Config->Map->Validate(Reader->CountChannels(), true);
     LogMessage("Mapping updated");
 
     UpdateGui();
@@ -214,7 +213,7 @@ void MainWindow::on_pteMapping_customContextMenuRequested(const QPoint &pos)
               return;
           }
 
-          bool ok = Config->Map->Validate(Reader->GetNumChannels());
+          bool ok = Config->Map->Validate(Reader->CountChannels());
           if (ok) QMessageBox::information(this, "TRB3 reader", "Mapping is valid", QMessageBox::Ok, QMessageBox::Ok);
           else    QMessageBox::warning(this, "TRB3 reader", "mapping is NOT valid!", QMessageBox::Ok, QMessageBox::Ok);
           qDebug() << "Validation result: Map is good?"<<ok;
@@ -241,7 +240,7 @@ void MainWindow::on_pbSaveTotextFile_clicked()
     int numEvents = Extractor->CountEvents();
     int numChannels = Extractor->CountChannels();
 
-    if (numEvents == 0 || numChannels == 0 || numEvents != Reader->GetNumEvents() || numChannels != Reader->GetNumChannels())
+    if (numEvents == 0 || numChannels == 0 || numEvents != Reader->CountEvents() || numChannels != Reader->CountChannels())
     {
         QMessageBox::warning(this, "TRB3reader", "Data not ready!", QMessageBox::Ok, QMessageBox::Ok);
         return;
@@ -316,51 +315,9 @@ void MainWindow::on_pbStop_toggled(bool checked)
     else ui->pbStop->setText("Stop");
 }
 
-void MainWindow::on_pbShowWaveform_toggled(bool checked)
-{
-#ifdef CERN_ROOT
-    RootModule->ShowSingleWaveWindow(checked);
-    LogMessage("");
-    if (!checked) return;
-    if (!Reader->isValid()) return;
-
-    int iHardwChan = getCurrentlySelectedHardwareChannel();
-    if ( iHardwChan < 0 )
-    {
-        RootModule->ClearSingleWaveWindow();
-        return;
-    }
-
-    int ievent = ui->sbEvent->value();
-    if (ievent>Reader->GetNumEvents()-1)
-    {
-        ui->sbEvent->setValue(0);
-        return;
-    }
-
-    bool bNegative = Config->IsNegative(iHardwChan);
-    double Min, Max;
-    if (bNegative)
-    {
-        Min = ui->ledMinNeg->text().toDouble();
-        Max = ui->ledMaxNeg->text().toDouble();
-    }
-    else
-    {
-        Min = ui->ledMinPos->text().toDouble();
-        Max = ui->ledMaxPos->text().toDouble();
-    }
-
-    RootModule->DrawSingle(ievent, iHardwChan, ui->cbAutoscaleY->isChecked(), Min, Max);
-
-#else
-    QMessageBox::information(this, "", "Cern ROOT module was not configured!", QMessageBox::Ok, QMessageBox::Ok);
-#endif
-}
-
 void MainWindow::on_sbEvent_valueChanged(int arg1)
 {
-    if (!Reader || arg1 >= Reader->GetNumEvents())
+    if (!Reader || arg1 >= Reader->CountEvents())
     {
         ui->sbEvent->setValue(0);
         return;
@@ -384,7 +341,7 @@ int MainWindow::getCurrentlySelectedHardwareChannel()
     if (bUseLogical)                          iHardwChan = Config->Map->LogicalToHardware(val);
     else
     {
-        if (val >= Reader->GetNumChannels())  iHardwChan = -1;
+        if (val >= Reader->CountChannels())  iHardwChan = -1;
         else                                  iHardwChan = val;
     }
     return iHardwChan;
@@ -429,16 +386,18 @@ void MainWindow::OnEventOrChannelChanged(bool bOnlyChannel)
         else s = QString::number(ilogical);
         ui->leLogic->setText(s);
     }
-    bool bNegative = Config->IsNegative(iHardwChan);
+
+    bool bNegative = Config->IsNegativeHardwareChannel(iHardwChan);
     QString s = ( bNegative ? "Neg" : "Pos");
     ui->lePolar->setText(s);
 
     // Check is channel number is valid
-    int max = (bUseLogical ? Config->CountLogicalChannels() : Reader->GetNumChannels());
+    int max = (bUseLogical ? Config->CountLogicalChannels() : Reader->CountChannels());
     max--;
     if (val > max )
     {
         if (val == 0) return; //in case no channels are defined
+        qDebug() << max;
         ui->sbChannel->setValue(max);
         return;  // will return to this cycle with on_changed signal
     }
@@ -497,6 +456,64 @@ void MainWindow::OnEventOrChannelChanged(bool bOnlyChannel)
     }
 }
 
+void MainWindow::on_pbShowWaveform_toggled(bool checked)
+{
+#ifdef CERN_ROOT
+    RootModule->ShowSingleWaveWindow(checked);
+    LogMessage("");
+    if (!checked) return;
+
+    const bool bFromDataHub = (ui->cobExplorerSource->currentIndex() == 1);
+    int numEvents = bFromDataHub ? DataHub->CountEvents() : Reader->CountEvents();
+    int ievent = ui->sbEvent->value();
+    if (ievent >= numEvents)
+    {
+        ui->sbEvent->setValue(0);
+        RootModule->ClearSingleWaveWindow();
+        return;
+    }
+
+    int ichannel;
+    if (bFromDataHub)
+    {
+        ichannel = ui->sbChannel->value();
+        if (ichannel >= DataHub->CountChannels())
+        {
+            RootModule->ClearSingleWaveWindow();
+            return;
+        }
+    }
+    else
+    {
+        ichannel = getCurrentlySelectedHardwareChannel();
+        if (ichannel<0 || !Reader->isValid())
+        {
+            RootModule->ClearSingleWaveWindow();
+            return;
+        }
+    }
+
+    bool bNegative = bFromDataHub ? Config->IsNegativeLogicalChannel(ichannel) : Config->IsNegativeHardwareChannel(ichannel);
+    double Min, Max;
+    if (bNegative)
+    {
+        Min = ui->ledMinNeg->text().toDouble();
+        Max = ui->ledMaxNeg->text().toDouble();
+    }
+    else
+    {
+        Min = ui->ledMinPos->text().toDouble();
+        Max = ui->ledMaxPos->text().toDouble();
+    }
+
+    bool bOK = RootModule->DrawSingle(bFromDataHub, ievent, ichannel, ui->cbAutoscaleY->isChecked(), Min, Max);
+    if (!bOK) RootModule->ClearSingleWaveWindow();
+
+#else
+    QMessageBox::information(this, "", "Cern ROOT module was not configured!", QMessageBox::Ok, QMessageBox::Ok);
+#endif
+}
+
 void MainWindow::on_pbShowOverlayNeg_toggled(bool checked)
 {
     showOverlay(checked, true);
@@ -513,12 +530,14 @@ void MainWindow::showOverlay(bool checked, bool bNeg)
     bNeg ? RootModule->ShowOverNegWaveWindow(checked) : RootModule->ShowOverPosWaveWindow(checked);
     LogMessage("");
     if (!checked) return;
-    if (!Reader->isValid()) return;
 
+    const bool bFromDataHub = (ui->cobExplorerSource->currentIndex() == 1);
+    int numEvents = bFromDataHub ? DataHub->CountEvents() : Reader->CountEvents();
     int ievent = ui->sbEvent->value();
-    if (ievent > Reader->GetNumEvents()-1)
+    if (ievent >= numEvents)
     {
         ui->sbEvent->setValue(0);
+        RootModule->ClearSingleWaveWindow();
         return;
     }
 
@@ -534,7 +553,12 @@ void MainWindow::showOverlay(bool checked, bool bNeg)
         Max = ui->ledMaxPos->text().toDouble();
     }
 
-    RootModule->DrawOverlay(ievent, bNeg, ui->cbAutoscaleY->isChecked(), Min, Max, ui->cobSortBy->currentIndex());
+    bool bOK = RootModule->DrawOverlay(bFromDataHub, ievent, bNeg, ui->cbAutoscaleY->isChecked(), Min, Max, ui->cobSortBy->currentIndex());
+    if (!bOK)
+    {
+        if (bNeg) RootModule->ClearOverNegWaveWindow();
+        else      RootModule->ClearOverPosWaveWindow();
+    }
 
 #else
     QMessageBox::information(this, "", "Cern ROOT module was not configured!", QMessageBox::Ok, QMessageBox::Ok);
@@ -558,12 +582,14 @@ void MainWindow::showAllWave(bool checked, bool bNeg)
     bNeg ? RootModule->ShowAllNegWaveWindow(checked) : RootModule->ShowAllPosWaveWindow(checked);
     LogMessage("");
     if (!checked) return;
-    if (!Reader->isValid()) return;
 
+    const bool bFromDataHub = (ui->cobExplorerSource->currentIndex() == 1);
+    int numEvents = bFromDataHub ? DataHub->CountEvents() : Reader->CountEvents();
     int ievent = ui->sbEvent->value();
-    if (ievent > Reader->GetNumEvents()-1)
+    if (ievent >= numEvents)
     {
         ui->sbEvent->setValue(0);
+        RootModule->ClearSingleWaveWindow();
         return;
     }
 
@@ -584,12 +610,18 @@ void MainWindow::showAllWave(bool checked, bool bNeg)
         padsY = ui->sbAllPosY->value();
     }
 
-    RootModule->DrawAll(ievent, bNeg, padsX, padsY, ui->cbAutoscaleY->isChecked(), Min, Max, ui->cobSortBy->currentIndex(), ui->cbLabels->isChecked());
+    bool bOK = RootModule->DrawAll(bFromDataHub, ievent, bNeg, padsX, padsY, ui->cbAutoscaleY->isChecked(), Min, Max, ui->cobSortBy->currentIndex(), ui->cbLabels->isChecked());
+    if (!bOK)
+    {
+        if (bNeg) RootModule->ClearAllNegWaveWindow();
+        else      RootModule->ClearAllPosWaveWindow();
+    }
 
 #else
     QMessageBox::information(this, "", "Cern ROOT module was not configured!", QMessageBox::Ok, QMessageBox::Ok);
 #endif
 }
+
 
 void MainWindow::on_cbLabels_clicked()
 {
@@ -1020,7 +1052,7 @@ bool MainWindow::bulkProcessCore()
     // Checking that after extraction/script the data are consistent in num channels / mapping
     int numEvents = Extractor->CountEvents();
     int numChannels = Extractor->CountChannels();
-    if (numEvents == 0 || numChannels == 0 || numEvents != Reader->GetNumEvents() || numChannels != Reader->GetNumChannels())
+    if (numEvents == 0 || numChannels == 0 || numEvents != Reader->CountEvents() || numChannels != Reader->CountChannels())
     {
         ui->pteBulkLog->appendPlainText("---- Extractor data not valid -> ignoring this file");
         return false;
@@ -1067,7 +1099,7 @@ bool MainWindow::bulkProcessCore()
                 QVector< QVector<float>* > vec;
                 for (int ihardw : map)
                 {
-                    if (Extractor->GetSignalFast(iev, ihardw) == 0 || Config->IsIgnoredChannel(ihardw)) vec << 0;
+                    if (Extractor->GetSignalFast(iev, ihardw) == 0 || Config->IsIgnoredHardwareChannel(ihardw)) vec << 0;
                     else
                     {
                         QVector<float>* wave = new QVector<float>();

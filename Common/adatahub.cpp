@@ -39,6 +39,12 @@ void AOneEvent::ClearWaveforms()
     for (QVector<float>* vec : Waveforms) delete vec;
 }
 
+const QVector<float> *AOneEvent::GetWaveform(int ichannel) const
+{
+    if (ichannel<0 || ichannel>=Waveforms.size()) return 0;
+    return Waveforms.at(ichannel);
+}
+
 float AOneEvent::GetWaveformMax(int ichannel) const
 {
     if (ichannel<0 || ichannel>=Waveforms.size()) return NaN;
@@ -260,6 +266,17 @@ const QVector<QVector<float> *>* ADataHub::GetWaveforms(int ievent) const
 {
     if (ievent<0 || ievent>=Events.size()) return 0;
     return Events.at(ievent)->GetWaveforms();
+}
+
+const QVector<float>* ADataHub::GetWaveform(int ievent, int ichannel) const
+{
+    if (ievent<0 || ievent>=Events.size()) return 0;
+    return Events.at(ievent)->GetWaveform(ichannel);
+}
+
+const QVector<float> *ADataHub::GetWaveformFast(int ievent, int ichannel) const
+{
+    return Events.at(ievent)->GetWaveformFast(ichannel);
 }
 
 float ADataHub::GetWaveformMax(int ievent, int ichannel) const

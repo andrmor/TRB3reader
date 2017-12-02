@@ -160,7 +160,7 @@ private:
 
     void OnEventOrChannelChanged(bool bOnlyChannel = false);
     void showOverlay(bool checked, bool bNeg);
-    int getCurrentlySelectedHardwareChannel();
+    int  getCurrentlySelectedHardwareChannel();
     void showAllWave(bool checked, bool bNeg);
     void updateSmoothAfterPedeEnableStatus();
 

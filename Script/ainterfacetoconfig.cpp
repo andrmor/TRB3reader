@@ -42,12 +42,12 @@ int AInterfaceToConfig::countLogicalChannels()
 
 bool AInterfaceToConfig::isNegative(int iHardwChannel)
 {
-    return Config->IsNegative(iHardwChannel);
+    return Config->IsNegativeHardwareChannel(iHardwChannel);
 }
 
 bool AInterfaceToConfig::isIgnoredChannel(int iHardwChannel)
 {
-    return Config->IsIgnoredChannel(iHardwChannel);
+    return Config->IsIgnoredHardwareChannel(iHardwChannel);
 }
 
 int AInterfaceToConfig::toHardware(int iLogicalChannel)

@@ -40,10 +40,10 @@ public:
     bool    isValid() const {return (waveData.size()>0 && numChannels>0 && numSamples>0);}
 
     // parameter requests
-    int     GetNumSamples()   const {return numSamples;}      // number of samples in the waveform
-    int     GetNumChannels()  const {return numChannels;}     // number of channels per event
-    int     GetNumEvents()    const {return waveData.size();} // number of events in the datafile
-    int     GetNumBadEvents() const {return numBadEvents;}    // number of disreguarded events - they had wrong number of samples
+    int     CountSamples()   const {return numSamples;}      // number of samples in the waveform
+    int     CountChannels()  const {return numChannels;}     // number of channels per event
+    int     CountEvents()    const {return waveData.size();} // number of events in the datafile
+    int     CountBadEvents() const {return numBadEvents;}    // number of disreguarded events - they had wrong number of samples
 
     void    ClearData();
 

@@ -11,6 +11,7 @@ class AGraphWindow;
 class Trb3dataReader;
 class Trb3signalExtractor;
 class MasterConfig;
+class ADataHub;
 class TGraph;
 class TmpObjHubClass;
 class TObject;
@@ -20,7 +21,7 @@ class CernRootModule : public QObject
     Q_OBJECT
 
 public:
-    CernRootModule(Trb3dataReader* Reader, Trb3signalExtractor* Extractor, MasterConfig* Config, int refreshInterval = 100);
+    CernRootModule(Trb3dataReader* Reader, Trb3signalExtractor* Extractor, MasterConfig* Config, ADataHub* DataHub, int refreshInterval = 100);
     ~CernRootModule();
 
     //Graph windows show/hide
@@ -31,10 +32,14 @@ public:
     void ShowAllPosWaveWindow(bool flag);
 
     void ClearSingleWaveWindow();
+    void ClearOverNegWaveWindow();
+    void ClearOverPosWaveWindow();
+    void ClearAllNegWaveWindow();
+    void ClearAllPosWaveWindow();
 
-    void DrawSingle(int ievent, int iHardwChan, bool autoscale, float MinY, float MaxY);
-    void DrawOverlay(int ievent, bool bNeg, bool bAutoscale, float Min, float Max, int SortBy_0Logic1Hardw);
-    void DrawAll(int ievent, bool bNeg, int padsX, int padsY, bool bAutoscale, float Min, float Max, int SortBy_0Logic1Hardw, bool bShowlabels);
+    bool DrawSingle(bool bFromDataHub, int ievent, int iHardwChan, bool autoscale, float MinY, float MaxY);
+    bool DrawOverlay(bool bFromDataHub, int ievent, bool bNeg, bool bAutoscale, float Min, float Max, int SortBy_0Logic1Hardw);
+    bool DrawAll(bool bFromDataHub, int ievent, bool bNeg, int padsX, int padsY, bool bAutoscale, float Min, float Max, int SortBy_0Logic1Hardw, bool bShowlabels);
 
     void StartGraphWindows();
     const QJsonObject SaveGraphWindows() const;
@@ -52,6 +57,7 @@ private:
     Trb3dataReader* Reader;
     Trb3signalExtractor* Extractor;
     MasterConfig* Config;
+    ADataHub* DataHub;
 
     TApplication* RootApp;
 
@@ -70,6 +76,8 @@ private:
     void showGraphWindow(AGraphWindow **win, bool flag);
     void clearNegGraphVectors();
     void clearPosGraphVectors();
+
+    void SetGraphAttributes(TGraph* g, bool bFromDataHub, int ievent, int ichannel);
 
 private slots:
     void timerTimeout();

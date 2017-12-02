@@ -16,7 +16,7 @@ int AInterfaceToWaveforms::countSamples()
 {
     if (!Reader->isValid()) return 0;
 
-    return Reader->GetNumSamples();
+    return Reader->CountSamples();
 }
 
 float AInterfaceToWaveforms::getValue(int ievent, int iHardwChannel, int isample)

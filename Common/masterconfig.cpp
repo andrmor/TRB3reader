@@ -138,7 +138,7 @@ bool MasterConfig::readSignalPolarityFromJson(QJsonObject &json)
     ListNegativeChannels.clear();
     QJsonArray arr = json["NegativeChannels"].toArray();
     for (int i=0; i<arr.size(); i++)
-        ListNegativeChannels.push_back(arr[i].toInt());
+        ListNegativeChannels << arr[i].toInt();
 
     updatePolarityQuickAccessData();
     return true;
@@ -328,16 +328,24 @@ bool MasterConfig::readScriptSettingsFromJson(QJsonObject &json)
 
 void MasterConfig::updatePolarityQuickAccessData()
 {
+    int imax = 0;
     for (int ichannel : ListNegativeChannels)
-    {
-        if (ichannel >= NegPol.size())
-            NegPol.resize(ichannel+1, false);
+        if (ichannel>imax) imax = ichannel;
+    NegPol = QVector<bool>(imax+1, false);
+
+    for (int ichannel : ListNegativeChannels)
         NegPol[ichannel] = true;
-    }
 }
 
-bool MasterConfig::IsNegative(int iHardwChannel) const
+bool MasterConfig::IsNegativeHardwareChannel(int iHardwChannel) const
 {
+    if ( iHardwChannel >= NegPol.size() || iHardwChannel < 0 ) return false;
+    return NegPol.at(iHardwChannel);
+}
+
+bool MasterConfig::IsNegativeLogicalChannel(int iLogical) const
+{
+    int iHardwChannel = Map->LogicalToHardware(iLogical);
     if ( iHardwChannel >= NegPol.size() || iHardwChannel < 0 ) return false;
     return NegPol.at(iHardwChannel);
 }
@@ -370,4 +378,8 @@ void MasterConfig::SetListOfIgnoreChannels(const QVector<int> &list)
     for (int i : list) IgnoreHardwareChannels << i;
 }
 
-
+bool MasterConfig::IsIgnoredLogicalChannel(int iLogical) const
+{
+    int iHardwChan = Map->LogicalToHardware(iLogical);
+    return IgnoreHardwareChannels.contains(iHardwChan);
+}
