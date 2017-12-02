@@ -57,7 +57,6 @@ void MasterConfig::WriteToJson(QJsonObject &json)
     writeSmoothingToJson(json);
     writeSignalExtractionToJson(json);
     writeMaxGateToJson(json);
-    writeScriptSettingsToJson(json);
 
     json["FileName"] = FileName;
     json["WorkingDir"] = WorkingDir;
@@ -76,7 +75,6 @@ bool MasterConfig::ReadFromJson(QJsonObject &json)
     readSmoothingFromJson(json);
     readSignalExtractionFromJson(json);
     readMaxGateFromJson(json);
-    readScriptSettingsFromJson(json);
 
     parseJson(json, "FileName", FileName);
     parseJson(json, "WorkingDir", WorkingDir);
@@ -288,41 +286,6 @@ bool MasterConfig::readMaxGateFromJson(QJsonObject &json)
     parseJson(js, "PositiveMaxGateFrom", PosMaxGateFrom);
     parseJson(js, "PositiveMaxGateTo",   PosMaxGateTo);
 
-    return true;
-}
-
-void MasterConfig::writeScriptSettingsToJson(QJsonObject &json)
-{
-    QJsonObject js;
-
-    js["ScriptWindowJson"] = ScriptWindowJson;
-    js["DefaultFontSize_ScriptWindow"] = DefaultFontSize_ScriptWindow;
-    js["DefaultFontFamily_ScriptWindow"] = DefaultFontFamily_ScriptWindow;
-    js["DefaultFontWeight_ScriptWindow"] = DefaultFontWeight_ScriptWindow;
-    js["DefaultFontItalic_ScriptWindow"] = DefaultFontItalic_ScriptWindow;
-    QJsonArray mspAr;
-    for (int w : MainSplitterSizes_ScriptWindow) mspAr << w;
-    js["MainSplitterSizes_ScriptWindow"] = mspAr;
-
-    json["ScriptWinSettings"] = js;
-}
-
-bool MasterConfig::readScriptSettingsFromJson(QJsonObject &json)
-{
-    QJsonObject js;
-    parseJson(json, "ScriptWinSettings", js);
-
-    if (!js.isEmpty())
-    {
-        parseJson(js, "DefaultFontSize_ScriptWindow", DefaultFontSize_ScriptWindow);
-        parseJson(js, "DefaultFontFamily_ScriptWindow", DefaultFontFamily_ScriptWindow);
-        parseJson(js, "DefaultFontWeight_ScriptWindow", DefaultFontWeight_ScriptWindow);
-        parseJson(js, "DefaultFontItalic_ScriptWindow", DefaultFontItalic_ScriptWindow);
-        QJsonArray mspAr;
-        parseJson(js, "MainSplitterSizes_ScriptWindow", mspAr);
-        for (int imsa=0; imsa<mspAr.size(); imsa++)
-            MainSplitterSizes_ScriptWindow << mspAr[imsa].toInt(50);
-    }
     return true;
 }
 

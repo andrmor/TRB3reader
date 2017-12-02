@@ -34,12 +34,12 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::saveCompleteState()
 {
-    Dispatcher->SaveConfig(Dispatcher->AutosaveFile);
-
     //save script-related config
     QJsonObject jsS;
     ScriptWindow->WriteToJson(jsS);
     SaveJsonToFile(jsS, Dispatcher->ConfigDir+"/scripting.json");
+
+    Dispatcher->SaveConfig(Dispatcher->AutosaveFile);
 }
 
 void MainWindow::on_actionLoad_config_triggered()

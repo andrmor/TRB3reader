@@ -5,10 +5,10 @@
 #include "coreinterfaces.h"
 #include "histgraphinterfaces.h"
 #include "amessage.h"
-//#include "ascriptexampleexplorer.h"
 #include "ascriptmanager.h"
 #include "masterconfig.h"
 #include "afiletools.h"
+#include "ajsontools.h"
 
 #include <QScriptEngine>
 #include <QTextStream>
@@ -32,9 +32,10 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QMessageBox>
+#include <QFontDialog>
 
 AScriptWindow::AScriptWindow(MasterConfig *Config, QWidget *parent) :
-    QMainWindow(parent),
+    QMainWindow(parent), Config(Config),
     ui(new Ui::AScriptWindow)
 {
     if (parent)
@@ -53,7 +54,6 @@ AScriptWindow::AScriptWindow(MasterConfig *Config, QWidget *parent) :
     QObject::connect(ScriptManager, SIGNAL(onAbort()), this, SLOT(receivedOnAbort()));
     QObject::connect(ScriptManager, SIGNAL(success(QString)), this, SLOT(receivedOnSuccess(QString)));
 
-    this->Config = Config;
     //ScriptManager->LibScripts = Config->LibScripts;
     //ScriptManager->LastOpenDir = Config->LastOpenDir;
     //ScriptManager->ExamplesDir = Config->ExamplesDir;
@@ -204,21 +204,13 @@ AScriptWindow::AScriptWindow(MasterConfig *Config, QWidget *parent) :
 
     trwJson->header()->resizeSection(0, 200);
 
-    if (!Config->MainSplitterSizes_ScriptWindow.isEmpty())
-        SetMainSplitterSizes(Config->MainSplitterSizes_ScriptWindow);
-    else
-    {
-        sizes.clear();
-        sizes << 800 << 70;
-        splMain->setSizes(sizes);
-    }
+    sizes.clear();
+    sizes << 800 << 70;
+    splMain->setSizes(sizes);
 
     //shortcuts
     QShortcut* Run = new QShortcut(QKeySequence("Ctrl+Return"), this);
     connect(Run, SIGNAL(activated()), this, SLOT(on_pbRunScript_clicked()));
-
-    if (!Config->ScriptWindowJson.isEmpty())
-        ReadFromJson(Config->ScriptWindowJson);
 }
 
 AScriptWindow::~AScriptWindow()
@@ -329,7 +321,17 @@ void AScriptWindow::WriteToJson(QJsonObject &json)
     json["ScriptTabs"] = ar;
     json["CurrentTab"] = CurrentTab;
 
-    Config->MainSplitterSizes_ScriptWindow = splMain->sizes();
+    QJsonArray arr;
+    for (const int& i : splMain->sizes()) arr << i;
+    json["Splitters"] = arr;
+
+    QJsonObject js;
+    js["DefaultFontSize_ScriptWindow"] = DefaultFontSize;
+    js["DefaultFontFamily_ScriptWindow"] = DefaultFontFamily;
+    js["DefaultFontWeight_ScriptWindow"] = DefaultFontWeight;
+    js["DefaultFontItalic_ScriptWindow"] = DefaultFontItalic;
+    json["ScriptWinSettings"] = js;
+
 }
 
 void AScriptWindow::ReadFromJson(QJsonObject &json)
@@ -363,6 +365,26 @@ void AScriptWindow::ReadFromJson(QJsonObject &json)
     CurrentTab = json["CurrentTab"].toInt();
     if (CurrentTab<0 || CurrentTab>ScriptTabs.size()-1) CurrentTab = 0;
     twScriptTabs->setCurrentIndex(CurrentTab);
+
+    if (json.contains("Splitters"))
+    {
+        QJsonArray arr = json["Splitters"].toArray();
+        QList<int> sizes;
+        for (int i=0; i<arr.size(); i++) sizes << arr[i].toInt(50);
+        splMain->setSizes(sizes);
+    }
+
+    QJsonObject js;
+    parseJson(json, "ScriptWinSettings", js);
+    if (!js.isEmpty())
+    {
+        parseJson(js, "DefaultFontSize_ScriptWindow", DefaultFontSize);
+        parseJson(js, "DefaultFontFamily_ScriptWindow", DefaultFontFamily);
+        parseJson(js, "DefaultFontWeight_ScriptWindow", DefaultFontWeight);
+        parseJson(js, "DefaultFontItalic_ScriptWindow", DefaultFontItalic);
+        QFont font(DefaultFontFamily, DefaultFontSize, DefaultFontWeight, DefaultFontItalic);
+        for (AScriptWindowTabItem* tab : ScriptTabs) tab->TextEdit->setFont(font);
+    }
 }
 
 void AScriptWindow::UpdateHighlight()
@@ -1007,7 +1029,7 @@ bool AScriptWindow::event(QEvent *e)
 
 void AScriptWindow::onDefaulFontSizeChanged(int size)
 {
-    Config->DefaultFontSize_ScriptWindow = size;
+    DefaultFontSize = size;
     for (AScriptWindowTabItem* tab : ScriptTabs)
         tab->TextEdit->SetFontSize(size);
 }
@@ -1171,13 +1193,13 @@ void AScriptWindow::AddNewTab()
     AScriptWindowTabItem* tab = new AScriptWindowTabItem(completitionModel);
     tab->highlighter->setCustomCommands(functions);
 
-    if (Config->DefaultFontFamily_ScriptWindow.isEmpty())
+    if (DefaultFontFamily.isEmpty())
       {
-         tab->TextEdit->SetFontSize(Config->DefaultFontSize_ScriptWindow);
+         tab->TextEdit->SetFontSize(DefaultFontSize);
       }
     else
       {
-        QFont font(Config->DefaultFontFamily_ScriptWindow, Config->DefaultFontSize_ScriptWindow, Config->DefaultFontWeight_ScriptWindow, Config->DefaultFontItalic_ScriptWindow);
+        QFont font(DefaultFontFamily, DefaultFontSize, DefaultFontWeight, DefaultFontItalic);
         tab->TextEdit->setFont(font);
       }
 
@@ -1250,34 +1272,28 @@ void AScriptWindow::on_pbHelp_toggled(bool checked)
 
 void AScriptWindow::on_actionIncrease_font_size_triggered()
 {
-    onDefaulFontSizeChanged(++Config->DefaultFontSize_ScriptWindow);
+    onDefaulFontSizeChanged(++DefaultFontSize);
 }
 
 void AScriptWindow::on_actionDecrease_font_size_triggered()
 {
-    if (Config->DefaultFontSize_ScriptWindow<1) return;
-
-    onDefaulFontSizeChanged(--Config->DefaultFontSize_ScriptWindow);
-    //qDebug() << "New font size:"<<GlobSet->DefaultFontSize_ScriptWindow;
+    if (DefaultFontSize < 1) return;
+    onDefaulFontSizeChanged(--DefaultFontSize);
 }
 
-#include <QFontDialog>
 void AScriptWindow::on_actionSelect_font_triggered()
 {
   bool ok;
   QFont font = QFontDialog::getFont(
                   &ok,
-                  QFont(Config->DefaultFontFamily_ScriptWindow,
-                        Config->DefaultFontSize_ScriptWindow,
-                        Config->DefaultFontWeight_ScriptWindow,
-                        Config->DefaultFontItalic_ScriptWindow),
+                  QFont(DefaultFontFamily, DefaultFontSize, DefaultFontWeight, DefaultFontItalic),
                   this);
   if (!ok) return;
 
-  Config->DefaultFontFamily_ScriptWindow = font.family();
-  Config->DefaultFontSize_ScriptWindow = font.pointSize();
-  Config->DefaultFontWeight_ScriptWindow = font.weight();
-  Config->DefaultFontItalic_ScriptWindow = font.italic();
+  DefaultFontFamily = font.family();
+  DefaultFontSize = font.pointSize();
+  DefaultFontWeight = font.weight();
+  DefaultFontItalic = font.italic();
 
   for (AScriptWindowTabItem* tab : ScriptTabs)
       tab->TextEdit->setFont(font);

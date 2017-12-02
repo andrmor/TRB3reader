@@ -108,6 +108,11 @@ private:
     QList<AScriptWindowTabItem*> ScriptTabs;
     QTabWidget* twScriptTabs;
 
+    int DefaultFontSize = 12;
+    QString DefaultFontFamily;
+    bool DefaultFontWeight;
+    bool DefaultFontItalic;
+
     QSplitter* splMain;
     QSplitter* splHelp;
     QPlainTextEdit* pteOut;

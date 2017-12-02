@@ -81,14 +81,6 @@ public:
     QString             FileName;
     QString             WorkingDir;
 
-    QJsonObject         ScriptWindowJson;
-    int                 DefaultFontSize_ScriptWindow = 12;
-    QString             DefaultFontFamily_ScriptWindow;
-    bool                DefaultFontWeight_ScriptWindow;
-    bool                DefaultFontItalic_ScriptWindow;
-    QList<int>          MainSplitterSizes_ScriptWindow;
-
-
     // config <-> JSON handling
     void                WriteToJson(QJsonObject& json);
     bool                ReadFromJson(QJsonObject& json);
@@ -126,9 +118,6 @@ private:
 
     void writeMaxGateToJson(QJsonObject& json);
     bool readMaxGateFromJson(QJsonObject& json);
-
-    void writeScriptSettingsToJson(QJsonObject& json);
-    bool readScriptSettingsFromJson(QJsonObject& json);
 };
 
 #endif // MASTERCONFIG_H
