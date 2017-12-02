@@ -111,7 +111,7 @@ void CernRootModule::DrawSignature(bool bNeg)
                        100, -0.05, 1.05);
 
     int numEvents = Reader->CountEvents();
-    int numChan = Config->Map->CountLogicalChannels();
+    int numChan = Config->CountLogicalChannels();
 
     for (int ievent=0; ievent<numEvents; ievent++)
         if (!Extractor->IsRejectedEventFast(ievent))
@@ -340,7 +340,7 @@ bool CernRootModule::DrawOverlay(bool bFromDataHub, int ievent, bool bNeg, bool 
     if (multiGraph) delete multiGraph;
     multiGraph = new TMultiGraph();
 
-    int numChan = ( (bFromDataHub || SortBy_0Logic1Hardw==0) ? Config->Map->CountLogicalChannels() : Reader->CountChannels() );
+    int numChan = ( (bFromDataHub || SortBy_0Logic1Hardw==0) ? Config->CountLogicalChannels() : Reader->CountChannels() );
 
     for (int iCh=0; iCh<numChan; ++iCh)
     {
@@ -413,7 +413,7 @@ bool CernRootModule::DrawAll(bool bFromDataHub, int ievent, bool bNeg, int padsX
     c->Divide(padsX, padsY, 0, 0.000001f);
     gPad->Modified();
 
-    int numChannels = ( (bFromDataHub || SortBy_0Logic1Hardw==0) ? Config->Map->CountLogicalChannels() : Reader->CountChannels() );
+    int numChannels = ( (bFromDataHub || SortBy_0Logic1Hardw==0) ? Config->CountLogicalChannels() : Reader->CountChannels() );
     if (bAutoscale)
     {
         Min = 1e20f;

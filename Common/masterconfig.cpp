@@ -361,7 +361,7 @@ void MasterConfig::SetMapping(const QVector<int> &mapping)
 
 int MasterConfig::CountLogicalChannels() const
 {
-    return Map->CountLogicalChannels();
+    return ChannelMap.size();
 }
 
 QVector<int> MasterConfig::GetListOfIgnoreChannels() const

@@ -296,7 +296,7 @@ bool MainWindow::sendSignalData(QTextStream &outStream, bool bUseHardware)
     }
     else
     {
-        numChannels = Config->Map->CountLogicalChannels();
+        numChannels = Config->CountLogicalChannels();
         for (int ie=0; ie<numEvents; ie++)
             if (!Extractor->IsRejectedEventFast(ie))
             {
@@ -370,6 +370,11 @@ void MainWindow::OnEventOrChannelChanged(bool bOnlyChannel)
     if (bUseLogical)
     {
         ui->leLogic->setText(QString::number(val));
+        if (val>=Config->CountLogicalChannels())
+        {
+            ui->sbChannel->setValue(0);
+            return;
+        }
 
         iHardwChan = Config->Map->LogicalToHardware(val);
         if ( iHardwChan < 0 ) ui->leHardw->setText("n.a.");
