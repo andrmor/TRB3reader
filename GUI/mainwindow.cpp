@@ -402,7 +402,6 @@ void MainWindow::OnEventOrChannelChanged(bool bOnlyChannel)
     if (val > max )
     {
         if (val == 0) return; //in case no channels are defined
-        qDebug() << max;
         ui->sbChannel->setValue(max);
         return;  // will return to this cycle with on_changed signal
     }
