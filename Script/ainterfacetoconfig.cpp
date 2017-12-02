@@ -8,10 +8,7 @@
 #include <QJsonValue>
 
 AInterfaceToConfig::AInterfaceToConfig(MasterConfig *Config, ADispatcher* Dispatcher) :
-    Config(Config), Dispatcher(Dispatcher)
-{
-
-}
+    Config(Config), Dispatcher(Dispatcher) {}
 
 QVariant AInterfaceToConfig::getConfigJson()
 {
@@ -40,14 +37,26 @@ int AInterfaceToConfig::countLogicalChannels()
     return Config->CountLogicalChannels();
 }
 
-bool AInterfaceToConfig::isNegative(int iHardwChannel)
+bool AInterfaceToConfig::isNegativeHardwareChannel(int iHardwChannel)
 {
     return Config->IsNegativeHardwareChannel(iHardwChannel);
 }
 
-bool AInterfaceToConfig::isIgnoredChannel(int iHardwChannel)
+bool AInterfaceToConfig::isNegativeLogicalChannel(int iLogicalChannel)
+{
+    const int iHardwCh = Config->Map->LogicalToHardware(iLogicalChannel);
+    return Config->IsNegativeHardwareChannel(iLogicalChannel);
+}
+
+bool AInterfaceToConfig::isIgnoredHardwareChannel(int iHardwChannel)
 {
     return Config->IsIgnoredHardwareChannel(iHardwChannel);
+}
+
+bool AInterfaceToConfig::isIgnoredLogicalChannel(int iLogicalChannel)
+{
+    const int iHardwCh = Config->Map->LogicalToHardware(iLogicalChannel);
+    return Config->IsIgnoredHardwareChannel(iHardwCh);
 }
 
 int AInterfaceToConfig::toHardware(int iLogicalChannel)

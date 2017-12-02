@@ -427,7 +427,7 @@ bool AScriptWindow::ExecuteScript(const QString& Script)
    bool bSuccessFlag = false;
    //qDebug() << "Init on Start done";
    pteOut->clear();
-   AScriptWindow::ShowText("Processing script");
+   //AScriptWindow::ShowText("Processing script");
 
    //syntax check
    int errorLineNum = ScriptManager->FindSyntaxError(Script);
@@ -464,8 +464,10 @@ bool AScriptWindow::ExecuteScript(const QString& Script)
        //qDebug() << "Script returned:" << result;
        if (!ScriptManager->fAborted)
          {
-            if (ShowEvalResult && result!="undefined") ShowText("Script evaluation result:\n"+result);
-            else ShowText("Script evaluation: success");
+            //if (ShowEvalResult && result!="undefined") ShowText("Result:\n"+result);
+            //else ShowText("Script evaluation: success");
+            if (ShowEvalResult && result!="undefined") ShowText("Script returned:\n"+result);
+            else ShowText("Script evaluation completed");
             bSuccessFlag = true;
          }
        else
