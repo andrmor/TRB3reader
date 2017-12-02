@@ -27,6 +27,7 @@ int main(int argc, char *argv[])
     QObject::connect(&Dispatcher, &ADispatcher::RequestWriteWindowSettings, &MW, &MainWindow::SaveWindowSettings);
 
     Dispatcher.LoadAutosaveConfig();
+    MW.UpdateGui();
 
     return a.exec();
 }

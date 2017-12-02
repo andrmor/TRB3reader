@@ -128,6 +128,7 @@ private slots:
     void on_cbSubstractPedestal_toggled(bool checked);
     void on_cbSmoothWaveforms_toggled(bool checked);
     void on_cobSignalExtractionMethod_currentIndexChanged(int index);
+    void on_cobExplorerSource_currentIndexChanged(int index);
 
 protected:
     void closeEvent(QCloseEvent* event);

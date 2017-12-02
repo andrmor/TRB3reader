@@ -14,12 +14,12 @@ AInterfaceToExtractor::AInterfaceToExtractor(MasterConfig* Config, Trb3signalExt
 
 int AInterfaceToExtractor::countEvents()
 {
-    return Extractor->GetNumEvents();
+    return Extractor->CountEvents();
 }
 
 int AInterfaceToExtractor::countChannels()
 {
-    return Extractor->GetNumChannels();
+    return Extractor->CountChannels();
 }
 
 float AInterfaceToExtractor::getSignal(int ievent, int iHardwChannel)
@@ -68,7 +68,7 @@ void AInterfaceToExtractor::setSignals(int ievent, QVariant arrayOfValues)
 
     QVariantList vl = arrayOfValues.toList();
     QJsonArray ar = QJsonArray::fromVariantList(vl);
-    const int numChannels = Extractor->GetNumChannels();
+    const int numChannels = Extractor->CountChannels();
     if (ar.size() != numChannels)
     {
         abort("Failed to set signal values - array size mismatch");

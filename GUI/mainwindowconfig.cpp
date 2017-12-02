@@ -261,11 +261,7 @@ void MainWindow::UpdateGui()
     ui->sbPosMaxTo->setValue(Config->PosMaxGateTo);
 
     updateNumEventsIndication();
-}
-
-void MainWindow::updateNumEventsIndication()
-{
-    ui->labDatahubEvents->setText("DataHub contains " + QString::number(DataHub->CountEvents()) + " events");
+    OnEventOrChannelChanged(true);
 }
 
 // --- update Config on GUI operated by user ---

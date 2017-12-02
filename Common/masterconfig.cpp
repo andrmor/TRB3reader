@@ -351,6 +351,11 @@ void MasterConfig::SetMapping(const QVector<int> &mapping)
     Map->SetChannels_OrderedByLogical(ChannelMap);
 }
 
+int MasterConfig::CountLogicalChannels() const
+{
+    return Map->CountLogicalChannels();
+}
+
 QVector<int> MasterConfig::GetListOfIgnoreChannels() const
 {
     QVector<int> vec;

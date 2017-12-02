@@ -107,7 +107,7 @@ void Trb3signalExtractor::ClearData()
     signalData.clear();
 }
 
-int Trb3signalExtractor::GetNumChannels() const
+int Trb3signalExtractor::CountChannels() const
 {
     if (signalData.size() == 0) return 0;
     return signalData.at(0).size();

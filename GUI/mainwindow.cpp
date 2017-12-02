@@ -238,8 +238,8 @@ void MainWindow::on_pteIgnoreHardwareChannels_customContextMenuRequested(const Q
 
 void MainWindow::on_pbSaveTotextFile_clicked()
 {
-    int numEvents = Extractor->GetNumEvents();
-    int numChannels = Extractor->GetNumChannels();
+    int numEvents = Extractor->CountEvents();
+    int numChannels = Extractor->CountChannels();
 
     if (numEvents == 0 || numChannels == 0 || numEvents != Reader->GetNumEvents() || numChannels != Reader->GetNumChannels())
     {
@@ -282,8 +282,8 @@ bool MainWindow::saveSignalsToFile(const QString FileName, bool bUseHardware)
 
 bool MainWindow::sendSignalData(QTextStream &outStream, bool bUseHardware)
 {
-    int numEvents = Extractor->GetNumEvents();
-    int numChannels = Extractor->GetNumChannels();
+    int numEvents = Extractor->CountEvents();
+    int numChannels = Extractor->CountChannels();
 
     if (bUseHardware)
     {
@@ -297,7 +297,7 @@ bool MainWindow::sendSignalData(QTextStream &outStream, bool bUseHardware)
     }
     else
     {
-        numChannels = Config->Map->GetNumLogicalChannels();
+        numChannels = Config->Map->CountLogicalChannels();
         for (int ie=0; ie<numEvents; ie++)
             if (!Extractor->IsRejectedEventFast(ie))
             {
@@ -331,10 +331,6 @@ void MainWindow::on_pbShowWaveform_toggled(bool checked)
         return;
     }
 
-    bool bNegative = Config->IsNegative(iHardwChan);
-    QString s = ( bNegative ? "Neg" : "Pos");
-    ui->lePolar->setText(s);
-
     int ievent = ui->sbEvent->value();
     if (ievent>Reader->GetNumEvents()-1)
     {
@@ -342,6 +338,7 @@ void MainWindow::on_pbShowWaveform_toggled(bool checked)
         return;
     }
 
+    bool bNegative = Config->IsNegative(iHardwChan);
     double Min, Max;
     if (bNegative)
     {
@@ -372,20 +369,8 @@ void MainWindow::on_sbEvent_valueChanged(int arg1)
     OnEventOrChannelChanged();
 }
 
-void MainWindow::on_sbChannel_valueChanged(int arg1)
+void MainWindow::on_sbChannel_valueChanged(int)
 {
-    bool bUseLogical = (ui->cobHardwareOrLogical->currentIndex() == 1);
-
-    if (!bUseLogical)
-    {
-        int max = Reader->GetNumChannels()-1;
-        if (arg1 > max )
-        {
-            ui->sbChannel->setValue(max);
-            return;
-        }
-    }
-
     OnEventOrChannelChanged(true);
 }
 
@@ -421,7 +406,10 @@ void MainWindow::OnEventOrChannelChanged(bool bOnlyChannel)
     int val = ui->sbChannel->value();
 
     int iHardwChan;
-    bool bUseLogical = (ui->cobHardwareOrLogical->currentIndex() == 1);
+    bool bFromDataHub = (ui->cobExplorerSource->currentIndex()==1);
+    bool bUseLogical = (bFromDataHub || ui->cobHardwareOrLogical->currentIndex()==1);
+
+    // Update channel indication
     if (bUseLogical)
     {
         ui->leLogic->setText(QString::number(val));
@@ -441,23 +429,60 @@ void MainWindow::OnEventOrChannelChanged(bool bOnlyChannel)
         else s = QString::number(ilogical);
         ui->leLogic->setText(s);
     }
+    bool bNegative = Config->IsNegative(iHardwChan);
+    QString s = ( bNegative ? "Neg" : "Pos");
+    ui->lePolar->setText(s);
 
-    if (Extractor->GetNumEvents() == 0)
+    // Check is channel number is valid
+    int max = (bUseLogical ? Config->CountLogicalChannels() : Reader->GetNumChannels());
+    max--;
+    if (val > max )
+    {
+        if (val == 0) return; //in case no channels are defined
+        ui->sbChannel->setValue(max);
+        return;  // will return to this cycle with on_changed signal
+    }
+
+    // Event/Signal check and indication
+    const int numEvents = (bFromDataHub ? DataHub->CountEvents() : Extractor->CountEvents());
+    if (numEvents == 0)
     {
         ui->leSignal->setText("");
         return;
     }
-
-    QString ss;
-    if (Extractor->IsRejectedEventFast(ievent)) ss = "Rejected event";
-    else
+    if (ievent>numEvents)
     {
-        if ( iHardwChan < 0 ) ss = "n.a.";
+        ui->sbEvent->setValue(numEvents-1);
+        return;
+    }
+    QString ss;
+    if (bFromDataHub)
+    {
+        if (DataHub->IsRejected(ievent)) ss = "Rejected event";
         else
         {
-            double signal = Extractor->GetSignalFast(ievent, iHardwChan);
-            if ( std::isnan(signal) ) ss = "n.a.";
-            else ss = QString::number(signal);
+            const int numChannels = DataHub->CountChannels();
+            if ( val >= numChannels ) ss = "n.a.";  //paranoic :)
+            else
+            {
+                double signal = DataHub->GetSignal(ievent, val);
+                if ( std::isnan(signal) ) ss = "n.a.";
+                else ss = QString::number(signal);
+            }
+        }
+    }
+    else
+    {
+        if (Extractor->IsRejectedEventFast(ievent)) ss = "Rejected event";
+        else
+        {
+            if ( iHardwChan < 0 ) ss = "n.a.";
+            else
+            {
+                double signal = Extractor->GetSignalFast(ievent, iHardwChan);
+                if ( std::isnan(signal) ) ss = "n.a.";
+                else ss = QString::number(signal);
+            }
         }
     }
     ui->leSignal->setText(ss);
@@ -471,7 +496,6 @@ void MainWindow::OnEventOrChannelChanged(bool bOnlyChannel)
         on_pbShowAllPos_toggled(ui->pbShowAllPos->isChecked());
     }
 }
-
 
 void MainWindow::on_pbShowOverlayNeg_toggled(bool checked)
 {
@@ -994,8 +1018,8 @@ bool MainWindow::bulkProcessCore()
     }
 
     // Checking that after extraction/script the data are consistent in num channels / mapping
-    int numEvents = Extractor->GetNumEvents();
-    int numChannels = Extractor->GetNumChannels();
+    int numEvents = Extractor->CountEvents();
+    int numChannels = Extractor->CountChannels();
     if (numEvents == 0 || numChannels == 0 || numEvents != Reader->GetNumEvents() || numChannels != Reader->GetNumChannels())
     {
         ui->pteBulkLog->appendPlainText("---- Extractor data not valid -> ignoring this file");
@@ -1094,4 +1118,25 @@ void MainWindow::on_pbSaveSignalsFromDataHub_clicked()
         }
         outStream << "\r\n";
     }
+}
+
+void MainWindow::on_cobExplorerSource_currentIndexChanged(int index)
+{
+    const bool bDirect = (index == 0);
+
+    ui->frExploreDirectly->setVisible(bDirect);
+    ui->cobHardwareOrLogical->setVisible(bDirect);
+    ui->labLogicalChannelNumber->setVisible(!bDirect);
+    ui->cobSortBy->setVisible(bDirect);
+
+    OnEventOrChannelChanged(true);
+}
+
+void MainWindow::updateNumEventsIndication()
+{
+    ui->labDatahubEvents->setText("DataHub contains " + QString::number(DataHub->CountEvents()) + " events");
+
+    const bool bFromDataHub = (ui->cobExplorerSource->currentIndex()==1);
+    const int numEvents = ( bFromDataHub ? DataHub->CountEvents() : Extractor->CountEvents());
+    ui->leNumEvents->setText( QString::number(numEvents) );
 }

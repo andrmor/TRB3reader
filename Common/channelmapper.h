@@ -20,7 +20,7 @@ public:
     int HardwareToLogicalFast(int iHardwareChannel) const;
     int LogicalToHardwareFast(int iLogicalChannel) const;
 
-    int GetNumLogicalChannels() const {return ToHardware.size();}
+    int CountLogicalChannels() const {return ToHardware.size();}
 
     const QVector<int>& GetMapToHardware() const {return ToHardware;}
 

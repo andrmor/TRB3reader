@@ -37,7 +37,7 @@ void AInterfaceToConfig::setConfigJson(QVariant configJson)
 
 int AInterfaceToConfig::countLogicalChannels()
 {
-    return Config->Map->GetNumLogicalChannels();
+    return Config->Map->CountLogicalChannels();
 }
 
 bool AInterfaceToConfig::isNegative(int iHardwChannel)
