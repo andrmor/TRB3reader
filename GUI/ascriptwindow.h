@@ -52,14 +52,11 @@ public:
 
     void SetMainSplitterSizes(QList<int> values);
 
-    AScriptManager* ScriptManager;
-    QStringList functions;
-
     bool ExecuteScript(const QString &Script);
     bool ExecuteScriptInFirstTab();
 
 public slots:
-    void updateJsonTree();
+    void updateJsonTree();       //update "config" tree widget
 
     void ShowText(QString text); //shows text in the output box
     void ClearText(); //clears text in the output box
@@ -103,6 +100,9 @@ private:
     Ui::AScriptWindow *ui;
     QStringListModel* completitionModel;
     MasterConfig* Config;
+
+    AScriptManager* ScriptManager;
+    QStringList functions;
 
     int CurrentTab;
     QList<AScriptWindowTabItem*> ScriptTabs;

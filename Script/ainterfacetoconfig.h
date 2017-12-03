@@ -20,7 +20,7 @@ public slots:
     //QVariant getConfigJson();
     //void     setConfigJson(QVariant configJson);
 
-    bool     setKeyValue(QString Key, QVariant val);
+    void     setKeyValue(QString Key, QVariant val);
     QVariant getKeyValue(QString Key);
 
     int      countLogicalChannels();

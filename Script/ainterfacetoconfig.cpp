@@ -42,7 +42,7 @@ void AInterfaceToConfig::setConfigJson(QVariant configJson)
 }
 */
 
-bool AInterfaceToConfig::setKeyValue(QString Key, QVariant val)
+void AInterfaceToConfig::setKeyValue(QString Key, QVariant val)
 {
     LastError = "";
     //qDebug() << Key << val << val.typeName();
@@ -86,11 +86,11 @@ bool AInterfaceToConfig::setKeyValue(QString Key, QVariant val)
         }
     else
       {
-        abort("Wrong argument type ("+type+") in replaceKeyValue with the key line:\n"+Key);
-        return false;
+        abort("Wrong argument type ("+type+") in setKeyValue with the key:\n"+Key);
+        return;
       }
 
-    if (!expandKey(Key)) return false;
+    if (!expandKey(Key)) return;  //aborted inside
 
     QJsonObject JSON;
     Config->WriteToJson(JSON);
@@ -99,18 +99,18 @@ bool AInterfaceToConfig::setKeyValue(QString Key, QVariant val)
     if (ok)
       {
         Dispatcher->LoadConfig(JSON);
-        return true;
+        return;
       }
 
-    abort("replaceKeyValue("+Key+", "+rep+") format error:<br>"+LastError);
-    return false;
+    abort("setKeyValue("+Key+", "+rep+") format error:<br>"+LastError);
+    return;
 }
 
 QVariant AInterfaceToConfig::getKeyValue(QString Key)
 {
     LastError = "";
 
-    if (!expandKey(Key)) return 0; //aborted anyway
+    if (!expandKey(Key)) return QVariant(); //aborted anyway
     //qDebug() << "Key after expansion:"<<Key;
 
     QJsonObject obj;
@@ -131,7 +131,7 @@ QVariant AInterfaceToConfig::getKeyValue(QString Key)
         if (!ok)
         {
             abort("getKeyValue for "+Key+" format error");
-            return false;
+            return QVariant();
         }
         propertyName = name;
         //qDebug() << "Attempting to extract:"<<propertyName<<indexes;
@@ -139,9 +139,10 @@ QVariant AInterfaceToConfig::getKeyValue(QString Key)
         //qDebug() << "QJsonValue extraction success?" << (subValue != QJsonValue());
         if (subValue == QJsonValue())
           {
-            LastError = "Property not found:"+propertyName;
+            LastError = "Field not found:"+propertyName;
             qDebug() << LastError;
-            return false;
+            abort(LastError);
+            return QVariant();
           }
 
         //updating QJsonObject
@@ -165,9 +166,10 @@ QVariant AInterfaceToConfig::getKeyValue(QString Key)
                     int index = indexes.at(i);
                     if (index<0 || index>arr.size()-1)
                       {
-                        LastError = "Array index is out of bounds ("+QString::number(index)+") for property anme "+propertyName;
+                        LastError = "Array index is out of bounds ("+QString::number(index)+") for field name "+propertyName;
                         qDebug() << LastError;
-                        return false;
+                        abort(LastError);
+                        return QVariant();
                       }
                     if (i == indexes.size()-1)
                     {
@@ -187,14 +189,15 @@ QVariant AInterfaceToConfig::getKeyValue(QString Key)
                   {
                     LastError = "Array element of "+propertyName+" is not QJsonObject!";
                     qDebug() << LastError;
-                    return false;
+                    abort(LastError);
+                    return QVariant();
                   }
           }
     }
     while (indexOfDot>0);
 
-    abort("getKeyValue for "+Key+" error");
-    return 0;
+    abort("getKeyValue for "+Key+" failed");
+    return QVariant();
 }
 
 int AInterfaceToConfig::countLogicalChannels()
@@ -266,8 +269,7 @@ bool AInterfaceToConfig::expandKey(QString &Key)
           }
         if (res.isEmpty())
           {
-            abort("Search error for config key "+Key+":<br>" +
-                  "Not found config object according to this key");
+            abort("Not found config key "+Key);
             return false;
           }
         if (res.size()>1)
