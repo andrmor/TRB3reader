@@ -27,12 +27,12 @@ public slots:
   }
 
 signals:
-  void AbortScriptEvaluation(QString);      //abort request is automatically linked to abort slot of core unit
+  void AbortScriptEvaluation(const QString) const;      //abort request is automatically linked to abort slot of core unit
 
 protected:
   QHash<QString, QString> H;
 
-  void abort(QString message = "Aborted!") {emit AbortScriptEvaluation(message);}
+  void abort(const QString message = "Aborted!") const {emit AbortScriptEvaluation(message);}
 };
 
 #endif // ASCRIPTINTERFACE_H

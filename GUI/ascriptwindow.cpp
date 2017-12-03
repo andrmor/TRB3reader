@@ -480,6 +480,7 @@ bool AScriptWindow::ExecuteScript(const QString& Script)
    ScriptManager->CollectGarbage();
 
    updateJsonTree();
+   emit RequestUpdateMainWindowGui();
    return bSuccessFlag;
 }
 

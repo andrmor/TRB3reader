@@ -1166,6 +1166,7 @@ void MainWindow::on_cobExplorerSource_currentIndexChanged(int index)
     ui->cobSortBy->setVisible(bDirect);
 
     OnEventOrChannelChanged(true);
+    updateNumEventsIndication();
 }
 
 void MainWindow::updateNumEventsIndication()

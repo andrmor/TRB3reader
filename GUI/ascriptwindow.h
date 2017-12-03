@@ -159,6 +159,7 @@ signals:
     void onAbort();
     void success(QString eval);
     void RequestStateSave();
+    void RequestUpdateMainWindowGui();
 
 public slots:
     void receivedOnStart() {emit onStart();}
