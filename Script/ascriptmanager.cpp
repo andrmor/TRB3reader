@@ -1,8 +1,10 @@
 #include "ascriptmanager.h"
 #include "ainterfacetomessagewindow.h"
 #include "coreinterfaces.h"
+#include "ainterfacetoconfig.h"
 
 #include <QScriptEngine>
+#include <QMetaMethod>
 #include <QDebug>
 
 AScriptManager::AScriptManager()
@@ -59,12 +61,45 @@ QString AScriptManager::Evaluate(const QString& Script)
     return result;
 }
 
+QScriptValue AScriptManager::EvaluateScriptInScript(const QString &script)
+{
+    return engine->evaluate(script);
+}
+
+bool AScriptManager::isUncaughtException() const
+{
+    return engine->hasUncaughtException();
+}
+
+int AScriptManager::getUncaughtExceptionLineNumber() const
+{
+    return engine->uncaughtExceptionLineNumber();
+}
+
+const QString AScriptManager::getUncaughtExceptionString() const
+{
+    return engine->uncaughtException().toString();
+}
+
+QJsonObject *AScriptManager::CreateJsonOfConfig()
+{
+    for (int i=0; i<interfaces.size(); i++)
+    {
+        AInterfaceToConfig* inter = dynamic_cast<AInterfaceToConfig*>(interfaces[i]);
+        if (!inter) continue;
+
+        QJsonObject* json = inter->MakeConfigJson();
+        return json;
+    }
+    return 0;
+}
+
 void AScriptManager::CollectGarbage()
 {
     engine->collectGarbage();
 }
 
-void AScriptManager::AbortEvaluation(QString message)
+void AScriptManager::AbortEvaluation(const QString message)
 {
     //qDebug() << "ScriptManager: Abort requested!"<<fAborted<<fEngineIsRunning;
 
@@ -81,8 +116,7 @@ void AScriptManager::AbortEvaluation(QString message)
         if (bi) bi->ForceStop();
       }
 
-    message = "<font color=\"red\">"+ message +"</font><br>";
-    emit showMessage(message);
+    emit showMessage("<font color=\"red\">"+ message +"</font><br>");
     emit onAbort();
 }
 
@@ -176,4 +210,46 @@ void AScriptManager::restoreMsgDialog()
             return;
         }
     }
+}
+
+const QString AScriptManager::getFunctionReturnType(const QString UnitFunction)
+{
+  QStringList f = UnitFunction.split(".");
+  if (f.size() != 2) return "";
+
+  QString unit = f.first();
+  int unitIndex = interfaceNames.indexOf(unit);
+  if (unitIndex == -1) return "";
+  //qDebug() << "Found unit"<<unit<<" with index"<<unitIndex;
+  QString met = f.last();
+  //qDebug() << met;
+  QStringList skob = met.split("(", QString::SkipEmptyParts);
+  if (skob.size()<2) return "";
+  QString funct = skob.first();
+  QString args = skob[1];
+  args.chop(1);
+  //qDebug() << funct << args;
+
+  QString insert;
+  if (!args.isEmpty())
+    {
+      QStringList argl = args.split(",");
+      for (int i=0; i<argl.size(); i++)
+        {
+          QStringList a = argl.at(i).simplified().split(" ");
+          if (!insert.isEmpty()) insert += ",";
+          insert += a.first();
+        }
+    }
+  //qDebug() << insert;
+
+  QString methodName = funct + "(" + insert + ")";
+  //qDebug() << "method name" << methodName;
+  int mi = interfaces.at(unitIndex)->metaObject()->indexOfMethod(methodName.toLatin1().data());
+  //qDebug() << "method index:"<<mi;
+  if (mi == -1) return "";
+
+  QString returnType = interfaces.at(unitIndex)->metaObject()->method(mi).typeName();
+  //qDebug() << returnType;
+  return returnType;
 }

@@ -18,42 +18,41 @@ public:
 
 public slots:
   //abort execution of the script
-  void abort(QString message = "Aborted!");
+  void          abort(const QString message = "Aborted!") const;
 
-  QVariant evaluate(QString script);
+  QVariant      evaluate(const QString script);
 
-  //sleep
-  void sleep(int ms);
+  void          sleep(int ms);
 
-  //output part of the script window
-  void print(QString text);
-  void clearText();
-  QString str(double value, int precision);
+  //output (lower) field of the script window
+  void          print(const QString text);
+  void          clearText();
+  const QString str(double value, int precision);
 
   //time stamps
-  QString GetTimeStamp();
-  QString GetDateTimeStamp();
+  const QString GetTimeStamp() const;
+  const QString GetDateTimeStamp() const;
 
   //save to file
-  bool createFile(QString fileName, bool AbortIfExists = true);
-  bool isFileExists(QString fileName);
-  bool deleteFile(QString fileName);
-  bool createDir(QString path);
-  QString getCurrentDir();
-  bool setCirrentDir(QString path);
-  bool save(QString fileName, QString str);
-  bool saveArray(QString fileName, QVariant array);
-  bool saveObject(QString FileName, QVariant Object, bool CanOverride);
+  bool          createFile(const QString fileName, bool AbortIfExists = true) const;
+  bool          isFileExists(const QString fileName) const;
+  bool          deleteFile(const QString fileName) const;
+  bool          createDir(const QString path) const;
+  const QString getCurrentDir() const;
+  bool          setCirrentDir(const QString path) const;
+  bool          save(const QString fileName, QString str) const;
+  bool          saveArray(const QString fileName, const QVariant array) const;
+  bool          saveObject(const QString FileName, const QVariant Object, bool CanOverride) const;
 
   //load from file
-  QVariant loadColumn(QString fileName, int column = 0); //load column of doubles from file and return it as an array
-  QVariant loadArray(QString fileName, int columns);     //load column of doubles from file and return it as an array
-  QString loadText(QString fileName);
+  const QVariant loadColumn(const QString fileName, int column = 0) const; //load column of doubles from file and return it as an array
+  const QVariant loadArray(const QString fileName, int columns) const;     //load column of doubles from file and return it as an array
+  const QString  loadText(const QString fileName) const;
 
   //dirs
-  QString GetWorkDir();
-  QString GetScriptDir();
-  QString GetExamplesDir();
+  const QString  GetWorkDir() const;
+  const QString  GetScriptDir() const;
+  const QString  GetExamplesDir() const;
 
 private:
   AScriptManager* ScriptManager;

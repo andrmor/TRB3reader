@@ -137,7 +137,6 @@ private:
     void fillSubArray(QTreeWidgetItem* parent, const QJsonArray& arr);
     QString getDesc(const QJsonValue &ref);
     void fillHelper(QObject* obj, QString module, QString helpText = "");  //fill help TreeWidget according to the data in the obj
-    QString getFunctionReturnType(QString UnitFunction);
     QString getKeyPath(QTreeWidgetItem *item, bool bAddQuatation);
     void showContextMenuForJsonTree(QTreeWidgetItem *item, QPoint pos);
     QStringList getCustomCommandsOfObject(QObject *obj, QString ObjName, bool fWithArguments = false);

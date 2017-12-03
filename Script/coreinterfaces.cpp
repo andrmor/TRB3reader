@@ -43,15 +43,15 @@ AInterfaceToCore::AInterfaceToCore(AScriptManager* ScriptManager) :
   H["evaluate"] = "Evaluate script during another script evaluation. See example ScriptInsideScript.txt";
 }
 
-void AInterfaceToCore::abort(QString message)
+void AInterfaceToCore::abort(const QString message) const
 {
   //qDebug() << "In-script abort triggered!";
   ScriptManager->AbortEvaluation(message);
 }
 
-QVariant AInterfaceToCore::evaluate(QString script)
+QVariant AInterfaceToCore::evaluate(const QString script)
 {
-    QScriptValue val = ScriptManager->engine->evaluate(script);
+    QScriptValue val = ScriptManager->EvaluateScriptInScript(script);
     return val.toVariant();
 }
 
@@ -64,7 +64,7 @@ void AInterfaceToCore::sleep(int ms)
   while (t.elapsed()<ms);
 }
 
-void AInterfaceToCore::print(QString text)
+void AInterfaceToCore::print(const QString text)
 {
     emit ScriptManager->showMessage(text);
 }
@@ -74,22 +74,22 @@ void AInterfaceToCore::clearText()
     emit ScriptManager->clearText();
 }
 
-QString AInterfaceToCore::str(double value, int precision)
+const QString AInterfaceToCore::str(double value, int precision)
 {
     return QString::number(value, 'g', precision);
 }
 
-QString AInterfaceToCore::GetTimeStamp()
+const QString AInterfaceToCore::GetTimeStamp() const
 {
     return QDateTime::currentDateTime().toString("H:m:s");
 }
 
-QString AInterfaceToCore::GetDateTimeStamp()
+const QString AInterfaceToCore::GetDateTimeStamp() const
 {
     return QDateTime::currentDateTime().toString("d/M/yyyy H:m:s");
 }
 
-bool AInterfaceToCore::save(QString fileName, QString str)
+bool AInterfaceToCore::save(const QString fileName, QString str) const
 {
   if (!QFileInfo(fileName).exists())
     {
@@ -113,7 +113,7 @@ bool AInterfaceToCore::save(QString fileName, QString str)
   return true;
 }
 
-bool AInterfaceToCore::saveArray(QString fileName, QVariant array)
+bool AInterfaceToCore::saveArray(const QString fileName, const QVariant array) const
 {
     QString type = array.typeName();
     if (type != "QVariantList")
@@ -164,7 +164,7 @@ bool AInterfaceToCore::saveArray(QString fileName, QVariant array)
     return true;
 }
 
-bool AInterfaceToCore::saveObject(QString FileName, QVariant Object, bool CanOverride)
+bool AInterfaceToCore::saveObject(const QString FileName, const QVariant Object, bool CanOverride) const
 {
     QString type = Object.typeName();
     if (type != "QVariantMap")
@@ -199,7 +199,7 @@ bool AInterfaceToCore::saveObject(QString FileName, QVariant Object, bool CanOve
     return true;
 }
 
-QVariant AInterfaceToCore::loadColumn(QString fileName, int column)
+const QVariant AInterfaceToCore::loadColumn(const QString fileName, int column) const
 {
   if (column<0 || column>2)
     {
@@ -239,7 +239,7 @@ QVariant AInterfaceToCore::loadColumn(QString fileName, int column)
   return l;
 }
 
-QVariant AInterfaceToCore::loadArray(QString fileName, int columns)
+const QVariant AInterfaceToCore::loadArray(const QString fileName, int columns) const
 {
   if (columns<0 || columns>2)
     {
@@ -283,7 +283,7 @@ QVariant AInterfaceToCore::loadArray(QString fileName, int columns)
   return l;
 }
 
-QString AInterfaceToCore::loadText(QString fileName)
+const QString AInterfaceToCore::loadText(const QString fileName) const
 {
   if (!QFileInfo(fileName).exists())
   {
@@ -302,22 +302,22 @@ QString AInterfaceToCore::loadText(QString fileName)
   return str;
 }
 
-QString AInterfaceToCore::GetWorkDir()
+const QString AInterfaceToCore::GetWorkDir() const
 {
   return ScriptManager->LastOpenDir;
 }
 
-QString AInterfaceToCore::GetScriptDir()
+const QString AInterfaceToCore::GetScriptDir() const
 {
   return ScriptManager->LibScripts;
 }
 
-QString AInterfaceToCore::GetExamplesDir()
+const QString AInterfaceToCore::GetExamplesDir() const
 {
   return ScriptManager->ExamplesDir;
 }
 
-bool AInterfaceToCore::createFile(QString fileName, bool AbortIfExists)
+bool AInterfaceToCore::createFile(const QString fileName, bool AbortIfExists) const
 {
   if (QFileInfo(fileName).exists())
     {
@@ -340,28 +340,28 @@ bool AInterfaceToCore::createFile(QString fileName, bool AbortIfExists)
   return true;
 }
 
-bool AInterfaceToCore::isFileExists(QString fileName)
+bool AInterfaceToCore::isFileExists(const QString fileName) const
 {
     return QFileInfo(fileName).exists();
 }
 
-bool AInterfaceToCore::deleteFile(QString fileName)
+bool AInterfaceToCore::deleteFile(const QString fileName) const
 {
     return QFile(fileName).remove();
 }
 
-bool AInterfaceToCore::createDir(QString path)
+bool AInterfaceToCore::createDir(const QString path) const
 {
     QDir dir(path);
     return dir.mkdir(".");
 }
 
-QString AInterfaceToCore::getCurrentDir()
+const QString AInterfaceToCore::getCurrentDir() const
 {
     return QDir::currentPath();
 }
 
-bool AInterfaceToCore::setCirrentDir(QString path)
+bool AInterfaceToCore::setCirrentDir(const QString path) const
 {
     return QDir::setCurrent(path);
 }

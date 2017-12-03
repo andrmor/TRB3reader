@@ -11,7 +11,7 @@
 #include "ajsontools.h"
 #include "ainterfacetoconfig.h"
 
-#include <QScriptEngine>
+//#include <QScriptEngine>
 #include <QTextStream>
 #include <QSplitter>
 #include <QFileDialog>
@@ -450,10 +450,10 @@ bool AScriptWindow::ExecuteScript(const QString& Script)
    {
        AScriptWindow::ReportError("Script error: "+ScriptManager->LastError, -1);
    }
-   else if (ScriptManager->engine->hasUncaughtException())
+   else if (ScriptManager->isUncaughtException())
    {   //Script has uncaught exception
-       int lineNum = ScriptManager->engine->uncaughtExceptionLineNumber();
-       QString message = ScriptManager->engine->uncaughtException().toString();
+       int lineNum = ScriptManager->getUncaughtExceptionLineNumber();
+       QString message = ScriptManager->getUncaughtExceptionString();
        //qDebug() << "Error message:" << message;
        //QString backtrace = engine.uncaughtExceptionBacktrace().join('\n');
        //qDebug() << "backtrace:" << backtrace;
@@ -684,48 +684,6 @@ void AScriptWindow::fillHelper(QObject* obj, QString module, QString helpText)
     }
 }
 
-QString AScriptWindow::getFunctionReturnType(QString UnitFunction)
-{
-  QStringList f = UnitFunction.split(".");
-  if (f.size() != 2) return "";
-
-  QString unit = f.first();
-  int unitIndex = ScriptManager->interfaceNames.indexOf(unit);
-  if (unitIndex == -1) return "";
-  //qDebug() << "Found unit"<<unit<<" with index"<<unitIndex;
-  QString met = f.last();
-  //qDebug() << met;
-  QStringList skob = met.split("(", QString::SkipEmptyParts);
-  if (skob.size()<2) return "";
-  QString funct = skob.first();
-  QString args = skob[1];
-  args.chop(1);
-  //qDebug() << funct << args;
-
-  QString insert;
-  if (!args.isEmpty())
-    {
-      QStringList argl = args.split(",");
-      for (int i=0; i<argl.size(); i++)
-        {
-          QStringList a = argl.at(i).simplified().split(" ");
-          if (!insert.isEmpty()) insert += ",";
-          insert += a.first();
-        }
-    }
-  //qDebug() << insert;
-
-  QString methodName = funct + "(" + insert + ")";
-  //qDebug() << "method name" << methodName;
-  int mi = ScriptManager->interfaces.at(unitIndex)->metaObject()->indexOfMethod(methodName.toLatin1().data());
-  //qDebug() << "method index:"<<mi;
-  if (mi == -1) return "";
-
-  QString returnType = ScriptManager->interfaces.at(unitIndex)->metaObject()->method(mi).typeName();
-  //qDebug() << returnType;
-  return returnType;
-}
-
 void AScriptWindow::onJsonTWExpanded(QTreeWidgetItem *item)
 {
    ExpandedItemsInJsonTW << item->text(0);
@@ -738,31 +696,25 @@ void AScriptWindow::onJsonTWCollapsed(QTreeWidgetItem *item)
 
 void AScriptWindow::updateJsonTree()
 {
-  trwJson->clear();
+    trwJson->clear();
 
-  for (int i=0; i<ScriptManager->interfaces.size(); i++)
+    QJsonObject* json = ScriptManager->CreateJsonOfConfig();
+    QJsonObject::const_iterator it;
+    for (it = json->begin(); it != json->end(); ++it)
     {
-      AInterfaceToConfig* inter = dynamic_cast<AInterfaceToConfig*>(ScriptManager->interfaces[i]);
-      if (!inter) continue;
+        QString key = it.key();
+        QTreeWidgetItem *TopKey = new QTreeWidgetItem(trwJson);
+        TopKey->setText(0, key);
 
-      QJsonObject* json = inter->MakeConfigJson();
-      QJsonObject::const_iterator it;
-      for (it = json->begin(); it != json->end(); ++it)
-        {
-           QString key = it.key();
-           QTreeWidgetItem *TopKey = new QTreeWidgetItem(trwJson);
-           TopKey->setText(0, key);
+        const QJsonValue &value = it.value();
+        TopKey->setText(1, getDesc(value));
 
-           const QJsonValue &value = it.value();
-           TopKey->setText(1, getDesc(value));
-
-           if (value.isObject())
-             fillSubObject(TopKey, value.toObject());
-           else if (value.isArray())
-             fillSubArray(TopKey, value.toArray());
-        }
-      delete json;
+        if (value.isObject())
+            fillSubObject(TopKey, value.toObject());
+        else if (value.isArray())
+            fillSubArray(TopKey, value.toArray());
     }
+    delete json;
 
   //restoring expanded status
   QSet<QString> expanded = ExpandedItemsInJsonTW;
