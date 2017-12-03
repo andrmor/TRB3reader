@@ -14,12 +14,13 @@ class AInterfaceToConfig : public AScriptInterface
 
 public:
     AInterfaceToConfig(MasterConfig* Config, ADispatcher *Dispatcher);
+    QJsonObject* MakeConfigJson() const;  //does not own this object - delete after use
 
 public slots:
-    QVariant getConfigJson();
-    void     setConfigJson(QVariant configJson);
+    //QVariant getConfigJson();
+    //void     setConfigJson(QVariant configJson);
 
-    bool     replaceKeyValue(QString Key, QVariant val);
+    bool     setKeyValue(QString Key, QVariant val);
     QVariant getKeyValue(QString Key);
 
     int      countLogicalChannels();

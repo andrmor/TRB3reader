@@ -9,6 +9,7 @@
 #include "masterconfig.h"
 #include "afiletools.h"
 #include "ajsontools.h"
+#include "ainterfacetoconfig.h"
 
 #include <QScriptEngine>
 #include <QTextStream>
@@ -63,7 +64,6 @@ AScriptWindow::AScriptWindow(MasterConfig *Config, QWidget *parent) :
     ui->setupUi(this);
     ui->pbStop->setVisible(false);
     LocalScript = "//no external script provided!";
-    this->setWindowTitle("ANTS2 script");
 
     QPixmap rm(16, 16);
     rm.fill(Qt::transparent);
@@ -326,10 +326,10 @@ void AScriptWindow::WriteToJson(QJsonObject &json)
     json["Splitters"] = arr;
 
     QJsonObject js;
-    js["DefaultFontSize_ScriptWindow"] = DefaultFontSize;
-    js["DefaultFontFamily_ScriptWindow"] = DefaultFontFamily;
-    js["DefaultFontWeight_ScriptWindow"] = DefaultFontWeight;
-    js["DefaultFontItalic_ScriptWindow"] = DefaultFontItalic;
+    js["DefaultFontSize"] = DefaultFontSize;
+    js["DefaultFontFamily"] = DefaultFontFamily;
+    js["DefaultFontWeight"] = DefaultFontWeight;
+    js["DefaultFontItalic"] = DefaultFontItalic;
     json["ScriptWinSettings"] = js;
 
 }
@@ -378,10 +378,10 @@ void AScriptWindow::ReadFromJson(QJsonObject &json)
     parseJson(json, "ScriptWinSettings", js);
     if (!js.isEmpty())
     {
-        parseJson(js, "DefaultFontSize_ScriptWindow", DefaultFontSize);
-        parseJson(js, "DefaultFontFamily_ScriptWindow", DefaultFontFamily);
-        parseJson(js, "DefaultFontWeight_ScriptWindow", DefaultFontWeight);
-        parseJson(js, "DefaultFontItalic_ScriptWindow", DefaultFontItalic);
+        parseJson(js, "DefaultFontSize", DefaultFontSize);
+        parseJson(js, "DefaultFontFamily", DefaultFontFamily);
+        parseJson(js, "DefaultFontWeight", DefaultFontWeight);
+        parseJson(js, "DefaultFontItalic", DefaultFontItalic);
         QFont font(DefaultFontFamily, DefaultFontSize, DefaultFontWeight, DefaultFontItalic);
         for (AScriptWindowTabItem* tab : ScriptTabs) tab->TextEdit->setFont(font);
     }
@@ -479,6 +479,7 @@ bool AScriptWindow::ExecuteScript(const QString& Script)
 
    ScriptManager->CollectGarbage();
 
+   updateJsonTree();
    return bSuccessFlag;
 }
 
@@ -736,17 +737,16 @@ void AScriptWindow::onJsonTWCollapsed(QTreeWidgetItem *item)
 
 void AScriptWindow::updateJsonTree()
 {
-    /*
   trwJson->clear();
 
   for (int i=0; i<ScriptManager->interfaces.size(); i++)
     {
-      InterfaceToConfig* inter = dynamic_cast<InterfaceToConfig*>(ScriptManager->interfaces[i]);
+      AInterfaceToConfig* inter = dynamic_cast<AInterfaceToConfig*>(ScriptManager->interfaces[i]);
       if (!inter) continue;
 
-      QJsonObject json = inter->Config->JSON;
+      QJsonObject* json = inter->MakeConfigJson();
       QJsonObject::const_iterator it;
-      for (it = json.begin(); it != json.end(); ++it)
+      for (it = json->begin(); it != json->end(); ++it)
         {
            QString key = it.key();
            QTreeWidgetItem *TopKey = new QTreeWidgetItem(trwJson);
@@ -760,6 +760,7 @@ void AScriptWindow::updateJsonTree()
            else if (value.isArray())
              fillSubArray(TopKey, value.toArray());
         }
+      delete json;
     }
 
   //restoring expanded status
@@ -772,7 +773,6 @@ void AScriptWindow::updateJsonTree()
        item->setExpanded(true);
     }
   //qDebug() << "Expanded items:"<<ExpandedItemsInJsonTW.size();
-  */
 }
 
 void AScriptWindow::fillSubObject(QTreeWidgetItem *parent, const QJsonObject &obj)
@@ -862,7 +862,7 @@ void AScriptWindow::onKeyDoubleClicked(QTreeWidgetItem *item, int /*column*/)
   showContextMenuForJsonTree(item, trwJson->mapFromGlobal(cursor().pos()));
 }
 
-QString AScriptWindow::getKeyPath(QTreeWidgetItem *item)
+QString AScriptWindow::getKeyPath(QTreeWidgetItem *item, bool bAddQuatation)
 {
   if (!item) return "";
 
@@ -882,7 +882,7 @@ QString AScriptWindow::getKeyPath(QTreeWidgetItem *item)
   while (item);
 
   path.chop(1);
-  path = " \""+path+"\" ";
+  if (bAddQuatation) path = " \""+path+"\" ";
   return path;
 }
 
@@ -953,17 +953,21 @@ void AScriptWindow::showContextMenuForJsonTree(QTreeWidgetItem *item, QPoint pos
 {
   QMenu menu;
 
-  QAction* showVtoClipboard = menu.addAction("Add Key path to clipboard");
+  QAction* aAddPath = menu.addAction("Add Key path to clipboard");
+  QAction* aAddPathInQuatation = menu.addAction("Add \"Key path\" to clipboard");
+  QAction* aAddGetPattern = menu.addAction("Add get value command pattern to clipboard");
+  QAction* aAddReplacePattern = menu.addAction("Add set value command pattern to clipboard");
+
   //menu.addSeparator();
 
   QAction* selectedItem = menu.exec(trwJson->mapToGlobal(pos));
   if (!selectedItem) return; //nothing was selected
 
-  if (selectedItem == showVtoClipboard)
-    {
-      QClipboard *clipboard = QApplication::clipboard();
-      clipboard->setText(getKeyPath(item));
-    }
+  QClipboard *clipboard = QApplication::clipboard();
+  if (selectedItem == aAddPath)                 clipboard->setText(getKeyPath(item, false));
+  else if (selectedItem == aAddPathInQuatation) clipboard->setText(getKeyPath(item, true));
+  else if (selectedItem == aAddGetPattern)      clipboard->setText( "config.getKeyValue(" + getKeyPath(item, true) + ")");
+  else if (selectedItem == aAddReplacePattern)  clipboard->setText( "config.setKeyValue(" + getKeyPath(item, true) + ", NewValue )");
 }
 
 void AScriptWindow::onContextMenuRequestedByHelp(QPoint pos)

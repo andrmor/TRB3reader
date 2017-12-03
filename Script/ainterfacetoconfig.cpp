@@ -11,6 +11,14 @@
 AInterfaceToConfig::AInterfaceToConfig(MasterConfig *Config, ADispatcher* Dispatcher) :
     Config(Config), Dispatcher(Dispatcher) {}
 
+QJsonObject* AInterfaceToConfig::MakeConfigJson() const
+{
+    QJsonObject* js = new QJsonObject;
+    Config->WriteToJson(*js);
+    return js;
+}
+
+/*
 QVariant AInterfaceToConfig::getConfigJson()
 {
     QJsonObject js;
@@ -32,8 +40,9 @@ void AInterfaceToConfig::setConfigJson(QVariant configJson)
 
     Dispatcher->LoadConfig(json);
 }
+*/
 
-bool AInterfaceToConfig::replaceKeyValue(QString Key, QVariant val)
+bool AInterfaceToConfig::setKeyValue(QString Key, QVariant val)
 {
     LastError = "";
     //qDebug() << Key << val << val.typeName();
@@ -201,7 +210,7 @@ bool AInterfaceToConfig::isNegativeHardwareChannel(int iHardwChannel)
 bool AInterfaceToConfig::isNegativeLogicalChannel(int iLogicalChannel)
 {
     const int iHardwCh = Config->Map->LogicalToHardware(iLogicalChannel);
-    return Config->IsNegativeHardwareChannel(iLogicalChannel);
+    return Config->IsNegativeHardwareChannel(iHardwCh);
 }
 
 bool AInterfaceToConfig::isIgnoredHardwareChannel(int iHardwChannel)
