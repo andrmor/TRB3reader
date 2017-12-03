@@ -44,7 +44,14 @@ void MasterConfig::RemoveDatakind(int datakind)
 
 void MasterConfig::SetNegativeChannels(const QVector<int> &list)
 {
-    ListNegativeChannels = list;
+    QSet<int> set;
+    for (auto i : list) set << i;
+
+    QVector<int> vec;
+    for (auto i: set) vec << i;
+    std::sort(vec.begin(), vec.end());
+
+    ListNegativeChannels = vec;
     updatePolarityQuickAccessData();
 }
 
@@ -313,13 +320,18 @@ bool MasterConfig::IsNegativeLogicalChannel(int iLogical) const
     return NegPol.at(iHardwChannel);
 }
 
-void MasterConfig::SetMapping(const QVector<int> &mapping)
+bool MasterConfig::SetMapping(const QVector<int> &mapping)
 {
+    QSet<int> tmp;
+    for (int i : mapping) tmp << i;
+    if (tmp.size() != mapping.size()) return false;
+
     Map->Clear();
     ChannelMap.clear();
 
     ChannelMap = mapping;
     Map->SetChannels_OrderedByLogical(ChannelMap);
+    return true;
 }
 
 int MasterConfig::CountLogicalChannels() const

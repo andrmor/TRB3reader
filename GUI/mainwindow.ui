@@ -30,7 +30,7 @@
     <item>
      <widget class="QTabWidget" name="twMain">
       <property name="currentIndex">
-       <number>1</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="tab_6">
        <attribute name="title">
@@ -221,6 +221,9 @@
               <bold>false</bold>
              </font>
             </property>
+            <property name="toolTip">
+             <string>Channel numbers in one or multiple lines. Separators: space tab comma or end_of_line</string>
+            </property>
             <property name="text">
              <string>Load list of channels from file</string>
             </property>
@@ -355,7 +358,7 @@
              </font>
             </property>
             <property name="toolTip">
-             <string>One column of channel numbers</string>
+             <string>Channel numbers in one or multiple lines. Separators: space tab comma or end_of_line</string>
             </property>
             <property name="text">
              <string>Load mapping from file</string>
@@ -398,6 +401,13 @@
          </spacer>
         </item>
         <item>
+         <widget class="QLabel" name="label_23">
+          <property name="text">
+           <string>These channels will be always digitized to zero signal:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QPlainTextEdit" name="pteIgnoreHardwareChannels">
           <property name="maximumSize">
            <size>
@@ -425,10 +435,10 @@
           <item>
            <widget class="QPushButton" name="pbAddListHardwChToIgnore">
             <property name="toolTip">
-             <string>These channels will be always digitized as zero signal</string>
+             <string>Channel numbers in one or multiple lines. Separators: space tab comma or end_of_line</string>
             </property>
             <property name="text">
-             <string>Add list of hardware channels to ignore</string>
+             <string>Load list of hardware channels to ignore</string>
             </property>
            </widget>
           </item>

@@ -169,7 +169,7 @@ void MainWindow::on_pbLoadPolarities_clicked()
     {
         bool bOK;
         int val = s.toInt(&bOK);
-        if (bOK) negList << val;
+        if (bOK && val>=0) negList << val;
         else
         {
             bStrangies = true;
@@ -177,13 +177,44 @@ void MainWindow::on_pbLoadPolarities_clicked()
         }
     }
 
-    if (bStrangies) message("There were some non-integer fields in the file which were ignored!", this);
-    qDebug() << negList;
+    if (bStrangies) message("There were some unexpected fields in the file which were ignored!", this);
 
     Config->SetNegativeChannels(negList);
 
     ClearData();
     LogMessage("Polarities updated");
+
+    UpdateGui();
+}
+
+void MainWindow::on_pbEditMap_clicked()
+{
+    QString old;
+    for (int i : Config->GetMapping()) old += QString::number(i) + " ";
+
+    AEditChannelsDialog* D = new AEditChannelsDialog("Hardware channels sorted by logical number", old, "Example: 5 4 3 2 1 0 10 11 12");
+    int res = D->exec();
+    if (res != 1) return;
+    const QString str = D->GetText().simplified();
+    delete D;
+
+    QRegExp rx("(\\ |\\,|\\:|\\t|\\n)");
+    QStringList fields = str.split(rx, QString::SkipEmptyParts);
+    QVector<int> vec;
+    for (QString str : fields)
+    {
+        bool bOK;
+        int i = str.toInt(&bOK);
+        if (!bOK || i<0)
+        {
+            message("Error in format: only integers (>=0) are accepted", this);
+            return;
+        }
+        vec << i;
+    }
+
+    bool bOK = Config->SetMapping(vec);
+    if (!bOK) message("Ignored: there are non-unique channel numbers in the list!", this);
 
     UpdateGui();
 }
@@ -194,21 +225,63 @@ void MainWindow::on_pbAddMapping_clicked()
                                                     "The file should contain hardware channel numbers sorted by logical channel number");
 
     QVector<int> arr;
-    LoadIntVectorsFromFile(FileName, &arr);
+    //LoadIntVectorsFromFile(FileName, &arr);
 
-    for (int i : arr)
+    QString AllText;
+    bool bOK = LoadTextFromFile(FileName, AllText);
+    if (!bOK)
     {
-        if (i<0)
+        message("Read failed!", this);
+        return;
+    }
+    AllText = AllText.simplified();
+    QRegExp rx("(\\ |\\,|\\:|\\t)"); //separators: ' ' or ',' or ':' or '\t'
+    QStringList sl = AllText.split(rx, QString::SkipEmptyParts);
+
+    bool bStrangies = false;
+    for (QString& s : sl)
+    {
+        bool bOK;
+        int val = s.toInt(&bOK);
+        if (bOK && val>=0) arr << val;
+        else
         {
-            message("Only positive channel numbers are allowed!", this);
-            return;
+            bStrangies = true;
+            continue;
         }
     }
-    Config->SetMapping(arr);
 
-    Config->Map->Validate(Reader->CountChannels(), true);
-    LogMessage("Mapping updated");
+    if (bStrangies) message("There were some unexpected fields in the file which were ignored!", this);
 
+    bOK = Config->SetMapping(arr);
+    if (bOK)
+    {
+        Config->Map->Validate(Reader->CountChannels(), true);
+        LogMessage("Mapping updated");
+    }
+    else message("Ignored: There are non-unique channel numbers in the list!", this);
+
+    UpdateGui();
+}
+
+void MainWindow::on_pbEditIgnoreChannelList_clicked()
+{
+    QString old =  PackChannelList(Config->GetListOfIgnoreChannels());
+    AEditChannelsDialog* D = new AEditChannelsDialog("List of ignored hardware channels", old, "Example: 2, 5-15, 30-45");
+    int res = D->exec();
+    if (res != 1) return;
+    const QString str = D->GetText();
+    delete D;
+
+    QVector<int> vec;
+    ExtractNumbersFromQString(str, &vec);
+    QSet<int> set;
+    for (int i : vec) set << i;
+
+    vec.clear();
+    for (int i: set) vec << i;
+
+    Config->SetListOfIgnoreChannels(vec);
     UpdateGui();
 }
 
@@ -218,7 +291,33 @@ void MainWindow::on_pbAddListHardwChToIgnore_clicked()
                                                     "These channels will be always digitized as having zero signal");
 
     QVector<int> arr;
-    LoadIntVectorsFromFile(FileName, &arr);
+    //LoadIntVectorsFromFile(FileName, &arr);
+
+    QString AllText;
+    bool bOK = LoadTextFromFile(FileName, AllText);
+    if (!bOK)
+    {
+        message("Read failed!", this);
+        return;
+    }
+    AllText = AllText.simplified();
+    QRegExp rx("(\\ |\\,|\\:|\\t)"); //separators: ' ' or ',' or ':' or '\t'
+    QStringList sl = AllText.split(rx, QString::SkipEmptyParts);
+
+    bool bStrangies = false;
+    for (QString& s : sl)
+    {
+        bool bOK;
+        int val = s.toInt(&bOK);
+        if (bOK && val>=0) arr << val;
+        else
+        {
+            bStrangies = true;
+            continue;
+        }
+    }
+
+    if (bStrangies) message("There were some unexpected fields in the file which were ignored!", this);
 
     Config->SetListOfIgnoreChannels(arr);
 
@@ -874,57 +973,6 @@ const QString MainWindow::PackChannelList(QVector<int> vec)
     return out;
 }
 
-void MainWindow::on_pbEditMap_clicked()
-{
-    QString old;
-    for (int i : Config->GetMapping()) old += QString::number(i) + " ";
-
-    AEditChannelsDialog* D = new AEditChannelsDialog("Hardware channels sorted by logical number", old, "Example: 5 4 3 2 1 0 10 11 12");
-    int res = D->exec();
-    if (res != 1) return;
-    const QString str = D->GetText().simplified();
-    delete D;
-
-    QRegExp rx("(\\ |\\,|\\:|\\t|\\n)");
-    QStringList fields = str.split(rx, QString::SkipEmptyParts);
-    QVector<int> vec;
-    for (QString str : fields)
-    {
-        bool bOK;
-        int i = str.toInt(&bOK);
-        if (!bOK || i<0)
-        {
-            message("Error in format: only integers (>=0) are accepted", this);
-            return;
-        }
-        vec << i;
-    }
-
-    Config->SetMapping(vec);
-    UpdateGui();
-}
-
-void MainWindow::on_pbEditIgnoreChannelList_clicked()
-{
-    QString old =  PackChannelList(Config->GetListOfIgnoreChannels());
-    AEditChannelsDialog* D = new AEditChannelsDialog("List of ignored hardware channels", old, "Example: 2, 5-15, 30-45");
-    int res = D->exec();
-    if (res != 1) return;
-    const QString str = D->GetText();
-    delete D;
-
-    QVector<int> vec;
-    ExtractNumbersFromQString(str, &vec);
-    QSet<int> set;
-    for (int i : vec) set << i;
-
-    vec.clear();
-    for (int i: set) vec << i;
-
-    Config->SetListOfIgnoreChannels(vec);
-    UpdateGui();
-}
-
 void MainWindow::on_pbAddDatakind_clicked()
 {
     bool bOK;
@@ -1155,7 +1203,7 @@ void MainWindow::on_pbSaveSignalsFromDataHub_clicked()
         return;
     }
 
-    QString FileName = QFileDialog::getSaveFileName(this, "Save events from DataHub", Config->WorkingDir, "*.dat,*.txt");
+    QString FileName = QFileDialog::getSaveFileName(this, "Save events from DataHub", Config->WorkingDir, "Data files (*.dat *.txt);;All files (*.*)");
     if (FileName.isEmpty()) return;
     Config->WorkingDir = QFileInfo(FileName).absolutePath();
 
