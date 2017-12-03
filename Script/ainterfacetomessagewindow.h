@@ -15,36 +15,37 @@ public:
   AInterfaceToMessageWindow(QWidget *parent);
   ~AInterfaceToMessageWindow();
 
-  QDialog *D;
-  double X, Y;
-  double WW, HH;
-
-  QPlainTextEdit* e;
-  bool bEnabled;
-
 public slots:
-  void Enable(bool flag) {bEnabled = flag;}
-  void Append(QString txt);
-  void Clear();
-  void Show();
-  void Hide();
-  void Show(QString txt, int ms = -1);
-  void SetTransparent(bool flag);
+  void  setEnable(bool flag) {bEnabled = flag;}
 
-  void Move(double x, double y);
-  void Resize(double w, double h);
+  void  move(double x, double y);
+  void  resize(double w, double h);
+  void  show();
+  void  hide();
+  void  setTransparent(bool flag);
 
-  void SetFontSize(int size);
+  void  append(const QString txt);
+  void  show(const QString txt, int ms = -1);
+  void  clear();
+
+  void  setFontSize(int size);
 
 public:
-  void deleteDialog();
-  bool isActive() {return bActivated;}
-  void hide();     //does not affect bActivated status
-  void restore();  //does not affect bActivated status
+  void  deleteDialog();
+  bool  isActive() {return bActivated;}
+  void  hideDialog();     //does not affect bActivated status
+  void  restore();  //does not affect bActivated status
 
 private:
-  QWidget* Parent;
-  bool bActivated;
+  QWidget*  Parent;
+  bool      bActivated;
+
+  QDialog   *D;
+  double    X, Y;
+  double    WW, HH;
+
+  QPlainTextEdit* e;
+  bool      bEnabled;
 
   void init(bool fTransparent);
 };

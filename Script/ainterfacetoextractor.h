@@ -18,24 +18,23 @@ public:
 
 public slots:
 
-    int      countEvents();
-    int      countChannels();
+    int      countEvents() const;
+    int      countChannels() const;
 
     //get signals
-    float   getSignal(int ievent, int iHardwChannel);
-    QVariant getSignals(int ievent);
-    QVariant getSignals_logical(int ievent); // array of signal values ordered according to the map of logical channels
+    float    getSignal(int ievent, int iHardwChannel) const;
+    const QVariant getSignals(int ievent) const;
+    const QVariant getSignals_logical(int ievent) const; // array of signal values ordered according to the map of logical channels
 
     //set signals
     void     setSignal(int ievent, int iHardwChannel, float value);
-    void     setSignals(int ievent, QVariant arrayOfValues);
+    void     setSignals(int ievent, const QVariant arrayOfValues);
 
     //rejection of events
     void     setAllRejected(bool flag);
-    bool     isRejectedEvent(int ievent);
-    bool     isRejectedEventFast(int ievent);
+    bool     isRejectedEvent(int ievent) const;
+    bool     isRejectedEventFast(int ievent) const;
     void     setRejected(int ievent, bool flag);
-
 
 private:
     MasterConfig *Config;

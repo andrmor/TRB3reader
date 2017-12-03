@@ -159,7 +159,7 @@ void AScriptManager::hideMsgDialog()
         AInterfaceToMessageWindow* t = dynamic_cast<AInterfaceToMessageWindow*>(interfaces[i]);
         if (t)
         {
-            t->hide();
+            t->hideDialog();
             return;
         }
     }
