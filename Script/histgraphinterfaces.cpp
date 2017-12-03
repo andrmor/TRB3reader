@@ -398,7 +398,7 @@ void AInterfaceToHist::DeleteAllHist()
     TmpHub->ScriptDrawObjects.removeAllHists();
 }
 
-bool AInterfaceToHist::isHistExist(QString HistName)
+bool AInterfaceToHist::IsHistExist(QString HistName)
 {
     int index = TmpHub->ScriptDrawObjects.findIndexOf(HistName);
     return (index != -1);
@@ -727,7 +727,7 @@ void AInterfaceToGraph::DeleteAllGraph()
     TmpHub->ScriptDrawObjects.removeAllGraphs();
 }
 
-bool AInterfaceToGraph::isGraphExists(QString GraphName)
+bool AInterfaceToGraph::IsGraphExists(QString GraphName)
 {
     int index = TmpHub->ScriptDrawObjects.findIndexOf(GraphName);
     return (index != -1);

@@ -23,8 +23,14 @@ public slots:
     float    getValue(int ievent, int iHardwChannel, int isample) const;
     float    getValueFast(int ievent, int iHardwChannel, int isample) const; // not safe - no argument check
 
+    void     setValue(int ievent, int iHardwChannel, int isample, float value);
+    void     setValueFast(int ievent, int iHardwChannel, int isample, float value);
+
     const QVariant getWaveform(int ievent, int iHardwChannel) const;
     const QVariant getWaveformFast(int ievent, int iHardwChannel) const; // not safe - no argument check
+
+    void     setWaveform(int ievent, int ichannel, const QVariant array);
+    void     setWaveformFast(int ievent, int ichannel, const QVariant array);
 
     //max/min value over waveform
     float    getMax(int ievent, int iHardwChannel) const;

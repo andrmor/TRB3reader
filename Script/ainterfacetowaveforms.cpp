@@ -32,6 +32,18 @@ float AInterfaceToWaveforms::getValueFast(int ievent, int iHardwChannel, int isa
     return Reader->GetValueFast(ievent, iHardwChannel, isample);
 }
 
+void AInterfaceToWaveforms::setValue(int ievent, int iHardwChannel, int isample, float value)
+{
+    bool bOK = Reader->SetValue(ievent, iHardwChannel, isample, value);
+    if (!bOK)
+        abort("Failed to set waveform value");
+}
+
+void AInterfaceToWaveforms::setValueFast(int ievent, int iHardwChannel, int isample, float value)
+{
+    Reader->SetValueFast(ievent, iHardwChannel, isample, value);
+}
+
 const QVariant AInterfaceToWaveforms::getWaveform(int ievent, int iHardwChannel) const
 {
     const QVector<float> *wave = Reader->GetWaveformPtr(ievent, iHardwChannel);
@@ -55,6 +67,47 @@ const QVariant AInterfaceToWaveforms::getWaveformFast(int ievent, int iHardwChan
     for (int val : *wave) ar << val;
     QJsonValue jv = ar;
     return jv.toVariant();
+}
+
+void AInterfaceToWaveforms::setWaveform(int ievent, int ichannel, const QVariant array)
+{
+    QString type = array.typeName();
+    if (type != "QVariantList")
+    {
+        abort("Failed to set waveform - need array as argument");
+        return;
+    }
+
+    QVariantList vl = array.toList();
+    QJsonArray ar = QJsonArray::fromVariantList(vl);
+
+    QVector<float> vec;
+    vec.reserve(ar.size());
+    for (int i=0; i<ar.size(); ++i)
+    {
+        if (!ar[i].isDouble())
+        {
+            abort("Failed to set signal values - array contains non-numerical data");
+            return;
+        }
+        vec << ar[i].toDouble();
+    }
+
+    bool bOK = Reader->SetWaveform(ievent, ichannel, vec);
+    if (!bOK)
+        abort("Failed to set waveform - check event/channel and array size are valid");
+}
+
+void AInterfaceToWaveforms::setWaveformFast(int ievent, int ichannel, const QVariant array)
+{
+    QVariantList vl = array.toList();
+    QJsonArray ar = QJsonArray::fromVariantList(vl);
+
+    QVector<float> vec;
+    vec.reserve(ar.size());
+    for (int i=0; i<ar.size(); ++i) vec << ar[i].toDouble();
+
+    Reader->SetWaveformFast(ievent, ichannel, vec);
 }
 
 float AInterfaceToWaveforms::getMax(int ievent, int iHardwChannel) const

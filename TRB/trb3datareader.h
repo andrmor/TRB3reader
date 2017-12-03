@@ -18,8 +18,14 @@ public:
     float   GetValue(int ievent, int ichannel, int isample) const;
     float   GetValueFast(int ievent, int ichannel, int isample) const; //no argument validity check!
 
+    bool    SetValue(int ievent, int ichannel, int isample, float value);
+    void    SetValueFast(int ievent, int ichannel, int isample, float value); //no argument validity check!
+
     const QVector<float>* GetWaveformPtr(int ievent, int ichannel) const;
     const QVector<float>* GetWaveformPtrFast(int ievent, int ichannel) const; //no argument validity check!
+
+    bool    SetWaveform(int ievent, int ichannel, const QVector<float> &array);
+    void    SetWaveformFast(int ievent, int ichannel, const QVector<float> &array);
 
     float   GetMax(int ievent, int ichannel) const;
     float   GetMaxFast(int ievent, int ichannel) const;
