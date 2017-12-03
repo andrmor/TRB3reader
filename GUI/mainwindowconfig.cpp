@@ -74,6 +74,8 @@ void MainWindow::WriteGUItoJson(QJsonObject &json)
     jsgui["BulkCopyWaveforms"] = ui->cbBulkAlsoCopyWaveforms->isChecked();
     jsgui["SaveAddPositions"] = ui->cbAddReconstructedPositions->isChecked();
 
+    jsgui["ExplorerSource"] = ui->cobExplorerSource->currentIndex();
+
     QJsonObject ja;
         ja["AutoY"] = ui->cbAutoscaleY->isChecked();
         ja["Sort"] = ui->cobSortBy->currentIndex();
@@ -110,6 +112,8 @@ void MainWindow::ReadGUIfromJson(const QJsonObject& json)
     JsonToCheckbox(jsgui, "BulkCopy", ui->cbBulkCopyToDatahub);
     JsonToCheckbox(jsgui, "BulkCopyWaveforms", ui->cbBulkAlsoCopyWaveforms);
     JsonToCheckbox(jsgui, "SaveAddPositions", ui->cbAddReconstructedPositions);
+
+    JsonToComboBox(jsgui, "ExplorerSource", ui->cobExplorerSource);
 
     QJsonObject ja = jsgui["GraphScale"].toObject();
         JsonToCheckbox(ja, "AutoY", ui->cbAutoscaleY);

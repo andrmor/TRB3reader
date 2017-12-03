@@ -28,8 +28,8 @@ void readTwoQVectorsFromJArray(QJsonArray &ar, QVector<double> &x, QVector<doubl
 bool write2DQVectorToJArray(QVector< QVector<double> > &xy, QJsonArray &ar);
 void read2DQVectorFromJArray(QJsonArray &ar, QVector<QVector<double> > &xy);
 
-bool LoadJsonFromFile(QJsonObject &json, QString fileName);
-bool SaveJsonToFile(QJsonObject &json, QString fileName);
+bool LoadJsonFromFile(QJsonObject &json, const QString fileName);
+bool SaveJsonToFile(QJsonObject &json, const QString fileName);
 
 const QJsonObject SaveWindowToJson(int x, int y, int w, int h, bool bVis);
 void LoadWindowFromJson(const QJsonObject& js, int& x, int& y, int& w, int& h, bool& bVis);

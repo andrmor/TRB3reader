@@ -34,7 +34,7 @@ void ADispatcher::ClearData()
     Extractor->ClearData();
 }
 
-void ADispatcher::LoadConfig(QString FileName)
+void ADispatcher::LoadConfig(const QString FileName)
 {
     QJsonObject json;
     LoadJsonFromFile(json, FileName);
@@ -52,7 +52,7 @@ bool ADispatcher::LoadConfig(QJsonObject &json)
     return true;
 }
 
-void ADispatcher::SaveConfig(QString FileName)
+void ADispatcher::SaveConfig(const QString FileName)
 {
     QJsonObject json;
     Config->WriteToJson(json);

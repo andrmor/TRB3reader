@@ -8,7 +8,7 @@
 #include <QJsonArray>
 #include <QJsonValue>
 
-AInterfaceToConfig::AInterfaceToConfig(MasterConfig *Config, ADispatcher* Dispatcher) :
+AInterfaceToConfig::AInterfaceToConfig(MasterConfig *Config, ADispatcher *Dispatcher) :
     Config(Config), Dispatcher(Dispatcher) {}
 
 QJsonObject* AInterfaceToConfig::MakeConfigJson() const
@@ -18,7 +18,6 @@ QJsonObject* AInterfaceToConfig::MakeConfigJson() const
     return js;
 }
 
-/*
 QVariant AInterfaceToConfig::getConfigJson()
 {
     QJsonObject js;
@@ -40,9 +39,18 @@ void AInterfaceToConfig::setConfigJson(QVariant configJson)
 
     Dispatcher->LoadConfig(json);
 }
-*/
 
-void AInterfaceToConfig::setKeyValue(QString Key, QVariant val)
+void AInterfaceToConfig::saveConfig(const QString FileName)
+{
+    Dispatcher->SaveConfig(FileName);
+}
+
+void AInterfaceToConfig::loadConfig(const QString FileName)
+{
+    Dispatcher->LoadConfig(FileName);
+}
+
+void AInterfaceToConfig::setKeyValue(QString Key, const QVariant val)
 {
     LastError = "";
     //qDebug() << Key << val << val.typeName();
@@ -106,7 +114,7 @@ void AInterfaceToConfig::setKeyValue(QString Key, QVariant val)
     return;
 }
 
-QVariant AInterfaceToConfig::getKeyValue(QString Key)
+const QVariant AInterfaceToConfig::getKeyValue(QString Key)
 {
     LastError = "";
 
@@ -200,34 +208,34 @@ QVariant AInterfaceToConfig::getKeyValue(QString Key)
     return QVariant();
 }
 
-int AInterfaceToConfig::countLogicalChannels()
+int AInterfaceToConfig::countLogicalChannels() const
 {
     return Config->CountLogicalChannels();
 }
 
-bool AInterfaceToConfig::isNegativeHardwareChannel(int iHardwChannel)
+bool AInterfaceToConfig::isNegativeHardwareChannel(int iHardwChannel) const
 {
     return Config->IsNegativeHardwareChannel(iHardwChannel);
 }
 
-bool AInterfaceToConfig::isNegativeLogicalChannel(int iLogicalChannel)
+bool AInterfaceToConfig::isNegativeLogicalChannel(int iLogicalChannel) const
 {
     const int iHardwCh = Config->Map->LogicalToHardware(iLogicalChannel);
     return Config->IsNegativeHardwareChannel(iHardwCh);
 }
 
-bool AInterfaceToConfig::isIgnoredHardwareChannel(int iHardwChannel)
+bool AInterfaceToConfig::isIgnoredHardwareChannel(int iHardwChannel) const
 {
     return Config->IsIgnoredHardwareChannel(iHardwChannel);
 }
 
-bool AInterfaceToConfig::isIgnoredLogicalChannel(int iLogicalChannel)
+bool AInterfaceToConfig::isIgnoredLogicalChannel(int iLogicalChannel) const
 {
     const int iHardwCh = Config->Map->LogicalToHardware(iLogicalChannel);
     return Config->IsIgnoredHardwareChannel(iHardwCh);
 }
 
-int AInterfaceToConfig::toHardware(int iLogicalChannel)
+int AInterfaceToConfig::toHardware(int iLogicalChannel) const
 {
     int ihardw = Config->Map->LogicalToHardware(iLogicalChannel);
     if ( ihardw < 0 )
@@ -238,7 +246,7 @@ int AInterfaceToConfig::toHardware(int iLogicalChannel)
     return ihardw;
 }
 
-int AInterfaceToConfig::toLogical(int iHardwChannel)
+int AInterfaceToConfig::toLogical(int iHardwChannel) const
 {
     int ilogical = Config->Map->HardwareToLogical(iHardwChannel);
     if ( ilogical < 0 )

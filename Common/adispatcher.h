@@ -23,9 +23,9 @@ public:
     void ClearData();
 
     void LoadAutosaveConfig();
-    void LoadConfig(QString FileName);
+    void LoadConfig(const QString FileName);
     bool LoadConfig(QJsonObject& json);
-    void SaveConfig(QString FileName);
+    void SaveConfig(const QString FileName);
 
     void ClearNegativeChannels();
     void ClearMapping();
