@@ -19,7 +19,7 @@ AInterfaceToMessageWindow::AInterfaceToMessageWindow(QWidget* parent) : D(0), Pa
 void AInterfaceToMessageWindow::init(bool fTransparent)
 {
   D = new QDialog(Parent);
-  QObject::connect(D, &QDialog::finished, this, &AInterfaceToMessageWindow::Hide);
+  QObject::connect(D, &QDialog::finished, this, &AInterfaceToMessageWindow::hideDialog);
 
   QVBoxLayout* l = new QVBoxLayout;
   e = new QPlainTextEdit();
@@ -52,7 +52,7 @@ AInterfaceToMessageWindow::~AInterfaceToMessageWindow()
   deleteDialog();
 }
 
-void AInterfaceToMessageWindow::SetTransparent(bool flag)
+void AInterfaceToMessageWindow::setTransparent(bool flag)
 {
   QString text = e->document()->toPlainText();
   delete D;
@@ -61,17 +61,17 @@ void AInterfaceToMessageWindow::SetTransparent(bool flag)
   e->setPlainText(text);
 }
 
-void AInterfaceToMessageWindow::Append(QString txt)
+void AInterfaceToMessageWindow::append(const QString txt)
 {
   e->appendHtml(txt);
 }
 
-void AInterfaceToMessageWindow::Clear()
+void AInterfaceToMessageWindow::clear()
 {
   e->clear();
 }
 
-void AInterfaceToMessageWindow::Show(QString txt, int ms)
+void AInterfaceToMessageWindow::show(const QString txt, int ms)
 {
   if (!bEnabled) return;
   e->clear();
@@ -96,19 +96,19 @@ void AInterfaceToMessageWindow::Show(QString txt, int ms)
   bActivated = false;
 }
 
-void AInterfaceToMessageWindow::Move(double x, double y)
+void AInterfaceToMessageWindow::move(double x, double y)
 {
   X = msgX = x; Y = msgY = y;
   D->move(X, Y);
 }
 
-void AInterfaceToMessageWindow::Resize(double w, double h)
+void AInterfaceToMessageWindow::resize(double w, double h)
 {
   WW = msgW = w; HH = msgH = h;
   D->resize(WW, HH);
 }
 
-void AInterfaceToMessageWindow::Show()
+void AInterfaceToMessageWindow::show()
 {
   if (!bEnabled) return;
   D->show();
@@ -116,13 +116,13 @@ void AInterfaceToMessageWindow::Show()
   bActivated = true;
 }
 
-void AInterfaceToMessageWindow::Hide()
+void AInterfaceToMessageWindow::hide()
 {
   D->hide();
   bActivated = false;
 }
 
-void AInterfaceToMessageWindow::SetFontSize(int size)
+void AInterfaceToMessageWindow::setFontSize(int size)
 {
   QFont f = e->font();
   f.setPointSize(size);
@@ -135,7 +135,7 @@ void AInterfaceToMessageWindow::deleteDialog()
    D = 0;
 }
 
-void AInterfaceToMessageWindow::hide()
+void AInterfaceToMessageWindow::hideDialog()
 {
     if (D) D->hide();
 }

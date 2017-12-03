@@ -18,33 +18,33 @@ public:
 
 public slots:
 
-    int      countSamples();
+    int      countSamples() const;
 
-    float    getValue(int ievent, int iHardwChannel, int isample);
-    float    getValueFast(int ievent, int iHardwChannel, int isample); // not safe - no argument check
+    float    getValue(int ievent, int iHardwChannel, int isample) const;
+    float    getValueFast(int ievent, int iHardwChannel, int isample) const; // not safe - no argument check
 
-    QVariant getWaveform(int ievent, int iHardwChannel);
-    QVariant getWaveformFast(int ievent, int iHardwChannel); // not safe - no argument check
+    const QVariant getWaveform(int ievent, int iHardwChannel) const;
+    const QVariant getWaveformFast(int ievent, int iHardwChannel) const; // not safe - no argument check
 
     //max/min value over waveform
-    float    getMax(int ievent, int iHardwChannel);
-    float    getMaxFast(int ievent, int iHardwChannel); // not safe - no argument check
-    float    getMin(int ievent, int iHardwChannel);
-    float    getMinFast(int ievent, int iHardwChannel); // not safe - no argument check
+    float    getMax(int ievent, int iHardwChannel) const;
+    float    getMaxFast(int ievent, int iHardwChannel) const; // not safe - no argument check
+    float    getMin(int ievent, int iHardwChannel) const;
+    float    getMinFast(int ievent, int iHardwChannel) const; // not safe - no argument check
 
     //sample # where max/min is reached over waveform
-    int      getMaxSample(int ievent, int iHardwChannel);
-    int      getMaxSampleFast(int ievent, int iHardwChannel); // not safe - no argument check
-    int      getMinSample(int ievent, int iHardwChannel);
-    int      getMinSampleFast(int ievent, int iHardwChannel); // not safe - no argument check
+    int      getMaxSample(int ievent, int iHardwChannel) const;
+    int      getMaxSampleFast(int ievent, int iHardwChannel) const; // not safe - no argument check
+    int      getMinSample(int ievent, int iHardwChannel) const;
+    int      getMinSampleFast(int ievent, int iHardwChannel) const; // not safe - no argument check
 
-    int      getSampleWhereFirstAbove(int ievent, int iHardwChannel, int threshold);
-    int      getSampleWhereFirstAboveFast(int ievent, int iHardwChannel, int threshold);
-    int      getSampleWhereFirstBelow(int ievent, int iHardwChannel, int threshold);
-    int      getSampleWhereFirstBelowFast(int ievent, int iHardwChannel, int threshold);
+    int      getSampleWhereFirstAbove(int ievent, int iHardwChannel, int threshold) const;
+    int      getSampleWhereFirstAboveFast(int ievent, int iHardwChannel, int threshold) const;
+    int      getSampleWhereFirstBelow(int ievent, int iHardwChannel, int threshold) const;
+    int      getSampleWhereFirstBelowFast(int ievent, int iHardwChannel, int threshold) const;
 
 private:
-    MasterConfig* Config;
+    MasterConfig*   Config;
     Trb3dataReader* Reader;
 };
 
