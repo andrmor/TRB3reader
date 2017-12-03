@@ -126,17 +126,63 @@ void MainWindow::LogMessage(const QString message)
     qApp->processEvents();
 }
 
+void MainWindow::on_pbEditListOfNegatives_clicked()
+{
+    QString old =  PackChannelList(Config->GetListOfNegativeChannels());
+    AEditChannelsDialog* D = new AEditChannelsDialog("List of negative channels", old, "Example: 0, 2, 5-15, 7, 30-45");
+    int res = D->exec();
+    if (res != 1) return;
+    const QString str = D->GetText();
+    delete D;
+
+    QVector<int> vec;
+    ExtractNumbersFromQString(str, &vec);
+    QSet<int> set;
+    for (int i : vec) set << i;
+
+    vec.clear();
+    for (int i: set) vec << i;
+
+    Config->SetNegativeChannels(vec);
+    UpdateGui();
+}
+
 void MainWindow::on_pbLoadPolarities_clicked()
 {
     QString FileName = QFileDialog::getOpenFileName(this, "Add channel polarity data.\n"
                                                     "The file should contain hardware channel numbers which have negative polarity");
     QVector<int> negList;
-    LoadIntVectorsFromFile(FileName, &negList);
+    //LoadIntVectorsFromFile(FileName, &negList);
+    QString AllText;
+    bool bOK = LoadTextFromFile(FileName, AllText);
+    if (!bOK)
+    {
+        message("Read failed!", this);
+        return;
+    }
+    AllText = AllText.simplified();
+    QRegExp rx("(\\ |\\,|\\:|\\t)"); //separators: ' ' or ',' or ':' or '\t'
+    QStringList sl = AllText.split(rx, QString::SkipEmptyParts);
 
+    bool bStrangies = false;
+    for (QString& s : sl)
+    {
+        bool bOK;
+        int val = s.toInt(&bOK);
+        if (bOK) negList << val;
+        else
+        {
+            bStrangies = true;
+            continue;
+        }
+    }
+
+    if (bStrangies) message("There were some non-integer fields in the file which were ignored!", this);
+    qDebug() << negList;
 
     Config->SetNegativeChannels(negList);
 
-    Extractor->ClearData();
+    ClearData();
     LogMessage("Polarities updated");
 
     UpdateGui();
@@ -826,27 +872,6 @@ const QString MainWindow::PackChannelList(QVector<int> vec)
     }
 
     return out;
-}
-
-void MainWindow::on_pbEditListOfNegatives_clicked()
-{
-    QString old =  PackChannelList(Config->GetListOfNegativeChannels());
-    AEditChannelsDialog* D = new AEditChannelsDialog("List of negative channels", old, "Example: 0, 2, 5-15, 7, 30-45");
-    int res = D->exec();
-    if (res != 1) return;
-    const QString str = D->GetText();
-    delete D;
-
-    QVector<int> vec;
-    ExtractNumbersFromQString(str, &vec);
-    QSet<int> set;
-    for (int i : vec) set << i;
-
-    vec.clear();
-    for (int i: set) vec << i;
-
-    Config->SetNegativeChannels(vec);
-    UpdateGui();
 }
 
 void MainWindow::on_pbEditMap_clicked()
