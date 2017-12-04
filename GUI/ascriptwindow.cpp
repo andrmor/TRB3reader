@@ -5,12 +5,13 @@
 #include "coreinterfaces.h"
 #include "histgraphinterfaces.h"
 #include "amessage.h"
-//#include "ascriptexampleexplorer.h"
 #include "ascriptmanager.h"
 #include "masterconfig.h"
 #include "afiletools.h"
+#include "ajsontools.h"
+#include "ainterfacetoconfig.h"
 
-#include <QScriptEngine>
+//#include <QScriptEngine>
 #include <QTextStream>
 #include <QSplitter>
 #include <QFileDialog>
@@ -32,9 +33,10 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QMessageBox>
+#include <QFontDialog>
 
 AScriptWindow::AScriptWindow(MasterConfig *Config, QWidget *parent) :
-    QMainWindow(parent),
+    QMainWindow(parent), Config(Config),
     ui(new Ui::AScriptWindow)
 {
     if (parent)
@@ -53,7 +55,6 @@ AScriptWindow::AScriptWindow(MasterConfig *Config, QWidget *parent) :
     QObject::connect(ScriptManager, SIGNAL(onAbort()), this, SLOT(receivedOnAbort()));
     QObject::connect(ScriptManager, SIGNAL(success(QString)), this, SLOT(receivedOnSuccess(QString)));
 
-    this->Config = Config;
     //ScriptManager->LibScripts = Config->LibScripts;
     //ScriptManager->LastOpenDir = Config->LastOpenDir;
     //ScriptManager->ExamplesDir = Config->ExamplesDir;
@@ -63,7 +64,6 @@ AScriptWindow::AScriptWindow(MasterConfig *Config, QWidget *parent) :
     ui->setupUi(this);
     ui->pbStop->setVisible(false);
     LocalScript = "//no external script provided!";
-    this->setWindowTitle("ANTS2 script");
 
     QPixmap rm(16, 16);
     rm.fill(Qt::transparent);
@@ -204,21 +204,13 @@ AScriptWindow::AScriptWindow(MasterConfig *Config, QWidget *parent) :
 
     trwJson->header()->resizeSection(0, 200);
 
-    if (!Config->MainSplitterSizes_ScriptWindow.isEmpty())
-        SetMainSplitterSizes(Config->MainSplitterSizes_ScriptWindow);
-    else
-    {
-        sizes.clear();
-        sizes << 800 << 70;
-        splMain->setSizes(sizes);
-    }
+    sizes.clear();
+    sizes << 800 << 70;
+    splMain->setSizes(sizes);
 
     //shortcuts
     QShortcut* Run = new QShortcut(QKeySequence("Ctrl+Return"), this);
     connect(Run, SIGNAL(activated()), this, SLOT(on_pbRunScript_clicked()));
-
-    if (!Config->ScriptWindowJson.isEmpty())
-        ReadFromJson(Config->ScriptWindowJson);
 }
 
 AScriptWindow::~AScriptWindow()
@@ -329,7 +321,17 @@ void AScriptWindow::WriteToJson(QJsonObject &json)
     json["ScriptTabs"] = ar;
     json["CurrentTab"] = CurrentTab;
 
-    Config->MainSplitterSizes_ScriptWindow = splMain->sizes();
+    QJsonArray arr;
+    for (const int& i : splMain->sizes()) arr << i;
+    json["Splitters"] = arr;
+
+    QJsonObject js;
+    js["DefaultFontSize"] = DefaultFontSize;
+    js["DefaultFontFamily"] = DefaultFontFamily;
+    js["DefaultFontWeight"] = DefaultFontWeight;
+    js["DefaultFontItalic"] = DefaultFontItalic;
+    json["ScriptWinSettings"] = js;
+
 }
 
 void AScriptWindow::ReadFromJson(QJsonObject &json)
@@ -363,6 +365,26 @@ void AScriptWindow::ReadFromJson(QJsonObject &json)
     CurrentTab = json["CurrentTab"].toInt();
     if (CurrentTab<0 || CurrentTab>ScriptTabs.size()-1) CurrentTab = 0;
     twScriptTabs->setCurrentIndex(CurrentTab);
+
+    if (json.contains("Splitters"))
+    {
+        QJsonArray arr = json["Splitters"].toArray();
+        QList<int> sizes;
+        for (int i=0; i<arr.size(); i++) sizes << arr[i].toInt(50);
+        splMain->setSizes(sizes);
+    }
+
+    QJsonObject js;
+    parseJson(json, "ScriptWinSettings", js);
+    if (!js.isEmpty())
+    {
+        parseJson(js, "DefaultFontSize", DefaultFontSize);
+        parseJson(js, "DefaultFontFamily", DefaultFontFamily);
+        parseJson(js, "DefaultFontWeight", DefaultFontWeight);
+        parseJson(js, "DefaultFontItalic", DefaultFontItalic);
+        QFont font(DefaultFontFamily, DefaultFontSize, DefaultFontWeight, DefaultFontItalic);
+        for (AScriptWindowTabItem* tab : ScriptTabs) tab->TextEdit->setFont(font);
+    }
 }
 
 void AScriptWindow::UpdateHighlight()
@@ -405,7 +427,7 @@ bool AScriptWindow::ExecuteScript(const QString& Script)
    bool bSuccessFlag = false;
    //qDebug() << "Init on Start done";
    pteOut->clear();
-   AScriptWindow::ShowText("Processing script");
+   //AScriptWindow::ShowText("Processing script");
 
    //syntax check
    int errorLineNum = ScriptManager->FindSyntaxError(Script);
@@ -428,10 +450,10 @@ bool AScriptWindow::ExecuteScript(const QString& Script)
    {
        AScriptWindow::ReportError("Script error: "+ScriptManager->LastError, -1);
    }
-   else if (ScriptManager->engine->hasUncaughtException())
+   else if (ScriptManager->isUncaughtException())
    {   //Script has uncaught exception
-       int lineNum = ScriptManager->engine->uncaughtExceptionLineNumber();
-       QString message = ScriptManager->engine->uncaughtException().toString();
+       int lineNum = ScriptManager->getUncaughtExceptionLineNumber();
+       QString message = ScriptManager->getUncaughtExceptionString();
        //qDebug() << "Error message:" << message;
        //QString backtrace = engine.uncaughtExceptionBacktrace().join('\n');
        //qDebug() << "backtrace:" << backtrace;
@@ -442,8 +464,10 @@ bool AScriptWindow::ExecuteScript(const QString& Script)
        //qDebug() << "Script returned:" << result;
        if (!ScriptManager->fAborted)
          {
-            if (ShowEvalResult && result!="undefined") ShowText("Script evaluation result:\n"+result);
-            else ShowText("Script evaluation: success");
+            //if (ShowEvalResult && result!="undefined") ShowText("Result:\n"+result);
+            //else ShowText("Script evaluation: success");
+            if (ShowEvalResult && result!="undefined") ShowText("Script returned:\n"+result);
+            else ShowText("Script evaluation completed");
             bSuccessFlag = true;
          }
        else
@@ -455,6 +479,8 @@ bool AScriptWindow::ExecuteScript(const QString& Script)
 
    ScriptManager->CollectGarbage();
 
+   updateJsonTree();
+   emit RequestUpdateMainWindowGui();
    return bSuccessFlag;
 }
 
@@ -658,48 +684,6 @@ void AScriptWindow::fillHelper(QObject* obj, QString module, QString helpText)
     }
 }
 
-QString AScriptWindow::getFunctionReturnType(QString UnitFunction)
-{
-  QStringList f = UnitFunction.split(".");
-  if (f.size() != 2) return "";
-
-  QString unit = f.first();
-  int unitIndex = ScriptManager->interfaceNames.indexOf(unit);
-  if (unitIndex == -1) return "";
-  //qDebug() << "Found unit"<<unit<<" with index"<<unitIndex;
-  QString met = f.last();
-  //qDebug() << met;
-  QStringList skob = met.split("(", QString::SkipEmptyParts);
-  if (skob.size()<2) return "";
-  QString funct = skob.first();
-  QString args = skob[1];
-  args.chop(1);
-  //qDebug() << funct << args;
-
-  QString insert;
-  if (!args.isEmpty())
-    {
-      QStringList argl = args.split(",");
-      for (int i=0; i<argl.size(); i++)
-        {
-          QStringList a = argl.at(i).simplified().split(" ");
-          if (!insert.isEmpty()) insert += ",";
-          insert += a.first();
-        }
-    }
-  //qDebug() << insert;
-
-  QString methodName = funct + "(" + insert + ")";
-  //qDebug() << "method name" << methodName;
-  int mi = ScriptManager->interfaces.at(unitIndex)->metaObject()->indexOfMethod(methodName.toLatin1().data());
-  //qDebug() << "method index:"<<mi;
-  if (mi == -1) return "";
-
-  QString returnType = ScriptManager->interfaces.at(unitIndex)->metaObject()->method(mi).typeName();
-  //qDebug() << returnType;
-  return returnType;
-}
-
 void AScriptWindow::onJsonTWExpanded(QTreeWidgetItem *item)
 {
    ExpandedItemsInJsonTW << item->text(0);
@@ -712,31 +696,25 @@ void AScriptWindow::onJsonTWCollapsed(QTreeWidgetItem *item)
 
 void AScriptWindow::updateJsonTree()
 {
-    /*
-  trwJson->clear();
+    trwJson->clear();
 
-  for (int i=0; i<ScriptManager->interfaces.size(); i++)
+    QJsonObject* json = ScriptManager->CreateJsonOfConfig();
+    QJsonObject::const_iterator it;
+    for (it = json->begin(); it != json->end(); ++it)
     {
-      InterfaceToConfig* inter = dynamic_cast<InterfaceToConfig*>(ScriptManager->interfaces[i]);
-      if (!inter) continue;
+        QString key = it.key();
+        QTreeWidgetItem *TopKey = new QTreeWidgetItem(trwJson);
+        TopKey->setText(0, key);
 
-      QJsonObject json = inter->Config->JSON;
-      QJsonObject::const_iterator it;
-      for (it = json.begin(); it != json.end(); ++it)
-        {
-           QString key = it.key();
-           QTreeWidgetItem *TopKey = new QTreeWidgetItem(trwJson);
-           TopKey->setText(0, key);
+        const QJsonValue &value = it.value();
+        TopKey->setText(1, getDesc(value));
 
-           const QJsonValue &value = it.value();
-           TopKey->setText(1, getDesc(value));
-
-           if (value.isObject())
-             fillSubObject(TopKey, value.toObject());
-           else if (value.isArray())
-             fillSubArray(TopKey, value.toArray());
-        }
+        if (value.isObject())
+            fillSubObject(TopKey, value.toObject());
+        else if (value.isArray())
+            fillSubArray(TopKey, value.toArray());
     }
+    delete json;
 
   //restoring expanded status
   QSet<QString> expanded = ExpandedItemsInJsonTW;
@@ -748,7 +726,6 @@ void AScriptWindow::updateJsonTree()
        item->setExpanded(true);
     }
   //qDebug() << "Expanded items:"<<ExpandedItemsInJsonTW.size();
-  */
 }
 
 void AScriptWindow::fillSubObject(QTreeWidgetItem *parent, const QJsonObject &obj)
@@ -838,7 +815,7 @@ void AScriptWindow::onKeyDoubleClicked(QTreeWidgetItem *item, int /*column*/)
   showContextMenuForJsonTree(item, trwJson->mapFromGlobal(cursor().pos()));
 }
 
-QString AScriptWindow::getKeyPath(QTreeWidgetItem *item)
+QString AScriptWindow::getKeyPath(QTreeWidgetItem *item, bool bAddQuatation)
 {
   if (!item) return "";
 
@@ -858,7 +835,7 @@ QString AScriptWindow::getKeyPath(QTreeWidgetItem *item)
   while (item);
 
   path.chop(1);
-  path = " \""+path+"\" ";
+  if (bAddQuatation) path = " \""+path+"\" ";
   return path;
 }
 
@@ -929,17 +906,21 @@ void AScriptWindow::showContextMenuForJsonTree(QTreeWidgetItem *item, QPoint pos
 {
   QMenu menu;
 
-  QAction* showVtoClipboard = menu.addAction("Add Key path to clipboard");
+  QAction* aAddPath = menu.addAction("Add Key path to clipboard");
+  QAction* aAddPathInQuatation = menu.addAction("Add \"Key path\" to clipboard");
+  QAction* aAddGetPattern = menu.addAction("Add get value command pattern to clipboard");
+  QAction* aAddReplacePattern = menu.addAction("Add set value command pattern to clipboard");
+
   //menu.addSeparator();
 
   QAction* selectedItem = menu.exec(trwJson->mapToGlobal(pos));
   if (!selectedItem) return; //nothing was selected
 
-  if (selectedItem == showVtoClipboard)
-    {
-      QClipboard *clipboard = QApplication::clipboard();
-      clipboard->setText(getKeyPath(item));
-    }
+  QClipboard *clipboard = QApplication::clipboard();
+  if (selectedItem == aAddPath)                 clipboard->setText(getKeyPath(item, false));
+  else if (selectedItem == aAddPathInQuatation) clipboard->setText(getKeyPath(item, true));
+  else if (selectedItem == aAddGetPattern)      clipboard->setText( "config.getKeyValue(" + getKeyPath(item, true) + ")");
+  else if (selectedItem == aAddReplacePattern)  clipboard->setText( "config.setKeyValue(" + getKeyPath(item, true) + ", NewValue )");
 }
 
 void AScriptWindow::onContextMenuRequestedByHelp(QPoint pos)
@@ -1007,7 +988,7 @@ bool AScriptWindow::event(QEvent *e)
 
 void AScriptWindow::onDefaulFontSizeChanged(int size)
 {
-    Config->DefaultFontSize_ScriptWindow = size;
+    DefaultFontSize = size;
     for (AScriptWindowTabItem* tab : ScriptTabs)
         tab->TextEdit->SetFontSize(size);
 }
@@ -1171,13 +1152,13 @@ void AScriptWindow::AddNewTab()
     AScriptWindowTabItem* tab = new AScriptWindowTabItem(completitionModel);
     tab->highlighter->setCustomCommands(functions);
 
-    if (Config->DefaultFontFamily_ScriptWindow.isEmpty())
+    if (DefaultFontFamily.isEmpty())
       {
-         tab->TextEdit->SetFontSize(Config->DefaultFontSize_ScriptWindow);
+         tab->TextEdit->SetFontSize(DefaultFontSize);
       }
     else
       {
-        QFont font(Config->DefaultFontFamily_ScriptWindow, Config->DefaultFontSize_ScriptWindow, Config->DefaultFontWeight_ScriptWindow, Config->DefaultFontItalic_ScriptWindow);
+        QFont font(DefaultFontFamily, DefaultFontSize, DefaultFontWeight, DefaultFontItalic);
         tab->TextEdit->setFont(font);
       }
 
@@ -1250,34 +1231,28 @@ void AScriptWindow::on_pbHelp_toggled(bool checked)
 
 void AScriptWindow::on_actionIncrease_font_size_triggered()
 {
-    onDefaulFontSizeChanged(++Config->DefaultFontSize_ScriptWindow);
+    onDefaulFontSizeChanged(++DefaultFontSize);
 }
 
 void AScriptWindow::on_actionDecrease_font_size_triggered()
 {
-    if (Config->DefaultFontSize_ScriptWindow<1) return;
-
-    onDefaulFontSizeChanged(--Config->DefaultFontSize_ScriptWindow);
-    //qDebug() << "New font size:"<<GlobSet->DefaultFontSize_ScriptWindow;
+    if (DefaultFontSize < 1) return;
+    onDefaulFontSizeChanged(--DefaultFontSize);
 }
 
-#include <QFontDialog>
 void AScriptWindow::on_actionSelect_font_triggered()
 {
   bool ok;
   QFont font = QFontDialog::getFont(
                   &ok,
-                  QFont(Config->DefaultFontFamily_ScriptWindow,
-                        Config->DefaultFontSize_ScriptWindow,
-                        Config->DefaultFontWeight_ScriptWindow,
-                        Config->DefaultFontItalic_ScriptWindow),
+                  QFont(DefaultFontFamily, DefaultFontSize, DefaultFontWeight, DefaultFontItalic),
                   this);
   if (!ok) return;
 
-  Config->DefaultFontFamily_ScriptWindow = font.family();
-  Config->DefaultFontSize_ScriptWindow = font.pointSize();
-  Config->DefaultFontWeight_ScriptWindow = font.weight();
-  Config->DefaultFontItalic_ScriptWindow = font.italic();
+  DefaultFontFamily = font.family();
+  DefaultFontSize = font.pointSize();
+  DefaultFontWeight = font.weight();
+  DefaultFontItalic = font.italic();
 
   for (AScriptWindowTabItem* tab : ScriptTabs)
       tab->TextEdit->setFont(font);

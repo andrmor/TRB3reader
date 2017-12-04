@@ -4,8 +4,10 @@
 #include <QObject>
 #include <QVector>
 #include <QString>
+#include <QScriptValue>
 
 class QScriptEngine;
+class QJsonObject;
 
 class AScriptManager : public QObject
 {
@@ -16,45 +18,52 @@ public:
     ~AScriptManager();    
 
     //configuration
-    void SetInterfaceObject(QObject* interfaceObject, QString name = "");
+    void          SetInterfaceObject(QObject* interfaceObject, QString name = "");
 
     //run
-    int     FindSyntaxError(const QString& script); //returns line number of the first syntax error; -1 if no errors found
-    QString Evaluate(const QString& Script);
+    int           FindSyntaxError(const QString& script); //returns line number of the first syntax error; -1 if no errors found
+    QString       Evaluate(const QString& Script);
+    QScriptValue  EvaluateScriptInScript(const QString& script);
+    bool          isUncaughtException() const;
+    int           getUncaughtExceptionLineNumber() const;
+    const QString getUncaughtExceptionString() const;
 
-    void CollectGarbage();
+    QJsonObject*  CreateJsonOfConfig(); // does not own the created object!
+    const QString getFunctionReturnType(const QString UnitFunction);
+    void          CollectGarbage();
+    void          deleteMsgDialog();         //needed in batch mode to force close MSG window if shown
+    void          hideMsgDialog();
+    void          restoreMsgDialog();
 
-    QScriptEngine* engine;
-    QString LastError;
+    QString       LastError;
 
-    bool fEngineIsRunning;
-    bool fAborted;
+    bool          fEngineIsRunning;
+    bool          fAborted;
+
+    //starter dirs
+    QString       LibScripts, LastOpenDir, ExamplesDir;
+
+    //for minimizer
+    QString       FunctName;
+    double        bestResult;
+    int           numVariables;
+
+private:
+    QScriptEngine*  engine;
 
     //registered objects
     QVector<QObject*> interfaces;
-    QVector<QString> interfaceNames;
+    QVector<QString>  interfaceNames;
 
-    //starter dirs
-    QString LibScripts, LastOpenDir, ExamplesDir;
-
-    //for minimizer
-    QString FunctName;
-    double bestResult;
-    int numVariables;
-
-    void deleteMsgDialog();  //needed in batch mode to force close MSG window if shown
-    void hideMsgDialog();
-    void restoreMsgDialog();
-
-public slots:    
-    void AbortEvaluation(QString message = "Aborted!");
+public slots:
+    void    AbortEvaluation(const QString message = "Aborted!");
 
 signals:
-    void onStart();
-    void onAbort();
-    void success(QString eval);
-    void showMessage(QString message);
-    void clearText();
+    void    onStart();
+    void    onAbort();
+    void    success(QString eval);
+    void    showMessage(QString message);
+    void    clearText();
 };
 
 #endif // ASCRIPTMANAGER_H

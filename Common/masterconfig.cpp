@@ -44,7 +44,14 @@ void MasterConfig::RemoveDatakind(int datakind)
 
 void MasterConfig::SetNegativeChannels(const QVector<int> &list)
 {
-    ListNegativeChannels = list;
+    QSet<int> set;
+    for (auto i : list) set << i;
+
+    QVector<int> vec;
+    for (auto i: set) vec << i;
+    std::sort(vec.begin(), vec.end());
+
+    ListNegativeChannels = vec;
     updatePolarityQuickAccessData();
 }
 
@@ -57,7 +64,6 @@ void MasterConfig::WriteToJson(QJsonObject &json)
     writeSmoothingToJson(json);
     writeSignalExtractionToJson(json);
     writeMaxGateToJson(json);
-    writeScriptSettingsToJson(json);
 
     json["FileName"] = FileName;
     json["WorkingDir"] = WorkingDir;
@@ -76,7 +82,6 @@ bool MasterConfig::ReadFromJson(QJsonObject &json)
     readSmoothingFromJson(json);
     readSignalExtractionFromJson(json);
     readMaxGateFromJson(json);
-    readScriptSettingsFromJson(json);
 
     parseJson(json, "FileName", FileName);
     parseJson(json, "WorkingDir", WorkingDir);
@@ -138,7 +143,7 @@ bool MasterConfig::readSignalPolarityFromJson(QJsonObject &json)
     ListNegativeChannels.clear();
     QJsonArray arr = json["NegativeChannels"].toArray();
     for (int i=0; i<arr.size(); i++)
-        ListNegativeChannels.push_back(arr[i].toInt());
+        ListNegativeChannels << arr[i].toInt();
 
     updatePolarityQuickAccessData();
     return true;
@@ -291,65 +296,47 @@ bool MasterConfig::readMaxGateFromJson(QJsonObject &json)
     return true;
 }
 
-void MasterConfig::writeScriptSettingsToJson(QJsonObject &json)
-{
-    QJsonObject js;
-
-    js["GlobScript"] = GlobScript;
-    js["ScriptWindowJson"] = ScriptWindowJson;
-    js["DefaultFontSize_ScriptWindow"] = DefaultFontSize_ScriptWindow;
-    js["DefaultFontFamily_ScriptWindow"] = DefaultFontFamily_ScriptWindow;
-    js["DefaultFontWeight_ScriptWindow"] = DefaultFontWeight_ScriptWindow;
-    js["DefaultFontItalic_ScriptWindow"] = DefaultFontItalic_ScriptWindow;
-    QJsonArray mspAr;
-    for (int w : MainSplitterSizes_ScriptWindow) mspAr << w;
-    js["MainSplitterSizes_ScriptWindow"] = mspAr;
-
-    json["ScriptWinSettings"] = js;
-}
-
-bool MasterConfig::readScriptSettingsFromJson(QJsonObject &json)
-{
-    QJsonObject js;
-    parseJson(json, "ScriptWinSettings", js);
-
-    if (!js.isEmpty())
-    {
-        parseJson(js, "DefaultFontSize_ScriptWindow", DefaultFontSize_ScriptWindow);
-        parseJson(js, "DefaultFontFamily_ScriptWindow", DefaultFontFamily_ScriptWindow);
-        parseJson(js, "DefaultFontWeight_ScriptWindow", DefaultFontWeight_ScriptWindow);
-        parseJson(js, "DefaultFontItalic_ScriptWindow", DefaultFontItalic_ScriptWindow);
-        QJsonArray mspAr;
-        parseJson(js, "MainSplitterSizes_ScriptWindow", mspAr);
-        for (int imsa=0; imsa<mspAr.size(); imsa++)
-            MainSplitterSizes_ScriptWindow << mspAr[imsa].toInt(50);
-    }
-    return true;
-}
-
 void MasterConfig::updatePolarityQuickAccessData()
 {
+    int imax = 0;
     for (int ichannel : ListNegativeChannels)
-    {
-        if (ichannel >= NegPol.size())
-            NegPol.resize(ichannel+1, false);
+        if (ichannel>imax) imax = ichannel;
+    NegPol = QVector<bool>(imax+1, false);
+
+    for (int ichannel : ListNegativeChannels)
         NegPol[ichannel] = true;
-    }
 }
 
-bool MasterConfig::IsNegative(int iHardwChannel) const
+bool MasterConfig::IsNegativeHardwareChannel(int iHardwChannel) const
 {
     if ( iHardwChannel >= NegPol.size() || iHardwChannel < 0 ) return false;
     return NegPol.at(iHardwChannel);
 }
 
-void MasterConfig::SetMapping(const QVector<int> &mapping)
+bool MasterConfig::IsNegativeLogicalChannel(int iLogical) const
 {
+    int iHardwChannel = Map->LogicalToHardware(iLogical);
+    if ( iHardwChannel >= NegPol.size() || iHardwChannel < 0 ) return false;
+    return NegPol.at(iHardwChannel);
+}
+
+bool MasterConfig::SetMapping(const QVector<int> &mapping)
+{
+    QSet<int> tmp;
+    for (int i : mapping) tmp << i;
+    if (tmp.size() != mapping.size()) return false;
+
     Map->Clear();
     ChannelMap.clear();
 
     ChannelMap = mapping;
     Map->SetChannels_OrderedByLogical(ChannelMap);
+    return true;
+}
+
+int MasterConfig::CountLogicalChannels() const
+{
+    return ChannelMap.size();
 }
 
 QVector<int> MasterConfig::GetListOfIgnoreChannels() const
@@ -366,4 +353,8 @@ void MasterConfig::SetListOfIgnoreChannels(const QVector<int> &list)
     for (int i : list) IgnoreHardwareChannels << i;
 }
 
-
+bool MasterConfig::IsIgnoredLogicalChannel(int iLogical) const
+{
+    int iHardwChan = Map->LogicalToHardware(iLogical);
+    return IgnoreHardwareChannels.contains(iHardwChan);
+}

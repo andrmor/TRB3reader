@@ -52,14 +52,11 @@ public:
 
     void SetMainSplitterSizes(QList<int> values);
 
-    AScriptManager* ScriptManager;
-    QStringList functions;
-
     bool ExecuteScript(const QString &Script);
     bool ExecuteScriptInFirstTab();
 
 public slots:
-    void updateJsonTree();
+    void updateJsonTree();       //update "config" tree widget
 
     void ShowText(QString text); //shows text in the output box
     void ClearText(); //clears text in the output box
@@ -104,9 +101,17 @@ private:
     QStringListModel* completitionModel;
     MasterConfig* Config;
 
+    AScriptManager* ScriptManager;
+    QStringList functions;
+
     int CurrentTab;
     QList<AScriptWindowTabItem*> ScriptTabs;
     QTabWidget* twScriptTabs;
+
+    int DefaultFontSize = 12;
+    QString DefaultFontFamily;
+    bool DefaultFontWeight;
+    bool DefaultFontItalic;
 
     QSplitter* splMain;
     QSplitter* splHelp;
@@ -132,8 +137,7 @@ private:
     void fillSubArray(QTreeWidgetItem* parent, const QJsonArray& arr);
     QString getDesc(const QJsonValue &ref);
     void fillHelper(QObject* obj, QString module, QString helpText = "");  //fill help TreeWidget according to the data in the obj
-    QString getFunctionReturnType(QString UnitFunction);
-    QString getKeyPath(QTreeWidgetItem *item);
+    QString getKeyPath(QTreeWidgetItem *item, bool bAddQuatation);
     void showContextMenuForJsonTree(QTreeWidgetItem *item, QPoint pos);
     QStringList getCustomCommandsOfObject(QObject *obj, QString ObjName, bool fWithArguments = false);
 
@@ -154,6 +158,7 @@ signals:
     void onAbort();
     void success(QString eval);
     void RequestStateSave();
+    void RequestUpdateMainWindowGui();
 
 public slots:
     void receivedOnStart() {emit onStart();}

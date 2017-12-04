@@ -8,6 +8,7 @@
 #include "ascriptwindow.h"
 #include "adispatcher.h"
 #include "adatahub.h"
+#include "amessage.h"
 
 #include <QJsonObject>
 #include <QJsonArray>
@@ -33,16 +34,12 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::saveCompleteState()
 {
-    QJsonObject js;
-#ifdef CERN_ROOT
-    js = RootModule->SaveGraphWindows();
-#endif
-    Dispatcher->SaveConfig(Dispatcher->AutosaveFile, js);
-
     //save script-related config
     QJsonObject jsS;
     ScriptWindow->WriteToJson(jsS);
     SaveJsonToFile(jsS, Dispatcher->ConfigDir+"/scripting.json");
+
+    Dispatcher->SaveConfig(Dispatcher->AutosaveFile);
 }
 
 void MainWindow::on_actionLoad_config_triggered()
@@ -59,15 +56,10 @@ void MainWindow::on_actionSave_config_triggered()
     if (FileName.isEmpty()) return;
     if (QFileInfo(FileName).suffix().isEmpty()) FileName += ".json";
 
-    QJsonObject jsW;
-#ifdef CERN_ROOT
-    jsW = RootModule->SaveGraphWindows();
-#endif
-
-    Dispatcher->SaveConfig(FileName, jsW);
+    Dispatcher->SaveConfig(FileName);
 }
 
-void MainWindow::writeGUItoJson(QJsonObject &json)
+void MainWindow::WriteGUItoJson(QJsonObject &json)
 {
     QJsonObject jsgui;
 
@@ -81,6 +73,8 @@ void MainWindow::writeGUItoJson(QJsonObject &json)
     jsgui["BulkCopy"] = ui->cbBulkCopyToDatahub->isChecked();
     jsgui["BulkCopyWaveforms"] = ui->cbBulkAlsoCopyWaveforms->isChecked();
     jsgui["SaveAddPositions"] = ui->cbAddReconstructedPositions->isChecked();
+
+    jsgui["ExplorerSource"] = ui->cobExplorerSource->currentIndex();
 
     QJsonObject ja;
         ja["AutoY"] = ui->cbAutoscaleY->isChecked();
@@ -102,7 +96,7 @@ void MainWindow::writeGUItoJson(QJsonObject &json)
     json["GUI"] = jsgui;
 }
 
-void MainWindow::readGUIfromJson(QJsonObject &json)
+void MainWindow::ReadGUIfromJson(const QJsonObject& json)
 {
     if (!json.contains("GUI")) return;
 
@@ -118,6 +112,8 @@ void MainWindow::readGUIfromJson(QJsonObject &json)
     JsonToCheckbox(jsgui, "BulkCopy", ui->cbBulkCopyToDatahub);
     JsonToCheckbox(jsgui, "BulkCopyWaveforms", ui->cbBulkAlsoCopyWaveforms);
     JsonToCheckbox(jsgui, "SaveAddPositions", ui->cbAddReconstructedPositions);
+
+    JsonToComboBox(jsgui, "ExplorerSource", ui->cobExplorerSource);
 
     QJsonObject ja = jsgui["GraphScale"].toObject();
         JsonToCheckbox(ja, "AutoY", ui->cbAutoscaleY);
@@ -139,52 +135,59 @@ void MainWindow::readGUIfromJson(QJsonObject &json)
     }
 }
 
-void MainWindow::writeWindowsToJson(QJsonObject& json, const QJsonObject jsW)
+void MainWindow::SaveWindowSettings()
 {
-    QJsonObject js;
+    QJsonObject json;
 
-    js["Main"] = SaveWindowToJson(x(), y(), width(), height(), true);
-    js["ScriptWindow"] = SaveWindowToJson(ScriptWindow->x(), ScriptWindow->y(), ScriptWindow->width(), ScriptWindow->height(), ScriptWindow->isVisible());
-    js["GraphWindows"] = jsW;
-
-    json["WindowGeometries"] = js;
-}
-
-void MainWindow::readWindowsFromJson(QJsonObject &json)
-{
-    QJsonObject js;
-    parseJson(json, "WindowGeometries", js);
-    if (!js.isEmpty())
-    {
-        QJsonObject jsMain = js["Main"].toObject();
-        int x=10, y=10, w=500, h=700;
-        bool bVis=true;
-        LoadWindowFromJson(jsMain, x, y, w, h, bVis);
-        setGeometry(x, y, w, h);
-
-        QJsonObject jsScript;
-        parseJson(js, "ScriptWindow", jsScript);
-        if (!jsScript.isEmpty())
-        {
-            LoadWindowFromJson(jsScript, x, y, w, h, bVis);
-            ScriptWindow->setGeometry(x, y, w, h);
-            ScriptWindow->setVisible(bVis);
-        }
+    json["Main"] = SaveWindowToJson(x(), y(), width(), height(), true);
+    json["ScriptWindow"] = SaveWindowToJson(ScriptWindow->x(), ScriptWindow->y(), ScriptWindow->width(), ScriptWindow->height(), ScriptWindow->isVisible());
 
 #ifdef CERN_ROOT
-        QJsonObject jsW;
-        parseJson(js, "GraphWindows", jsW);
-        RootModule->SetWindowGeometries(jsW);
+    json["GraphWindows"] = RootModule->SaveGraphWindows();
 #endif
-    }
+
+    SaveJsonToFile(json, Dispatcher->WinSetFile);
 }
 
+void MainWindow::LoadWindowSettings()
+{
+    QJsonObject js;
+    LoadJsonFromFile(js, Dispatcher->WinSetFile);
+    if (js.isEmpty()) return;
 
+    int x=10, y=10, w=500, h=700;
+    bool bVis=true;
+
+    if (js.contains("Main"))
+    {
+        QJsonObject jsMain = js["Main"].toObject();
+        LoadWindowFromJson(jsMain, x, y, w, h, bVis);
+        this->move(x, y);
+        this->resize(w, h);
+        //setGeometry(x, y, w, h); // introduces a shift up on Windows7
+    }
+
+    if (js.contains("Main"))
+    {
+        QJsonObject jsScript = js["ScriptWindow"].toObject();
+        LoadWindowFromJson(jsScript, x, y, w, h, bVis);
+        ScriptWindow->move(x, y);
+        ScriptWindow->resize(w, h);
+        //ScriptWindow->setGeometry(x, y, w, h); // introduces a shift up on Windows7
+        ScriptWindow->setVisible(bVis);
+    }
+
+#ifdef CERN_ROOT
+    QJsonObject jsW;
+    parseJson(js, "GraphWindows", jsW);
+    RootModule->SetWindowGeometries(jsW);
+#endif
+}
 
 // --- Update GUI controls on Config change ---
 void MainWindow::UpdateGui()
 {
-    qDebug() << "--- Updating GUI";
+    //qDebug() << "--- Updating GUI";
 
     //datakinds
     ui->lwDatakinds->clear();
@@ -229,8 +232,15 @@ void MainWindow::UpdateGui()
             ui->sbAdjAvPoints->setValue(Config->AdjacentAveraging_NumPoints);
             ui->cbAdjAvWeighted->setChecked(Config->AdjacentAveraging_bWeighted);
 
-    ui->cobSignalExtractionMethod->setCurrentIndex(Config->SignalExtractionMethod);
+    int method = Config->SignalExtractionMethod;
+    if (method <= 3) ui->cobSignalExtractionMethod->setCurrentIndex(method);
+    else
+        message("Signal extraction method in config file is not valid in this version of program", this);
+
+
     ui->sbExtractAllFromSampleNumber->setValue(Config->CommonSampleNumber);
+    ui->sbIntegrateFrom->setValue(Config->IntegrateFrom);
+    ui->sbIntegrateTo->setValue(Config->IntegrateTo);
 
     ui->cbZeroSignalIfReverseMax->setChecked(Config->bZeroSignalIfReverse);
         ui->ledReverseMaxLimit->setText(QString::number(Config->ReverseMaxThreshold));
@@ -255,11 +265,7 @@ void MainWindow::UpdateGui()
     ui->sbPosMaxTo->setValue(Config->PosMaxGateTo);
 
     updateNumEventsIndication();
-}
-
-void MainWindow::updateNumEventsIndication()
-{
-    ui->labDatahubEvents->setText("DataHub contains " + QString::number(DataHub->CountEvents()) + " events");
+    OnEventOrChannelChanged(true);
 }
 
 // --- update Config on GUI operated by user ---
@@ -416,5 +422,17 @@ void MainWindow::on_sbNegMaxTo_editingFinished()
 void MainWindow::on_sbExtractAllFromSampleNumber_editingFinished()
 {
     Config->CommonSampleNumber = ui->sbExtractAllFromSampleNumber->value();
+    ClearData();
+}
+
+void MainWindow::on_sbIntegrateFrom_editingFinished()
+{
+    Config->IntegrateFrom = ui->sbIntegrateFrom->value();
+    ClearData();
+}
+
+void MainWindow::on_sbIntegrateTo_editingFinished()
+{
+    Config->IntegrateTo = ui->sbIntegrateTo->value();
     ClearData();
 }

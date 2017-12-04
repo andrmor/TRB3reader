@@ -12,12 +12,12 @@ AInterfaceToData::AInterfaceToData(ADataHub* DataHub) :
 
 }
 
-int AInterfaceToData::countEvents()
+int AInterfaceToData::countEvents() const
 {
     return DataHub->CountEvents();
 }
 
-int AInterfaceToData::countChannels()
+int AInterfaceToData::countChannels() const
 {
     return DataHub->CountChannels();
 }
@@ -27,17 +27,25 @@ void AInterfaceToData::Clear()
     DataHub->Clear();
 }
 
-float AInterfaceToData::getSignal(int ievent, int iLogicalChannel)
+void AInterfaceToData::addEvent(const QVariant signalArray)
+{
+    AOneEvent* ev = new AOneEvent();
+    ev->SetRejectedFlag(false);
+    DataHub->AddEvent(ev);
+    setSignals(DataHub->CountEvents()-1, signalArray); // size is checked there, abort if wrong
+}
+
+float AInterfaceToData::getSignal(int ievent, int iLogicalChannel) const
 {
     return DataHub->GetSignal(ievent, iLogicalChannel);
 }
 
-float AInterfaceToData::getSignalFast(int ievent, int iLogicalChannel)
+float AInterfaceToData::getSignalFast(int ievent, int iLogicalChannel) const
 {
     return DataHub->GetSignalFast(ievent, iLogicalChannel);
 }
 
-QVariant AInterfaceToData::getSignals(int ievent)
+const QVariant AInterfaceToData::getSignals(int ievent) const
 {
     const QVector<float>* vec = DataHub->GetSignals(ievent);
     if (!vec) return QVariantList();
@@ -48,7 +56,7 @@ QVariant AInterfaceToData::getSignals(int ievent)
     return jv.toVariant();
 }
 
-QVariant AInterfaceToData::getSignalsFast(int ievent)
+const QVariant AInterfaceToData::getSignalsFast(int ievent) const
 {
     const QVector<float>* vec = DataHub->GetSignalsFast(ievent);
 
@@ -69,7 +77,7 @@ void AInterfaceToData::setSignalFast(int ievent, int iLogicalChannel, float valu
     DataHub->SetSignalFast(ievent, iLogicalChannel, value);
 }
 
-void AInterfaceToData::setSignals(int ievent, QVariant arrayOfValues)
+void AInterfaceToData::setSignals(int ievent, const QVariant arrayOfValues)
 {
     QString type = arrayOfValues.typeName();
     if (type != "QVariantList")
@@ -80,12 +88,13 @@ void AInterfaceToData::setSignals(int ievent, QVariant arrayOfValues)
 
     QVariantList vl = arrayOfValues.toList();
     QJsonArray ar = QJsonArray::fromVariantList(vl);
-//    const int numChannels = DataHub->CountChannels();
-//    if (ar.size() != numChannels)
-//    {
-//        abort("Failed to set signal values - array size mismatch");
-//        return;
-//    }
+    const int numChannels = DataHub->CountChannels();
+    if (ar.size() != numChannels)
+        if (numChannels != 0)
+        {
+            abort("Failed to set signal values - array size mismatch");
+            return;
+        }
 
     QVector<float> vec;
     vec.reserve(ar.size());
@@ -106,7 +115,7 @@ void AInterfaceToData::setSignals(int ievent, QVariant arrayOfValues)
     }
 }
 
-void AInterfaceToData::setSignalsFast(int ievent, QVariant arrayOfValues)
+void AInterfaceToData::setSignalsFast(int ievent, const QVariant arrayOfValues)
 {
     QVariantList vl = arrayOfValues.toList();
     QJsonArray ar = QJsonArray::fromVariantList(vl);
@@ -118,12 +127,12 @@ void AInterfaceToData::setSignalsFast(int ievent, QVariant arrayOfValues)
     DataHub->SetSignalsFast(ievent, &vec);
 }
 
-bool AInterfaceToData::isRejectedEvent(int ievent)
+bool AInterfaceToData::isRejectedEvent(int ievent) const
 {
     return DataHub->IsRejected(ievent);
 }
 
-bool AInterfaceToData::isRejectedEventFast(int ievent)
+bool AInterfaceToData::isRejectedEventFast(int ievent) const
 {
     return DataHub->IsRejectedFast(ievent);
 }
@@ -145,7 +154,7 @@ void AInterfaceToData::setAllRejected(bool flag)
     DataHub->SetAllRejectedFlag(flag);
 }
 
-QVariant AInterfaceToData::getPosition(int ievent)
+const QVariant AInterfaceToData::getPosition(int ievent) const
 {
     const float* pos = DataHub->GetPosition(ievent);
     if (!pos)
@@ -160,7 +169,7 @@ QVariant AInterfaceToData::getPosition(int ievent)
     return jv.toVariant();
 }
 
-QVariant AInterfaceToData::getPositionFast(int ievent)
+const QVariant AInterfaceToData::getPositionFast(int ievent) const
 {
     const float* pos = DataHub->GetPosition(ievent);
 
@@ -184,7 +193,7 @@ void AInterfaceToData::setPositionFast(int ievent, float x, float y, float z)
     DataHub->SetPositionFast(ievent, x, y, z);
 }
 
-QVariant AInterfaceToData::getWaveforms(int ievent)
+const QVariant AInterfaceToData::getWaveforms(int ievent)
 {
     const QVector< QVector<float>* >* vec = DataHub->GetWaveforms(ievent);
     if (!vec)
@@ -206,7 +215,7 @@ QVariant AInterfaceToData::getWaveforms(int ievent)
     return jv.toVariant();
 }
 
-float AInterfaceToData::getWaveformMax(int ievent, int ichannel)
+float AInterfaceToData::getWaveformMax(int ievent, int ichannel) const
 {
     float val = DataHub->GetWaveformMax(ievent, ichannel);
     if (std::isnan(val))
@@ -214,7 +223,7 @@ float AInterfaceToData::getWaveformMax(int ievent, int ichannel)
     return val;
 }
 
-float AInterfaceToData::getWaveformMin(int ievent, int ichannel)
+float AInterfaceToData::getWaveformMin(int ievent, int ichannel) const
 {
     float val = DataHub->GetWaveformMin(ievent, ichannel);
     if (std::isnan(val))
@@ -222,7 +231,7 @@ float AInterfaceToData::getWaveformMin(int ievent, int ichannel)
     return val;
 }
 
-int AInterfaceToData::getWaveformMaxSample(int ievent, int ichannel)
+int AInterfaceToData::getWaveformMaxSample(int ievent, int ichannel) const
 {
     int val = DataHub->GetWaveformMaxSample(ievent, ichannel);
     if (val < 0)
@@ -230,7 +239,7 @@ int AInterfaceToData::getWaveformMaxSample(int ievent, int ichannel)
     return val;
 }
 
-int AInterfaceToData::getWaveformMinSample(int ievent, int ichannel)
+int AInterfaceToData::getWaveformMinSample(int ievent, int ichannel) const
 {
     int val = DataHub->GetWaveformMinSample(ievent, ichannel);
     if (val < 0)
@@ -238,7 +247,7 @@ int AInterfaceToData::getWaveformMinSample(int ievent, int ichannel)
     return val;
 }
 
-int AInterfaceToData::getWaveformSampleWhereFirstBelow(int ievent, int ichannel, float threshold)
+int AInterfaceToData::getWaveformSampleWhereFirstBelow(int ievent, int ichannel, float threshold) const
 {
     int val = DataHub->GetWaveformSampleWhereFirstBelow(ievent, ichannel, threshold);
     if (val < 0)
@@ -246,7 +255,7 @@ int AInterfaceToData::getWaveformSampleWhereFirstBelow(int ievent, int ichannel,
     return val;
 }
 
-int AInterfaceToData::getWaveformSampleWhereFirstAbove(int ievent, int ichannel, float threshold)
+int AInterfaceToData::getWaveformSampleWhereFirstAbove(int ievent, int ichannel, float threshold) const
 {
     int val = DataHub->GetWaveformSampleWhereFirstAbove(ievent, ichannel, threshold);
     if (val < 0)
@@ -318,7 +327,7 @@ void AInterfaceToData::setMultiplicityFast(int ievent, QVariant px_py_pz_nx_ny_n
     DataHub->SetMultiplicityNegativeFast(ievent, arrNeg);
 }
 
-QVariant AInterfaceToData::getMultiplicity(int ievent)
+const QVariant AInterfaceToData::getMultiplicity(int ievent) const
 {
     const int* multPos = DataHub->GetMultiplicityPositive(ievent);
     if (!multPos)
@@ -335,7 +344,7 @@ QVariant AInterfaceToData::getMultiplicity(int ievent)
     return jv.toVariant();
 }
 
-QVariant AInterfaceToData::getMultiplicityFast(int ievent)
+const QVariant AInterfaceToData::getMultiplicityFast(int ievent) const
 {
     const int* multPos = DataHub->GetMultiplicityPositiveFast(ievent);
     const int* multNeg = DataHub->GetMultiplicityNegativeFast(ievent);
@@ -411,7 +420,7 @@ void AInterfaceToData::setSumSignalsFast(int ievent, QVariant px_py_pz_nx_ny_nz)
     DataHub->SetSumSignalNegativeFast(ievent, arrNeg);
 }
 
-QVariant AInterfaceToData::getSumSignals(int ievent)
+const QVariant AInterfaceToData::getSumSignals(int ievent) const
 {
     const float* sumPos = DataHub->GetSumSignalPositive(ievent);
     if (!sumPos)
@@ -428,7 +437,7 @@ QVariant AInterfaceToData::getSumSignals(int ievent)
     return jv.toVariant();
 }
 
-QVariant AInterfaceToData::getSumSignalsFast(int ievent)
+const QVariant AInterfaceToData::getSumSignalsFast(int ievent) const
 {
     const float* sumPos = DataHub->GetSumSignalPositiveFast(ievent);
     const float* sumNeg = DataHub->GetSumSignalNegativeFast(ievent);

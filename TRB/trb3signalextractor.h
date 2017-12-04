@@ -31,8 +31,8 @@ public:
 
     void    ClearData();
 
-    int     GetNumEvents() const {return signalData.size();}
-    int     GetNumChannels() const;
+    int     CountEvents() const {return signalData.size();}
+    int     CountChannels() const;
 
     bool    IsRejectedEvent(int ievent) const;
     bool    IsRejectedEventFast(int ievent) const {return RejectedEvents.at(ievent);}

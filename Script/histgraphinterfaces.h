@@ -44,7 +44,7 @@ public slots:
   bool Delete(QString HistName);
   void DeleteAllHist();
 
-  bool isHistExist(QString HistName);
+  bool IsHistExist(QString HistName);
 
   void SetOptStat(QString opt);
 
@@ -83,7 +83,7 @@ public slots:
   bool Delete(QString GraphName);
   void DeleteAllGraph();
 
-  bool isGraphExists(QString GraphName);
+  bool IsGraphExists(QString GraphName);
 
 signals:
   void RequestDraw(TObject* obj, QString options, bool fFocus);

@@ -108,7 +108,7 @@ void JsonToComboBox(QJsonObject &json, QString key, QComboBox *qb)
     }
 }
 
-bool LoadJsonFromFile(QJsonObject &json, QString fileName)
+bool LoadJsonFromFile(QJsonObject &json, const QString fileName)
 {
     QFile loadFile(fileName);
     if (loadFile.open(QIODevice::ReadOnly))
@@ -127,7 +127,7 @@ bool LoadJsonFromFile(QJsonObject &json, QString fileName)
     return true;
 }
 
-bool SaveJsonToFile(QJsonObject &json, QString fileName)
+bool SaveJsonToFile(QJsonObject &json, const QString fileName)
 {
   QJsonDocument saveDoc(json);
 

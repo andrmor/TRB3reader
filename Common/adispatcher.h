@@ -7,22 +7,25 @@
 class MasterConfig;
 class Trb3dataReader;
 class Trb3signalExtractor;
+class QJsonObject;
 
 class MainWindow;
 
 class QJsonObject;
 
-class ADispatcher
+class ADispatcher : public QObject
 {
+    Q_OBJECT
+
 public:
-    //ADispatcher(MasterConfig* Config, Trb3dataReader* Reader, Trb3signalExtractor* Extractor); //No GUI
-    ADispatcher(MasterConfig* Config, Trb3dataReader* Reader, Trb3signalExtractor* Extractor, MainWindow* MW); //With GUI
+    ADispatcher(MasterConfig* Config, Trb3dataReader* Reader, Trb3signalExtractor* Extractor);
 
     void ClearData();
 
-    void LoadConfig(QString FileName);
+    void LoadAutosaveConfig();
+    void LoadConfig(const QString FileName);
     bool LoadConfig(QJsonObject& json);
-    void SaveConfig(QString FileName, QJsonObject js);
+    void SaveConfig(const QString FileName);
 
     void ClearNegativeChannels();
     void ClearMapping();
@@ -31,17 +34,19 @@ public:
 public:
     QString ConfigDir;
     QString AutosaveFile;
-
+    QString WinSetFile;
 
 private:
     MasterConfig* Config;
     Trb3dataReader* Reader;
     Trb3signalExtractor* Extractor;
 
-    //GUI
-    MainWindow* MW;
-
-    void onStart();
+    //interaction with GUI through the signals/slots
+signals:
+    void RequestUpdateGui();
+    void RequestReadGuiFromJson(const QJsonObject& json);
+    void RequestWriteGuiToJson(QJsonObject& json);
+    void RequestWriteWindowSettings();
 };
 
 #endif // ADISPATCHER_H

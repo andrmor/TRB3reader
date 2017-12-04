@@ -7,27 +7,24 @@
 #include <QJsonArray>
 
 AInterfaceToExtractor::AInterfaceToExtractor(MasterConfig* Config, Trb3signalExtractor* Extractor) :
-    Config(Config), Extractor(Extractor)
-{
+    Config(Config), Extractor(Extractor) {}
 
+int AInterfaceToExtractor::countEvents() const
+{
+    return Extractor->CountEvents();
 }
 
-int AInterfaceToExtractor::countEvents()
+int AInterfaceToExtractor::countChannels() const
 {
-    return Extractor->GetNumEvents();
+    return Extractor->CountChannels();
 }
 
-int AInterfaceToExtractor::countChannels()
-{
-    return Extractor->GetNumChannels();
-}
-
-float AInterfaceToExtractor::getSignal(int ievent, int iHardwChannel)
+float AInterfaceToExtractor::getSignal(int ievent, int iHardwChannel) const
 {
     return Extractor->GetSignal(ievent, iHardwChannel);
 }
 
-QVariant AInterfaceToExtractor::getSignals(int ievent)
+const QVariant AInterfaceToExtractor::getSignals(int ievent) const
 {
     const QVector<float>* vec = Extractor->GetSignals(ievent);
     if (!vec) return QVariantList();
@@ -38,7 +35,7 @@ QVariant AInterfaceToExtractor::getSignals(int ievent)
     return jv.toVariant();
 }
 
-QVariant AInterfaceToExtractor::getSignals_logical(int ievent)
+const QVariant AInterfaceToExtractor::getSignals_logical(int ievent) const
 {
     const QVector<float>* vec = Extractor->GetSignals(ievent);
     if (!vec) return QVariantList();
@@ -57,7 +54,7 @@ void AInterfaceToExtractor::setSignal(int ievent, int iHardwChannel, float value
     if (!bOK) abort("Failed to set signal value - wrong arguments");
 }
 
-void AInterfaceToExtractor::setSignals(int ievent, QVariant arrayOfValues)
+void AInterfaceToExtractor::setSignals(int ievent, const QVariant arrayOfValues)
 {
     QString type = arrayOfValues.typeName();
     if (type != "QVariantList")
@@ -68,7 +65,7 @@ void AInterfaceToExtractor::setSignals(int ievent, QVariant arrayOfValues)
 
     QVariantList vl = arrayOfValues.toList();
     QJsonArray ar = QJsonArray::fromVariantList(vl);
-    const int numChannels = Extractor->GetNumChannels();
+    const int numChannels = Extractor->CountChannels();
     if (ar.size() != numChannels)
     {
         abort("Failed to set signal values - array size mismatch");
@@ -96,12 +93,12 @@ void AInterfaceToExtractor::setAllRejected(bool flag)
     Extractor->SetAllRejected(flag);
 }
 
-bool AInterfaceToExtractor::isRejectedEvent(int ievent)
+bool AInterfaceToExtractor::isRejectedEvent(int ievent) const
 {
     return Extractor->IsRejectedEvent(ievent);
 }
 
-bool AInterfaceToExtractor::isRejectedEventFast(int ievent)
+bool AInterfaceToExtractor::isRejectedEventFast(int ievent) const
 {
     return Extractor->IsRejectedEventFast(ievent);
 }

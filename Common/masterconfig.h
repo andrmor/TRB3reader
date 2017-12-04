@@ -25,17 +25,20 @@ public:
     //negative/positive channels
     const QVector<int>& GetListOfNegativeChannels() const {return ListNegativeChannels;}
     void                SetNegativeChannels(const QVector<int> &list);
-    bool                IsNegative(int iHardwChannel) const;
+    bool                IsNegativeHardwareChannel(int iHardwChannel) const;
+    bool                IsNegativeLogicalChannel(int iLogical) const;
 
     //channel map (hardware / logical)
     ChannelMapper*      Map;  //use this class to access convertion methods!
-    void                SetMapping(const QVector<int> &mapping);
+    bool                SetMapping(const QVector<int> &mapping);
     const QVector<int>& GetMapping() const {return ChannelMap;}
+    int                 CountLogicalChannels() const;
 
     QVector<int>        GetListOfIgnoreChannels() const;
     void                SetListOfIgnoreChannels(const QVector<int>& list);
     void                ClearListOfIgnoreChannels() {IgnoreHardwareChannels.clear();}
-    bool                IsIgnoredChannel(int iHardwChannel) const {return IgnoreHardwareChannels.contains(iHardwChannel); }
+    bool                IsIgnoredHardwareChannel(int iHardwChannel) const {return IgnoreHardwareChannels.contains(iHardwChannel); }
+    bool                IsIgnoredLogicalChannel(int iLogical) const;
 
     bool                bSmoothWaveforms = false;
     bool                AdjacentAveraging_bOn = false;
@@ -49,6 +52,8 @@ public:
 
     int                 SignalExtractionMethod = 0; //0 - independent max, 1 - common sample, at global max
     int                 CommonSampleNumber = 0;
+    int                 IntegrateFrom = 0;
+    int                 IntegrateTo = 100;
 
     bool                bZeroSignalIfReverse = false;
     double              ReverseMaxThreshold = 0.25;
@@ -76,15 +81,6 @@ public:
     QString             FileName;
     QString             WorkingDir;
 
-    QString             GlobScript;
-    QJsonObject         ScriptWindowJson;
-    int                 DefaultFontSize_ScriptWindow = 12;
-    QString             DefaultFontFamily_ScriptWindow;
-    bool                DefaultFontWeight_ScriptWindow;
-    bool                DefaultFontItalic_ScriptWindow;
-    QList<int>          MainSplitterSizes_ScriptWindow;
-
-
     // config <-> JSON handling
     void                WriteToJson(QJsonObject& json);
     bool                ReadFromJson(QJsonObject& json);
@@ -93,7 +89,7 @@ private:
     QSet<int>           Datakinds;
 
     QVector<int>        ListNegativeChannels;
-    std::vector<bool>   NegPol; //Quick access
+    QVector<bool>       NegPol; //Quick access
 
     QVector<int>        ChannelMap;
 
@@ -122,9 +118,6 @@ private:
 
     void writeMaxGateToJson(QJsonObject& json);
     bool readMaxGateFromJson(QJsonObject& json);
-
-    void writeScriptSettingsToJson(QJsonObject& json);
-    bool readScriptSettingsFromJson(QJsonObject& json);
 };
 
 #endif // MASTERCONFIG_H

@@ -18,8 +18,14 @@ public:
     float   GetValue(int ievent, int ichannel, int isample) const;
     float   GetValueFast(int ievent, int ichannel, int isample) const; //no argument validity check!
 
+    bool    SetValue(int ievent, int ichannel, int isample, float value);
+    void    SetValueFast(int ievent, int ichannel, int isample, float value); //no argument validity check!
+
     const QVector<float>* GetWaveformPtr(int ievent, int ichannel) const;
     const QVector<float>* GetWaveformPtrFast(int ievent, int ichannel) const; //no argument validity check!
+
+    bool    SetWaveform(int ievent, int ichannel, const QVector<float> &array);
+    void    SetWaveformFast(int ievent, int ichannel, const QVector<float> &array);
 
     float   GetMax(int ievent, int ichannel) const;
     float   GetMaxFast(int ievent, int ichannel) const;
@@ -40,10 +46,10 @@ public:
     bool    isValid() const {return (waveData.size()>0 && numChannels>0 && numSamples>0);}
 
     // parameter requests
-    int     GetNumSamples()   const {return numSamples;}      // number of samples in the waveform
-    int     GetNumChannels()  const {return numChannels;}     // number of channels per event
-    int     GetNumEvents()    const {return waveData.size();} // number of events in the datafile
-    int     GetNumBadEvents() const {return numBadEvents;}    // number of disreguarded events - they had wrong number of samples
+    int     CountSamples()   const {return numSamples;}      // number of samples in the waveform
+    int     CountChannels()  const {return numChannels;}     // number of channels per event
+    int     CountEvents()    const {return waveData.size();} // number of events in the datafile
+    int     CountBadEvents() const {return numBadEvents;}    // number of disreguarded events - they had wrong number of samples
 
     void    ClearData();
 

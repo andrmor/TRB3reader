@@ -19,7 +19,7 @@ bool Trb3signalExtractor::ExtractSignals()
         return false;
     }
 
-    numChannels = Reader->GetNumChannels();
+    numChannels = Reader->CountChannels();
 
     qDebug() << "--> Extracting signals from waveforms...";
     ExtractAllSignals();
@@ -29,8 +29,8 @@ bool Trb3signalExtractor::ExtractSignals()
 
 void Trb3signalExtractor::GenerateDummyData()
 {
-    int numEvents = Reader->GetNumEvents();
-    numChannels = Reader->GetNumChannels();
+    int numEvents = Reader->CountEvents();
+    numChannels = Reader->CountChannels();
 
     signalData.resize(numEvents);
     for (int i=0; i<numEvents; i++) signalData[i] = QVector<float>(numChannels, 0);
@@ -107,7 +107,7 @@ void Trb3signalExtractor::ClearData()
     signalData.clear();
 }
 
-int Trb3signalExtractor::GetNumChannels() const
+int Trb3signalExtractor::CountChannels() const
 {
     if (signalData.size() == 0) return 0;
     return signalData.at(0).size();
@@ -122,13 +122,13 @@ bool Trb3signalExtractor::IsRejectedEvent(int ievent) const
 void Trb3signalExtractor::ExtractAllSignals()
 {
     //qDebug() << "Method:"<< Config.SignalExtractionMethod;
-    const int numEvents = Reader->GetNumEvents();
+    const int numEvents = Reader->CountEvents();
     signalData.resize(numEvents);
 
     //clear -> fill all with false
     RejectedEvents = QVector<bool>(numEvents, false);
 
-    const int numSamples = Reader->GetNumSamples();
+    const int numSamples = Reader->CountSamples();
     if (numSamples == 0) return;
 
     if (Config->SignalExtractionMethod == 2 &&  (Config->CommonSampleNumber<0 || Config->CommonSampleNumber>=numSamples) )
@@ -146,7 +146,7 @@ void Trb3signalExtractor::ExtractAllSignals()
         NegMaxValue = PosMaxValue = -1.0e10;
         for (int ichannel=0; ichannel<numChannels; ichannel++)
         {
-            if (Config->IsIgnoredChannel(ichannel) )
+            if (Config->IsIgnoredHardwareChannel(ichannel) )
             {
                 signalData[ievent][ichannel] = 0;
                 continue;
@@ -183,7 +183,7 @@ void Trb3signalExtractor::ExtractAllSignals()
             for (int ichannel=0; ichannel<numChannels; ichannel++)
               {
                 if (signalData.at(ievent).at(ichannel) == 0) continue; //respect suppression - applicable since it operates with max of waveform
-                if ( Config->IsNegative(ichannel) )
+                if ( Config->IsNegativeHardwareChannel(ichannel) )
                     signalData[ievent][ichannel] = -Reader->GetValueFast(ievent, ichannel, iNegMaxSample);
                 else
                     signalData[ievent][ichannel] = Reader->GetValueFast(ievent, ichannel, iPosMaxSample);
@@ -193,11 +193,25 @@ void Trb3signalExtractor::ExtractAllSignals()
             for (int ichannel=0; ichannel<numChannels; ichannel++)
               {
                 if (signalData.at(ievent).at(ichannel) == 0) continue; //respect suppression - applicable since it operates with max of waveform
-                if ( Config->IsNegative(ichannel) )
+                if ( Config->IsNegativeHardwareChannel(ichannel) )
                     signalData[ievent][ichannel] = -Reader->GetValueFast(ievent, ichannel, Config->CommonSampleNumber);
                 else
                     signalData[ievent][ichannel] = Reader->GetValueFast(ievent, ichannel, Config->CommonSampleNumber);
               }
+            break;
+        case 3:
+            for (int ichannel=0; ichannel<numChannels; ichannel++)
+            {
+                if (signalData.at(ievent).at(ichannel) == 0) continue; //respect suppression - applicable since it operates with max of waveform
+                const QVector<float>* wave = Reader->GetWaveformPtrFast(ievent, ichannel);
+                float val = 0;
+                for (int isam = Config->IntegrateFrom; isam<=Config->IntegrateTo; ++isam)
+                {
+                    if (isam < wave->size()) val += wave->at(isam);
+                    else break;
+                }
+                signalData[ievent][ichannel] = ( (Config->IsNegativeHardwareChannel(ichannel)) ? -val : val);
+            }
             break;
         default:
             qWarning() << "Unknown signal extraction method!";
@@ -219,7 +233,7 @@ float Trb3signalExtractor::extractSignalFromWaveform(int ievent, int ichannel, b
 {
     float sig;
 
-    if ( Config->IsNegative(ichannel) )
+    if ( Config->IsNegativeHardwareChannel(ichannel) )
     {
         sig = -extractMin(Reader->GetWaveformPtrFast(ievent, ichannel));
 

@@ -75,6 +75,21 @@ float Trb3dataReader::GetValueFast(int ievent, int ichannel, int isample) const
     return waveData.at(ievent).at(ichannel).at(isample);
 }
 
+bool Trb3dataReader::SetValue(int ievent, int ichannel, int isample, float value)
+{
+    if (ievent<0 || ievent>=waveData.size()) return false;
+    if (ichannel<0 || ichannel>=numChannels) return false;
+    if (isample<0 || isample>=numSamples) return false;
+
+    waveData[ievent][ichannel][isample] = value;
+    return true;
+}
+
+void Trb3dataReader::SetValueFast(int ievent, int ichannel, int isample, float value)
+{
+    waveData[ievent][ichannel][isample] = value;
+}
+
 const QVector<float> *Trb3dataReader::GetWaveformPtr(int ievent, int ichannel) const
 {
     if (ievent<0 || ievent>=waveData.size()) return 0;
@@ -86,6 +101,25 @@ const QVector<float> *Trb3dataReader::GetWaveformPtr(int ievent, int ichannel) c
 const QVector<float> *Trb3dataReader::GetWaveformPtrFast(int ievent, int ichannel) const
 {
     return &(waveData.at(ievent).at(ichannel));
+}
+
+bool Trb3dataReader::SetWaveform(int ievent, int ichannel, const QVector<float>& array)
+{
+    if (ievent<0 || ievent>=waveData.size()) return false;
+    if (ichannel<0 || ichannel>=numChannels) return false;
+    if (array.size() != numSamples)
+    {
+        if (numSamples != 0) return false;
+        else numSamples = array.size();
+    }
+
+    waveData[ievent][ichannel] = array;
+    return true;
+}
+
+void Trb3dataReader::SetWaveformFast(int ievent, int ichannel, const QVector<float> &array)
+{
+    waveData[ievent][ichannel] = array;
 }
 
 float Trb3dataReader::GetMax(int ievent, int ichannel) const
