@@ -263,30 +263,36 @@ void CernRootModule::ClearSingleWaveWindow()
 {
     if (!WOne) return; //paranoic
     WOne->ClearRootCanvas();
+    WOne->UpdateRootCanvas();
+    WOne->SetTitle("");
 }
 
 void CernRootModule::ClearOverNegWaveWindow()
 {
     if (!WOverNeg) return; //paranoic
     WOverNeg->ClearRootCanvas();
+    WOverNeg->UpdateRootCanvas();
 }
 
 void CernRootModule::ClearOverPosWaveWindow()
 {
     if (!WOverPos) return; //paranoic
     WOverPos->ClearRootCanvas();
+    WOverPos->UpdateRootCanvas();
 }
 
 void CernRootModule::ClearAllNegWaveWindow()
 {
     if (!WAllNeg) return; //paranoic
     WAllNeg->ClearRootCanvas();
+    WAllNeg->UpdateRootCanvas();
 }
 
 void CernRootModule::ClearAllPosWaveWindow()
 {
     if (!WAllPos) return; //paranoic
     WAllPos->ClearRootCanvas();
+    WAllPos->UpdateRootCanvas();
 }
 
 void CernRootModule::SetGraphAttributes(TGraph* g, bool bFromDataHub, int ievent, int ichannel)
@@ -331,7 +337,9 @@ bool CernRootModule::DrawSingle(bool bFromDataHub, int ievent, int ichannel, boo
     WOne->SetAsActiveRootWindow();
     gSingle->Draw("AL");
     WOne->UpdateRootCanvas();
-    WOne->SetTitle("Event: "+ QString::number(ievent) + "  LogicalChannel: "+QString::number(Config->Map->HardwareToLogical(ichannel)));
+
+    int ic = bFromDataHub ? ichannel : Config->Map->HardwareToLogical(ichannel);
+    WOne->SetTitle("Event: "+ QString::number(ievent) + "  LogicalChannel: "+QString::number(ic));
     return true;
 }
 
@@ -472,7 +480,7 @@ bool CernRootModule::DrawAll(bool bFromDataHub, int ievent, bool bNeg, int padsX
         bool bEmptyOne = false;
         const QVector<float>* wave = bFromDataHub ? DataHub->GetWaveform(ievent, iChannel) : Reader->GetWaveformPtr(ievent, iChannel);
         if (!wave) bEmptyOne = true;
-        if (wave->isEmpty()) bEmptyOne = true;
+        else if (wave->isEmpty()) bEmptyOne = true;
 
         if (!bEmptyOne)
         {
