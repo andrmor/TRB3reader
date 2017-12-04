@@ -469,11 +469,19 @@ void MainWindow::on_sbEvent_valueChanged(int arg1)
     }
 
     OnEventOrChannelChanged();
+
+    on_pbShowWaveform_toggled(ui->pbShowWaveform->isChecked());
+    on_pbShowOverlayNeg_toggled(ui->pbShowOverlayNeg->isChecked());
+    on_pbShowOverlayPos_toggled(ui->pbShowOverlayPos->isChecked());
+    on_pbShowAllNeg_toggled(ui->pbShowAllNeg->isChecked());
+    on_pbShowAllPos_toggled(ui->pbShowAllPos->isChecked());
 }
 
 void MainWindow::on_sbChannel_valueChanged(int)
 {
     OnEventOrChannelChanged(true);
+
+    on_pbShowWaveform_toggled(ui->pbShowWaveform->isChecked());
 }
 
 int MainWindow::getCurrentlySelectedHardwareChannel()
@@ -593,16 +601,7 @@ void MainWindow::OnEventOrChannelChanged(bool bOnlyChannel)
             }
         }
     }
-    ui->leSignal->setText(ss);
-
-    on_pbShowWaveform_toggled(ui->pbShowWaveform->isChecked());
-    if (!bOnlyChannel)
-    {
-        on_pbShowOverlayNeg_toggled(ui->pbShowOverlayNeg->isChecked());
-        on_pbShowOverlayPos_toggled(ui->pbShowOverlayPos->isChecked());
-        on_pbShowAllNeg_toggled(ui->pbShowAllNeg->isChecked());
-        on_pbShowAllPos_toggled(ui->pbShowAllPos->isChecked());
-    }
+    ui->leSignal->setText(ss);    
 }
 
 void MainWindow::on_pbShowWaveform_toggled(bool checked)
