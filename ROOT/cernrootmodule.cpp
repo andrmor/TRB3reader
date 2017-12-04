@@ -463,7 +463,11 @@ bool CernRootModule::DrawAll(bool bFromDataHub, int ievent, bool bNeg, int padsX
         else iChannel = iCh;
 
         bool bPolarity = bFromDataHub ? Config->IsNegativeLogicalChannel(iChannel) : Config->IsNegativeHardwareChannel(iChannel);
+
         if (bNeg != bPolarity) continue;
+
+        c->cd(iCounter);
+        iCounter++;
 
         bool bEmptyOne = false;
         const QVector<float>* wave = bFromDataHub ? DataHub->GetWaveform(ievent, iChannel) : Reader->GetWaveformPtr(ievent, iChannel);
@@ -503,10 +507,7 @@ bool CernRootModule::DrawAll(bool bFromDataHub, int ievent, bool bNeg, int padsX
 
             gs->append(g);
             NonZeroWaves++;
-        }
-
-        c->cd(iCounter);
-        iCounter++;
+        }        
     }
 
     win->UpdateRootCanvas();
