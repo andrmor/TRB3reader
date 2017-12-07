@@ -22,8 +22,8 @@
 #include <QMessageBox>
 #include <QDirIterator>
 #include <QInputDialog>
+#include <QProgressBar>
 
-//#include <vector>
 #include <cmath>
 
 MainWindow::MainWindow(MasterConfig* Config, ADispatcher *Dispatcher, ADataHub* DataHub, Trb3dataReader* Reader, Trb3signalExtractor* Extractor, QWidget *parent) :
@@ -60,6 +60,7 @@ MainWindow::MainWindow(MasterConfig* Config, ADispatcher *Dispatcher, ADataHub* 
     if (!jsS.isEmpty()) ScriptWindow->ReadFromJson(jsS);
 
     //misc gui settings
+    ui->prbMainBar->setVisible(false);
     ui->cbAutoscaleY->setChecked(true);
     ui->pbStop->setVisible(false);
     on_cobSignalExtractionMethod_currentIndexChanged(ui->cobSignalExtractionMethod->currentIndex());
@@ -104,6 +105,8 @@ void MainWindow::on_pbProcessData_clicked()
     ui->pbSaveTotextFile->setEnabled(true);
 
     OnEventOrChannelChanged();
+    on_sbEvent_valueChanged(ui->sbEvent->value());
+    updateNumEventsIndication();
 }
 
 const QString MainWindow::ProcessData()
@@ -479,7 +482,7 @@ void MainWindow::on_sbEvent_valueChanged(int arg1)
 
 void MainWindow::on_sbChannel_valueChanged(int)
 {
-    OnEventOrChannelChanged(true);
+    OnEventOrChannelChanged();
 
     on_pbShowWaveform_toggled(ui->pbShowWaveform->isChecked());
 }
@@ -503,14 +506,16 @@ int MainWindow::getCurrentlySelectedHardwareChannel()
 void MainWindow::on_cobHardwareOrLogical_activated(int /*index*/)
 {
     OnEventOrChannelChanged();
+    on_sbEvent_valueChanged(ui->sbEvent->value());
 }
 
 void MainWindow::on_cbAutoscaleY_clicked()
 {
     OnEventOrChannelChanged();
+    on_sbEvent_valueChanged(ui->sbEvent->value());
 }
 
-void MainWindow::OnEventOrChannelChanged(bool bOnlyChannel)
+void MainWindow::OnEventOrChannelChanged()
 {
     int ievent = ui->sbEvent->value();
     int val = ui->sbChannel->value();
@@ -785,22 +790,26 @@ void MainWindow::on_cobSortBy_activated(int)
 
 void MainWindow::on_ledMinNeg_editingFinished()
 {
-    OnEventOrChannelChanged(false);
+    OnEventOrChannelChanged();
+    on_sbEvent_valueChanged(ui->sbEvent->value());
 }
 
 void MainWindow::on_ledMaxNeg_editingFinished()
 {
-    OnEventOrChannelChanged(false);
+    OnEventOrChannelChanged();
+    on_sbEvent_valueChanged(ui->sbEvent->value());
 }
 
 void MainWindow::on_ledMinPos_editingFinished()
 {
-    OnEventOrChannelChanged(false);
+    OnEventOrChannelChanged();
+    on_sbEvent_valueChanged(ui->sbEvent->value());
 }
 
 void MainWindow::on_ledMaxPos_editingFinished()
 {
-    OnEventOrChannelChanged(false);
+    OnEventOrChannelChanged();
+    on_sbEvent_valueChanged(ui->sbEvent->value());
 }
 
 void MainWindow::on_pbGotoNextEvent_clicked()
@@ -1215,14 +1224,19 @@ void MainWindow::on_pbSaveSignalsFromDataHub_clicked()
       }
     QTextStream outStream(&outFile);
 
+
+    const bool bSavePositions = ui->cbAddReconstructedPositions->isChecked();
+    const bool bSkipRejected = ui->cbSaveOnlyGood->isChecked();
     for (int iev=0; iev<numEvents; iev++)
     {
+        if (bSkipRejected)
+            if (DataHub->IsRejectedFast(iev)) continue;
         const QVector<float>* vec = DataHub->GetSignalsFast(iev);
         for (float val : *vec) outStream << QString::number(val) << " ";
-        if (ui->cbAddReconstructedPositions->isChecked())
+        if (bSavePositions)
         {
             const float* R = DataHub->GetPositionFast(iev);
-            outStream << "     " << R[0] << R[1] << R[2];
+            outStream << "     " << R[0] << " " << R[1] << " " << R[2];
         }
         outStream << "\r\n";
     }
@@ -1237,8 +1251,8 @@ void MainWindow::on_cobExplorerSource_currentIndexChanged(int index)
     ui->labLogicalChannelNumber->setVisible(!bDirect);
     ui->cobSortBy->setVisible(bDirect);
 
-    OnEventOrChannelChanged(true);
-    updateNumEventsIndication();
+    OnEventOrChannelChanged();
+    on_sbEvent_valueChanged(ui->sbEvent->value());
 }
 
 void MainWindow::updateNumEventsIndication()
@@ -1248,4 +1262,107 @@ void MainWindow::updateNumEventsIndication()
     const bool bFromDataHub = (ui->cobExplorerSource->currentIndex()==1);
     const int numEvents = ( bFromDataHub ? DataHub->CountEvents() : Extractor->CountEvents());
     ui->leNumEvents->setText( QString::number(numEvents) );
+}
+
+void MainWindow::on_pbClearDataHub_clicked()
+{
+    DataHub->Clear();
+    UpdateGui();
+}
+
+void MainWindow::on_pbLoadToDataHub_clicked()
+{
+    if ( DataHub->CountEvents() != 0 && !bNeverRemindAppendToHub)
+    {
+        QMessageBox mb;
+        mb.setText("DataHub is not empty - data will be appended");
+        mb.addButton("OK", QMessageBox::YesRole);
+        QAbstractButton* ConfAlways = mb.addButton("OK, and do not remind", QMessageBox::YesRole);
+        QAbstractButton* Nope = mb.addButton("Cancel", QMessageBox::NoRole);
+        mb.setIcon(QMessageBox::Question);
+        mb.exec();
+
+        if (mb.clickedButton() == Nope) return;
+        if (mb.clickedButton() == ConfAlways) bNeverRemindAppendToHub = true;
+    }
+
+    QString FileName = QFileDialog::getOpenFileName(this, "Load events", Config->WorkingDir, "Data files (*.dat *.txt);;All files (*.*)");
+    if (FileName.isEmpty()) return;
+    Config->WorkingDir = QFileInfo(FileName).absolutePath();
+
+    QFile inFile( FileName );
+    inFile.open(QIODevice::ReadOnly);
+    if(!inFile.isOpen())
+      {
+        message("Unable to open file " +FileName+ " for reading!", this);
+        return;
+      }
+    QTextStream inStream(&inFile);
+
+    this->setEnabled(false);
+    ui->prbMainBar->setVisible(true);
+
+    int numChannels = Config->CountLogicalChannels();
+    int upperLim = numChannels;
+    bool bLoadXYZ = ui->cbLoadIncludeReconstructed->isChecked();
+    if (bLoadXYZ) upperLim += 3;
+    int numEvents = 0;
+    qint64 totSize = QFileInfo(FileName).size();
+    while (!inStream.atEnd())  // optimized assuming proper format of the file
+    {
+        const QString s = inStream.readLine();
+
+        if (numEvents % 1000 == 0)
+        {
+            ui->prbMainBar->setValue(100.0 * inStream.pos() / totSize);
+            qApp->processEvents();
+        }
+
+        QRegExp rx("(\\ |\\,|\\:|\\t)");
+        QStringList fields = s.split(rx, QString::SkipEmptyParts);
+        if (fields.size() < upperLim) continue;
+
+        QVector<float>* vec = new QVector<float>(numChannels);
+        for (int i=0; i<numChannels; i++)
+        {
+            bool bOK;
+            const QString f = fields.at(i);
+            float val = f.toFloat(&bOK);
+            if (!bOK)
+            {
+                delete vec;
+                continue;
+            }
+            (*vec)[i] = val;
+        }
+
+        float xyz[3];
+        if (bLoadXYZ)
+        {
+
+            bool bOK;
+            for (int i=0; i<3; i++)
+            {
+                const QString ss = fields.at(numChannels+i);
+                xyz[i] = ss.toFloat(&bOK);
+                if (!bOK)
+                {
+                    delete vec;
+                    continue;
+                }
+            }
+        }
+
+        AOneEvent* ev = new AOneEvent();
+        ev->SetSignals(vec);  // transfer ownership!
+        if (bLoadXYZ) ev->SetPosition(xyz);
+
+        DataHub->AddEvent(ev);
+        numEvents++;
+    }
+
+    setEnabled(true);
+    ui->prbMainBar->setVisible(false);
+    message("Added " + QString::number(numEvents) + " events", this);
+    UpdateGui();
 }

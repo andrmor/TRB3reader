@@ -33,6 +33,8 @@ public slots:
   void FillArr(QString HistName, QVariant Array);
   void Fill2DArr(QString HistName, QVariant Array);
 
+  void Divide(QString HistName, QString HistToDivideWith);
+
   void Draw(QString HistName, QString options);
 
   void Save(QString HistName, QString FileName);

@@ -61,6 +61,7 @@ void AInterfaceToHist::NewHist(QString HistName, int bins, double start, double 
 
   TH1D* hist = new TH1D("", HistName.toLatin1().data(), bins, start, stop);
   hist->GetYaxis()->SetTitleOffset((Float_t)1.30);
+  hist->SetOption("HIST");
   TmpHub->ScriptDrawObjects.append(hist, HistName, "TH1D");
 }
 
@@ -257,6 +258,47 @@ void AInterfaceToHist::Fill2DArr(QString HistName, QVariant Array)
             h->Fill(x, y, weight);
         }
     }
+}
+
+void AInterfaceToHist::Divide(QString HistName, QString HistToDivideWith)
+{
+    int index = TmpHub->ScriptDrawObjects.findIndexOf(HistName);
+    if (index == -1)
+      {
+        abort("Histogram "+HistName+" not found!");
+        return;
+      }
+    RootDrawObj& r1 = TmpHub->ScriptDrawObjects.List[index];
+    if (!r1.type.startsWith("TH"))
+    {
+        abort("Histogram "+HistName+" not found!");
+        return;
+    }
+
+    index = TmpHub->ScriptDrawObjects.findIndexOf(HistToDivideWith);
+    if (index == -1)
+      {
+        abort("Histogram "+HistToDivideWith+" not found!");
+        return;
+      }
+    RootDrawObj& r2 = TmpHub->ScriptDrawObjects.List[index];
+    if (!r2.type.startsWith("TH"))
+    {
+        abort("Histogram "+HistToDivideWith+" not found!");
+        return;
+    }
+
+    TH1* h1 = dynamic_cast<TH1*>(r1.Obj);
+    if (h1)
+    {
+        TH1* h2 = dynamic_cast<TH1*>(r2.Obj);
+        if (h2)
+        {
+            bool bOK = h1->Divide(h2);
+            if (bOK) return;
+        }
+    }
+    abort("Division failed!");
 }
 
 void AInterfaceToHist::Smooth(QString HistName, int times)

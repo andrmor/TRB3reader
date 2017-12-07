@@ -73,6 +73,8 @@ void MainWindow::WriteGUItoJson(QJsonObject &json)
     jsgui["BulkCopy"] = ui->cbBulkCopyToDatahub->isChecked();
     jsgui["BulkCopyWaveforms"] = ui->cbBulkAlsoCopyWaveforms->isChecked();
     jsgui["SaveAddPositions"] = ui->cbAddReconstructedPositions->isChecked();
+    jsgui["SaveSkipRejected"] = ui->cbSaveOnlyGood->isChecked();
+    jsgui["LoadAlsoPositions"] = ui->cbLoadIncludeReconstructed->isChecked();
 
     jsgui["ExplorerSource"] = ui->cobExplorerSource->currentIndex();
 
@@ -112,6 +114,8 @@ void MainWindow::ReadGUIfromJson(const QJsonObject& json)
     JsonToCheckbox(jsgui, "BulkCopy", ui->cbBulkCopyToDatahub);
     JsonToCheckbox(jsgui, "BulkCopyWaveforms", ui->cbBulkAlsoCopyWaveforms);
     JsonToCheckbox(jsgui, "SaveAddPositions", ui->cbAddReconstructedPositions);
+    JsonToCheckbox(jsgui, "SaveSkipRejected", ui->cbSaveOnlyGood);
+    JsonToCheckbox(jsgui, "LoadAlsoPositions", ui->cbLoadIncludeReconstructed);
 
     JsonToComboBox(jsgui, "ExplorerSource", ui->cobExplorerSource);
 
@@ -265,7 +269,7 @@ void MainWindow::UpdateGui()
     ui->sbPosMaxTo->setValue(Config->PosMaxGateTo);
 
     updateNumEventsIndication();
-    OnEventOrChannelChanged(true);
+    OnEventOrChannelChanged();
 }
 
 // --- update Config on GUI operated by user ---
