@@ -30,6 +30,7 @@ int ChannelMapper::LogicalToHardwareFast(int iLogicalChannel) const
     return ToHardware.at(iLogicalChannel);
 }
 
+/*
 void ChannelMapper::SetChannels_OrderedByHardware(QVector<int> ToLogicalChannelMap)
 {
     Clear();
@@ -47,6 +48,7 @@ void ChannelMapper::SetChannels_OrderedByHardware(QVector<int> ToLogicalChannelM
 
     update_ToHardware();
 }
+*/
 
 void ChannelMapper::SetChannels_OrderedByLogical(QVector<int> ToHardwareChannelMap)
 {
@@ -63,6 +65,20 @@ void ChannelMapper::SetChannels_OrderedByLogical(QVector<int> ToHardwareChannelM
     }
 
     update_ToLogical();
+}
+
+bool ChannelMapper::UpdateNumberOfHardwareChannels(int NewNumberOfHardwChannels)
+{
+    if ( NewNumberOfHardwChannels < CountLogicalChannels() )
+    {
+        qDebug() << "Channel map update error: New number of hardware channels is less than the defined number of logical channels";
+        return false;
+    }
+
+    if (ToLogical.size() == NewNumberOfHardwChannels) return true; //nothing changed
+
+    update_ToLogical();
+    return true;
 }
 
 void ChannelMapper::Clear()
@@ -103,21 +119,23 @@ void ChannelMapper::update_ToLogical()
     }
 }
 
-bool ChannelMapper::Validate(int numChannels, bool ensureLogicalChannelContinuity) const
+const QString ChannelMapper::Validate() const
 {
-    if (ToHardware.isEmpty() || ToLogical.isEmpty())
-    {
-        qDebug() << "mapping is not defined!";
-        return false;
-    }
+    if (ToHardware.isEmpty() || ToLogical.isEmpty()) return "Channel map is not defined!";
 
-    if (ensureLogicalChannelContinuity)
-        if ( ToHardware.size() != numChannels)
-        {
-            qDebug() << "--- ToHardware size ("<<ToHardware.size()<<") not consistent with requested number of channels ("<<numChannels<<")";
-            return false;
-        }
+    bool bEnsureLogicalChannelContinuity = true;
 
+    //check uniquness
+    QSet<int> setHardwToLogical;
+    int numUndefined = 0;
+    for (int i : ToLogical) if (i == -1) numUndefined++; else setHardwToLogical << i;
+    if (setHardwToLogical.size() != ToLogical.size()-numUndefined) return "";
+    QSet<int> setLogicalToHardware;
+    numUndefined = 0;
+    for (int i : ToHardware) if (i == -1) numUndefined++; else setLogicalToHardware << i;
+    if (setLogicalToHardware.size() != ToHardware.size()-numUndefined) return "";
+
+    //checking logical->hardware
     int imax = -1;
     for (int ich : ToHardware) if ( ich > imax ) imax = ich;
     QVector<bool> check = QVector<bool>(imax+1, false);
@@ -127,42 +145,31 @@ bool ChannelMapper::Validate(int numChannels, bool ensureLogicalChannelContinuit
         int iHardware = ToHardware[iLogical];
         if ( iHardware < 0 )
         {
-            if (ensureLogicalChannelContinuity)
-            {
-                qDebug() << "--- Logical channel numbering is not continuous";
-                return false;
-            }
+            if (bEnsureLogicalChannelContinuity) return "Logical channel# "+QString::number(iLogical)+"is not mapped to any hardware channel";
             else continue;
         }
-        if ( check.at(iHardware) )
-        {
-            qDebug() << "--- Dublication found in ToLogical ("<<iHardware<<")";
-            return false;
-        }
-        if ( (iHardware >= ToLogical.size()) || (ToLogical[iHardware] != iLogical) )
-        {
-            qDebug() << "--- Not consistent ToHardware and ToLogial (Logical at"<<iLogical<<" of "<<iHardware<<")";
-            return false;
-        }
+        if ( check.at(iHardware) ) return "Several logical channels are mapped to the same hardware one";
         check[iHardware] = true;
+
+        if ( (iHardware >= ToLogical.size()) || (ToLogical.at(iHardware) != iLogical) )
+        return "Logical channel is mapped to hardware channel which is not correctly mapped back (Logical# "+
+               QString::number(iLogical)+", Hardware# "+QString::number(iHardware)+")";
     }
 
-    check = QVector<bool>(ToLogical.size(), false);
+    imax = -1;
+    for (int ich : ToLogical) if ( ich > imax ) imax = ich;
+    check = QVector<bool>(imax+1, false);
+
     for (int iHardware=0; iHardware<ToLogical.size(); iHardware++)
     {
         int iLogical = ToLogical.at(iHardware);
         if ( iLogical < 0 ) continue;
-        if ( check.at(iLogical) )
-        {
-            qDebug() << "--- Dublication found in ToHardware ("<<iLogical<<")";
-            return false;
-        }        
-        if ( (iLogical >= ToHardware.size()) || (ToHardware.at(iLogical) != iHardware) )
-        {
-            qDebug() << "--- Not consistent ToLogial and ToHardware (Hardware at"<<iHardware<<" of "<<iLogical<<")";
-            return false;
-        }
+        if ( check.at(iLogical) ) return "Several hardware channels are mapped to the same logical one";
         check[iLogical] = true;
+
+        if ( (iLogical >= ToHardware.size()) || (ToHardware.at(iLogical) != iHardware) )
+        return "Hardware channel is mapped to logical channel which is not correctly mapped back (Hardware# "+
+               QString::number(iHardware)+", Logical# "+QString::number(iLogical)+")";
     }
 
     return true;

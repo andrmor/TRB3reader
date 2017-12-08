@@ -353,6 +353,17 @@ void Trb3dataReader::readRawData()
     }
 
     ref.Disconnect();
+
+    bool bOK = Config->UpdateNumberOfHardwareChannels(numChannels);
+    if (!bOK)
+    {
+        qDebug() << "The number of hardware channels in the file ("<< numChannels << "is incompatible with the defined number of logical channels";
+        waveData.clear();
+        numChannels = 0;
+        numSamples = 0;
+        return;
+    }
+
     qDebug() << "--> Data read completed\n--> Events: "<< waveData.size() <<" Channels: "<<numChannels << "  Samples: "<<numSamples;
     if (numBadEvents > 0) qDebug() << "--> " << numBadEvents << " bad events were disreguarded!";
 #endif

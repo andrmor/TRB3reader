@@ -334,6 +334,11 @@ bool MasterConfig::SetMapping(const QVector<int> &mapping)
     return true;
 }
 
+bool MasterConfig::UpdateNumberOfHardwareChannels(int numHardwChannels)
+{
+    return Map->UpdateNumberOfHardwareChannels(numHardwChannels);
+}
+
 int MasterConfig::CountLogicalChannels() const
 {
     return ChannelMap.size();

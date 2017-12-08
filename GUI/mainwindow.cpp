@@ -259,7 +259,7 @@ void MainWindow::on_pbAddMapping_clicked()
     bOK = Config->SetMapping(arr);
     if (bOK)
     {
-        Config->Map->Validate(Reader->CountChannels(), true);
+        //Config->Map->Validate(Reader->CountChannels(), true);
         LogMessage("Mapping updated");
     }
     else message("Ignored: There are non-unique channel numbers in the list!", this);
@@ -361,10 +361,13 @@ void MainWindow::on_pteMapping_customContextMenuRequested(const QPoint &pos)
               return;
           }
 
-          bool ok = Config->Map->Validate(Reader->CountChannels());
-          if (ok) QMessageBox::information(this, "TRB3 reader", "Mapping is valid", QMessageBox::Ok, QMessageBox::Ok);
-          else    QMessageBox::warning(this, "TRB3 reader", "mapping is NOT valid!", QMessageBox::Ok, QMessageBox::Ok);
-          qDebug() << "Validation result: Map is good?"<<ok;
+          const QString err = Config->Map->Validate();
+          QString output;
+          if (err.isEmpty()) output = "Map is valid";
+          else output = "Map is NOT valid:\n" + err;
+
+          QMessageBox::information(this, "TRB3 reader", output, QMessageBox::Ok, QMessageBox::Ok);
+          qDebug() << "Validation result:"<<output;
         }
       else if (selectedItem == Clear)
           Dispatcher->ClearMapping();
@@ -395,7 +398,7 @@ void MainWindow::on_pbSaveTotextFile_clicked()
     }
 
     bool bUseHardware = false;
-    if (!Config->Map->Validate(numChannels))
+    if (!Config->Map->Validate().isEmpty())
     {
         int ret = QMessageBox::warning(this, "TRB3reader", "Channel map not valid!\nSave data without mapping (use hardware channels)?", QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
         if (ret == QMessageBox::Cancel) return;
@@ -1142,7 +1145,7 @@ bool MainWindow::bulkProcessCore()
         ui->pteBulkLog->appendPlainText("---- Extractor data not valid -> ignoring this file");
         return false;
     }
-    if (!Config->Map->Validate(numChannels))
+    if (!Config->Map->Validate().isEmpty())
     {
         ui->pteBulkLog->appendPlainText("---- Conflict with channel map -> ignoring this file");
         return false;
