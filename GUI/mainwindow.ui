@@ -2674,16 +2674,6 @@
          </spacer>
         </item>
         <item>
-         <widget class="QLabel" name="labDatahubEvents">
-          <property name="text">
-           <string>DataHub contains 0 events</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item>
          <layout class="QHBoxLayout" name="horizontalLayout_44">
           <item>
            <spacer name="horizontalSpacer_5">
@@ -2700,6 +2690,12 @@
           </item>
           <item>
            <widget class="QPushButton" name="pbClearDataHub">
+            <property name="minimumSize">
+             <size>
+              <width>150</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="maximumSize">
              <size>
               <width>16777215</width>
@@ -2895,6 +2891,16 @@
       </property>
      </widget>
     </item>
+    <item>
+     <widget class="QLabel" name="labDatahubEvents">
+      <property name="text">
+       <string>DataHub contains 0 events</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -2903,7 +2909,7 @@
      <x>0</x>
      <y>0</y>
      <width>681</width>
-     <height>19</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
