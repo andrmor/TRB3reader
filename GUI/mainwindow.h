@@ -130,27 +130,31 @@ private slots:
     void on_cobSignalExtractionMethod_currentIndexChanged(int index);
     void on_cobExplorerSource_currentIndexChanged(int index);
 
+    void on_pbClearDataHub_clicked();
+
+    void on_pbLoadToDataHub_clicked();
+
 protected:
     void closeEvent(QCloseEvent* event);
 
 private:
-    //aliases
-    ADataHub* DataHub;    
+    //aliases    
     MasterConfig* Config;
+    ADispatcher* Dispatcher;
+    ADataHub* DataHub;
     Trb3dataReader* Reader;
     Trb3signalExtractor* Extractor;
 
     //owned objects
-    Ui::MainWindow* ui;
-    ADispatcher* Dispatcher;
+    Ui::MainWindow* ui;    
     AScriptWindow* ScriptWindow;
-
 #ifdef CERN_ROOT
     CernRootModule* RootModule;
 #endif
 
     //gui misc
     bool bStopFlag;
+    bool bNeverRemindAppendToHub = false;
 
 private:
     const QString ProcessData(); //returns error message if any
@@ -158,7 +162,7 @@ private:
     bool saveSignalsToFile(const QString FileName, bool bUseHardware);
     bool sendSignalData(QTextStream& outStream, bool bUseHardware = false);
 
-    void OnEventOrChannelChanged(bool bOnlyChannel = false);
+    void OnEventOrChannelChanged();
     void showOverlay(bool checked, bool bNeg);
     int  getCurrentlySelectedHardwareChannel();
     void showAllWave(bool checked, bool bNeg);

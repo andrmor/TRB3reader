@@ -25,7 +25,7 @@ bool Trb3dataReader::Read()
     readRawData();
     if (!isValid())
     {
-        qDebug() << "--- Read of hld file failed!";
+        qDebug() << "--- Read of hld file failed or all events were rejected!";
         return false;
     }
 
