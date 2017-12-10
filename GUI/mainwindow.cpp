@@ -1315,9 +1315,10 @@ void MainWindow::on_pbLoadToDataHub_clicked()
     {
         const QString s = inStream.readLine();
 
-        if (numEvents % 1000 == 0)
+        if (numEvents % 200 == 0)
         {
             ui->prbMainBar->setValue(100.0 * inStream.pos() / totSize);
+            updateNumEventsIndication();
             qApp->processEvents();
         }
 
