@@ -50,6 +50,7 @@ public:
     int     CountChannels()  const {return numChannels;}     // number of channels per event
     int     CountEvents()    const {return waveData.size();} // number of events in the datafile
     int     CountBadEvents() const {return numBadEvents;}    // number of disreguarded events - they had wrong number of samples
+    int     CountAllProcessedEvents() const {return numAllEvents;} //total number of processed events including bad events
 
     void    ClearData();
 
@@ -60,6 +61,7 @@ private:
     int     numSamples;
     int     numChannels;
     int     numBadEvents;
+    int     numAllEvents;
 
     void    readRawData();    // read raw data from the hld file
     void    smoothData();     // smooth raw data

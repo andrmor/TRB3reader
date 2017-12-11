@@ -1066,6 +1066,8 @@ void MainWindow::bulkProcessorEnvelope(const QStringList FileNames)
     ui->pbStop->setChecked(false);
 
     int numErrors = 0;
+    numProcessedEvents = 0;
+    numBadEvents = 0;
     for (QString name : FileNames)
     {
         Config->FileName = name;
@@ -1080,6 +1082,8 @@ void MainWindow::bulkProcessorEnvelope(const QStringList FileNames)
 
     if (numErrors > 0) ui->pteBulkLog->appendPlainText("============= There were errors! =============");
     else ui->pteBulkLog->appendPlainText("Done - no errors");
+
+    LogMessage("Processed events: " + QString::number(numProcessedEvents) + "  Disreguarded events: " + QString::number(numBadEvents) );
 
     ui->twMain->setEnabled(true);
     ui->pbStop->setVisible(false);
@@ -1106,6 +1110,8 @@ bool MainWindow::bulkProcessCore()
         ui->pteBulkLog->appendPlainText("---- File read failed!");
         return false;
     }
+    numProcessedEvents += Reader->CountAllProcessedEvents();
+    numBadEvents += Reader->CountBadEvents();
 
     // Extracting signals (or generating dummy data if disabled)
     Extractor->ClearData();

@@ -267,6 +267,7 @@ void Trb3dataReader::readRawData()
     bool bReportOnStart = true;
 
     numBadEvents = 0;
+    numAllEvents = 0;
     while ( (evnt = ref.NextEvent(1.0)) )
     {
         bool bBadEvent = false;
@@ -350,6 +351,7 @@ void Trb3dataReader::readRawData()
             //qDebug() << "New data size: "<<data.size();
         }
         bReportOnStart = false;
+        numAllEvents++;
     }
 
     ref.Disconnect();

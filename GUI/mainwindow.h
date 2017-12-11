@@ -155,6 +155,8 @@ private:
     //gui misc
     bool bStopFlag;
     bool bNeverRemindAppendToHub = false;
+    int  numProcessedEvents;
+    int  numBadEvents;
 
 private:
     const QString ProcessData(); //returns error message if any
