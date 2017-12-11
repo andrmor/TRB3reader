@@ -10,7 +10,7 @@
 
 const float NaN = std::numeric_limits<float>::quiet_NaN();
 
-Trb3dataReader::Trb3dataReader(const MasterConfig *Config) :
+Trb3dataReader::Trb3dataReader(MasterConfig *Config) :
     Config(Config), numSamples(0), numChannels(0) {}
 
 bool Trb3dataReader::Read()

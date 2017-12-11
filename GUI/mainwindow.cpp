@@ -355,11 +355,11 @@ void MainWindow::on_pteMapping_customContextMenuRequested(const QPoint &pos)
 
       if (selectedItem == Validate)
         {
-          if (!Reader->isValid())
-          {
-              QMessageBox::information(this, "TRB3 reader", "Cannot validate map - data are not loaded.", QMessageBox::Ok, QMessageBox::Ok);
-              return;
-          }
+          //if (!Reader->isValid())
+          //{
+          //    QMessageBox::information(this, "TRB3 reader", "Cannot validate map - data are not loaded.", QMessageBox::Ok, QMessageBox::Ok);
+          //    return;
+          //}
 
           const QString err = Config->Map->Validate();
           QString output;

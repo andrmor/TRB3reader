@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>681</width>
-    <height>602</height>
+    <height>629</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>TRB3_reader</string>
+   <string>TRB3_reader v2.1</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -30,7 +30,7 @@
     <item>
      <widget class="QTabWidget" name="twMain">
       <property name="currentIndex">
-       <number>5</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab_6">
        <attribute name="title">
@@ -2909,7 +2909,7 @@
      <x>0</x>
      <y>0</y>
      <width>681</width>
-     <height>21</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

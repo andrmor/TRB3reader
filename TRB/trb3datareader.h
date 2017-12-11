@@ -9,7 +9,7 @@ class MasterConfig;
 class Trb3dataReader
 {
 public:
-    Trb3dataReader(const MasterConfig* Config);
+    Trb3dataReader(MasterConfig *Config);
 
       // Reading waveform data from the file, optional - substract pedestals and apply smoothing
     bool    Read();
@@ -54,7 +54,7 @@ public:
     void    ClearData();
 
 private:
-    const MasterConfig* Config;
+    MasterConfig* Config;
     QVector < QVector < QVector <float> > > waveData;  // format:  [event] [hardware chanel] [sample]
 
     int     numSamples;

@@ -172,5 +172,5 @@ const QString ChannelMapper::Validate() const
                QString::number(iHardware)+", Logical# "+QString::number(iLogical)+")";
     }
 
-    return true;
+    return "";
 }
