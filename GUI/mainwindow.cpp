@@ -342,6 +342,7 @@ void MainWindow::on_ptePolarity_customContextMenuRequested(const QPoint &pos)
         Dispatcher->ClearNegativeChannels();
 }
 
+#include <QDialog>
 void MainWindow::on_pteMapping_customContextMenuRequested(const QPoint &pos)
 {
       QMenu menu;
@@ -349,18 +350,15 @@ void MainWindow::on_pteMapping_customContextMenuRequested(const QPoint &pos)
       QAction* Validate = menu.addAction("Validate");
       menu.addSeparator();
       QAction* Clear = menu.addAction("Clear");
+      menu.addSeparator();
+      QAction* PrintToLogical = menu.addAction("Print hardware->logical map");
+      QAction* PrintToHardware = menu.addAction("Print logical->hardware map");
 
       QAction* selectedItem = menu.exec(ui->pteMapping->mapToGlobal(pos));
       if (!selectedItem) return;
 
       if (selectedItem == Validate)
         {
-          //if (!Reader->isValid())
-          //{
-          //    QMessageBox::information(this, "TRB3 reader", "Cannot validate map - data are not loaded.", QMessageBox::Ok, QMessageBox::Ok);
-          //    return;
-          //}
-
           const QString err = Config->Map->Validate();
           QString output;
           if (err.isEmpty()) output = "Map is valid";
@@ -369,8 +367,36 @@ void MainWindow::on_pteMapping_customContextMenuRequested(const QPoint &pos)
           QMessageBox::information(this, "TRB3 reader", output, QMessageBox::Ok, QMessageBox::Ok);
           qDebug() << "Validation result:"<<output;
         }
-      else if (selectedItem == Clear)
-          Dispatcher->ClearMapping();
+      else if (selectedItem == Clear) Dispatcher->ClearMapping();
+      else if (selectedItem == PrintToLogical || selectedItem == PrintToHardware)
+      {
+          QStringList list;
+          QString title;
+          if (selectedItem == PrintToLogical)
+          {
+              list = Config->Map->PrintToLogical();
+              title = "Hardware -> Logical";
+          }
+          else
+          {
+              list = Config->Map->PrintToHardware();
+              title = "Logical -> Hardware";
+          }
+
+          QDialog* D = new QDialog(this);
+          D->setWindowTitle("Channel mapping");
+          QVBoxLayout* l = new QVBoxLayout(D);
+
+            QLabel* lab = new QLabel(title);
+            l->addWidget(lab);
+
+            QListWidget* lw = new QListWidget();
+            lw->addItems(list);
+            l->addWidget(lw);
+
+          D->resize(200,400);
+          D->exec();
+      }
 }
 
 void MainWindow::on_pteIgnoreHardwareChannels_customContextMenuRequested(const QPoint &pos)
@@ -1153,6 +1179,7 @@ bool MainWindow::bulkProcessCore()
     }
     if (!Config->Map->Validate().isEmpty())
     {
+        qDebug() << Config->Map->Validate();
         ui->pteBulkLog->appendPlainText("---- Conflict with channel map -> ignoring this file");
         return false;
     }

@@ -2,6 +2,7 @@
 #define CHANNELMAPPER_H
 
 #include <QVector>
+#include <QStringList>
 
 class ChannelMapper
 {
@@ -24,6 +25,9 @@ public:
 
     const QVector<int>& GetMapToHardware() const {return ToHardware;}
 
+    const QStringList PrintToLogical() const;
+    const QStringList PrintToHardware() const;
+
 protected:
     //Set channel map: vector should contain logical channel numbers for consequitive hardware channels
   //void SetChannels_OrderedByHardware(QVector<int> ToLogicalChannelMap);
@@ -38,7 +42,7 @@ private:
     QVector<int> ToLogical;
     QVector<int> ToHardware;
 
-    void update_ToHardware();
+    //void update_ToHardware();
     void update_ToLogical();
 };
 
