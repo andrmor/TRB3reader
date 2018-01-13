@@ -16,6 +16,10 @@
   #include "cernrootmodule.h"
 #endif
 
+#ifdef SPEECH
+  #include "ainterfacetospeech.h"
+#endif
+
 #include <QDebug>
 
 void MainWindow::CreateScriptWindow()
@@ -52,6 +56,12 @@ void MainWindow::CreateScriptWindow()
     //  qDebug() << "-> hist...";
     AInterfaceToHist* hist = new AInterfaceToHist(RootModule->GetTmpHub());
     ScriptWindow->SetInterfaceObject(hist, "hist");
+#endif
+
+#ifdef SPEECH
+    qDebug() << "-> speech...";
+    AInterfaceToSpeech* speech = new AInterfaceToSpeech();
+    ScriptWindow->SetInterfaceObject(speech, "speech");
 #endif
 
     //  qDebug() << "-> msg...";
