@@ -10,7 +10,7 @@
 
 const float NaN = std::numeric_limits<float>::quiet_NaN();
 
-Trb3dataReader::Trb3dataReader(const MasterConfig *Config) :
+Trb3dataReader::Trb3dataReader(MasterConfig *Config) :
     Config(Config), numSamples(0), numChannels(0) {}
 
 bool Trb3dataReader::Read()
@@ -267,6 +267,7 @@ void Trb3dataReader::readRawData()
     bool bReportOnStart = true;
 
     numBadEvents = 0;
+    numAllEvents = 0;
     while ( (evnt = ref.NextEvent(1.0)) )
     {
         bool bBadEvent = false;
@@ -350,9 +351,21 @@ void Trb3dataReader::readRawData()
             //qDebug() << "New data size: "<<data.size();
         }
         bReportOnStart = false;
+        numAllEvents++;
     }
 
     ref.Disconnect();
+
+    bool bOK = Config->UpdateNumberOfHardwareChannels(numChannels);
+    if (!bOK)
+    {
+        qDebug() << "The number of hardware channels in the file ("<< numChannels << "is incompatible with the defined number of logical channels";
+        waveData.clear();
+        numChannels = 0;
+        numSamples = 0;
+        return;
+    }
+
     qDebug() << "--> Data read completed\n--> Events: "<< waveData.size() <<" Channels: "<<numChannels << "  Samples: "<<numSamples;
     if (numBadEvents > 0) qDebug() << "--> " << numBadEvents << " bad events were disreguarded!";
 #endif

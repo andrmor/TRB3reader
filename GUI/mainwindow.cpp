@@ -259,7 +259,7 @@ void MainWindow::on_pbAddMapping_clicked()
     bOK = Config->SetMapping(arr);
     if (bOK)
     {
-        Config->Map->Validate(Reader->CountChannels(), true);
+        //Config->Map->Validate(Reader->CountChannels(), true);
         LogMessage("Mapping updated");
     }
     else message("Ignored: There are non-unique channel numbers in the list!", this);
@@ -342,6 +342,7 @@ void MainWindow::on_ptePolarity_customContextMenuRequested(const QPoint &pos)
         Dispatcher->ClearNegativeChannels();
 }
 
+#include <QDialog>
 void MainWindow::on_pteMapping_customContextMenuRequested(const QPoint &pos)
 {
       QMenu menu;
@@ -349,25 +350,53 @@ void MainWindow::on_pteMapping_customContextMenuRequested(const QPoint &pos)
       QAction* Validate = menu.addAction("Validate");
       menu.addSeparator();
       QAction* Clear = menu.addAction("Clear");
+      menu.addSeparator();
+      QAction* PrintToLogical = menu.addAction("Print hardware->logical map");
+      QAction* PrintToHardware = menu.addAction("Print logical->hardware map");
 
       QAction* selectedItem = menu.exec(ui->pteMapping->mapToGlobal(pos));
       if (!selectedItem) return;
 
       if (selectedItem == Validate)
         {
-          if (!Reader->isValid())
+          const QString err = Config->Map->Validate();
+          QString output;
+          if (err.isEmpty()) output = "Map is valid";
+          else output = "Map is NOT valid:\n" + err;
+
+          QMessageBox::information(this, "TRB3 reader", output, QMessageBox::Ok, QMessageBox::Ok);
+          qDebug() << "Validation result:"<<output;
+        }
+      else if (selectedItem == Clear) Dispatcher->ClearMapping();
+      else if (selectedItem == PrintToLogical || selectedItem == PrintToHardware)
+      {
+          QStringList list;
+          QString title;
+          if (selectedItem == PrintToLogical)
           {
-              QMessageBox::information(this, "TRB3 reader", "Cannot validate map - data are not loaded.", QMessageBox::Ok, QMessageBox::Ok);
-              return;
+              list = Config->Map->PrintToLogical();
+              title = "Hardware -> Logical";
+          }
+          else
+          {
+              list = Config->Map->PrintToHardware();
+              title = "Logical -> Hardware";
           }
 
-          bool ok = Config->Map->Validate(Reader->CountChannels());
-          if (ok) QMessageBox::information(this, "TRB3 reader", "Mapping is valid", QMessageBox::Ok, QMessageBox::Ok);
-          else    QMessageBox::warning(this, "TRB3 reader", "mapping is NOT valid!", QMessageBox::Ok, QMessageBox::Ok);
-          qDebug() << "Validation result: Map is good?"<<ok;
-        }
-      else if (selectedItem == Clear)
-          Dispatcher->ClearMapping();
+          QDialog* D = new QDialog(this);
+          D->setWindowTitle("Channel mapping");
+          QVBoxLayout* l = new QVBoxLayout(D);
+
+            QLabel* lab = new QLabel(title);
+            l->addWidget(lab);
+
+            QListWidget* lw = new QListWidget();
+            lw->addItems(list);
+            l->addWidget(lw);
+
+          D->resize(200,400);
+          D->exec();
+      }
 }
 
 void MainWindow::on_pteIgnoreHardwareChannels_customContextMenuRequested(const QPoint &pos)
@@ -395,7 +424,7 @@ void MainWindow::on_pbSaveTotextFile_clicked()
     }
 
     bool bUseHardware = false;
-    if (!Config->Map->Validate(numChannels))
+    if (!Config->Map->Validate().isEmpty())
     {
         int ret = QMessageBox::warning(this, "TRB3reader", "Channel map not valid!\nSave data without mapping (use hardware channels)?", QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
         if (ret == QMessageBox::Cancel) return;
@@ -1063,6 +1092,8 @@ void MainWindow::bulkProcessorEnvelope(const QStringList FileNames)
     ui->pbStop->setChecked(false);
 
     int numErrors = 0;
+    numProcessedEvents = 0;
+    numBadEvents = 0;
     for (QString name : FileNames)
     {
         Config->FileName = name;
@@ -1077,6 +1108,8 @@ void MainWindow::bulkProcessorEnvelope(const QStringList FileNames)
 
     if (numErrors > 0) ui->pteBulkLog->appendPlainText("============= There were errors! =============");
     else ui->pteBulkLog->appendPlainText("Done - no errors");
+
+    LogMessage("Processed events: " + QString::number(numProcessedEvents) + "  Disreguarded events: " + QString::number(numBadEvents) );
 
     ui->twMain->setEnabled(true);
     ui->pbStop->setVisible(false);
@@ -1103,6 +1136,8 @@ bool MainWindow::bulkProcessCore()
         ui->pteBulkLog->appendPlainText("---- File read failed!");
         return false;
     }
+    numProcessedEvents += Reader->CountAllProcessedEvents();
+    numBadEvents += Reader->CountBadEvents();
 
     // Extracting signals (or generating dummy data if disabled)
     Extractor->ClearData();
@@ -1142,8 +1177,9 @@ bool MainWindow::bulkProcessCore()
         ui->pteBulkLog->appendPlainText("---- Extractor data not valid -> ignoring this file");
         return false;
     }
-    if (!Config->Map->Validate(numChannels))
+    if (!Config->Map->Validate().isEmpty())
     {
+        qDebug() << Config->Map->Validate();
         ui->pteBulkLog->appendPlainText("---- Conflict with channel map -> ignoring this file");
         return false;
     }
@@ -1312,9 +1348,10 @@ void MainWindow::on_pbLoadToDataHub_clicked()
     {
         const QString s = inStream.readLine();
 
-        if (numEvents % 1000 == 0)
+        if (numEvents % 200 == 0)
         {
             ui->prbMainBar->setValue(100.0 * inStream.pos() / totSize);
+            updateNumEventsIndication();
             qApp->processEvents();
         }
 

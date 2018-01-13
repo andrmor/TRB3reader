@@ -14,6 +14,8 @@
 #include "TGraph.h"
 #include "TF1.h"
 #include "TStyle.h"
+#include "TAttFill.h"
+#include "THStack.h"
 
 //----------------- HIST  -----------------
 AInterfaceToHist::AInterfaceToHist(TmpObjHubClass* TmpHub)
@@ -103,10 +105,46 @@ void AInterfaceToHist::SetLineProperties(QString HistName, int LineColor, int Li
       return;
     }
 
+//  RootDrawObj& r = TmpHub->ScriptDrawObjects.List[index];
+//  r.LineColor = LineColor;
+//  r.LineStyle = LineStyle;
+//  r.LineWidth = LineWidth;
+
   RootDrawObj& r = TmpHub->ScriptDrawObjects.List[index];
-  r.LineColor = LineColor;
-  r.LineStyle = LineStyle;
-  r.LineWidth = LineWidth;
+  if (r.type.startsWith("TH"))
+    {
+      TH1* h = dynamic_cast<TH1*>(r.Obj);
+      if (h)
+      {
+          //qDebug() << "Hereeeeeee!";
+          h->SetLineColor(LineColor);
+          h->SetLineStyle(LineStyle);
+          h->SetLineWidth(LineWidth);
+      }
+    }
+}
+
+void AInterfaceToHist::SetFillProperties(QString HistName, int color, int style)
+{
+    int index = TmpHub->ScriptDrawObjects.findIndexOf(HistName);
+    if (index == -1)
+      {
+        abort("Histogram "+HistName+" not found!");
+        return;
+      }
+
+    RootDrawObj& r = TmpHub->ScriptDrawObjects.List[index];
+    if (r.type.startsWith("TH"))
+      {
+        TH1* h = dynamic_cast<TH1*>(r.Obj);
+        if (h)
+        {
+            //qDebug() << "Setting filling";
+            h->SetFillColor(color);
+            h->SetFillStyle(style);
+        }
+      }
+
 }
 
 void AInterfaceToHist::Fill(QString HistName, double val, double weight)
@@ -466,9 +504,9 @@ void AInterfaceToHist::Draw(QString HistName, QString options)
       TH1D* h = static_cast<TH1D*>(r.Obj);
       h->SetXTitle(r.Xtitle.toLatin1().data());
       h->SetYTitle(r.Ytitle.toLatin1().data());
-      h->SetLineColor(r.LineColor);
-      h->SetLineWidth(r.LineWidth);
-      h->SetLineStyle(r.LineStyle);
+//      h->SetLineColor(r.LineColor);
+//      h->SetLineWidth(r.LineWidth);
+//      h->SetLineStyle(r.LineStyle);
       emit RequestDraw(h, options, true);
     }
   else if (r.type == "TH2D")
@@ -477,9 +515,9 @@ void AInterfaceToHist::Draw(QString HistName, QString options)
       h->SetXTitle(r.Xtitle.toLatin1().data());
       h->SetYTitle(r.Ytitle.toLatin1().data());
       h->SetZTitle(r.Ztitle.toLatin1().data());
-      h->SetLineColor(r.LineColor);
-      h->SetLineWidth(r.LineWidth);
-      h->SetLineStyle(r.LineStyle);
+//      h->SetLineColor(r.LineColor);
+//      h->SetLineWidth(r.LineWidth);
+//      h->SetLineStyle(r.LineStyle);
       emit RequestDraw(h, options, true);
     }
   else
@@ -487,6 +525,54 @@ void AInterfaceToHist::Draw(QString HistName, QString options)
       abort("Object "+HistName+": unknown histogram type!");
       return;
   }
+}
+
+void AInterfaceToHist::DrawStack(QVariant HistNames, QString options, QString XTitle, QString YTitle)
+{
+    QString typeArr = HistNames.typeName();
+    if (typeArr != "QVariantList")
+    {
+        abort("Array with histogram names is expected as the second argument in hist.DrawStack");
+        return;
+    }
+
+    QVariantList vl = HistNames.toList();
+    QJsonArray arr = QJsonArray::fromVariantList(vl);
+    THStack *stack = new THStack();
+    for (int i=0; i<arr.size(); i++)
+    {
+        QString HistName = arr[i].toString();
+        int index = TmpHub->ScriptDrawObjects.findIndexOf(HistName);
+        if (index == -1)
+          {
+            abort("Histogram "+HistName+" not found!");
+            delete stack;
+            return;
+          }
+        RootDrawObj& r = TmpHub->ScriptDrawObjects.List[index];
+        if (r.type != "TH1D")
+        {
+            abort("This is not a 1D histogram!");
+            delete stack;
+            return;
+        }
+        TH1D* h = static_cast<TH1D*>(r.Obj);
+        //h->SetOption("bar");
+        stack->Add(h);
+    }
+
+
+
+    emit RequestDraw(stack, options, true);
+
+    if (!XTitle.isEmpty() || !YTitle.isEmpty())
+    {
+        stack->GetXaxis()->SetTitle(XTitle.toLocal8Bit().data());
+        stack->GetYaxis()->SetTitle(YTitle.toLocal8Bit().data());
+        emit RequestDraw(stack, options, true);
+    }
+
+    // ***!!! add storage / delete!!!
 }
 
 void AInterfaceToHist::Save(QString HistName, QString FileName)

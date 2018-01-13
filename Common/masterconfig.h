@@ -32,6 +32,7 @@ public:
     ChannelMapper*      Map;  //use this class to access convertion methods!
     bool                SetMapping(const QVector<int> &mapping);
     const QVector<int>& GetMapping() const {return ChannelMap;}
+    bool                UpdateNumberOfHardwareChannels(int numHardwChannels);
     int                 CountLogicalChannels() const;
 
     QVector<int>        GetListOfIgnoreChannels() const;

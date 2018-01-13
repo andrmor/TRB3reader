@@ -26,6 +26,7 @@ public slots:
 
   void SetTitles(QString HistName, QString X_Title, QString Y_Title, QString Z_Title = "");
   void SetLineProperties(QString HistName, int LineColor, int LineStyle, int LineWidth);
+  void SetFillProperties(QString HistName, int color, int style);
 
   void Fill(QString HistName, double val, double weight);
   void Fill2D(QString HistName, double x, double y, double weight);
@@ -36,6 +37,7 @@ public slots:
   void Divide(QString HistName, QString HistToDivideWith);
 
   void Draw(QString HistName, QString options);
+  void DrawStack(QVariant HistNames, QString options, QString XTitle = "", QString YTitle = "");
 
   void Save(QString HistName, QString FileName);
 

@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>681</width>
-    <height>602</height>
+    <height>629</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>TRB3_reader</string>
+   <string>TRB3_reader v2.1.2</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -30,7 +30,7 @@
     <item>
      <widget class="QTabWidget" name="twMain">
       <property name="currentIndex">
-       <number>5</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="tab_6">
        <attribute name="title">
@@ -114,7 +114,7 @@
         <item>
          <widget class="QPushButton" name="pbPrintHLDfileProperties">
           <property name="text">
-           <string>Print HLD file properties</string>
+           <string>Select an hld file to print it's data structure</string>
           </property>
          </widget>
         </item>
@@ -2674,16 +2674,6 @@
          </spacer>
         </item>
         <item>
-         <widget class="QLabel" name="labDatahubEvents">
-          <property name="text">
-           <string>DataHub contains 0 events</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item>
          <layout class="QHBoxLayout" name="horizontalLayout_44">
           <item>
            <spacer name="horizontalSpacer_5">
@@ -2700,6 +2690,12 @@
           </item>
           <item>
            <widget class="QPushButton" name="pbClearDataHub">
+            <property name="minimumSize">
+             <size>
+              <width>150</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="maximumSize">
              <size>
               <width>16777215</width>
@@ -2892,6 +2888,16 @@
      <widget class="QProgressBar" name="prbMainBar">
       <property name="value">
        <number>0</number>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="labDatahubEvents">
+      <property name="text">
+       <string>DataHub contains 0 events</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
       </property>
      </widget>
     </item>
