@@ -134,6 +134,8 @@ private slots:
 
     void on_pbLoadToDataHub_clicked();
 
+    void on_cobLableType_activated(int index);
+
 protected:
     void closeEvent(QCloseEvent* event);
 

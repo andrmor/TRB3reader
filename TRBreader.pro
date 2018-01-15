@@ -7,11 +7,11 @@ CONFIG += speech_support   #enables text_to_speech script unit - minimum Qt 5.8.
 cern_root {
     DEFINES += CERN_ROOT
 
-    INCLUDEPATH += $$system(/usr/local/root/bin/root-config --incdir)
-    LIBS += $$system(/usr/local/root/bin/root-config --libs) #-lGeom -lGeomPainter -lGeomBuilder -lMathMore -lMinuit2
+#    INCLUDEPATH += $$system(/usr/local/root/bin/root-config --incdir)
+#    LIBS += $$system(/usr/local/root/bin/root-config --libs) #-lGeom -lGeomPainter -lGeomBuilder -lMathMore -lMinuit2
 
-#    INCLUDEPATH += c:/root/include
-#    LIBS += -Lc:/root/lib/ -llibCore -llibCint -llibRIO -llibNet -llibHist -llibGraf -llibGraf3d -llibGpad -llibTree -llibRint -llibPostscript -llibMatrix -llibPhysics -llibRint -llibMathCore -llibGeom -llibGeomPainter -llibGeomBuilder -llibMathMore -llibMinuit2 -llibThread
+    INCLUDEPATH += c:/root/include
+    LIBS += -Lc:/root/lib/ -llibCore -llibCint -llibRIO -llibNet -llibHist -llibGraf -llibGraf3d -llibGpad -llibTree -llibRint -llibPostscript -llibMatrix -llibPhysics -llibRint -llibMathCore -llibGeom -llibGeomPainter -llibGeomBuilder -llibMathMore -llibMinuit2 -llibThread
 
     SOURCES += ROOT/cernrootmodule.cpp \
                ROOT/GUI/arasterwindow.cpp \
@@ -33,9 +33,9 @@ cern_root {
 #-----------
 
 #---DABC---
-DEFINES += DABC
-INCLUDEPATH += /home/andr/Soft/DABC/dabc_debug/include
-LIBS += -L/home/andr/Soft/DABC/dabc_debug/lib/ -lDabcBase -lDabcMbs -lDabcHadaq
+#DEFINES += DABC
+#INCLUDEPATH += /home/andr/Soft/DABC/dabc_debug/include
+#LIBS += -L/home/andr/Soft/DABC/dabc_debug/lib/ -lDabcBase -lDabcMbs -lDabcHadaq
 #-----------
 
 #---Speech---
