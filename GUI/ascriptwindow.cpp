@@ -3,7 +3,9 @@
 #include "ahighlighters.h"
 #include "completingtexteditclass.h"
 #include "coreinterfaces.h"
-#include "histgraphinterfaces.h"
+#ifdef CERN_ROOT
+    #include "histgraphinterfaces.h"
+#endif
 #include "amessage.h"
 #include "ascriptmanager.h"
 #include "masterconfig.h"
@@ -261,8 +263,10 @@ void AScriptWindow::SetInterfaceObject(QObject *interfaceObject, QString name)
     completitionModel->setStringList(functions);
 
     //special "needs" of particular interface objects
+#ifdef CERN_ROOT
     if ( dynamic_cast<AInterfaceToHist*>(interfaceObject) || dynamic_cast<AInterfaceToGraph*>(interfaceObject)) //"graph" or "hist"
        QObject::connect(interfaceObject, SIGNAL(RequestDraw(TObject*,QString,bool)), this, SLOT(onRequestDraw(TObject*,QString,bool)));
+#endif
 
     trwHelp->collapseAll();
 }

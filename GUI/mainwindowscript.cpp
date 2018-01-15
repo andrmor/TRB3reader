@@ -59,7 +59,7 @@ void MainWindow::CreateScriptWindow()
 #endif
 
 #ifdef SPEECH
-    qDebug() << "-> speech...";
+    //  qDebug() << "-> speech...";
     AInterfaceToSpeech* speech = new AInterfaceToSpeech();
     ScriptWindow->SetInterfaceObject(speech, "speech");
 #endif

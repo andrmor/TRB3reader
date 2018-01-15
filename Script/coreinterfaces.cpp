@@ -2,7 +2,7 @@
 #include "ascriptmanager.h"
 #include "afiletools.h"
 
-#include "TRandom2.h"
+//#include "TRandom2.h"
 
 #include <QScriptEngine>
 #include <QDateTime>
@@ -241,7 +241,7 @@ const QVariant AInterfaceToCore::loadColumn(const QString fileName, int column) 
 
 const QVariant AInterfaceToCore::loadArray(const QString fileName, int columns) const
 {
-  if (columns<0 || columns>2)
+  if (columns<0 || columns>3)
     {
       abort ("Supported 1, 2 and 3 columns");
       return QVariant();
@@ -255,7 +255,7 @@ const QVariant AInterfaceToCore::loadArray(const QString fileName, int columns) 
   }
 
   QVector<double> v1, v2, v3;
-  int res;
+  int res = -1;
   if (columns == 1)
      res = LoadDoubleVectorsFromFile(fileName, &v1);
   else if (columns == 2)

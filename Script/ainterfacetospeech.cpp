@@ -30,7 +30,10 @@ void AInterfaceToSpeech::Stop()
 
 const QStringList AInterfaceToSpeech::GetAvailableEngines() const
 {
-    return QTextToSpeech::availableEngines();
+    QStringList list = QTextToSpeech::availableEngines();
+    for (int i=0; i<list.size(); i++)
+        list[i] = QString::number(i)+"="+list.at(i);
+    return list;
 }
 
 bool AInterfaceToSpeech::SelectEngine(int EngineIndex)
@@ -53,12 +56,13 @@ const QStringList AInterfaceToSpeech::GetAvailableLocales() const
     //QLocale current = m_speech->locale();
 
     QStringList list;
+    int icounter = 0;
     foreach (const QLocale &locale, locales)
     {
         QString name(QString("%1 (%2)")
                      .arg(QLocale::languageToString(locale.language()))
                      .arg(QLocale::countryToString(locale.country())));
-        list << name;
+        list << QString::number(icounter++)+"="+name;
     }
     return list;
 }
@@ -82,13 +86,14 @@ const QStringList AInterfaceToSpeech::GetAvailableVoices() const
     //QVoice currentVoice = m_speech->voice();
 
     QStringList list;
+    int icounter = 0;
     foreach (const QVoice &voice, m_voices)
     {
         QString tv = QString("%1 (%2 %3)")
                           .arg(voice.name())
                           .arg(QVoice::genderName(voice.gender()))
                           .arg(QVoice::ageName(voice.age()));
-        list << tv;
+        list << QString::number(icounter++)+"="+tv;
     }
     return list;
 }

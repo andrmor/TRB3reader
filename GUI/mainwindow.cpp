@@ -47,7 +47,7 @@ MainWindow::MainWindow(MasterConfig* Config, ADispatcher *Dispatcher, ADataHub* 
     connect(RootModule, &CernRootModule::WAllNegHidden, [=](){ui->pbShowAllNeg->setChecked(false);});
     connect(RootModule, &CernRootModule::WAllPosHidden, [=](){ui->pbShowAllPos->setChecked(false);});
 #else
-    QMessageBox::warning(this, "TRB3 reader", "Graph module was not configured!", QMessageBox::Ok, QMessageBox::Ok);
+    qDebug() << "-> Graph module (based on CERN ROOT) was NOT compiled";
 #endif
 
     //Creating script window, registering script units, and setting up QObject connections
@@ -60,6 +60,7 @@ MainWindow::MainWindow(MasterConfig* Config, ADispatcher *Dispatcher, ADataHub* 
     if (!jsS.isEmpty()) ScriptWindow->ReadFromJson(jsS);
 
     //misc gui settings
+    menuBar()->setNativeMenuBar(false);  //otherwise on some system menu bar is not wisible!
     ui->prbMainBar->setVisible(false);
     ui->cbAutoscaleY->setChecked(true);
     ui->pbStop->setVisible(false);
