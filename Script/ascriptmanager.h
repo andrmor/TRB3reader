@@ -8,6 +8,7 @@
 
 class QScriptEngine;
 class QJsonObject;
+class AInterfaceToCore;
 
 class AScriptManager : public QObject
 {
@@ -55,8 +56,11 @@ private:
     QVector<QObject*> interfaces;
     QVector<QString>  interfaceNames;
 
+    AInterfaceToCore* coreObj;  //core interface - to forward evaluate-script-in-script
+
 public slots:
     void    AbortEvaluation(const QString message = "Aborted!");
+    void    EvaluateScriptInScript(const QString& script, QVariant& result);
 
 signals:
     void    onStart();

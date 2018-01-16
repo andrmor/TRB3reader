@@ -120,6 +120,13 @@ void AScriptManager::AbortEvaluation(const QString message)
     emit onAbort();
 }
 
+void AScriptManager::EvaluateScriptInScript(const QString &script, QVariant &result)
+{
+    qDebug() << "ahaaaaaaaa"<< script;
+    result = coreObj->evaluate(script);
+    qDebug() << "res:"<<result;
+}
+
 void AScriptManager::SetInterfaceObject(QObject *interfaceObject, QString name)
 {
     //qDebug() << "Registering:" << interfaceObject << name;
@@ -130,7 +137,7 @@ void AScriptManager::SetInterfaceObject(QObject *interfaceObject, QString name)
         if (interfaceObject)
            engine->setGlobalObject(obj); //do not replace the global object for global script - in effect (non zero pointer) only for local scripts
         // registering service object
-        QObject* coreObj = new AInterfaceToCore(this);
+        coreObj = new AInterfaceToCore(this);
         QScriptValue coreVal = engine->newQObject(coreObj, QScriptEngine::QtOwnership);
         QString coreName = "core";
         engine->globalObject().setProperty(coreName, coreVal);
@@ -141,7 +148,7 @@ void AScriptManager::SetInterfaceObject(QObject *interfaceObject, QString name)
         QScriptValue mathVal = engine->newQObject(mathObj, QScriptEngine::QtOwnership);
         QString mathName = "math";
         engine->globalObject().setProperty(mathName, mathVal);
-        interfaces.append(mathObj);  //SERVICE OBJECT IS FIRST in interfaces!
+        interfaces.append(mathObj);
         interfaceNames.append(mathName);
       }
     else
@@ -156,8 +163,13 @@ void AScriptManager::SetInterfaceObject(QObject *interfaceObject, QString name)
 
         //connecting abort request from main interface to serviceObj
         int index = interfaceObject->metaObject()->indexOfSignal("AbortScriptEvaluation(QString)");
-        if (index != -1)
-            QObject::connect(interfaceObject, "2AbortScriptEvaluation(QString)", this, SLOT(AbortEvaluation(QString)));  //1-slot, 2-signal
+        if (index != -1) QObject::connect(interfaceObject, "2AbortScriptEvaluation(QString)",
+                                          this, SLOT(AbortEvaluation(QString)));  //1-slot, 2-signal
+        //connecting evaluate script-in-script to core object
+        index = interfaceObject->metaObject()->indexOfSignal("RequestEvaluate(QString,QVariant&)");
+        qDebug() << name << index;
+        if (index != -1) QObject::connect(interfaceObject, "2RequestEvaluate(QString,QVariant&)",
+                                          this, SLOT(EvaluateScriptInScript(const QString&, QVariant&)));  //1-slot, 2-signal
       }
 }
 
