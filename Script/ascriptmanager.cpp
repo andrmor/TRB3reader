@@ -122,9 +122,9 @@ void AScriptManager::AbortEvaluation(const QString message)
 
 void AScriptManager::EvaluateScriptInScript(const QString &script, QVariant &result)
 {
-    qDebug() << "ahaaaaaaaa"<< script;
+    //qDebug() << "Request recieved to evaluate script inside script:"<< script;
     result = coreObj->evaluate(script);
-    qDebug() << "res:"<<result;
+    //qDebug() << "res:"<<result;
 }
 
 void AScriptManager::SetInterfaceObject(QObject *interfaceObject, QString name)
@@ -167,7 +167,7 @@ void AScriptManager::SetInterfaceObject(QObject *interfaceObject, QString name)
                                           this, SLOT(AbortEvaluation(QString)));  //1-slot, 2-signal
         //connecting evaluate script-in-script to core object
         index = interfaceObject->metaObject()->indexOfSignal("RequestEvaluate(QString,QVariant&)");
-        qDebug() << name << index;
+        //  qDebug() << name << index;
         if (index != -1) QObject::connect(interfaceObject, "2RequestEvaluate(QString,QVariant&)",
                                           this, SLOT(EvaluateScriptInScript(const QString&, QVariant&)));  //1-slot, 2-signal
       }

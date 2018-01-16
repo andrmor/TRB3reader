@@ -20,8 +20,8 @@ public:
 
 public slots:
     void setTimeout(int milliseconds) {timeout = milliseconds;}
-    QString SendTextMessage(QString Url, QVariant message, bool WaitForAnswer=false);
-    int Ping(QString Url);
+    QString SendTextMessage(QString Url, QVariant message, bool WaitForAnswer=true);
+    QString Ping(QString Url);
 
     bool StartListen(quint16 port);
     void StopListen();
@@ -53,7 +53,7 @@ private:
     QString MessageReceived;
     bool fWaitForAnswer;
 
-    QString variantToString(QVariant val);
+    const QString variantToString(QVariant val) const;
     void ReplyAndClose(QString message);
 };
 

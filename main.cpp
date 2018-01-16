@@ -2,6 +2,7 @@
 #include <QApplication>
 #include <QObject>
 #include <QDebug>
+#include <QLoggingCategory>
 
 #include "adatahub.h"
 #include "masterconfig.h"
@@ -11,6 +12,9 @@
 
 int main(int argc, char *argv[])
 {
+    //SUPPRESS WARNINGS about ssl
+    QLoggingCategory::setFilterRules("qt.network.ssl.warning=false");
+
     ADataHub DataHub;    
     MasterConfig Config;
     Trb3dataReader Reader(&Config);
