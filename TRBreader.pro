@@ -51,6 +51,7 @@ speech_support{
 QT += core gui
 QT += widgets
 QT += script
+QT += websockets
 
 TARGET = RootBase
 TEMPLATE = app
@@ -79,7 +80,8 @@ SOURCES += main.cpp \
     GUI/aeditchannelsdialog.cpp \
     Common/adatahub.cpp \
     Script/ainterfacetodata.cpp \
-    Script/ainterfacetoextractor.cpp
+    Script/ainterfacetoextractor.cpp \
+    Script/ainterfacetowebsocket.cpp
 
 HEADERS  += GUI/mainwindow.h \    
     TRB/trb3datareader.h \
@@ -102,7 +104,8 @@ HEADERS  += GUI/mainwindow.h \
     GUI/aeditchannelsdialog.h \
     Common/adatahub.h \
     Script/ainterfacetodata.h \
-    Script/ainterfacetoextractor.h
+    Script/ainterfacetoextractor.h \
+    Script/ainterfacetowebsocket.h
 
 FORMS    += GUI/mainwindow.ui \
     GUI/ascriptwindow.ui \
