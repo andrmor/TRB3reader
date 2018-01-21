@@ -82,6 +82,14 @@ public:
     QString             FileName;
     QString             WorkingDir;
 
+    // hld file processor settings
+    bool                bDoSignalExtraction;
+    bool                bDoScript;
+    bool                bDoSave;
+    QString             AddToFileName;
+    bool                bDoCopy;
+    bool                bCopyWaveforms;
+
     // config <-> JSON handling
     void                WriteToJson(QJsonObject& json);
     bool                ReadFromJson(QJsonObject& json);

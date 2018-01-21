@@ -13,16 +13,10 @@ const float NaN = std::numeric_limits<float>::quiet_NaN();
 Trb3dataReader::Trb3dataReader(MasterConfig *Config) :
     Config(Config), numSamples(0), numChannels(0) {}
 
-bool Trb3dataReader::Read()
+bool Trb3dataReader::Read(const QString& FileName)
 {
-    if (Config->FileName.isEmpty())
-    {
-        qDebug() << "--- File name is not set!";
-        return false;
-    }
-
     qDebug() << "--> Reading hld file...";
-    readRawData();
+    readRawData(FileName);
     if (!isValid())
     {
         qDebug() << "--- Read of hld file failed or all events were rejected!";
@@ -253,14 +247,14 @@ void Trb3dataReader::substractPedestals()
         }
 }
 
-void Trb3dataReader::readRawData()
+void Trb3dataReader::readRawData(const QString &FileName)
 {
 #ifdef DABC
     waveData.clear();
     numChannels = 0;
     numSamples = 0;
 
-    hadaq::ReadoutHandle ref = hadaq::ReadoutHandle::Connect(Config->FileName.toLocal8Bit().data());
+    hadaq::ReadoutHandle ref = hadaq::ReadoutHandle::Connect(FileName.toLocal8Bit().data());
     hadaq::RawEvent* evnt = 0;
     //evnt = ref.NextEvent(1.0);
     //evnt = ref.NextEvent(1.0);
@@ -371,7 +365,7 @@ void Trb3dataReader::readRawData()
 #endif
 }
 
-const QString Trb3dataReader::GetFileInfo(const QString FileName) const
+const QString Trb3dataReader::GetFileInfo(const QString& FileName) const
 {
     QString output;
 #ifdef DABC

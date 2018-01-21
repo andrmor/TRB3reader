@@ -12,6 +12,7 @@ class CernRootModule;
 class AScriptWindow;
 class ADispatcher;
 class ADataHub;
+class AHldFileProcessor;
 
 namespace Ui {
 class MainWindow;
@@ -22,7 +23,13 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(MasterConfig* Config, ADispatcher* Dispatcher, ADataHub* DataHub, Trb3dataReader* Reader, Trb3signalExtractor* Extractor, QWidget *parent = 0);
+    explicit MainWindow(MasterConfig* Config,
+                        ADispatcher* Dispatcher,
+                        ADataHub* DataHub,
+                        Trb3dataReader* Reader,
+                        Trb3signalExtractor* Extractor,
+                        AHldFileProcessor& HldFileProcessor,
+                        QWidget *parent = 0);
     ~MainWindow();
 
 public slots:
@@ -146,6 +153,7 @@ private:
     ADataHub* DataHub;
     Trb3dataReader* Reader;
     Trb3signalExtractor* Extractor;
+    AHldFileProcessor& HldFileProcessor;
 
     //owned objects
     Ui::MainWindow* ui;    

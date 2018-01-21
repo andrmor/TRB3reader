@@ -16,6 +16,7 @@
 
 #include "trb3datareader.h"
 #include "trb3signalextractor.h"
+#include "ahldfileprocessor.h"
 
 #include <QDebug>
 #include <QFileDialog>
@@ -26,9 +27,15 @@
 
 #include <cmath>
 
-MainWindow::MainWindow(MasterConfig* Config, ADispatcher *Dispatcher, ADataHub* DataHub, Trb3dataReader* Reader, Trb3signalExtractor* Extractor, QWidget *parent) :
+MainWindow::MainWindow(MasterConfig* Config,
+                       ADispatcher *Dispatcher,
+                       ADataHub* DataHub,
+                       Trb3dataReader* Reader,
+                       Trb3signalExtractor* Extractor,
+                       AHldFileProcessor& HldFileProcessor,
+                       QWidget *parent) :
     QMainWindow(parent),
-    Config(Config), Dispatcher(Dispatcher), DataHub(DataHub), Reader(Reader), Extractor(Extractor),
+    Config(Config), Dispatcher(Dispatcher), DataHub(DataHub), Reader(Reader), Extractor(Extractor), HldFileProcessor(HldFileProcessor),
     ui(new Ui::MainWindow)
 {
     bStopFlag = false;
@@ -115,7 +122,7 @@ const QString MainWindow::ProcessData()
     if (Config->FileName.isEmpty()) return "File name not defined!";
 
     LogMessage("Reading hld file...");
-    bool ok = Reader->Read();
+    bool ok = Reader->Read(Config->FileName);
     if (!ok) return "File read failed!";
 
     LogMessage("Extracting signals...");
@@ -1134,7 +1141,7 @@ bool MainWindow::bulkProcessCore()
     qDebug() << "Processing" <<  Config->FileName;
 
     // Reading waveforms, pefroming optional smoothing/pedestal substraction
-    bool ok = Reader->Read();
+    bool ok = Reader->Read(Config->FileName);
     if (!ok)
     {
         ui->pteBulkLog->appendPlainText("---- File read failed!");

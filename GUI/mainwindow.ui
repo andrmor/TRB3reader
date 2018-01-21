@@ -2585,6 +2585,85 @@
          </layout>
         </item>
         <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_45">
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QCheckBox" name="cbProcessOnlyFilesWith">
+            <property name="text">
+             <string>Only files with</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="sbNumChannels">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>21</height>
+             </size>
+            </property>
+            <property name="maximum">
+             <number>10000</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_13">
+            <property name="text">
+             <string>channels and</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="sbNumSamples">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>21</height>
+             </size>
+            </property>
+            <property name="maximum">
+             <number>10000</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_39">
+            <property name="text">
+             <string>samples</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_7">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
          <widget class="QLabel" name="label_15">
           <property name="text">
            <string>Execute the following actions for each file (in this order)</string>
@@ -3055,11 +3134,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>131</x>
-     <y>201</y>
+     <y>230</y>
     </hint>
     <hint type="destinationlabel">
      <x>401</x>
-     <y>203</y>
+     <y>232</y>
     </hint>
    </hints>
   </connection>
@@ -3070,12 +3149,12 @@
    <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>136</x>
-     <y>228</y>
+     <x>142</x>
+     <y>257</y>
     </hint>
     <hint type="destinationlabel">
      <x>528</x>
-     <y>228</y>
+     <y>257</y>
     </hint>
    </hints>
   </connection>
@@ -3087,11 +3166,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>131</x>
-     <y>201</y>
+     <y>230</y>
     </hint>
     <hint type="destinationlabel">
      <x>262</x>
-     <y>203</y>
+     <y>232</y>
     </hint>
    </hints>
   </connection>
@@ -3108,6 +3187,38 @@
     <hint type="destinationlabel">
      <x>394</x>
      <y>453</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cbProcessOnlyFilesWith</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>sbNumChannels</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>74</x>
+     <y>133</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>146</x>
+     <y>129</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cbProcessOnlyFilesWith</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>sbNumSamples</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>59</x>
+     <y>127</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>263</x>
+     <y>127</y>
     </hint>
    </hints>
   </connection>

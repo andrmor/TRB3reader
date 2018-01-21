@@ -194,3 +194,13 @@ const QString ChannelMapper::Validate() const
 
     return "";
 }
+
+const QString ChannelMapper::ValidateForAvailableHardwareChannels(int numHardwChannels) const
+{
+    for (int i : ToLogical)
+    {
+        if (i >= numHardwChannels)
+            return "Conflict with channel map: too few hardware channels";
+    }
+    return "";
+}

@@ -75,6 +75,9 @@ void MainWindow::WriteGUItoJson(QJsonObject &json)
     jsgui["SaveAddPositions"] = ui->cbAddReconstructedPositions->isChecked();
     jsgui["SaveSkipRejected"] = ui->cbSaveOnlyGood->isChecked();
     jsgui["LoadAlsoPositions"] = ui->cbLoadIncludeReconstructed->isChecked();
+    jsgui["OnlyFilesWithChanSam"] = ui->cbProcessOnlyFilesWith->isChecked();
+    jsgui["NumChannels"] = ui->sbNumChannels->value();
+    jsgui["NumSamples"] = ui->sbNumSamples->value();
 
     jsgui["ExplorerSource"] = ui->cobExplorerSource->currentIndex();
 
@@ -117,6 +120,9 @@ void MainWindow::ReadGUIfromJson(const QJsonObject& json)
     JsonToCheckbox(jsgui, "SaveAddPositions", ui->cbAddReconstructedPositions);
     JsonToCheckbox(jsgui, "SaveSkipRejected", ui->cbSaveOnlyGood);
     JsonToCheckbox(jsgui, "LoadAlsoPositions", ui->cbLoadIncludeReconstructed);
+    JsonToCheckbox(jsgui, "OnlyFilesWithChanSam", ui->cbProcessOnlyFilesWith);
+    JsonToSpinBox(jsgui, "NumChannels", ui->sbNumChannels);
+    JsonToSpinBox(jsgui, "NumSamples", ui->sbNumSamples);
 
     JsonToComboBox(jsgui, "ExplorerSource", ui->cobExplorerSource);
 
