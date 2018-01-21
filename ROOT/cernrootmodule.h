@@ -39,7 +39,9 @@ public:
 
     bool DrawSingle(bool bFromDataHub, int ievent, int iHardwChan, bool autoscale, float MinY, float MaxY);
     bool DrawOverlay(bool bFromDataHub, int ievent, bool bNeg, bool bAutoscale, float Min, float Max, int SortBy_0Logic1Hardw);
-    bool DrawAll(bool bFromDataHub, int ievent, bool bNeg, int padsX, int padsY, bool bAutoscale, float Min, float Max, int SortBy_0Logic1Hardw, bool bShowlabels);
+    bool DrawAll(bool bFromDataHub, int ievent, bool bNeg, int padsX, int padsY,
+                 bool bAutoscale, float Min, float Max, int SortBy_0Logic1Hardw,
+                 bool bShowlabels, int Channels0_Signals1);
 
     void StartGraphWindows();
     const QJsonObject SaveGraphWindows() const;

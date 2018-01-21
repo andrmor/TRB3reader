@@ -2,7 +2,7 @@
 #include "ascriptmanager.h"
 #include "afiletools.h"
 
-#include "TRandom2.h"
+//#include "TRandom2.h"
 
 #include <QScriptEngine>
 #include <QDateTime>
@@ -241,7 +241,7 @@ const QVariant AInterfaceToCore::loadColumn(const QString fileName, int column) 
 
 const QVariant AInterfaceToCore::loadArray(const QString fileName, int columns) const
 {
-  if (columns<0 || columns>2)
+  if (columns<0 || columns>3)
     {
       abort ("Supported 1, 2 and 3 columns");
       return QVariant();
@@ -255,7 +255,7 @@ const QVariant AInterfaceToCore::loadArray(const QString fileName, int columns) 
   }
 
   QVector<double> v1, v2, v3;
-  int res;
+  int res = -1;
   if (columns == 1)
      res = LoadDoubleVectorsFromFile(fileName, &v1);
   else if (columns == 2)
@@ -314,7 +314,50 @@ const QString AInterfaceToCore::GetScriptDir() const
 
 const QString AInterfaceToCore::GetExamplesDir() const
 {
-  return ScriptManager->ExamplesDir;
+    return ScriptManager->ExamplesDir;
+}
+
+#include <QProcess>
+const QString AInterfaceToCore::StartExternalProcess(QString command, QVariant arguments, bool waitToFinish, int milliseconds)
+{
+    QStringList arg;
+    QString type = arguments.typeName();
+    if (type == "QString") arg << arguments.toString();
+    else if (type == "int") arg << QString::number(arguments.toInt());
+    else if (type == "double") arg << QString::number(arguments.toDouble());
+    else if (type == "QVariantList")
+    {
+        QVariantList vl = arguments.toList();
+        QJsonArray ar = QJsonArray::fromVariantList(vl);
+        for (int i=0; i<ar.size(); i++) arg << ar.at(i).toString();
+    }
+    else
+    {
+        qDebug() << "Format error in argument list";
+        return "bad arguments";
+    }
+
+    QString str = command + " ";
+    for (QString &s : arg) str += s + " ";
+    qDebug() << "Executing external command:" << str;
+
+    QProcess *process = new QProcess(this);
+    QString errorString;
+
+    if (waitToFinish)
+    {
+        process->start(command, arg);
+        process->waitForFinished(milliseconds);
+        errorString = process->errorString();
+        delete process;
+    }
+    else
+    {
+        QObject::connect(process, SIGNAL(finished(int)), process, SLOT(deleteLater()));
+        process->start(command, arg);
+    }
+
+    return errorString;
 }
 
 bool AInterfaceToCore::createFile(const QString fileName, bool AbortIfExists) const

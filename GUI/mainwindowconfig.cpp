@@ -93,6 +93,7 @@ void MainWindow::WriteGUItoJson(QJsonObject &json)
         jx["PosX"] = ui->sbAllPosX->value();
         jx["PosY"] = ui->sbAllPosY->value();
         jx["Labels"] = ui->cbLabels->isChecked();
+        jx["LabelsType"] = ui->cobLableType->currentIndex();
     jsgui["AllGraph"] = jx;
 
     json["GUI"] = jsgui;
@@ -136,6 +137,7 @@ void MainWindow::ReadGUIfromJson(const QJsonObject& json)
         JsonToSpinBox(jx, "PosX", ui->sbAllPosX);
         JsonToSpinBox(jx, "PosY", ui->sbAllPosY);
         JsonToCheckbox(jx, "Labels", ui->cbLabels);
+        JsonToComboBox(jx, "LabelsType", ui->cobLableType);
     }
 }
 
@@ -440,3 +442,4 @@ void MainWindow::on_sbIntegrateTo_editingFinished()
     Config->IntegrateTo = ui->sbIntegrateTo->value();
     ClearData();
 }
+

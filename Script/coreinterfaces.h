@@ -5,6 +5,7 @@
 
 #include <QVariant>
 #include <QString>
+#include <QDesktopServices>
 
 class AScriptManager;
 //class TRandom2;
@@ -53,6 +54,9 @@ public slots:
   const QString  GetWorkDir() const;
   const QString  GetScriptDir() const;
   const QString  GetExamplesDir() const;
+
+  //externals
+  const QString  StartExternalProcess(QString command, QVariant arguments, bool waitToFinish = false, int milliseconds = 1000);
 
 private:
   AScriptManager* ScriptManager;

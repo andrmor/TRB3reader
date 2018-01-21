@@ -47,7 +47,7 @@ MainWindow::MainWindow(MasterConfig* Config, ADispatcher *Dispatcher, ADataHub* 
     connect(RootModule, &CernRootModule::WAllNegHidden, [=](){ui->pbShowAllNeg->setChecked(false);});
     connect(RootModule, &CernRootModule::WAllPosHidden, [=](){ui->pbShowAllPos->setChecked(false);});
 #else
-    QMessageBox::warning(this, "TRB3 reader", "Graph module was not configured!", QMessageBox::Ok, QMessageBox::Ok);
+    qDebug() << "-> Graph module (based on CERN ROOT) was NOT compiled";
 #endif
 
     //Creating script window, registering script units, and setting up QObject connections
@@ -60,6 +60,7 @@ MainWindow::MainWindow(MasterConfig* Config, ADispatcher *Dispatcher, ADataHub* 
     if (!jsS.isEmpty()) ScriptWindow->ReadFromJson(jsS);
 
     //misc gui settings
+    menuBar()->setNativeMenuBar(false);  //otherwise on some system menu bar is not wisible!
     ui->prbMainBar->setVisible(false);
     ui->cbAutoscaleY->setChecked(true);
     ui->pbStop->setVisible(false);
@@ -792,7 +793,10 @@ void MainWindow::showAllWave(bool checked, bool bNeg)
         padsY = ui->sbAllPosY->value();
     }
 
-    bool bOK = RootModule->DrawAll(bFromDataHub, ievent, bNeg, padsX, padsY, ui->cbAutoscaleY->isChecked(), Min, Max, ui->cobSortBy->currentIndex(), ui->cbLabels->isChecked());
+    bool bOK = RootModule->DrawAll(bFromDataHub, ievent, bNeg, padsX, padsY,
+                                   ui->cbAutoscaleY->isChecked(), Min, Max,
+                                   ui->cobSortBy->currentIndex(),
+                                   ui->cbLabels->isChecked(), ui->cobLableType->currentIndex());
     if (!bOK)
     {
         if (bNeg) RootModule->ClearAllNegWaveWindow();
@@ -1402,4 +1406,10 @@ void MainWindow::on_pbLoadToDataHub_clicked()
     ui->prbMainBar->setVisible(false);
     message("Added " + QString::number(numEvents) + " events", this);
     UpdateGui();
+}
+
+void MainWindow::on_cobLableType_activated(int)
+{
+    on_pbShowAllNeg_toggled(ui->pbShowAllNeg->isChecked());
+    on_pbShowAllPos_toggled(ui->pbShowAllPos->isChecked());
 }

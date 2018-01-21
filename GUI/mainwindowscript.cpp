@@ -11,9 +11,14 @@
 #include "ainterfacetoconfig.h"
 #include "adispatcher.h"
 #include "ainterfacetodata.h"
+#include "ainterfacetowebsocket.h"
 
 #ifdef CERN_ROOT
   #include "cernrootmodule.h"
+#endif
+
+#ifdef SPEECH
+  #include "ainterfacetospeech.h"
 #endif
 
 #include <QDebug>
@@ -53,6 +58,15 @@ void MainWindow::CreateScriptWindow()
     AInterfaceToHist* hist = new AInterfaceToHist(RootModule->GetTmpHub());
     ScriptWindow->SetInterfaceObject(hist, "hist");
 #endif
+
+#ifdef SPEECH
+    //  qDebug() << "-> speech...";
+    AInterfaceToSpeech* speech = new AInterfaceToSpeech();
+    ScriptWindow->SetInterfaceObject(speech, "speech");
+#endif
+
+    AInterfaceToWebSocket* websoc = new AInterfaceToWebSocket();
+    ScriptWindow->SetInterfaceObject(websoc, "websoc");
 
     //  qDebug() << "-> msg...";
     AInterfaceToMessageWindow* txt = new AInterfaceToMessageWindow(ScriptWindow);

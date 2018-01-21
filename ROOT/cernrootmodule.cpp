@@ -397,7 +397,7 @@ bool CernRootModule::DrawOverlay(bool bFromDataHub, int ievent, bool bNeg, bool 
     return true;
 }
 
-bool CernRootModule::DrawAll(bool bFromDataHub, int ievent, bool bNeg, int padsX, int padsY, bool bAutoscale, float Min, float Max, int SortBy_0Logic1Hardw, bool bShowlabels)
+bool CernRootModule::DrawAll(bool bFromDataHub, int ievent, bool bNeg, int padsX, int padsY, bool bAutoscale, float Min, float Max, int SortBy_0Logic1Hardw, bool bShowlabels, int Channels0_Signals1)
 {
     AGraphWindow* win;
     QVector<TGraph*>* gs;
@@ -508,7 +508,16 @@ bool CernRootModule::DrawAll(bool bFromDataHub, int ievent, bool bNeg, int padsX
                 la->SetLineColor(1);
                 la->SetTextAlign(22);
 
-                la->AddText(QString::number(iCh).toLatin1());
+                QString s;
+                if (Channels0_Signals1 == 0)
+                    s = QString::number(iCh);
+                else
+                {
+                    double sig = bFromDataHub ? DataHub->GetSignalFast(ievent, iChannel) : Extractor->GetSignalFast(ievent, iChannel);
+                    s = QString::number(sig, 'g', 2);
+                }
+
+                la->AddText(s.toLocal8Bit().data());
                 la->Draw("same");
             }
             //gPad->Update();
