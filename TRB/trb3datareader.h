@@ -42,8 +42,7 @@ public:
     int     GetSampleWhereFirstAbove(int ievent, int ichannel, int threshold) const;
     int     GetSampleWhereFirstAboveFast(int ievent, int ichannel, int threshold) const;
 
-    // processing successful?
-    bool    isValid() const {return (waveData.size()>0 && numChannels>0 && numSamples>0);}
+    bool    isEmpty() const {return waveData.isEmpty();}
 
     // parameter requests
     int     CountSamples()   const {return numSamples;}      // number of samples in the waveform
@@ -60,10 +59,13 @@ private:
 
     int     numSamples;
     int     numChannels;
+
     int     numBadEvents;
     int     numAllEvents;
 
-    void    readRawData(const QString& FileName);    // read raw data from the hld file
+    void    readRawData(const QString& FileName,
+                        int enforceNumChannels,
+                        int enforceNumSamples);    // read raw data from the hld file, 0 enforce => set numSamples/numChannels from first event
     void    smoothData();     // smooth raw data
 
     void    doAdjacentAverage(QVector<float> &arr, int numPoints);

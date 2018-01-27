@@ -14,8 +14,7 @@ AInterfaceToWaveforms::AInterfaceToWaveforms(MasterConfig* Config, Trb3dataReade
 
 int AInterfaceToWaveforms::countSamples() const
 {
-    if (!Reader->isValid()) return 0;
-
+    if (Reader->isEmpty()) return 0;
     return Reader->CountSamples();
 }
 

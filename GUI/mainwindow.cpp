@@ -676,7 +676,7 @@ void MainWindow::on_pbShowWaveform_toggled(bool checked)
     else
     {
         ichannel = getCurrentlySelectedHardwareChannel();
-        if (ichannel<0 || !Reader->isValid())
+        if (ichannel<0 || Reader->isEmpty())
         {
             RootModule->ClearSingleWaveWindow();
             return;

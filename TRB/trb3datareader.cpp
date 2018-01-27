@@ -16,10 +16,30 @@ Trb3dataReader::Trb3dataReader(MasterConfig *Config) :
 bool Trb3dataReader::Read(const QString& FileName)
 {
     qDebug() << "--> Reading hld file...";
-    readRawData(FileName);
-    if (!isValid())
+    readRawData(FileName, Config->HldProcessSettings.NumChannels, Config->HldProcessSettings.NumSamples);
+
+    if ( Config->HldProcessSettings.NumChannels != 0)
+    {
+        if ( Config->HldProcessSettings.NumChannels != numChannels )
+        {
+            waveData.clear();
+            numChannels = 0;
+            numSamples = 0;
+            qDebug() << "The number of channel is different from requested in config";
+            return false;
+        }
+    }
+
+    if (isEmpty())
     {
         qDebug() << "--- Read of hld file failed or all events were rejected!";
+        return false;
+    }
+
+    bool bOK = Config->UpdateNumberOfHardwareChannels(numChannels);
+    if (!bOK)
+    {
+        qDebug() << "The number of hardware channels in the file ("<< numChannels << "is incompatible with the defined number of logical channels";
         return false;
     }
 
@@ -247,12 +267,13 @@ void Trb3dataReader::substractPedestals()
         }
 }
 
-void Trb3dataReader::readRawData(const QString &FileName)
+void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels, int enforceNumSamples)
 {
 #ifdef DABC
     waveData.clear();
-    numChannels = 0;
-    numSamples = 0;
+
+    numChannels = enforceNumChannels;
+    numSamples = enforceNumSamples;
 
     hadaq::ReadoutHandle ref = hadaq::ReadoutHandle::Connect(FileName.toLocal8Bit().data());
     hadaq::RawEvent* evnt = 0;
@@ -265,6 +286,7 @@ void Trb3dataReader::readRawData(const QString &FileName)
     while ( (evnt = ref.NextEvent(1.0)) )
     {
         bool bBadEvent = false;
+        int foundChannels = 0;
         QVector < QVector <float> > thisEventData;  //format: [channel] [sample]
 
         // loop over sections
@@ -288,7 +310,6 @@ void Trb3dataReader::readRawData(const QString &FileName)
 
                 unsigned ixTmp = ix;
 
-                //if (datakind == 0xc313 || datakind == 49152 || datakind == 49155)
                 if (Config->IsGoodDatakind(datakind))
                 {
                     // last word in the data block identifies max. ADC# and max. channel
@@ -313,25 +334,33 @@ void Trb3dataReader::readRawData(const QString &FileName)
                             for (int is=0; is<samples; is++)
                                 thisEventData[oldSize+ic][is] = (sub->Data(ix++) & 0xFFFF);
                         }
+                        foundChannels = oldSize + channels;
 
-                        if (numSamples!=0 && numSamples!=samples)
-                        {                            
-                            bBadEvent = true;
-                            if (numBadEvents<500) qDebug() << "----- Event #" << waveData.size()-1 << " has wrong number of samples ("<< samples <<")\n";
-                        }
-                        else
+                        if (numSamples != 0)
                         {
-                            numSamples = samples;
-                            numChannels = oldSize + channels;
+                            if (samples != numSamples)
+                            {
+                                bBadEvent = true;
+                                if (numBadEvents<50) qDebug() << "----- Event #" << waveData.size()-1 << " has wrong number of samples ("<< samples <<")\n";
+                            }
                         }
+                        else numSamples = samples;
                     }
                 }
-
-                //else ix+=datalen;
-                ix = ixTmp + datalen;  //more general (and safer) way to do the same
-                //qDebug() << "ix:"<< ix;
+                ix = ixTmp + datalen;
             }            
         }
+
+        if (numChannels != 0)
+        {
+            if (foundChannels != numChannels)
+            {
+                qDebug() << "Found event with wrong number of channels:"<<foundChannels<<"while expecting"<<numChannels;
+                ClearData();
+                break;
+            }
+        }
+        else numChannels = foundChannels;
 
         //qDebug() << "Event processed.\n";
         if (bBadEvent)
@@ -350,17 +379,7 @@ void Trb3dataReader::readRawData(const QString &FileName)
 
     ref.Disconnect();
 
-    bool bOK = Config->UpdateNumberOfHardwareChannels(numChannels);
-    if (!bOK)
-    {
-        qDebug() << "The number of hardware channels in the file ("<< numChannels << "is incompatible with the defined number of logical channels";
-        waveData.clear();
-        numChannels = 0;
-        numSamples = 0;
-        return;
-    }
-
-    qDebug() << "--> Data read completed\n--> Events: "<< waveData.size() <<" Channels: "<<numChannels << "  Samples: "<<numSamples;
+    qDebug() << "--> Data read completed\n--> Events: "<< waveData.size() <<" Channels: "<<foundChannels << "  Samples: "<<numSamples;
     if (numBadEvents > 0) qDebug() << "--> " << numBadEvents << " bad events were disreguarded!";
 #endif
 }
@@ -495,4 +514,6 @@ void Trb3dataReader::ClearData()
     waveData.clear();
     numChannels = 0;
     numSamples = 0;
+    numBadEvents = 0;
+    numAllEvents = 0;
 }
