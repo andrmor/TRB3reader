@@ -14,7 +14,7 @@ AHldFileProcessor::AHldFileProcessor(MasterConfig& Config,
                                      ADataHub& DataHub) :
     Config(Config), Reader(Reader), Extractor(Extractor), DataHub(DataHub) {}
 
-bool AHldFileProcessor::ProcessFile(const QString& FileName)
+bool AHldFileProcessor::ProcessFile(const QString FileName, const QString SaveFileName)
 {
     if (FileName.isEmpty())
     {
@@ -45,7 +45,7 @@ bool AHldFileProcessor::ProcessFile(const QString& FileName)
 
     // Extracting signals (or generating dummy data if disabled)
     Extractor.ClearData();
-    if (Config.bDoSignalExtraction)
+    if (Config.HldProcessSettings.bDoSignalExtraction)
     {
         LogAction("Extracting signals...");
         bool bOK = Extractor.ExtractSignals();
@@ -64,7 +64,7 @@ bool AHldFileProcessor::ProcessFile(const QString& FileName)
     }
 
     // Executing script
-    if (Config.bDoScript)
+    if (Config.HldProcessSettings.bDoScript)
     {
         LogAction("Executing script...");
         bool bOK;
@@ -88,10 +88,16 @@ bool AHldFileProcessor::ProcessFile(const QString& FileName)
     }
 
     // saving processed data to file
-    if (Config.bDoSave)
+    if (Config.HldProcessSettings.bDoSave || !SaveFileName.isEmpty())
     {
-        QFileInfo fi(FileName);
-        QString nameSave = fi.path() + "/" + fi.completeBaseName() + Config.AddToFileName;
+        QString nameSave;
+        if (SaveFileName.isEmpty())
+        {
+            QFileInfo fi(FileName);
+            nameSave = fi.path() + "/" + fi.completeBaseName() + Config.HldProcessSettings.AddToFileName;
+        }
+        else nameSave = SaveFileName;
+
         qDebug() << "Saving to file:"<< nameSave;
         LogAction("Saving to file...");
         bool bOK = SaveSignalsToFile(nameSave, false);
@@ -99,7 +105,7 @@ bool AHldFileProcessor::ProcessFile(const QString& FileName)
     }
 
     //Coping data to DataHub
-    if (Config.bDoCopy)
+    if (Config.HldProcessSettings.bDoCopyToDatahub)
     {
         LogAction("Copying to datahub...");
         qDebug() << "Copying to DataHub...";
@@ -121,7 +127,7 @@ bool AHldFileProcessor::ProcessFile(const QString& FileName)
             ev->SetRejectedFlag(false);
 
             //waveforms
-            if (Config.bCopyWaveforms)
+            if (Config.HldProcessSettings.bCopyWaveforms)
             {
                 QVector< QVector<float>* > vec;
                 for (int ihardw : map)
@@ -144,7 +150,7 @@ bool AHldFileProcessor::ProcessFile(const QString& FileName)
     return true;
 }
 
-bool AHldFileProcessor::SaveSignalsToFile(const QString& FileName, bool bUseHardware)
+bool AHldFileProcessor::SaveSignalsToFile(const QString FileName, bool bUseHardware)
 {
     QFile outputFile(FileName);
     outputFile.open(QIODevice::WriteOnly);

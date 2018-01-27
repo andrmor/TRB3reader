@@ -82,7 +82,8 @@ SOURCES += main.cpp \
     Script/ainterfacetodata.cpp \
     Script/ainterfacetoextractor.cpp \
     Script/ainterfacetowebsocket.cpp \
-    Common/ahldfileprocessor.cpp
+    Common/ahldfileprocessor.cpp \
+    Script/ainterfacetohldfileprocessor.cpp
 
 HEADERS  += GUI/mainwindow.h \    
     TRB/trb3datareader.h \
@@ -107,7 +108,8 @@ HEADERS  += GUI/mainwindow.h \
     Script/ainterfacetodata.h \
     Script/ainterfacetoextractor.h \
     Script/ainterfacetowebsocket.h \
-    Common/ahldfileprocessor.h
+    Common/ahldfileprocessor.h \
+    Script/ainterfacetohldfileprocessor.h
 
 FORMS    += GUI/mainwindow.ui \
     GUI/ascriptwindow.ui \

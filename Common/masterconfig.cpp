@@ -65,6 +65,8 @@ void MasterConfig::WriteToJson(QJsonObject &json)
     writeSignalExtractionToJson(json);
     writeMaxGateToJson(json);
 
+    json["HldProcessSettings"] = HldProcessSettings.WriteToJson();
+
     json["FileName"] = FileName;
     json["WorkingDir"] = WorkingDir;
 
@@ -82,6 +84,8 @@ bool MasterConfig::ReadFromJson(QJsonObject &json)
     readSmoothingFromJson(json);
     readSignalExtractionFromJson(json);
     readMaxGateFromJson(json);
+
+    HldProcessSettings.ReadFromJson( json["HldProcessSettings"].toObject() );
 
     parseJson(json, "FileName", FileName);
     parseJson(json, "WorkingDir", WorkingDir);
@@ -362,4 +366,34 @@ bool MasterConfig::IsIgnoredLogicalChannel(int iLogical) const
 {
     int iHardwChan = Map->LogicalToHardware(iLogical);
     return IgnoreHardwareChannels.contains(iHardwChan);
+}
+
+// -------- hld file processor settings ---------
+
+const QJsonObject AHldProcessSettings::WriteToJson() const
+{
+    QJsonObject js;
+
+    js["NumChannels"] =      NumChannels;
+    js["NumSamples"]  =      NumSamples;
+    js["DoExtraction"] =     bDoSignalExtraction;
+    js["DoScript"] =         bDoScript;
+    js["DoSave"] =           bDoSave;
+    js["AddToFileName"] =    AddToFileName;
+    js["DoCopyToDatahub"] =  bDoCopyToDatahub;
+    js["IncludeWaveforms"] = bCopyWaveforms;
+
+    return js;
+}
+
+void AHldProcessSettings::ReadFromJson(const QJsonObject &json)
+{
+    parseJson(json, "NumChannels",      NumChannels);
+    parseJson(json, "NumSamples",       NumSamples);
+    parseJson(json, "DoExtraction",     bDoSignalExtraction);
+    parseJson(json, "DoScript",         bDoScript);
+    parseJson(json, "DoSave",           bDoSave);
+    parseJson(json, "AddToFileName",    AddToFileName);
+    parseJson(json, "DoCopyToDatahub",  bDoCopyToDatahub);
+    parseJson(json, "IncludeWaveforms", bCopyWaveforms);
 }

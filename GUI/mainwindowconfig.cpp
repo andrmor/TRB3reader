@@ -66,18 +66,15 @@ void MainWindow::WriteGUItoJson(QJsonObject &json)
     jsgui["HardOrLog"] = ui->cobHardwareOrLogical->currentIndex();
 
     jsgui["KeepEventsOnStart"] = ui->cbKeepEvents->isChecked();
-    jsgui["BulkExtract"] = ui->cbBulkExtract->isChecked();
-    jsgui["AutoRunScript"] = ui->cbAutoExecuteScript->isChecked();
-    jsgui["SaveFiles"] = ui->cbSaveSignalsToFiles->isChecked();
-    jsgui["SuffixReplacement"] = ui->leAddToProcessed->text();
-    jsgui["BulkCopy"] = ui->cbBulkCopyToDatahub->isChecked();
-    jsgui["BulkCopyWaveforms"] = ui->cbBulkAlsoCopyWaveforms->isChecked();
+    //jsgui["BulkExtract"] = ui->cbBulkExtract->isChecked();
+    //jsgui["AutoRunScript"] = ui->cbAutoExecuteScript->isChecked();
+    //jsgui["SaveFiles"] = ui->cbSaveSignalsToFiles->isChecked();
+    //jsgui["SuffixReplacement"] = ui->leAddToProcessed->text();
+    //jsgui["BulkCopy"] = ui->cbBulkCopyToDatahub->isChecked();
+    //jsgui["BulkCopyWaveforms"] = ui->cbBulkAlsoCopyWaveforms->isChecked();
     jsgui["SaveAddPositions"] = ui->cbAddReconstructedPositions->isChecked();
     jsgui["SaveSkipRejected"] = ui->cbSaveOnlyGood->isChecked();
     jsgui["LoadAlsoPositions"] = ui->cbLoadIncludeReconstructed->isChecked();
-    jsgui["OnlyFilesWithChanSam"] = ui->cbProcessOnlyFilesWith->isChecked();
-    jsgui["NumChannels"] = ui->sbNumChannels->value();
-    jsgui["NumSamples"] = ui->sbNumSamples->value();
 
     jsgui["ExplorerSource"] = ui->cobExplorerSource->currentIndex();
 
@@ -111,18 +108,15 @@ void MainWindow::ReadGUIfromJson(const QJsonObject& json)
     JsonToComboBox(jsgui, "HardOrLog", ui->cobHardwareOrLogical);
 
     JsonToCheckbox(jsgui, "KeepEventsOnStart", ui->cbKeepEvents);
-    JsonToCheckbox(jsgui, "BulkExtract", ui->cbBulkExtract);
-    JsonToCheckbox(jsgui, "AutoRunScript", ui->cbAutoExecuteScript);
-    JsonToCheckbox(jsgui, "SaveFiles", ui->cbSaveSignalsToFiles);
-    JsonToLineEditText(jsgui, "SuffixReplacement", ui->leAddToProcessed);
-    JsonToCheckbox(jsgui, "BulkCopy", ui->cbBulkCopyToDatahub);
-    JsonToCheckbox(jsgui, "BulkCopyWaveforms", ui->cbBulkAlsoCopyWaveforms);
+    //JsonToCheckbox(jsgui, "BulkExtract", ui->cbBulkExtract);
+    //JsonToCheckbox(jsgui, "AutoRunScript", ui->cbAutoExecuteScript);
+    //JsonToCheckbox(jsgui, "SaveFiles", ui->cbSaveSignalsToFiles);
+    //JsonToLineEditText(jsgui, "SuffixReplacement", ui->leAddToProcessed);
+    //JsonToCheckbox(jsgui, "BulkCopy", ui->cbBulkCopyToDatahub);
+    //JsonToCheckbox(jsgui, "BulkCopyWaveforms", ui->cbBulkAlsoCopyWaveforms);
     JsonToCheckbox(jsgui, "SaveAddPositions", ui->cbAddReconstructedPositions);
     JsonToCheckbox(jsgui, "SaveSkipRejected", ui->cbSaveOnlyGood);
     JsonToCheckbox(jsgui, "LoadAlsoPositions", ui->cbLoadIncludeReconstructed);
-    JsonToCheckbox(jsgui, "OnlyFilesWithChanSam", ui->cbProcessOnlyFilesWith);
-    JsonToSpinBox(jsgui, "NumChannels", ui->sbNumChannels);
-    JsonToSpinBox(jsgui, "NumSamples", ui->sbNumSamples);
 
     JsonToComboBox(jsgui, "ExplorerSource", ui->cobExplorerSource);
 
@@ -275,6 +269,15 @@ void MainWindow::UpdateGui()
     ui->cbPosMaxSignalGate->setChecked(Config->bPosMaxGate);
     ui->sbPosMaxFrom->setValue(Config->PosMaxGateFrom);
     ui->sbPosMaxTo->setValue(Config->PosMaxGateTo);
+
+    ui->sbNumChannels->setValue( Config->HldProcessSettings.NumChannels );
+    ui->sbNumSamples->setValue( Config->HldProcessSettings.NumSamples );
+    ui->cbBulkExtract->setChecked( Config->HldProcessSettings.bDoSignalExtraction );
+    ui->cbAutoExecuteScript->setChecked( Config->HldProcessSettings.bDoScript );
+    ui->cbSaveSignalsToFiles->setChecked( Config->HldProcessSettings.bDoSave );
+    ui->leAddToProcessed->setText( Config->HldProcessSettings.AddToFileName );
+    ui->cbBulkCopyToDatahub->setChecked( Config->HldProcessSettings.bDoCopyToDatahub );
+    ui->cbBulkAlsoCopyWaveforms->setChecked( Config->HldProcessSettings.bCopyWaveforms );
 
     updateNumEventsIndication();
     OnEventOrChannelChanged();
@@ -449,3 +452,42 @@ void MainWindow::on_sbIntegrateTo_editingFinished()
     ClearData();
 }
 
+void MainWindow::on_sbNumChannels_editingFinished()
+{
+    Config->HldProcessSettings.NumChannels = ui->sbNumChannels->value();
+}
+
+void MainWindow::on_sbNumSamples_editingFinished()
+{
+    Config->HldProcessSettings.NumSamples = ui->sbNumSamples->value();
+}
+
+void MainWindow::on_cbBulkExtract_clicked()
+{
+    Config->HldProcessSettings.bDoSignalExtraction = ui->cbBulkExtract->isChecked();
+}
+
+void MainWindow::on_cbAutoExecuteScript_clicked()
+{
+    Config->HldProcessSettings.bDoScript = ui->cbAutoExecuteScript->isChecked();
+}
+
+void MainWindow::on_cbSaveSignalsToFiles_clicked()
+{
+    Config->HldProcessSettings.bDoSave = ui->cbSaveSignalsToFiles->isChecked();
+}
+
+void MainWindow::on_leAddToProcessed_editingFinished()
+{
+    Config->HldProcessSettings.AddToFileName = ui->leAddToProcessed->text();
+}
+
+void MainWindow::on_cbBulkCopyToDatahub_clicked()
+{
+    Config->HldProcessSettings.bDoCopyToDatahub = ui->cbBulkCopyToDatahub->isChecked();
+}
+
+void MainWindow::on_cbBulkAlsoCopyWaveforms_clicked()
+{
+    Config->HldProcessSettings.bCopyWaveforms = ui->cbBulkAlsoCopyWaveforms->isChecked();
+}

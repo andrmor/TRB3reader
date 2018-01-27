@@ -20,8 +20,8 @@ public:
                       Trb3signalExtractor& Extractor,
                       ADataHub& DataHub);
 
-    bool ProcessFile(const QString& FileName);
-    bool SaveSignalsToFile(const QString& FileName, bool bUseHardware);
+    bool ProcessFile(const QString FileName, const QString SaveFileName = "");
+    bool SaveSignalsToFile(const QString FileName, bool bUseHardware = false);
 
     const QString& GetLastError() const {return LastError;}
 

@@ -8,6 +8,23 @@
 
 class QJsonObject;
 class ChannelMapper;
+class AHldProcessSettings;
+
+class AHldProcessSettings
+{
+public:
+    int     NumChannels = 0;
+    int     NumSamples = 0;
+    bool    bDoSignalExtraction = true;
+    bool    bDoScript = false;
+    bool    bDoSave = true;
+    QString AddToFileName = "_proc.dat";
+    bool    bDoCopyToDatahub = false;
+    bool    bCopyWaveforms = false;
+
+    const QJsonObject   WriteToJson() const;
+    void                ReadFromJson(const QJsonObject &json);
+};
 
 class MasterConfig
 {
@@ -83,12 +100,7 @@ public:
     QString             WorkingDir;
 
     // hld file processor settings
-    bool                bDoSignalExtraction;
-    bool                bDoScript;
-    bool                bDoSave;
-    QString             AddToFileName;
-    bool                bDoCopy;
-    bool                bCopyWaveforms;
+    AHldProcessSettings HldProcessSettings;
 
     // config <-> JSON handling
     void                WriteToJson(QJsonObject& json);

@@ -12,6 +12,7 @@
 #include "adispatcher.h"
 #include "ainterfacetodata.h"
 #include "ainterfacetowebsocket.h"
+#include "ainterfacetohldfileprocessor.h"
 
 #ifdef CERN_ROOT
   #include "cernrootmodule.h"
@@ -37,9 +38,13 @@ void MainWindow::CreateScriptWindow()
     AInterfaceToConfig* conf = new AInterfaceToConfig(Config, Dispatcher);
     ScriptWindow->SetInterfaceObject(conf, "config");
 
-    //  qDebug() << "-> data...";
+    //  qDebug() << "-> hld file processor...";
+    AInterfaceToHldFileProcessor* hld = new AInterfaceToHldFileProcessor(HldFileProcessor);
+    ScriptWindow->SetInterfaceObject(hld, "hld");
+
+    //  qDebug() << "-> data hub...";
     AInterfaceToData* dat = new AInterfaceToData(DataHub);
-    ScriptWindow->SetInterfaceObject(dat, "events");
+    ScriptWindow->SetInterfaceObject(dat, "datahub");
 
     //  qDebug() << "-> waveforms...";
     AInterfaceToWaveforms* wav = new AInterfaceToWaveforms(Config, Reader);

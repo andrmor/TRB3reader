@@ -2590,32 +2590,9 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QCheckBox" name="cbProcessOnlyFilesWith">
-            <property name="text">
-             <string>Only files with</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QSpinBox" name="sbNumChannels">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>21</height>
-             </size>
-            </property>
-            <property name="maximum">
-             <number>10000</number>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="QLabel" name="label_13">
             <property name="text">
-             <string>channels and</string>
+             <string>Files should contain #channels:</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -2623,9 +2600,9 @@
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="sbNumSamples">
+           <widget class="QSpinBox" name="sbNumChannels">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="minimumSize">
              <size>
@@ -2641,10 +2618,33 @@
           <item>
            <widget class="QLabel" name="label_39">
             <property name="text">
-             <string>samples</string>
+             <string>and #samples:</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="sbNumSamples">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>21</height>
+             </size>
+            </property>
+            <property name="maximum">
+             <number>10000</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_40">
+            <property name="text">
+             <string>(0 for automatic)</string>
             </property>
            </widget>
           </item>
@@ -3187,38 +3187,6 @@
     <hint type="destinationlabel">
      <x>394</x>
      <y>453</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cbProcessOnlyFilesWith</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>sbNumChannels</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>74</x>
-     <y>133</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>146</x>
-     <y>129</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cbProcessOnlyFilesWith</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>sbNumSamples</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>59</x>
-     <y>127</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>263</x>
-     <y>127</y>
     </hint>
    </hints>
   </connection>

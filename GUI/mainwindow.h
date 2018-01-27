@@ -143,6 +143,22 @@ private slots:
 
     void on_cobLableType_activated(int index);
 
+    void on_sbNumChannels_editingFinished();
+
+    void on_sbNumSamples_editingFinished();
+
+    void on_cbBulkExtract_clicked();
+
+    void on_cbAutoExecuteScript_clicked();
+
+    void on_cbSaveSignalsToFiles_clicked();
+
+    void on_leAddToProcessed_editingFinished();
+
+    void on_cbBulkCopyToDatahub_clicked();
+
+    void on_cbBulkAlsoCopyWaveforms_clicked();
+
 protected:
     void closeEvent(QCloseEvent* event);
 
