@@ -6,6 +6,7 @@
 #include <QVariant>
 #include <QString>
 #include <QDesktopServices>
+#include <QSet>
 
 class AScriptManager;
 //class TRandom2;
@@ -55,11 +56,20 @@ public slots:
   const QString  GetScriptDir() const;
   const QString  GetExamplesDir() const;
 
+  //file finder
+  void          SetNewFileFinder(const QString dir, const QString fileNamePattern);
+  QVariant      GetNewFiles();
+
   //externals
   const QString  StartExternalProcess(QString command, QVariant arguments, bool waitToFinish = false, int milliseconds = 1000);
 
 private:
   AScriptManager* ScriptManager;
+
+  //file finder
+  QSet<QString>   Finder_FileNames;
+  QString         Finder_Dir;
+  QString         Finder_NamePattern = "*.*";
 };
 
 // ---- M A T H ----
