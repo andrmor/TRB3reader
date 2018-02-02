@@ -18,6 +18,7 @@ bool AHldFileProcessor::ProcessFile(const QString FileName, const QString SaveFi
 {
     if (FileName.isEmpty())
     {
+        LogMessage("File name is empty!");
         LastError = "File name is not defined";
         return false;
     }
@@ -143,7 +144,7 @@ bool AHldFileProcessor::ProcessFile(const QString FileName, const QString SaveFi
                 ev->SetWaveforms(&vec);
             }
 
-            DataHub.AddEvent(ev);
+            DataHub.AddEventFast(ev);
         }
     }
 

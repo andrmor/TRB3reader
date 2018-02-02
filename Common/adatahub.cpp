@@ -1,4 +1,10 @@
 #include "adatahub.h"
+#include "masterconfig.h"
+
+#include <QFile>
+#include <QFileInfo>
+#include <QTextStream>
+#include <QApplication>
 
 #include <limits>
 const float NaN = std::numeric_limits<float>::quiet_NaN();
@@ -130,6 +136,8 @@ int AOneEvent::GetWaveformSampleWhereFirstAbove(int ichannel, float threshold) c
         if (vec->at(i) > threshold) return i;
     return -1;
 }
+
+ADataHub::ADataHub(const MasterConfig &Config) : Config(Config) {}
 
 ADataHub::~ADataHub()
 {
@@ -405,4 +413,102 @@ bool ADataHub::SetSumSignalNegative(int ievent, const float *sums)
 void ADataHub::SetSumSignalNegativeFast(int ievent, const float *sums)
 {
     Events[ievent]->SetSumSigNegative(sums);
+}
+
+const QString ADataHub::Save(const QString& FileName, bool bSavePositions, bool bSkipRejected) const
+{
+    if ( Events.isEmpty())   return "There are no events in the DataHub!";
+    if ( FileName.isEmpty()) return "File name is empty!";
+
+    QFile outFile( FileName ); outFile.open(QIODevice::WriteOnly);
+    if(!outFile.isOpen())    return "Unable to open file " +FileName+ " for writing!";
+
+    QTextStream outStream(&outFile);
+    for (const AOneEvent* e : Events)
+    {
+        if (bSkipRejected && e->IsRejected()) continue;
+
+        const QVector<float>* vec = e->GetSignals();
+        for (float val : *vec) outStream << QString::number(val) << " ";
+        if (bSavePositions)
+        {
+            const float* R = e->GetPosition();
+            outStream << "     " << R[0] << " " << R[1] << " " << R[2];
+        }
+        outStream << "\r\n";
+    }
+
+    return "";
+}
+
+const QString ADataHub::Load(const QString &AppendFromFileName, bool bLoadPositionXYZ)
+{
+    QFile inFile( AppendFromFileName );
+    inFile.open(QIODevice::ReadOnly);
+    if(!inFile.isOpen()) return "Unable to open file " +AppendFromFileName+ " for reading!";
+
+    QTextStream inStream(&inFile);
+
+    int numChannels = Config.CountLogicalChannels();
+    int upperLim = numChannels;
+    if (bLoadPositionXYZ) upperLim += 3;
+    int numEvents = 0;
+    qint64 totSize = QFileInfo(AppendFromFileName).size();
+    while (!inStream.atEnd())  // optimized assuming expected format of the file
+    {
+        const QString s = inStream.readLine();
+
+        if (numEvents % 200 == 0)
+        {
+            emit reportProgress(100.0 * inStream.pos() / totSize);
+            qApp->processEvents();
+        }
+
+        QRegExp rx("(\\ |\\,|\\:|\\t)");
+        QStringList fields = s.split(rx, QString::SkipEmptyParts);
+        if (fields.size() < upperLim) continue;
+
+        QVector<float>* vec = new QVector<float>(numChannels);
+        for (int i=0; i<numChannels; i++)
+        {
+            bool bOK;
+            const QString f = fields.at(i);
+            float val = f.toFloat(&bOK);
+            if (!bOK)
+            {
+                delete vec;
+                continue;
+            }
+            (*vec)[i] = val;
+        }
+
+        float xyz[3];
+        if (bLoadPositionXYZ)
+        {
+
+            bool bOK;
+            for (int i=0; i<3; i++)
+            {
+                const QString ss = fields.at(numChannels+i);
+                xyz[i] = ss.toFloat(&bOK);
+                if (!bOK)
+                {
+                    delete vec;
+                    continue;
+                }
+            }
+        }
+
+        AOneEvent* ev = new AOneEvent();
+        ev->SetSignals(vec);  // transfer ownership!
+        if (bLoadPositionXYZ) ev->SetPosition(xyz);
+
+        AddEventFast(ev);
+        numEvents++;
+    }
+
+    emit requestGuiUpdate();
+
+    if (numEvents == 0) return "No events were added from file " + AppendFromFileName + "!";
+    else                return "";
 }

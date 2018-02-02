@@ -57,8 +57,16 @@ MainWindow::MainWindow(MasterConfig* Config,
     qDebug() << "-> Graph module (based on CERN ROOT) was NOT compiled";
 #endif
 
+    connect(DataHub, &ADataHub::requestGuiUpdate, this, &MainWindow::UpdateGui);
+    connect(DataHub, &ADataHub::reportProgress, this, &MainWindow::onProgressUpdate);
+
+    //messaging during bulk processing of hld files
+    connect(&HldFileProcessor, &AHldFileProcessor::LogMessage, this, &MainWindow::onShowMessageRequest);
+    connect(&HldFileProcessor, &AHldFileProcessor::LogAction, this, &MainWindow::onShowActionRequest);
+
     //Creating script window, registering script units, and setting up QObject connections
     CreateScriptWindow();
+    connect(&HldFileProcessor, &AHldFileProcessor::RequestExecuteScript, ScriptWindow, &AScriptWindow::ExecuteScriptInFirstTab);
 
     //Loading window settings
     LoadWindowSettings();
@@ -1102,7 +1110,8 @@ void MainWindow::bulkProcessorEnvelope(const QStringList FileNames)
     ui->pbStop->setVisible(true);
     ui->pbStop->setChecked(false);
 
-    int numErrors = 0;
+    int numErrors = 0;    
+    /*
     numProcessedEvents = 0;
     numBadEvents = 0;
     for (QString name : FileNames)
@@ -1116,9 +1125,22 @@ void MainWindow::bulkProcessorEnvelope(const QStringList FileNames)
         qApp->processEvents();
         if (bStopFlag) break;
     }
+    */
+
+    int numProcessedEvents = 0;
+    int numBadEvents = 0;
+    for (QString name : FileNames)
+    {
+        bool bOK = HldFileProcessor.ProcessFile(name);
+        if (!bOK) numErrors++;
+
+        updateNumEventsIndication();
+        qApp->processEvents();
+        if (bStopFlag) break;
+    }
 
     if (numErrors > 0) ui->pteBulkLog->appendPlainText("============= There were errors! =============");
-    else ui->pteBulkLog->appendPlainText("Done - no errors");
+    else ui->pteBulkLog->appendPlainText("Processed " + QString::number(FileNames.size()) + " files - no errors");
 
     LogMessage("Processed events: " + QString::number(numProcessedEvents) + "  Disreguarded events: " + QString::number(numBadEvents) );
 
@@ -1129,6 +1151,17 @@ void MainWindow::bulkProcessorEnvelope(const QStringList FileNames)
     UpdateGui();
 }
 
+void MainWindow::onShowMessageRequest(const QString message)
+{
+    ui->pteBulkLog->appendPlainText(message);
+}
+
+void MainWindow::onShowActionRequest(const QString action)
+{
+    LogMessage(action);
+}
+
+/*
 bool MainWindow::bulkProcessCore()
 {
     if (Config->FileName.isEmpty())
@@ -1248,45 +1281,19 @@ bool MainWindow::bulkProcessCore()
 
     return true;
 }
+*/
 
 void MainWindow::on_pbSaveSignalsFromDataHub_clicked()
 {
-    int numEvents = DataHub->CountEvents();
-    if ( numEvents == 0)
-    {
-        message("There are no events in the DataHub", this);
-        return;
-    }
-
     QString FileName = QFileDialog::getSaveFileName(this, "Save events from DataHub", Config->WorkingDir, "Data files (*.dat *.txt);;All files (*.*)");
     if (FileName.isEmpty()) return;
     Config->WorkingDir = QFileInfo(FileName).absolutePath();
 
-    QFile outFile( FileName );
-    outFile.open(QIODevice::WriteOnly);
-    if(!outFile.isOpen())
-      {
-        message("Unable to open file " +FileName+ " for writing!", this);
-        return;
-      }
-    QTextStream outStream(&outFile);
+    bool bSavePositions = ui->cbAddReconstructedPositions->isChecked();
+    bool bSkipRejected = ui->cbSaveOnlyGood->isChecked();
+    const QString ErrStr = DataHub->Save(FileName, bSavePositions, bSkipRejected);
 
-
-    const bool bSavePositions = ui->cbAddReconstructedPositions->isChecked();
-    const bool bSkipRejected = ui->cbSaveOnlyGood->isChecked();
-    for (int iev=0; iev<numEvents; iev++)
-    {
-        if (bSkipRejected)
-            if (DataHub->IsRejectedFast(iev)) continue;
-        const QVector<float>* vec = DataHub->GetSignalsFast(iev);
-        for (float val : *vec) outStream << QString::number(val) << " ";
-        if (bSavePositions)
-        {
-            const float* R = DataHub->GetPositionFast(iev);
-            outStream << "     " << R[0] << " " << R[1] << " " << R[2];
-        }
-        outStream << "\r\n";
-    }
+    if(!ErrStr.isEmpty()) message(ErrStr, this);
 }
 
 void MainWindow::on_cobExplorerSource_currentIndexChanged(int index)
@@ -1405,7 +1412,7 @@ void MainWindow::on_pbLoadToDataHub_clicked()
         ev->SetSignals(vec);  // transfer ownership!
         if (bLoadXYZ) ev->SetPosition(xyz);
 
-        DataHub->AddEvent(ev);
+        DataHub->AddEventFast(ev);
         numEvents++;
     }
 
@@ -1419,4 +1426,9 @@ void MainWindow::on_cobLableType_activated(int)
 {
     on_pbShowAllNeg_toggled(ui->pbShowAllNeg->isChecked());
     on_pbShowAllPos_toggled(ui->pbShowAllPos->isChecked());
+}
+
+void MainWindow::onProgressUpdate(int progress)
+{
+    ui->prbMainBar->setValue(progress);
 }

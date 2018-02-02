@@ -44,6 +44,9 @@ public slots:
     void onGlobalScriptFinished();
     void saveCompleteState();
 
+    void onShowMessageRequest(const QString message);
+    void onShowActionRequest(const QString action);
+    void onProgressUpdate(int progress);
 private slots:
     //right-click menus
     void on_ptePolarity_customContextMenuRequested(const QPoint &pos);
@@ -181,8 +184,8 @@ private:
     //gui misc
     bool bStopFlag;
     bool bNeverRemindAppendToHub = false;
-    int  numProcessedEvents;
-    int  numBadEvents;
+    //int  numProcessedEvents;
+    //int  numBadEvents;
 
 private:
     const QString ProcessData(); //returns error message if any
@@ -201,7 +204,7 @@ private:
 
     const QString PackChannelList(QVector<int> vec);
     bool ExtractNumbersFromQString(const QString input, QVector<int>* ToAdd);
-    bool bulkProcessCore();
+    //bool bulkProcessCore();
     void bulkProcessorEnvelope(const QStringList FileNames);
     void updateNumEventsIndication();
 };

@@ -70,6 +70,9 @@ public slots:
     const QVariant getSumSignals    (int ievent) const;
     const QVariant getSumSignalsFast(int ievent) const;
 
+    void     save(const QString &FileName, bool bSavePositions, bool bSkipRejected) const;
+    void     load(const QString &AppendFromFileName, bool bLoadPositionXYZ);
+
 private:
     ADataHub* DataHub;
 };

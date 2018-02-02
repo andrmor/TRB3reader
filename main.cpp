@@ -16,8 +16,8 @@ int main(int argc, char *argv[])
     //SUPPRESS WARNINGS about ssl
     QLoggingCategory::setFilterRules("qt.network.ssl.warning=false");
 
-    ADataHub DataHub;    
     MasterConfig Config;
+    ADataHub DataHub(Config);
     Trb3dataReader Reader(&Config);
     Trb3signalExtractor Extractor(&Config, &Reader);
     AHldFileProcessor HldFileProcessor(Config, Reader, Extractor, DataHub);

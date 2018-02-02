@@ -53,10 +53,11 @@ public:
     void SetMainSplitterSizes(QList<int> values);
 
     bool ExecuteScript(const QString &Script);
-    bool ExecuteScriptInFirstTab();
+
 
 public slots:
     void updateJsonTree();       //update "config" tree widget
+    bool ExecuteScriptInFirstTab();
 
     void ShowText(QString text); //shows text in the output box
     void ClearText(); //clears text in the output box

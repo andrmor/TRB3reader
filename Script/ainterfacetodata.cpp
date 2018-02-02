@@ -1,5 +1,6 @@
 #include "ainterfacetodata.h"
 #include "adatahub.h"
+#include "masterconfig.h"
 
 #include <QJsonArray>
 
@@ -29,9 +30,25 @@ void AInterfaceToData::Clear()
 
 void AInterfaceToData::addEvent(const QVariant signalArray)
 {
+    QString type = signalArray.typeName();
+    if (type != "QVariantList")
+    {
+        abort("Failed to add event - argument should be an array with signal values");
+        return;
+    }
+
+    QVariantList vl = signalArray.toList();
+    QJsonArray ar = QJsonArray::fromVariantList(vl);
+    const int numChannels = DataHub->getConfig().CountLogicalChannels();
+    if (ar.size() != numChannels)
+        {
+            abort("Failed to add event: signal array size is not equal to the number of logical channels!");
+            return;
+        }
+
     AOneEvent* ev = new AOneEvent();
     ev->SetRejectedFlag(false);
-    DataHub->AddEvent(ev);
+    DataHub->AddEventFast(ev);
     setSignals(DataHub->CountEvents()-1, signalArray); // size is checked there, abort if wrong
 }
 
@@ -88,9 +105,9 @@ void AInterfaceToData::setSignals(int ievent, const QVariant arrayOfValues)
 
     QVariantList vl = arrayOfValues.toList();
     QJsonArray ar = QJsonArray::fromVariantList(vl);
-    const int numChannels = DataHub->CountChannels();
-    if (ar.size() != numChannels)
-        if (numChannels != 0)
+    //const int numChannels = DataHub->CountChannels();
+    const int numChannels = DataHub->getConfig().CountLogicalChannels();
+    if (ar.size() != numChannels)       
         {
             abort("Failed to set signal values - array size mismatch");
             return;
@@ -447,5 +464,19 @@ const QVariant AInterfaceToData::getSumSignalsFast(int ievent) const
     for (int i=0; i<3; i++) ar << sumNeg[i];
     QJsonValue jv = ar;
     return jv.toVariant();
+}
+
+void AInterfaceToData::save(const QString& FileName, bool bSavePositions, bool bSkipRejected) const
+{
+    const QString ErrStr = DataHub->Save(FileName, bSavePositions, bSkipRejected);
+
+    if (!ErrStr.isEmpty()) abort(ErrStr);
+}
+
+void AInterfaceToData::load(const QString &AppendFromFileName, bool bLoadPositionXYZ)
+{
+    const QString ErrStr = DataHub->Load(AppendFromFileName, bLoadPositionXYZ);
+
+    if (!ErrStr.isEmpty()) abort(ErrStr);
 }
 
