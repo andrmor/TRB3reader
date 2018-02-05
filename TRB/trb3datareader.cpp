@@ -13,7 +13,7 @@ const float NaN = std::numeric_limits<float>::quiet_NaN();
 Trb3dataReader::Trb3dataReader(MasterConfig *Config) :
     Config(Config), numSamples(0), numChannels(0) {}
 
-bool Trb3dataReader::Read(const QString& FileName)
+const QString Trb3dataReader::Read(const QString& FileName)
 {
     qDebug() << "--> Reading hld file...";
     readRawData(FileName, Config->HldProcessSettings.NumChannels, Config->HldProcessSettings.NumSamples);
@@ -25,23 +25,14 @@ bool Trb3dataReader::Read(const QString& FileName)
             waveData.clear();
             numChannels = 0;
             numSamples = 0;
-            qDebug() << "The number of channel is different from requested in config";
-            return false;
+            return "--- Number of channels in file is different from requested";
         }
     }
 
-    if (isEmpty())
-    {
-        qDebug() << "--- Read of hld file failed or all events were rejected!";
-        return false;
-    }
+    if (isEmpty()) return "--- Read of hld file failed or all events were rejected!";
 
     bool bOK = Config->UpdateNumberOfHardwareChannels(numChannels);
-    if (!bOK)
-    {
-        qDebug() << "The number of hardware channels in the file ("<< numChannels << "is incompatible with the defined number of logical channels";
-        return false;
-    }
+    if (!bOK) return "The number of hardware channels in the file (" + QString::number(numChannels) + ") is incompatible with the defined number of logical channels";
 
     if (Config->bSmoothingBeforePedestals)
     {
@@ -72,7 +63,7 @@ bool Trb3dataReader::Read(const QString& FileName)
 
     //qDebug() << "--> Done!";
 
-    return true;
+    return "";
 }
 
 float Trb3dataReader::GetValue(int ievent, int ichannel, int isample) const

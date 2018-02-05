@@ -27,11 +27,10 @@ bool AHldFileProcessor::ProcessFile(const QString FileName, const QString SaveFi
     qDebug() << "Processing" <<  FileName;
 
     // Reading waveforms, pefroming optional smoothing/pedestal substraction
-    bool ok = Reader.Read(FileName);
-    if (!ok)
+    LastError = Reader.Read(FileName);
+    if (!LastError.isEmpty())
     {
-        LogMessage("Read failed or all events were rejected!");
-        LastError = "Read failed or all events were rejected";
+        LogMessage(LastError);
         return false;
     }
     const QString ValRes = Config.Map->ValidateForAvailableHardwareChannels(Reader.CountChannels());

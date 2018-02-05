@@ -130,8 +130,8 @@ const QString MainWindow::ProcessData()
     if (Config->FileName.isEmpty()) return "File name not defined!";
 
     LogMessage("Reading hld file...");
-    bool ok = Reader->Read(Config->FileName);
-    if (!ok) return "File read failed!";
+    QString err = Reader->Read(Config->FileName);
+    if (!err.isEmpty()) return err;
 
     LogMessage("Extracting signals...");
     Extractor->ExtractSignals();
