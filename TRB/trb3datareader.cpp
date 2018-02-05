@@ -379,7 +379,7 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
 
     ref.Disconnect();
 
-    qDebug() << "--> Data read completed\n--> Events: "<< waveData.size() <<" Channels: "<<foundChannels << "  Samples: "<<numSamples;
+    qDebug() << "--> Data read completed\n--> Events: "<< waveData.size() <<" Channels: "<<numChannels << "  Samples: "<<numSamples;
     if (numBadEvents > 0) qDebug() << "--> " << numBadEvents << " bad events were disreguarded!";
 #endif
 }

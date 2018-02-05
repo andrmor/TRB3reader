@@ -44,7 +44,7 @@ void MainWindow::CreateScriptWindow()
 
     //  qDebug() << "-> data hub...";
     AInterfaceToData* dat = new AInterfaceToData(DataHub);
-    ScriptWindow->SetInterfaceObject(dat, "datahub");
+    ScriptWindow->SetInterfaceObject(dat, "events");
 
     //  qDebug() << "-> waveforms...";
     AInterfaceToWaveforms* wav = new AInterfaceToWaveforms(Config, Reader);

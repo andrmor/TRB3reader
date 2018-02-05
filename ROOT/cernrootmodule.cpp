@@ -514,7 +514,7 @@ bool CernRootModule::DrawAll(bool bFromDataHub, int ievent, bool bNeg, int padsX
                 else
                 {
                     double sig = bFromDataHub ? DataHub->GetSignalFast(ievent, iChannel) : Extractor->GetSignalFast(ievent, iChannel);
-                    s = QString::number(sig, 'g', 2);
+                    s = QString::number(sig, 'g', 4);
                 }
 
                 la->AddText(s.toLocal8Bit().data());
