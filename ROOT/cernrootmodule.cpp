@@ -36,6 +36,8 @@ CernRootModule::CernRootModule(Trb3dataReader *Reader, Trb3signalExtractor *Extr
     RootUpdateTimer->start();
     //qDebug()<<"->Timer to refresh Root events started";
 
+    qDebug() << "Running CERN ROOT version"<<gROOT->GetVersion();
+
     WOne = WOverNeg = WOverPos = WAllNeg = WAllPos = 0;
     StartGraphWindows();
 
