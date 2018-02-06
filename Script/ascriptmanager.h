@@ -49,6 +49,9 @@ public:
     double        bestResult;
     int           numVariables;
 
+    //for multithread-in-scripting
+    AScriptManager* createNewScriptManager();
+
 private:
     QScriptEngine*  engine;
 

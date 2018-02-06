@@ -47,6 +47,23 @@ AInterfaceToCore::AInterfaceToCore(AScriptManager* ScriptManager) :
 
 }
 
+AInterfaceToCore::AInterfaceToCore(const AInterfaceToCore *other)
+{
+    H = other->H;
+    Description = other->Description;
+
+    Finder_FileNames = other->Finder_FileNames;
+    Finder_Dir = other->Finder_Dir;
+    Finder_NamePattern = other->Finder_NamePattern;
+
+    ScriptManager = 0; //to be set after copy!!!
+}
+
+void AInterfaceToCore::SetScriptManager(AScriptManager *ScriptManager)
+{
+    this->ScriptManager = ScriptManager;
+}
+
 void AInterfaceToCore::abort(const QString message) const
 {
   //qDebug() << "In-script abort triggered!";
@@ -445,6 +462,7 @@ AInterfaceToMath::AInterfaceToMath()    //TRandom2* RandGen)
 {
   //srand (time(NULL));
 
+  Description = "Custom math module. Uses std library.";
 
   //this->RandGen = RandGen;
 
@@ -453,6 +471,12 @@ AInterfaceToMath::AInterfaceToMath()    //TRandom2* RandGen)
   H["poisson"] = "Returns a random value sampled from Poisson distribution with mean given by the user";
   H["maxwell"] = "Returns a random value sampled from maxwell distribution with Sqrt(kT/M) given by the user";
   H["exponential"] = "Returns a random value sampled from exponential decay with decay time given by the user";
+}
+
+AInterfaceToMath::AInterfaceToMath(const AInterfaceToMath *other)
+{
+    H = other->H;
+    Description = other->Description;
 }
 
 /*

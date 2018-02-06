@@ -21,6 +21,7 @@
 #include "TList.h"
 #include "TPaveText.h"
 #include "TH2D.h"
+#include "TROOT.h"
 
 CernRootModule::CernRootModule(Trb3dataReader *Reader, Trb3signalExtractor *Extractor, MasterConfig *Config, ADataHub* DataHub, int refreshInterval) :
     Reader(Reader), Extractor(Extractor), Config(Config), DataHub(DataHub)

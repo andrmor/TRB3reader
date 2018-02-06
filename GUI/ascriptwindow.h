@@ -54,6 +54,7 @@ public:
 
     bool ExecuteScript(const QString &Script);
 
+    AScriptManager* GetScriptManager() {return ScriptManager;}
 
 public slots:
     void updateJsonTree();       //update "config" tree widget

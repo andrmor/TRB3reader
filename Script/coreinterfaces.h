@@ -15,8 +15,11 @@ class AInterfaceToCore : public AScriptInterface
 {
   Q_OBJECT
 
-public:
-  AInterfaceToCore(AScriptManager *ScriptManager);
+public:  
+  explicit AInterfaceToCore(AScriptManager *ScriptManager = 0);
+  explicit AInterfaceToCore(const AInterfaceToCore* other);
+
+  void SetScriptManager(AScriptManager *ScriptManager);
 
 public slots:
   //abort execution of the script
@@ -81,6 +84,7 @@ class AInterfaceToMath : public AScriptInterface
 
 public:
   AInterfaceToMath();
+  AInterfaceToMath(const AInterfaceToMath* other);
   //AInterfaceToMath(TRandom2* RandGen);
   //void setRandomGen(TRandom2* RandGen);
 

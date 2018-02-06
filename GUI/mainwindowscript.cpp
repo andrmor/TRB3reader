@@ -13,6 +13,7 @@
 #include "ainterfacetodata.h"
 #include "ainterfacetowebsocket.h"
 #include "ainterfacetohldfileprocessor.h"
+#include "ainterfacetomultithread.h"
 
 #ifdef CERN_ROOT
   #include "cernrootmodule.h"
@@ -76,6 +77,9 @@ void MainWindow::CreateScriptWindow()
     //  qDebug() << "-> msg...";
     AInterfaceToMessageWindow* txt = new AInterfaceToMessageWindow(ScriptWindow);
     ScriptWindow->SetInterfaceObject(txt, "msg");
+
+    AInterfaceToMultiThread* threads = new AInterfaceToMultiThread(ScriptWindow->GetScriptManager());
+    ScriptWindow->SetInterfaceObject(threads, "threads");
 
     //  qDebug() << "Done!";
 

@@ -238,7 +238,7 @@ void AScriptWindow::SetInterfaceObject(QObject *interfaceObject, QString name)
         // populating help for main, math and core units
         trwHelp->clear();
         //fillHelper(interfaceObject, "", "Global object functions"); //forbidden to override master object now.
-        AInterfaceToCore core(0); //dummy to extract methods
+        AInterfaceToCore core; //dummy to extract methods
         fillHelper(&core, "core", "Core object functions");
         newFunctions << getCustomCommandsOfObject(&core, "core", false);
         AInterfaceToMath math; //dummy to extract methods

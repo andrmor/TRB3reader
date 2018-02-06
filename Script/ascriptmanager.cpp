@@ -142,6 +142,7 @@ void AScriptManager::SetInterfaceObject(QObject *interfaceObject, QString name)
         QString coreName = "core";
         engine->globalObject().setProperty(coreName, coreVal);
         interfaces.append(coreObj);  //CORE OBJECT IS FIRST in interfaces!
+        coreObj->setObjectName(coreName);
         interfaceNames.append(coreName);
         //registering math module
         QObject* mathObj = new AInterfaceToMath();
@@ -150,6 +151,7 @@ void AScriptManager::SetInterfaceObject(QObject *interfaceObject, QString name)
         engine->globalObject().setProperty(mathName, mathVal);
         interfaces.append(mathObj);
         interfaceNames.append(mathName);
+        mathObj->setObjectName(mathName);
       }
     else
       { // name is not empty - this is one of the secondary modules
@@ -160,6 +162,7 @@ void AScriptManager::SetInterfaceObject(QObject *interfaceObject, QString name)
       {
         interfaces.append(interfaceObject);
         interfaceNames.append(name);
+        interfaceObject->setObjectName(name);
 
         //connecting abort request from main interface to serviceObj
         int index = interfaceObject->metaObject()->indexOfSignal("AbortScriptEvaluation(QString)");
@@ -264,4 +267,36 @@ const QString AScriptManager::getFunctionReturnType(const QString UnitFunction)
   QString returnType = interfaces.at(unitIndex)->metaObject()->method(mi).typeName();
   //qDebug() << returnType;
   return returnType;
+}
+
+#include "ascriptinterfacefactory.h"
+AScriptManager *AScriptManager::createNewScriptManager()
+{
+    AScriptManager* sm = new AScriptManager();
+
+    //sm->engine->setProcessEventsInterval(-1);
+
+    for (QObject* io : interfaces)
+    {
+        QObject* copy = AScriptInterfaceFactory::makeCopy(io);
+        if (copy)
+        {
+            //  qDebug() << "->"<<io->objectName();
+            sm->SetInterfaceObject(copy, io->objectName());
+
+            //special for core unit
+            AInterfaceToCore* core = dynamic_cast<AInterfaceToCore*>(io);
+            if (core)
+            {
+                //  qDebug() << "--this is core";
+                core->SetScriptManager(sm);
+            }
+        }
+        else
+        {
+            qDebug() << "Unknown interface object type";
+        }
+    }
+
+    return sm;
 }
