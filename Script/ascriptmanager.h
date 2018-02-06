@@ -51,6 +51,8 @@ public:
 
     //for multithread-in-scripting
     AScriptManager* createNewScriptManager();
+    void          abortEvaluation();
+    QScriptValue  EvaluationResult;
 
 private:
     QScriptEngine*  engine;
@@ -68,7 +70,8 @@ public slots:
 signals:
     void    onStart();
     void    onAbort();
-    void    success(QString eval);
+    void    onFinished(QString eval);
+
     void    showMessage(QString message);
     void    clearText();
 };

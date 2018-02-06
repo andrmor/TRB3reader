@@ -37,7 +37,7 @@ public:
 
     void SetInterfaceObject(QObject *interfaceObject, QString name = "");
     void SetScript(QString *text);
-    void SetShowEvaluationResult(bool flag) {ShowEvalResult = flag;} //if false, window only reports "success", ptherwise eval result is shown
+    void SetShowEvaluationResult(bool flag) {ShowEvalResult = flag;} //if false, window only reports "success", otherwise eval result is shown
 
     void AddNewTab();
     void OpenFirstTab();

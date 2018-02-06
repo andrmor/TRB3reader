@@ -34,6 +34,7 @@ QString AScriptManager::Evaluate(const QString& Script)
 {
     LastError = "";
     fAborted = false;
+    EvaluationResult = QScriptValue::UndefinedValue;
 
     emit onStart();
 
@@ -46,17 +47,19 @@ QString AScriptManager::Evaluate(const QString& Script)
               if (!bi->InitOnRun())
                 {
                   LastError = "Init failed for unit: "+interfaceNames.at(i);
+                  emit onFinished(LastError);
                   return LastError;
                 }
             }
       }
 
     fEngineIsRunning = true;
-    QScriptValue scriptreturn = engine->evaluate(Script);
+    EvaluationResult = engine->evaluate(Script);
+    qDebug() << "Just finished!" << EvaluationResult.toString();
     fEngineIsRunning = false;
 
-    QString result = scriptreturn.toString();
-    emit success(result); //bad name here :) could be not successful at all, but still want to trigger
+    QString result = EvaluationResult.toString();
+    emit onFinished(result);
 
     return result;
 }
@@ -281,14 +284,14 @@ AScriptManager *AScriptManager::createNewScriptManager()
         QObject* copy = AScriptInterfaceFactory::makeCopy(io);
         if (copy)
         {
-            //  qDebug() << "->"<<io->objectName();
+            qDebug() << "->"<<io->objectName();
             sm->SetInterfaceObject(copy, io->objectName());
 
             //special for core unit
-            AInterfaceToCore* core = dynamic_cast<AInterfaceToCore*>(io);
+            AInterfaceToCore* core = dynamic_cast<AInterfaceToCore*>(copy);
             if (core)
             {
-                //  qDebug() << "--this is core";
+                qDebug() << "--this is core";
                 core->SetScriptManager(sm);
             }
         }
@@ -299,4 +302,9 @@ AScriptManager *AScriptManager::createNewScriptManager()
     }
 
     return sm;
+}
+
+void AScriptManager::abortEvaluation()
+{
+    engine->abortEvaluation();
 }

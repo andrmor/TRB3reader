@@ -11,6 +11,7 @@ class AInterfaceToSpeech : public AScriptInterface
         Q_OBJECT
 public:
     AInterfaceToSpeech();
+    AInterfaceToSpeech(const AInterfaceToSpeech* other);
 
 public slots:
     void              Say(QString text);
@@ -29,7 +30,7 @@ public slots:
     void              SetPitch(double Pitch_minus1to1);
     void              SetRate(double Rate_minus1to1);
 
-private:
+public:
     QTextToSpeech* m_speech;
 
 };

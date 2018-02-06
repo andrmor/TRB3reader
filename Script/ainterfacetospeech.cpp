@@ -16,6 +16,11 @@ AInterfaceToSpeech::AInterfaceToSpeech() : m_speech(0)
     }
 }
 
+AInterfaceToSpeech::AInterfaceToSpeech(const AInterfaceToSpeech *other)
+{
+    m_speech = other->m_speech;
+}
+
 void AInterfaceToSpeech::Say(QString text)
 {
     if (!m_speech) return;

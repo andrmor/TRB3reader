@@ -87,6 +87,7 @@ void AInterfaceToCore::sleep(int ms)
 
 void AInterfaceToCore::print(const QString text)
 {
+    qDebug() << text << "on ScriptManager:"<<ScriptManager;
     emit ScriptManager->showMessage(text);
 }
 

@@ -50,12 +50,12 @@ AScriptWindow::AScriptWindow(MasterConfig *Config, QWidget *parent) :
     }
 
     ScriptManager = new AScriptManager();
-    QObject::connect(ScriptManager, SIGNAL(showMessage(QString)), this, SLOT(ShowText(QString)));
-    QObject::connect(ScriptManager, SIGNAL(clearText()), this, SLOT(ClearText()));
+    QObject::connect(ScriptManager, &AScriptManager::showMessage, this, &AScriptWindow::ShowText);
+    QObject::connect(ScriptManager, &AScriptManager::clearText, this, &AScriptWindow::ClearText);
     //retranslators:
-    QObject::connect(ScriptManager, SIGNAL(onStart()), this, SLOT(receivedOnStart()));
-    QObject::connect(ScriptManager, SIGNAL(onAbort()), this, SLOT(receivedOnAbort()));
-    QObject::connect(ScriptManager, SIGNAL(success(QString)), this, SLOT(receivedOnSuccess(QString)));
+    QObject::connect(ScriptManager, &AScriptManager::onStart, this, &AScriptWindow::receivedOnStart);
+    QObject::connect(ScriptManager, &AScriptManager::onAbort, this, &AScriptWindow::receivedOnAbort);
+    QObject::connect(ScriptManager, &AScriptManager::onFinished, this, &AScriptWindow::receivedOnSuccess);
 
     //ScriptManager->LibScripts = Config->LibScripts;
     //ScriptManager->LastOpenDir = Config->LastOpenDir;
