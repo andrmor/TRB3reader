@@ -273,10 +273,123 @@ const QString AScriptManager::getFunctionReturnType(const QString UnitFunction)
 }
 
 #include "ascriptinterfacefactory.h"
+#include "QScriptValueIterator"
+//https://stackoverflow.com/questions/5020459/deep-copy-of-a-qscriptvalue-as-global-object
+
+class ScriptCopier
+{
+public:
+    ScriptCopier(QScriptEngine& toEngine)
+        : m_toEngine(toEngine) {}
+
+    QScriptValue copy(const QScriptValue& obj);
+
+    QScriptEngine& m_toEngine;
+    QMap<quint64, QScriptValue> copiedObjs;
+};
+
+QScriptValue ScriptCopier::copy(const QScriptValue& obj)
+{
+    QScriptEngine& engine = m_toEngine;
+
+    if (obj.isUndefined()) {
+        return QScriptValue(QScriptValue::UndefinedValue);
+    }
+    if (obj.isNull()) {
+        return QScriptValue(QScriptValue::NullValue);
+    }
+
+    // If we've already copied this object, don't copy it again.
+    QScriptValue copy;
+    if (obj.isObject())
+    {
+        if (copiedObjs.contains(obj.objectId()))
+        {
+            return copiedObjs.value(obj.objectId());
+        }
+        copiedObjs.insert(obj.objectId(), copy);
+    }
+
+    if (obj.isQObject())
+    {
+        copy = engine.newQObject(copy, obj.toQObject());
+        copy.setPrototype(this->copy(obj.prototype()));
+    }
+    else if (obj.isQMetaObject())
+    {
+        copy = engine.newQMetaObject(obj.toQMetaObject());
+    }
+    else if (obj.isFunction())
+    {
+        // Calling .toString() on a pure JS function returns
+        // the function's source code.
+        // On a native function however toString() returns
+        // something like "function() { [native code] }".
+        // That's why we do a syntax on the code.
+
+        QString code = obj.toString();
+        auto syntaxCheck = engine.checkSyntax(code);
+
+        if (syntaxCheck.state() == syntaxCheck.Valid)
+        {
+            copy = engine.evaluate(QString() + "(" + code + ")");
+        }
+        else if (code.contains("[native code]"))
+        {
+            copy.setData(obj.data());
+        }
+        else
+        {
+            // Do error handling…
+            qDebug() << "-----------------problem---------------";
+        }
+
+    }
+    else if (obj.isNumber() || obj.isString() || obj.isBool() || obj.isBoolean())
+    {
+        copy = engine.newVariant(copy, obj.toVariant());
+    }
+//    else if (obj.isVariant())
+//    {
+//        QVariant var = obj.toVariant();
+//        copy = engine.newVariant(copy, obj.toVariant());
+//    }
+    else if (obj.isObject() || obj.isArray())
+    {
+        if (obj.isObject()) {
+            if (obj.scriptClass()) {
+                copy = engine.newObject(obj.scriptClass(), this->copy(obj.data()));
+            } else {
+                copy = engine.newObject();
+            }
+        } else {
+            copy = engine.newArray();
+        }
+        copy.setPrototype(this->copy(obj.prototype()));
+
+        QScriptValueIterator it(obj);
+        while ( it.hasNext())
+        {
+            it.next();
+
+            const QString& name = it.name();
+            const QScriptValue& property = it.value();
+
+            copy.setProperty(name, this->copy(property));
+        }
+    }
+    else
+    {
+        // Error handling…
+        qDebug() << "-----------------problem---------------";
+    }
+
+    return copy;
+}
+
 AScriptManager *AScriptManager::createNewScriptManager()
 {
-    AScriptManager* sm = new AScriptManager();
-
+    AScriptManager* sm = new AScriptManager();   
     //sm->engine->setProcessEventsInterval(-1);
 
     for (QObject* io : interfaces)
@@ -300,6 +413,26 @@ AScriptManager *AScriptManager::createNewScriptManager()
             qDebug() << "Unknown interface object type";
         }
     }
+
+    QScriptValue global = engine->globalObject();
+    ScriptCopier SC(*sm->engine);
+    QScriptValueIterator it(global);
+    while (it.hasNext())
+    {
+        it.next();
+        qDebug() << it.name() << ": " << it.value().toString();
+
+        if (!sm->engine->globalObject().property(it.name()).isValid())
+        {
+            //sm->engine->globalObject().setProperty(it.name(), it.value());
+            sm->engine->globalObject().setProperty(it.name(), SC.copy(it.value()));
+            qDebug() << sm->engine->globalObject().property(it.name()).toString();
+        }
+    }
+
+    qDebug() << "original:"<<                  global.property("a1").toString();
+    qDebug() << "cloned:"<<sm->engine->globalObject().property("a1").toString();
+
 
     return sm;
 }

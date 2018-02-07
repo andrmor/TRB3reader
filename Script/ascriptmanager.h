@@ -54,8 +54,10 @@ public:
     void          abortEvaluation();
     QScriptValue  EvaluationResult;
 
-private:
+//private:
     QScriptEngine*  engine;
+
+private:
 
     //registered objects
     QVector<QObject*> interfaces;

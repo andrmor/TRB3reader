@@ -13,7 +13,7 @@ void AInterfaceToMultiThread::ForceStop()
     abortAll();
 }
 
-const QString AInterfaceToMultiThread::evaluateInNewThread(const QString script)
+void AInterfaceToMultiThread::evaluateScript(const QString script)
 {
     AScriptManager* sm = MasterScriptManager->createNewScriptManager();
     qDebug() << "Cloned SM. master:"<<MasterScriptManager<<"clone:"<<sm;
@@ -30,8 +30,23 @@ const QString AInterfaceToMultiThread::evaluateInNewThread(const QString script)
     worker->moveToThread(t);
     t->start();
 
-    qDebug() << "Started!";
-    return "started";
+    qDebug() << "Started new thread!";
+}
+
+#include <QScriptEngine>
+void AInterfaceToMultiThread::evaluateFunction(const QString functionName)
+{
+    AScriptManager* sm = MasterScriptManager->createNewScriptManager();
+    qDebug() << "Cloned SM. master:"<<MasterScriptManager<<"clone:"<<sm;
+
+    QScriptValue global = sm->engine->globalObject();
+    QScriptValue func = global.property(functionName);
+    qDebug() << "a1 val:"<<global.property("a1").toString();
+    qDebug() << func.engine();
+    qDebug() << func.call().toString();
+
+    delete sm;
+
 }
 
 void AInterfaceToMultiThread::waitForAll()

@@ -24,7 +24,8 @@ public:
 
 public slots:
 
-    const QString evaluateInNewThread(const QString script);
+    void          evaluateScript(const QString script);
+    void          evaluateFunction(const QString functionName);
 
     void          waitForAll();
     void          waitForWorker(int IndexOfWorker);
