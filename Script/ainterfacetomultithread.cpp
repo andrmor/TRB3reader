@@ -24,7 +24,7 @@ void AInterfaceToMultiThread::evaluateScript(const QString script)
     connect(sm, &AScriptManager::showMessage, MasterScriptManager, &AScriptManager::showMessage, Qt::QueuedConnection);
 
     QThread* t = new QThread();
-    QObject::connect(t,  &QThread::started, worker, &AScriptEvalWorker::Start);
+    QObject::connect(t,  &QThread::started, worker, &AScriptEvalWorker::RunScript);
     QObject::connect(sm, &AScriptManager::onFinished, t, &QThread::quit);
     QObject::connect(t, &QThread::finished, t, &QThread::deleteLater);
     worker->moveToThread(t);
@@ -39,13 +39,25 @@ void AInterfaceToMultiThread::evaluateFunction(const QString functionName)
     AScriptManager* sm = MasterScriptManager->createNewScriptManager();
     qDebug() << "Cloned SM. master:"<<MasterScriptManager<<"clone:"<<sm;
 
-    QScriptValue global = sm->engine->globalObject();
-    QScriptValue func = global.property(functionName);
-    qDebug() << "a1 val:"<<global.property("a1").toString();
-    qDebug() << func.engine();
-    qDebug() << func.call().toString();
+    AScriptEvalWorker* worker = new AScriptEvalWorker(sm, functionName, QVariantList());
+    workers << worker;
 
-    delete sm;
+    QThread* t = new QThread();
+    QObject::connect(t,  &QThread::started, worker, &AScriptEvalWorker::RunFunction);
+    QObject::connect(sm, &AScriptManager::onFinished, t, &QThread::quit);
+    QObject::connect(t, &QThread::finished, t, &QThread::deleteLater);
+    worker->moveToThread(t);
+    t->start();
+
+    qDebug() << "Started new thread!";
+
+//    QScriptValue global = sm->engine->globalObject();
+//    QScriptValue func = global.property(functionName);
+//    qDebug() << "a1 val:"<<global.property("a1").toString();
+//    qDebug() << func.engine();
+//    qDebug() << func.call().toString();
+
+//    delete sm;
 
 }
 
@@ -124,12 +136,40 @@ const QString AInterfaceToMultiThread::deleteWorker(int IndexOfWorker)
 
    delete workers[IndexOfWorker];
    workers.removeAt(IndexOfWorker);
+
+   return "";
 }
 
 AScriptEvalWorker::AScriptEvalWorker(AScriptManager *ScriptManager, const QString &Script) :
-  ScriptManager(ScriptManager), Script(Script) {}
+    ScriptManager(ScriptManager), Script(Script) {}
 
-void AScriptEvalWorker::Start()
+AScriptEvalWorker::AScriptEvalWorker(AScriptManager *ScriptManager, const QString &Function, const QVariantList &Args) :
+    ScriptManager(ScriptManager), Function(Function)
 {
-   ScriptManager->Evaluate(Script);
+
+}
+
+void AScriptEvalWorker::RunScript()
+{
+    ScriptManager->Evaluate(Script);
+}
+
+void AScriptEvalWorker::RunFunction()
+{
+    QScriptValue global = ScriptManager->engine->globalObject();
+    QScriptValue func = global.property(Function);
+
+    if (!func.isValid())
+    {
+        Result = "Cannot evaluate: " + Function + " not found";
+    }
+    else if (!func.isFunction())
+    {
+        Result = "Cannot evaluate: " + Function + " is not a function";
+    }
+    else
+    {
+        Result = func.call();
+    }
+    qDebug() << Result.toString();
 }
