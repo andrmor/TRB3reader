@@ -3,6 +3,7 @@
 
 #include "ascriptinterface.h"
 #include "coreinterfaces.h"
+#include "ainterfacetoconfig.h"
 #include "ainterfacetospeech.h"
 
 #include <QObject>
@@ -17,6 +18,9 @@ public:
 
         const AInterfaceToMath* math = dynamic_cast<const AInterfaceToMath*>(other);
         if (math) return new AInterfaceToMath(math);
+
+        const AInterfaceToConfig* config = dynamic_cast<const AInterfaceToConfig*>(other);
+        if (config) return new AInterfaceToConfig(config);
 
         const AInterfaceToSpeech* speech = dynamic_cast<const AInterfaceToSpeech*>(other);
         if (speech) return new AInterfaceToSpeech(speech);

@@ -9,7 +9,16 @@
 #include <QJsonValue>
 
 AInterfaceToConfig::AInterfaceToConfig(MasterConfig *Config, ADispatcher *Dispatcher) :
-    Config(Config), Dispatcher(Dispatcher) {}
+  Config(Config), Dispatcher(Dispatcher) {}
+
+AInterfaceToConfig::AInterfaceToConfig(const AInterfaceToConfig *other)
+{
+    H = other->H;
+    Description = other->Description;
+
+    Config = other->Config;
+    Dispatcher = other->Dispatcher;
+}
 
 QJsonObject* AInterfaceToConfig::MakeConfigJson() const
 {

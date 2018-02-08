@@ -14,6 +14,8 @@ class AInterfaceToConfig : public AScriptInterface
 
 public:
     AInterfaceToConfig(MasterConfig* Config, ADispatcher *Dispatcher);
+    explicit AInterfaceToConfig(const AInterfaceToConfig* other);
+
     QJsonObject* MakeConfigJson() const;  //does not own this object - delete after use
 
 public slots:
