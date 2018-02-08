@@ -7,6 +7,8 @@
 #include <QObject>
 #include <QVector>
 #include <QScriptValue>
+#include <QVariant>
+#include <QVariantList>
 
 class AScriptManager;
 class QThread;
@@ -51,20 +53,54 @@ class AScriptThreadBase : public QObject
     Q_OBJECT
 
 public:
-    AScriptThreadBase(){}
-    AScriptThreadBase(AScriptManager* ScriptManager) : ScriptManager(ScriptManager) {}
-    virtual ~AScriptThreadBase(){}
+    AScriptThreadBase(AScriptManager* ScriptManager = 0) : ScriptManager(ScriptManager) {}
+    virtual         ~AScriptThreadBase();
 
-    virtual bool    isRunning() = 0;
+    bool            isRunning() {return bRunning;}
+    QScriptValue    getResult() {return Result;}
 
 public slots:
-    virtual void    Run();
+    virtual void    Run() = 0;
 
-private:
+protected:
     AScriptManager* ScriptManager = 0;
     bool            bRunning = false;
     QScriptValue    Result = "Evaluation was not yet performed";
 };
+
+class AScriptThreadScr : public AScriptThreadBase
+{
+    Q_OBJECT
+
+public:
+    AScriptThreadScr(){}
+    AScriptThreadScr(AScriptManager* ScriptManager, const QString& Script) :
+        AScriptThreadBase(ScriptManager), Script(Script) {}
+
+public slots:
+    virtual void    Run() override {}
+
+private:
+    const QString   Script;
+};
+
+class AScriptThreadFun : public AScriptThreadBase
+{
+    Q_OBJECT
+
+public:
+    AScriptThreadFun(){}
+    AScriptThreadFun(AScriptManager* ScriptManager, const QString& Function, const QVariantList& Arguments) :
+        AScriptThreadBase(ScriptManager), Function(Function), Arguments(Arguments) {}
+
+public slots:
+    virtual void       Run() override {}
+
+private:
+    const QString      Function;
+    const QVariantList Arguments;
+};
+
 
 class AScriptEvalWorker : public QObject
 {

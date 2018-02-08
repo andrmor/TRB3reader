@@ -390,27 +390,26 @@ QScriptValue ScriptCopier::copy(const QScriptValue& obj)
 AScriptManager *AScriptManager::createNewScriptManager()
 {
     AScriptManager* sm = new AScriptManager();   
-    //sm->engine->setProcessEventsInterval(-1);
 
     for (QObject* io : interfaces)
     {
         QObject* copy = AScriptInterfaceFactory::makeCopy(io);
         if (copy)
         {
-            qDebug() << "->"<<io->objectName();
+            //qDebug() << "->"<<io->objectName();
             sm->SetInterfaceObject(copy, io->objectName());
 
             //special for core unit
             AInterfaceToCore* core = dynamic_cast<AInterfaceToCore*>(copy);
             if (core)
             {
-                qDebug() << "--this is core";
+                //qDebug() << "--this is core";
                 core->SetScriptManager(sm);
             }
         }
         else
         {
-            qDebug() << "Unknown interface object type";
+            qDebug() << "Unknown interface object type for unit" << io->objectName();
         }
     }
 
@@ -420,19 +419,18 @@ AScriptManager *AScriptManager::createNewScriptManager()
     while (it.hasNext())
     {
         it.next();
-        qDebug() << it.name() << ": " << it.value().toString();
+        //  qDebug() << it.name() << ": " << it.value().toString();
 
         if (!sm->engine->globalObject().property(it.name()).isValid())
         {
-            //sm->engine->globalObject().setProperty(it.name(), it.value());
-            sm->engine->globalObject().setProperty(it.name(), SC.copy(it.value()));
-            qDebug() << sm->engine->globalObject().property(it.name()).toString();
+            if (it.value().isQObject()) qDebug() << "Skipping QObject" << it.name();
+            else
+            {
+                sm->engine->globalObject().setProperty(it.name(), SC.copy(it.value()));
+                //  qDebug() << "Registered:"<<it.name() << "-:->" << sm->engine->globalObject().property(it.name()).toVariant();
+            }
         }
     }
-
-    qDebug() << "original:"<<                  global.property("a1").toString();
-    qDebug() << "cloned:"<<sm->engine->globalObject().property("a1").toString();
-
 
     return sm;
 }

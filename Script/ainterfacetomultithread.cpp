@@ -171,5 +171,10 @@ void AScriptEvalWorker::RunFunction()
     {
         Result = func.call();
     }
-    qDebug() << Result.toString();
+    //  qDebug() << Result.toString();
+}
+
+AScriptThreadBase::~AScriptThreadBase()
+{
+    delete ScriptManager;
 }
