@@ -13,7 +13,7 @@
 class AScriptManager;
 class QThread;
 
-class AScriptEvalWorker;
+class AScriptThreadBase;
 
 class AInterfaceToMultiThread : public AScriptInterface
 {
@@ -22,30 +22,32 @@ class AInterfaceToMultiThread : public AScriptInterface
 public:
     AInterfaceToMultiThread(AScriptManager *MasterScriptManager);
 
-    virtual void ForceStop();
+    virtual void  ForceStop();
 
 public slots:
 
     void          evaluateScript(const QString script);
-    void          evaluateFunction(const QString functionName);
+    void          evaluateFunction(const QString functionName, const QVariant arguments);
 
     void          waitForAll();
-    void          waitForWorker(int IndexOfWorker);
+    void          waitForOne(int IndexOfWorker);
 
     void          abortAll();
-    void          abortWorker(int IndexOfWorker);
+    void          abortOne(int IndexOfWorker);
 
-    int           countWorkers();
-    int           countActiveWorkers();
+    int           countAll();
+    int           countNotFinished();
 
-    QScriptValue  getResult(int IndexOfWorker);
+    QVariant      getResult(int IndexOfWorker);
 
-    bool          deleteAllWorkers();
-    const QString deleteWorker(int IndexOfWorker);
+    bool          deleteAll();
+    const QString deleteOne(int IndexOfWorker);
 
 private:
     AScriptManager *MasterScriptManager;
-    QVector<AScriptEvalWorker*> workers;
+    QVector<AScriptThreadBase*> workers;
+
+    void          startEvaluation(AScriptManager *sm, AScriptThreadBase* worker);
 };
 
 class AScriptThreadBase : public QObject
@@ -53,11 +55,12 @@ class AScriptThreadBase : public QObject
     Q_OBJECT
 
 public:
-    AScriptThreadBase(AScriptManager* ScriptManager = 0) : ScriptManager(ScriptManager) {}
+    AScriptThreadBase(AScriptManager* ScriptManager = 0);
     virtual         ~AScriptThreadBase();
 
     bool            isRunning() {return bRunning;}
-    QScriptValue    getResult() {return Result;}
+    void            abort();
+    QVariant        getResult() {return Result;}
 
 public slots:
     virtual void    Run() = 0;
@@ -65,7 +68,9 @@ public slots:
 protected:
     AScriptManager* ScriptManager = 0;
     bool            bRunning = false;
-    QScriptValue    Result = "Evaluation was not yet performed";
+    QVariant        Result = QString("Evaluation was not yet performed");
+
+    const QVariant  resultToQVariant(const QScriptValue& result) const;
 };
 
 class AScriptThreadScr : public AScriptThreadBase
@@ -74,11 +79,10 @@ class AScriptThreadScr : public AScriptThreadBase
 
 public:
     AScriptThreadScr(){}
-    AScriptThreadScr(AScriptManager* ScriptManager, const QString& Script) :
-        AScriptThreadBase(ScriptManager), Script(Script) {}
+    AScriptThreadScr(AScriptManager* ScriptManager, const QString& Script);
 
 public slots:
-    virtual void    Run() override {}
+    virtual void    Run() override;
 
 private:
     const QString   Script;
@@ -90,36 +94,14 @@ class AScriptThreadFun : public AScriptThreadBase
 
 public:
     AScriptThreadFun(){}
-    AScriptThreadFun(AScriptManager* ScriptManager, const QString& Function, const QVariantList& Arguments) :
-        AScriptThreadBase(ScriptManager), Function(Function), Arguments(Arguments) {}
+    AScriptThreadFun(AScriptManager* ScriptManager, const QString& Function, const QVariant& Arguments);
 
 public slots:
-    virtual void       Run() override {}
+    virtual void       Run() override;
 
 private:
     const QString      Function;
-    const QVariantList Arguments;
-};
-
-
-class AScriptEvalWorker : public QObject
-{
-  Q_OBJECT
-
-public:
-  AScriptEvalWorker(AScriptManager* ScriptManager, const QString& Script);
-  AScriptEvalWorker(AScriptManager* ScriptManager, const QString& Function, const QVariantList& Args);
-  AScriptEvalWorker();
-
-  AScriptManager* ScriptManager;
-  QString         Script;
-  QString         Function;
-
-  QScriptValue    Result;
-
-public slots:
-  void            RunScript();
-  void            RunFunction();
+    const QVariant     Arguments;
 };
 
 #endif // AINTERFACETOMULTITHREAD_H

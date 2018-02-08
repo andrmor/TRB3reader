@@ -4,6 +4,7 @@
 #include <QThread>
 #include <QDebug>
 #include <QApplication>
+#include <QScriptEngine>
 
 AInterfaceToMultiThread::AInterfaceToMultiThread(AScriptManager *ScriptManager) :
   MasterScriptManager(ScriptManager) {}
@@ -16,65 +17,51 @@ void AInterfaceToMultiThread::ForceStop()
 void AInterfaceToMultiThread::evaluateScript(const QString script)
 {
     AScriptManager* sm = MasterScriptManager->createNewScriptManager();
-    qDebug() << "Cloned SM. master:"<<MasterScriptManager<<"clone:"<<sm;
+    //  qDebug() << "Cloned SM. master:"<<MasterScriptManager<<"clone:"<<sm;
 
-    AScriptEvalWorker* worker = new AScriptEvalWorker(sm, script);
+    AScriptThreadScr* worker = new AScriptThreadScr(sm, script);
+    startEvaluation(sm, worker);
+}
+
+void AInterfaceToMultiThread::evaluateFunction(const QString functionName, const QVariant arguments)
+{
+    AScriptManager* sm = MasterScriptManager->createNewScriptManager();
+    //  qDebug() << "Cloned SM. master:"<<MasterScriptManager<<"clone:"<<sm;
+
+    AScriptThreadFun* worker = new AScriptThreadFun(sm, functionName, arguments);
+    startEvaluation(sm, worker);
+}
+
+void AInterfaceToMultiThread::startEvaluation(AScriptManager* sm, AScriptThreadBase *worker)
+{
     workers << worker;
 
     connect(sm, &AScriptManager::showMessage, MasterScriptManager, &AScriptManager::showMessage, Qt::QueuedConnection);
 
     QThread* t = new QThread();
-    QObject::connect(t,  &QThread::started, worker, &AScriptEvalWorker::RunScript);
+    QObject::connect(t,  &QThread::started, worker, &AScriptThreadBase::Run);
     QObject::connect(sm, &AScriptManager::onFinished, t, &QThread::quit);
     QObject::connect(t, &QThread::finished, t, &QThread::deleteLater);
     worker->moveToThread(t);
     t->start();
 
-    qDebug() << "Started new thread!";
-}
-
-#include <QScriptEngine>
-void AInterfaceToMultiThread::evaluateFunction(const QString functionName)
-{
-    AScriptManager* sm = MasterScriptManager->createNewScriptManager();
-    qDebug() << "Cloned SM. master:"<<MasterScriptManager<<"clone:"<<sm;
-
-    AScriptEvalWorker* worker = new AScriptEvalWorker(sm, functionName, QVariantList());
-    workers << worker;
-
-    QThread* t = new QThread();
-    QObject::connect(t,  &QThread::started, worker, &AScriptEvalWorker::RunFunction);
-    QObject::connect(sm, &AScriptManager::onFinished, t, &QThread::quit);
-    QObject::connect(t, &QThread::finished, t, &QThread::deleteLater);
-    worker->moveToThread(t);
-    t->start();
-
-    qDebug() << "Started new thread!";
-
-//    QScriptValue global = sm->engine->globalObject();
-//    QScriptValue func = global.property(functionName);
-//    qDebug() << "a1 val:"<<global.property("a1").toString();
-//    qDebug() << func.engine();
-//    qDebug() << func.call().toString();
-
-//    delete sm;
-
+    //  qDebug() << "Started new thread!";
 }
 
 void AInterfaceToMultiThread::waitForAll()
 {
-    while (countActiveWorkers() > 0)
+    while (countNotFinished() > 0)
       {
         qApp->processEvents();
       }
 }
 
-void AInterfaceToMultiThread::waitForWorker(int IndexOfWorker)
+void AInterfaceToMultiThread::waitForOne(int IndexOfWorker)
 {
   if (IndexOfWorker < 0 || IndexOfWorker >= workers.size()) return;
-  if (!workers.at(IndexOfWorker)->ScriptManager->fEngineIsRunning) return;
+  if (!workers.at(IndexOfWorker)->isRunning()) return;
 
-  while (workers.at(IndexOfWorker)->ScriptManager->fEngineIsRunning)
+  while (workers.at(IndexOfWorker)->isRunning())
     {
       qApp->processEvents();
     }
@@ -82,57 +69,57 @@ void AInterfaceToMultiThread::waitForWorker(int IndexOfWorker)
 
 void AInterfaceToMultiThread::abortAll()
 {
-  for (AScriptEvalWorker* w : workers)
-     if (w->ScriptManager->fEngineIsRunning) w->ScriptManager->abortEvaluation();
+  for (AScriptThreadBase* w : workers)
+     if (w->isRunning()) w->abort();
 }
 
-void AInterfaceToMultiThread::abortWorker(int IndexOfWorker)
+void AInterfaceToMultiThread::abortOne(int IndexOfWorker)
 {
   if (IndexOfWorker < 0 || IndexOfWorker >= workers.size()) return;
-  if (!workers.at(IndexOfWorker)->ScriptManager->fEngineIsRunning) return;
+  if (!workers.at(IndexOfWorker)->isRunning()) return;
 
-  workers.at(IndexOfWorker)->ScriptManager->abortEvaluation();
+  workers.at(IndexOfWorker)->abort();
 }
 
-int AInterfaceToMultiThread::countWorkers()
+int AInterfaceToMultiThread::countAll()
 {
   return workers.size();
 }
 
-int AInterfaceToMultiThread::countActiveWorkers()
+int AInterfaceToMultiThread::countNotFinished()
 {
   //  qDebug() << "Total number of workers:"<< workers.count();
   int counter = 0;
-  for (AScriptEvalWorker* w : workers)
+  for (AScriptThreadBase* w : workers)
     {
         //  qDebug() << w << w->ScriptManager << w->ScriptManager->fEngineIsRunning;
-        if (w->ScriptManager->fEngineIsRunning) counter++;
+        if (w->isRunning()) counter++;
     }
   return counter;
 }
 
-QScriptValue AInterfaceToMultiThread::getResult(int IndexOfWorker)
+QVariant AInterfaceToMultiThread::getResult(int IndexOfWorker)
 {
   if (IndexOfWorker < 0 || IndexOfWorker >= workers.size()) return QString("Wrong worker index");
-  if (workers.at(IndexOfWorker)->ScriptManager->fEngineIsRunning) return QString("Still running");
+  if (workers.at(IndexOfWorker)->isRunning()) return QString("Still running");
 
-  return workers.at(IndexOfWorker)->ScriptManager->EvaluationResult;
+  return workers.at(IndexOfWorker)->getResult();
 }
 
-bool AInterfaceToMultiThread::deleteAllWorkers()
+bool AInterfaceToMultiThread::deleteAll()
 {
-    for (AScriptEvalWorker* w : workers)
-      if (w->ScriptManager->fEngineIsRunning) return false;
+    for (AScriptThreadBase* w : workers)
+      if (w->isRunning()) return false;
 
-    for (AScriptEvalWorker* w : workers) delete w;
+    for (AScriptThreadBase* w : workers) delete w;
     workers.clear();
     return true;
 }
 
-const QString AInterfaceToMultiThread::deleteWorker(int IndexOfWorker)
+const QString AInterfaceToMultiThread::deleteOne(int IndexOfWorker)
 {
    if (IndexOfWorker < 0 || IndexOfWorker >= workers.size()) return QString("Wrong worker index");
-   if (workers.at(IndexOfWorker)->ScriptManager->fEngineIsRunning) return QString("Still running");
+   if (workers.at(IndexOfWorker)->isRunning()) return QString("Still running");
 
    delete workers[IndexOfWorker];
    workers.removeAt(IndexOfWorker);
@@ -140,41 +127,65 @@ const QString AInterfaceToMultiThread::deleteWorker(int IndexOfWorker)
    return "";
 }
 
-AScriptEvalWorker::AScriptEvalWorker(AScriptManager *ScriptManager, const QString &Script) :
-    ScriptManager(ScriptManager), Script(Script) {}
-
-AScriptEvalWorker::AScriptEvalWorker(AScriptManager *ScriptManager, const QString &Function, const QVariantList &Args) :
-    ScriptManager(ScriptManager), Function(Function)
-{
-
-}
-
-void AScriptEvalWorker::RunScript()
-{
-    ScriptManager->Evaluate(Script);
-}
-
-void AScriptEvalWorker::RunFunction()
-{
-    QScriptValue global = ScriptManager->engine->globalObject();
-    QScriptValue func = global.property(Function);
-
-    if (!func.isValid())
-    {
-        Result = "Cannot evaluate: " + Function + " not found";
-    }
-    else if (!func.isFunction())
-    {
-        Result = "Cannot evaluate: " + Function + " is not a function";
-    }
-    else
-    {
-        Result = func.call();
-    }
-    //  qDebug() << Result.toString();
-}
+AScriptThreadBase::AScriptThreadBase(AScriptManager *ScriptManager) : ScriptManager(ScriptManager) {}
 
 AScriptThreadBase::~AScriptThreadBase()
 {
     delete ScriptManager;
+}
+
+void AScriptThreadBase::abort()
+{
+    if (ScriptManager) ScriptManager->abortEvaluation();
+}
+
+const QVariant AScriptThreadBase::resultToQVariant(const QScriptValue &result) const
+{
+    if (result.isString()) return result.toString();
+    if (result.isNumber()) return result.toNumber();
+    return result.toVariant();
+}
+
+AScriptThreadScr::AScriptThreadScr(AScriptManager *ScriptManager, const QString &Script) :
+    AScriptThreadBase(ScriptManager), Script(Script) {}
+
+void AScriptThreadScr::Run()
+{
+    bRunning = true;
+    ScriptManager->Evaluate(Script);
+    Result = resultToQVariant( ScriptManager->EvaluationResult );
+    bRunning = false;
+}
+
+AScriptThreadFun::AScriptThreadFun(AScriptManager *ScriptManager, const QString &Function, const QVariant &Arguments) :
+    AScriptThreadBase(ScriptManager), Function(Function), Arguments(Arguments) {}
+
+void AScriptThreadFun::Run()
+{
+    bRunning = true;
+    QScriptValue global = ScriptManager->engine->globalObject();
+    QScriptValue func = global.property(Function);
+    if (!func.isValid())         Result = "Cannot evaluate: " + Function + " not found";
+    else if (!func.isFunction()) Result = "Cannot evaluate: " + Function + " is not a function";
+    else
+    {
+        qDebug() << Arguments;
+
+        QVariantList ArgsVL;
+        QString typeArr = Arguments.typeName();
+        if (typeArr == "QVariantList") ArgsVL = Arguments.toList();
+        else ArgsVL << Arguments;
+
+        QScriptValueList args;
+        for (const QVariant& v : ArgsVL)
+        {
+            //to do ***!!! check for objects and array of arrays
+
+            args << ScriptManager->engine->newVariant(v);
+        }
+
+        QScriptValue res = func.call(QScriptValue(), args);
+        Result = resultToQVariant(res);
+    }
+    bRunning = false;
 }

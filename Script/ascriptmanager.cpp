@@ -55,7 +55,7 @@ QString AScriptManager::Evaluate(const QString& Script)
 
     fEngineIsRunning = true;
     EvaluationResult = engine->evaluate(Script);
-    qDebug() << "Just finished!" << EvaluationResult.toString();
+    //  qDebug() << "Just finished!" << EvaluationResult.toString();
     fEngineIsRunning = false;
 
     QString result = EvaluationResult.toString();
@@ -292,11 +292,12 @@ QScriptValue ScriptCopier::copy(const QScriptValue& obj)
 {
     QScriptEngine& engine = m_toEngine;
 
-    if (obj.isUndefined()) {
-        return QScriptValue(QScriptValue::UndefinedValue);
-    }
-    if (obj.isNull()) {
-        return QScriptValue(QScriptValue::NullValue);
+    if (obj.isUndefined()) return QScriptValue(QScriptValue::UndefinedValue);
+    if (obj.isNull())      return QScriptValue(QScriptValue::NullValue);
+    if (obj.isNumber() || obj.isString() || obj.isBool() || obj.isBoolean() || obj.isVariant())
+    {
+        //  qDebug() << "variant" << obj.toVariant();
+        return engine.newVariant(obj.toVariant());
     }
 
     // If we've already copied this object, don't copy it again.
@@ -345,15 +346,6 @@ QScriptValue ScriptCopier::copy(const QScriptValue& obj)
         }
 
     }
-    else if (obj.isNumber() || obj.isString() || obj.isBool() || obj.isBoolean())
-    {
-        copy = engine.newVariant(copy, obj.toVariant());
-    }
-//    else if (obj.isVariant())
-//    {
-//        QVariant var = obj.toVariant();
-//        copy = engine.newVariant(copy, obj.toVariant());
-//    }
     else if (obj.isObject() || obj.isArray())
     {
         if (obj.isObject()) {
