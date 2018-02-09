@@ -385,10 +385,15 @@ AScriptManager *AScriptManager::createNewScriptManager()
 
     for (QObject* io : interfaces)
     {
+        AScriptInterface* si = dynamic_cast<AScriptInterface*>(io);
+        if (!si) continue;
+
+        if (!si->IsMultithreadCapable()) continue;
+
         QObject* copy = AScriptInterfaceFactory::makeCopy(io);
         if (copy)
         {
-            //qDebug() << "->"<<io->objectName();
+            qDebug() << "Making avauilable for multi-thread use: "<<io->objectName();
             sm->SetInterfaceObject(copy, io->objectName());
 
             //special for core unit
@@ -415,11 +420,15 @@ AScriptManager *AScriptManager::createNewScriptManager()
 
         if (!sm->engine->globalObject().property(it.name()).isValid())
         {
-            if (it.value().isQObject()) qDebug() << "Skipping QObject" << it.name();
-            else
+            //do not copy QObjects - the multi-thread friendly ones were already copied
+            if (!it.value().isQObject())
             {
                 sm->engine->globalObject().setProperty(it.name(), SC.copy(it.value()));
                 //  qDebug() << "Registered:"<<it.name() << "-:->" << sm->engine->globalObject().property(it.name()).toVariant();
+            }
+            else
+            {
+                //  qDebug() << "Skipping QObject" << it.name();
             }
         }
     }

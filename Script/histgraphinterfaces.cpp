@@ -46,12 +46,6 @@ AInterfaceToHist::AInterfaceToHist(TmpObjHubClass* TmpHub)
             "Example: SetOptStat(\"ne\"); print only name of histogram and number of entries.";
 }
 
-bool AInterfaceToHist::InitOnRun()
-{
-  //TmpHub->ScriptDrawObjects.clear();
-  return true;
-}
-
 void AInterfaceToHist::NewHist(QString HistName, int bins, double start, double stop)
 {
   int index = TmpHub->ScriptDrawObjects.findIndexOf(HistName);
@@ -611,12 +605,6 @@ AInterfaceToGraph::AInterfaceToGraph(TmpObjHubClass *TmpHub)
   H["SetMarkerProperties"] = "Default marker properties are 1, 20, 1";
   H["SetLineProperties"] = "Default line properties are 1, 1, 2";
   H["Draw"] = "Draws the graph (use \"APL\" options if in doubt)";
-}
-
-bool AInterfaceToGraph::InitOnRun()
-{
-  //TmpHub->ScriptDrawObjects.clear();
-  return true;
 }
 
 void AInterfaceToGraph::NewGraph(QString GraphName)

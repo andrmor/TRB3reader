@@ -15,6 +15,8 @@ class AInterfaceToData : public AScriptInterface
 public:
     AInterfaceToData(ADataHub* DataHub);
 
+    bool IsMultithreadCapable() const {return true;}
+
 public slots:
 
     int      countEvents() const;

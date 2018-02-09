@@ -18,7 +18,7 @@ public:
   AInterfaceToHist(TmpObjHubClass *TmpHub);
   ~AInterfaceToHist(){}
 
-  virtual bool InitOnRun();
+  virtual bool IsMultithreadCapable() const {return true;}
 
 public slots:
   void NewHist(QString HistName, int bins, double start, double stop);
@@ -39,7 +39,7 @@ public slots:
   void Draw(QString HistName, QString options);
   void DrawStack(QVariant HistNames, QString options, QString XTitle = "", QString YTitle = "");
 
-  void Save(QString HistName, QString FileName);
+  void Save(QString HistName, QString FileName); // ***!!! add storage / delete!!!
 
   void Smooth(QString HistName, int times);
   QVariant FitGauss(QString HistName, QString options="");
@@ -68,7 +68,7 @@ public:
   AInterfaceToGraph(TmpObjHubClass *TmpHub);
   ~AInterfaceToGraph(){}
 
-  virtual bool InitOnRun();
+  virtual bool IsMultithreadCapable() const {return true;}
 
 public slots:
   void NewGraph(QString GraphName);

@@ -19,6 +19,8 @@ public:
   explicit AInterfaceToCore(AScriptManager *ScriptManager = 0);
   explicit AInterfaceToCore(const AInterfaceToCore& other);
 
+  bool IsMultithreadCapable() const {return true;}
+
   void SetScriptManager(AScriptManager *ScriptManager);
 
 public slots:
@@ -86,6 +88,8 @@ public:
   AInterfaceToMath();
   //AInterfaceToMath(TRandom2* RandGen);
   //void setRandomGen(TRandom2* RandGen);
+
+  bool IsMultithreadCapable() const {return true;}
 
 public slots:
   double abs(double val);

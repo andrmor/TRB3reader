@@ -17,6 +17,8 @@ public:
 
     QJsonObject* MakeConfigJson() const;  //does not own this object - delete after use
 
+    bool IsMultithreadCapable() const {return true;}
+
 public slots:
     QVariant getConfigJson();
     void     setConfigJson(QVariant configJson);

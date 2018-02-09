@@ -115,16 +115,9 @@ bool AInterfaceToMultiThread::deleteAll()
           return false;
       }
 
-    qDebug() << "master->"<<MasterScriptManager;
-    for (AScriptThreadBase* w : workers)
-    {
-        qDebug() << w << w->ScriptManager;
-        w->deleteLater();
-    }
-
-    qDebug() << "--------------saaaaaaa";
+    for (AScriptThreadBase* w : workers) w->deleteLater();
     workers.clear();
-    qDebug() << "--------------saaaaaaa";
+
     return true;
 }
 
