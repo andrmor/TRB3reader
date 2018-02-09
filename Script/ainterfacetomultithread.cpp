@@ -154,6 +154,7 @@ void AScriptThreadScr::Run()
     bRunning = true;
     ScriptManager->Evaluate(Script);
     Result = resultToQVariant( ScriptManager->EvaluationResult );
+    //  qDebug() << Result;
     bRunning = false;
 }
 

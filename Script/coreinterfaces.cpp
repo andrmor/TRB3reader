@@ -47,11 +47,9 @@ AInterfaceToCore::AInterfaceToCore(AScriptManager* ScriptManager) :
 
 }
 
-AInterfaceToCore::AInterfaceToCore(const AInterfaceToCore *other)
+AInterfaceToCore::AInterfaceToCore(const AInterfaceToCore *other) :
+    AScriptInterface(other)
 {
-    H = other->H;
-    Description = other->Description;
-
     Finder_FileNames = other->Finder_FileNames;
     Finder_Dir = other->Finder_Dir;
     Finder_NamePattern = other->Finder_NamePattern;
@@ -474,11 +472,8 @@ AInterfaceToMath::AInterfaceToMath()    //TRandom2* RandGen)
   H["exponential"] = "Returns a random value sampled from exponential decay with decay time given by the user";
 }
 
-AInterfaceToMath::AInterfaceToMath(const AInterfaceToMath *other)
-{
-    H = other->H;
-    Description = other->Description;
-}
+AInterfaceToMath::AInterfaceToMath(const AInterfaceToMath *other) :
+    AScriptInterface(other) {}
 
 /*
 void AInterfaceToMath::setRandomGen(TRandom2 *RandGen)

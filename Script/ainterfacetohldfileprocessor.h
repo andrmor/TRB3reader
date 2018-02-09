@@ -13,6 +13,7 @@ class AInterfaceToHldFileProcessor : public AScriptInterface
 
 public:
     AInterfaceToHldFileProcessor(AHldFileProcessor& hldProcessor);
+    AInterfaceToHldFileProcessor(const AInterfaceToHldFileProcessor* other);
 
 public slots:
     const QString ProcessFile(const QString FileName, const QString SaveFileName = "");

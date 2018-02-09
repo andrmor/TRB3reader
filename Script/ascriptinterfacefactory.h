@@ -4,7 +4,9 @@
 #include "ascriptinterface.h"
 #include "coreinterfaces.h"
 #include "ainterfacetoconfig.h"
+#include "ainterfacetodata.h"
 #include "ainterfacetospeech.h"
+#include "ainterfacetohldfileprocessor.h"
 
 #include <QObject>
 
@@ -22,8 +24,16 @@ public:
         const AInterfaceToConfig* config = dynamic_cast<const AInterfaceToConfig*>(other);
         if (config) return new AInterfaceToConfig(config);
 
+        const AInterfaceToData* events = dynamic_cast<const AInterfaceToData*>(other);
+        if (events) return new AInterfaceToData(events);
+
+        const AInterfaceToHldFileProcessor* hld = dynamic_cast<const AInterfaceToHldFileProcessor*>(other);
+        if (hld) return new AInterfaceToHldFileProcessor(hld);
+
+#ifdef SPEECH
         const AInterfaceToSpeech* speech = dynamic_cast<const AInterfaceToSpeech*>(other);
         if (speech) return new AInterfaceToSpeech(speech);
+#endif
 
         return 0;
     }

@@ -16,7 +16,7 @@ AInterfaceToSpeech::AInterfaceToSpeech() : m_speech(0)
     }
 }
 
-AInterfaceToSpeech::AInterfaceToSpeech(const AInterfaceToSpeech *other)
+AInterfaceToSpeech::AInterfaceToSpeech(const AInterfaceToSpeech *other) : AScriptInterface(other)
 {
     m_speech = other->m_speech;
 }

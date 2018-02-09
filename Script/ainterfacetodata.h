@@ -14,6 +14,7 @@ class AInterfaceToData : public AScriptInterface
 
 public:
     AInterfaceToData(ADataHub* DataHub);
+    AInterfaceToData(const AInterfaceToData* other);
 
 public slots:
 

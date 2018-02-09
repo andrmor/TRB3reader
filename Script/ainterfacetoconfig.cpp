@@ -11,11 +11,8 @@
 AInterfaceToConfig::AInterfaceToConfig(MasterConfig *Config, ADispatcher *Dispatcher) :
   Config(Config), Dispatcher(Dispatcher) {}
 
-AInterfaceToConfig::AInterfaceToConfig(const AInterfaceToConfig *other)
+AInterfaceToConfig::AInterfaceToConfig(const AInterfaceToConfig *other) : AScriptInterface(other)
 {
-    H = other->H;
-    Description = other->Description;
-
     Config = other->Config;
     Dispatcher = other->Dispatcher;
 }
