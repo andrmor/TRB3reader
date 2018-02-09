@@ -47,12 +47,12 @@ AInterfaceToCore::AInterfaceToCore(AScriptManager* ScriptManager) :
 
 }
 
-AInterfaceToCore::AInterfaceToCore(const AInterfaceToCore *other) :
+AInterfaceToCore::AInterfaceToCore(const AInterfaceToCore& other) :
     AScriptInterface(other)
 {
-    Finder_FileNames = other->Finder_FileNames;
-    Finder_Dir = other->Finder_Dir;
-    Finder_NamePattern = other->Finder_NamePattern;
+    Finder_FileNames = other.Finder_FileNames;
+    Finder_Dir = other.Finder_Dir;
+    Finder_NamePattern = other.Finder_NamePattern;
 
     ScriptManager = 0; //to be set after copy!!!
 }
@@ -471,9 +471,6 @@ AInterfaceToMath::AInterfaceToMath()    //TRandom2* RandGen)
   H["maxwell"] = "Returns a random value sampled from maxwell distribution with Sqrt(kT/M) given by the user";
   H["exponential"] = "Returns a random value sampled from exponential decay with decay time given by the user";
 }
-
-AInterfaceToMath::AInterfaceToMath(const AInterfaceToMath *other) :
-    AScriptInterface(other) {}
 
 /*
 void AInterfaceToMath::setRandomGen(TRandom2 *RandGen)

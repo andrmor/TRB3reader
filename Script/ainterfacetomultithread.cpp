@@ -109,10 +109,22 @@ QVariant AInterfaceToMultiThread::getResult(int IndexOfWorker)
 bool AInterfaceToMultiThread::deleteAll()
 {
     for (AScriptThreadBase* w : workers)
-      if (w->isRunning()) return false;
+      if (w->isRunning())
+      {
+          qDebug() << "Cannot delete all - not all threads finished";
+          return false;
+      }
 
-    for (AScriptThreadBase* w : workers) delete w;
+    qDebug() << "master->"<<MasterScriptManager;
+    for (AScriptThreadBase* w : workers)
+    {
+        qDebug() << w << w->ScriptManager;
+        w->deleteLater();
+    }
+
+    qDebug() << "--------------saaaaaaa";
     workers.clear();
+    qDebug() << "--------------saaaaaaa";
     return true;
 }
 

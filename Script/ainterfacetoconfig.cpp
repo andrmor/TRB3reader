@@ -11,12 +11,6 @@
 AInterfaceToConfig::AInterfaceToConfig(MasterConfig *Config, ADispatcher *Dispatcher) :
   Config(Config), Dispatcher(Dispatcher) {}
 
-AInterfaceToConfig::AInterfaceToConfig(const AInterfaceToConfig *other) : AScriptInterface(other)
-{
-    Config = other->Config;
-    Dispatcher = other->Dispatcher;
-}
-
 QJsonObject* AInterfaceToConfig::MakeConfigJson() const
 {
     QJsonObject* js = new QJsonObject;

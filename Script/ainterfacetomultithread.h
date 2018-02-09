@@ -65,7 +65,7 @@ public:
 public slots:
     virtual void    Run() = 0;
 
-protected:
+public://protected:
     AScriptManager* ScriptManager = 0;
     bool            bRunning = false;
     QVariant        Result = QString("Evaluation was not yet performed");

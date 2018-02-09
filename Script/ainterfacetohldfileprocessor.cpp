@@ -8,9 +8,6 @@ AInterfaceToHldFileProcessor::AInterfaceToHldFileProcessor(AHldFileProcessor &hl
                   "To modify settings use the global configuration.";
 }
 
-AInterfaceToHldFileProcessor::AInterfaceToHldFileProcessor(const AInterfaceToHldFileProcessor *other) :
-    AScriptInterface(other), hldProcessor(other->hldProcessor) {}
-
 const QString AInterfaceToHldFileProcessor::ProcessFile(const QString FileName, const QString SaveFileName)
 {
     bool bOK = hldProcessor.ProcessFile(FileName, SaveFileName);

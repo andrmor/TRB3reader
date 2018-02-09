@@ -11,7 +11,7 @@ class AScriptInterface : public QObject
 
 public:
   AScriptInterface() {}
-  AScriptInterface(const AScriptInterface* other) : H(other->H), Description(other->Description) {}
+  AScriptInterface(const AScriptInterface& other) : H(other.H), Description(other.Description) {}
   virtual bool InitOnRun() {return true;}               // automatically called before script evaluation
   virtual void ForceStop() {}                           // called when abort was triggered by any other module
 

@@ -11,7 +11,7 @@ class AInterfaceToSpeech : public AScriptInterface
         Q_OBJECT
 public:
     AInterfaceToSpeech();
-    AInterfaceToSpeech(const AInterfaceToSpeech* other);
+    AInterfaceToSpeech(const AInterfaceToSpeech& other);
 
 public slots:
     void              Say(QString text);
