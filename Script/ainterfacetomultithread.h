@@ -27,7 +27,7 @@ public:
 public slots:
 
     void          evaluateScript(const QString script);
-    void          evaluateFunction(const QString functionName, const QVariant arguments);
+    void          evaluateFunction(const QVariant function, const QVariant arguments = QVariant());
 
     void          waitForAll();
     void          waitForOne(int IndexOfWorker);

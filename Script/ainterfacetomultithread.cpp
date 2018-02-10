@@ -23,8 +23,24 @@ void AInterfaceToMultiThread::evaluateScript(const QString script)
     startEvaluation(sm, worker);
 }
 
-void AInterfaceToMultiThread::evaluateFunction(const QString functionName, const QVariant arguments)
+void AInterfaceToMultiThread::evaluateFunction(const QVariant function, const QVariant arguments)
 {
+    QString functionName;
+
+    QString typeArr = function.typeName();
+    if (typeArr == "QString") functionName = function.toString();
+    else if (typeArr == "QVariantMap")
+    {
+        QVariantMap vm = function.toMap();
+        functionName = vm["name"].toString();
+    }
+
+    if (functionName.isEmpty())
+    {
+        abort("Evaluate function requires function or its name as the first argument!");
+        return;
+    }
+
     AScriptManager* sm = MasterScriptManager->createNewScriptManager();
     //  qDebug() << "Cloned SM. master:"<<MasterScriptManager<<"clone:"<<sm;
 
@@ -171,7 +187,7 @@ void AScriptThreadFun::Run()
     bRunning = true;
     QScriptValue global = ScriptManager->engine->globalObject();
     QScriptValue func = global.property(Function);
-    if (!func.isValid())         Result = "Cannot evaluate: " + Function + " not found";
+    if (!func.isValid())         Result = "Cannot evaluate: Function " + Function + " not found";
     else if (!func.isFunction()) Result = "Cannot evaluate: " + Function + " is not a function";
     else
     {
