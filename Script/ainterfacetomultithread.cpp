@@ -11,6 +11,7 @@ AInterfaceToMultiThread::AInterfaceToMultiThread(AScriptManager *ScriptManager) 
 
 void AInterfaceToMultiThread::ForceStop()
 {
+    qDebug() << "External abort received, aborting all threads";
     abortAll();
 }
 
@@ -57,11 +58,23 @@ void AInterfaceToMultiThread::startEvaluation(AScriptManager* sm, AScriptThreadB
     QThread* t = new QThread();
     QObject::connect(t,  &QThread::started, worker, &AScriptThreadBase::Run);
     QObject::connect(sm, &AScriptManager::onFinished, t, &QThread::quit);
+    QObject::connect(worker, &AScriptThreadBase::errorFound, this, &AInterfaceToMultiThread::onErrorInTread);
     QObject::connect(t, &QThread::finished, t, &QThread::deleteLater);
     worker->moveToThread(t);
     t->start();
 
     //  qDebug() << "Started new thread!";
+}
+
+void AInterfaceToMultiThread::onErrorInTread(AScriptThreadBase *workerWithError)
+{
+    qDebug() << "Error in thread:"<<workerWithError;
+
+    int workerIndex = workers.indexOf(workerWithError);
+    QString errorMessage = workerWithError->Result.toString();
+
+    QString msg = "Error in thread #" + QString::number(workerIndex) + ": " + errorMessage;
+    abort(msg);
 }
 
 void AInterfaceToMultiThread::waitForAll()
@@ -174,7 +187,16 @@ void AScriptThreadScr::Run()
 {
     bRunning = true;
     ScriptManager->Evaluate(Script);
-    Result = resultToQVariant( ScriptManager->EvaluationResult );
+
+    QScriptValue res = ScriptManager->EvaluationResult;
+    if (res.isError())
+    {
+        Result = res.toString();
+        emit errorFound(this);
+    }
+    else
+        Result = resultToQVariant(res);
+
     //  qDebug() << Result;
     bRunning = false;
 }
@@ -207,7 +229,15 @@ void AScriptThreadFun::Run()
         }
 
         QScriptValue res = func.call(QScriptValue(), args);
-        Result = resultToQVariant(res);
+
+        if (res.isError())
+        {
+            Result = res.toString();
+            emit errorFound(this);
+        }
+        else
+            Result = resultToQVariant(res);
+
     }
     bRunning = false;
 }

@@ -19,6 +19,8 @@ class AInterfaceToMultiThread : public AScriptInterface
 {
     Q_OBJECT
 
+friend class AScriptThreadBase;
+
 public:
     AInterfaceToMultiThread(AScriptManager *MasterScriptManager);
 
@@ -48,6 +50,9 @@ private:
     QVector<AScriptThreadBase*> workers;
 
     void          startEvaluation(AScriptManager *sm, AScriptThreadBase* worker);
+
+private slots:
+    void          onErrorInTread(AScriptThreadBase *workerWithError);
 };
 
 class AScriptThreadBase : public QObject
@@ -64,6 +69,9 @@ public:
 
 public slots:
     virtual void    Run() = 0;
+
+signals:
+    void            errorFound(AScriptThreadBase*);
 
 public://protected:
     AScriptManager* ScriptManager = 0;
