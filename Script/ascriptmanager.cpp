@@ -6,6 +6,7 @@
 #include <QScriptEngine>
 #include <QMetaMethod>
 #include <QDebug>
+#include <QElapsedTimer>
 
 AScriptManager::AScriptManager()
 {
@@ -15,6 +16,8 @@ AScriptManager::AScriptManager()
     fEngineIsRunning = false;
     bestResult = 1e30;
     numVariables = 0;
+
+    timer = 0;
 }
 
 AScriptManager::~AScriptManager()
@@ -28,6 +31,8 @@ AScriptManager::~AScriptManager()
         engine->deleteLater();
         engine = 0;
     }
+
+    delete timer;
 }
 
 QString AScriptManager::Evaluate(const QString& Script)
@@ -53,10 +58,16 @@ QString AScriptManager::Evaluate(const QString& Script)
             }
       }
 
+    timer = new QElapsedTimer;
+    timeOfStart = timer->restart();
+
     fEngineIsRunning = true;
     EvaluationResult = engine->evaluate(Script);
     //  qDebug() << "Just finished!" << EvaluationResult.toString();
     fEngineIsRunning = false;
+
+    timerEvalTookMs = timer->elapsed();
+    delete timer; timer = 0;
 
     QString result = EvaluationResult.toString();
     emit onFinished(result);
@@ -439,4 +450,10 @@ AScriptManager *AScriptManager::createNewScriptManager()
 void AScriptManager::abortEvaluation()
 {
     engine->abortEvaluation();
+}
+
+qint64 AScriptManager::getElapsedTime()
+{
+    if (timer) return timer->elapsed();
+    return timerEvalTookMs;
 }

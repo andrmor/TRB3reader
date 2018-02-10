@@ -83,6 +83,11 @@ void AInterfaceToCore::sleep(int ms)
   while (t.elapsed()<ms);
 }
 
+int AInterfaceToCore::elapsedTimeInMs()
+{
+    return ScriptManager->getElapsedTime();
+}
+
 void AInterfaceToCore::print(const QString text)
 {
     //  qDebug() << text << "on ScriptManager:"<<ScriptManager;
