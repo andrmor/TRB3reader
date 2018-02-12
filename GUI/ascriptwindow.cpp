@@ -450,9 +450,9 @@ bool AScriptWindow::ExecuteScript(const QString& Script)
    ui->pbStop->setVisible(false);
    ui->pbRunScript->setVisible(true);
 
-   if (!ScriptManager->LastError.isEmpty())
+   if (!ScriptManager->getLastError().isEmpty())
    {
-       AScriptWindow::ReportError("Script error: "+ScriptManager->LastError, -1);
+       AScriptWindow::ReportError("Script error: "+ScriptManager->getLastError(), -1);
    }
    else if (ScriptManager->isUncaughtException())
    {   //Script has uncaught exception
@@ -466,7 +466,7 @@ bool AScriptWindow::ExecuteScript(const QString& Script)
    else
    {   //success
        //qDebug() << "Script returned:" << result;
-       if (!ScriptManager->fAborted)
+       if (!ScriptManager->isEvalAborted())
          {
             //if (ShowEvalResult && result!="undefined") ShowText("Result:\n"+result);
             //else ShowText("Script evaluation: success");
@@ -535,7 +535,7 @@ void AScriptWindow::onF1pressed(QString text)
 
 void AScriptWindow::on_pbStop_clicked()
 {
-  if (ScriptManager->fEngineIsRunning)
+  if (ScriptManager->isEngineRunning())
     {
       qDebug() << "Stop button pressed!";
       ShowText("Sending stop signal...");

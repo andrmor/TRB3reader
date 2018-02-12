@@ -135,30 +135,36 @@ QVariant AInterfaceToMultiThread::getResult(int IndexOfWorker)
   return workers.at(IndexOfWorker)->getResult();
 }
 
-bool AInterfaceToMultiThread::deleteAll()
+void AInterfaceToMultiThread::deleteAll()
 {
     for (AScriptThreadBase* w : workers)
       if (w->isRunning())
       {
-          qDebug() << "Cannot delete all - not all threads finished";
-          return false;
+          abort("Cannot delete all - not all threads finished");
+          return;
       }
 
     for (AScriptThreadBase* w : workers) w->deleteLater();
     workers.clear();
-
-    return true;
 }
 
-const QString AInterfaceToMultiThread::deleteOne(int IndexOfWorker)
+bool AInterfaceToMultiThread::deleteOne(int IndexOfWorker)
 {
-   if (IndexOfWorker < 0 || IndexOfWorker >= workers.size()) return QString("Wrong worker index");
-   if (workers.at(IndexOfWorker)->isRunning()) return QString("Still running");
+   if (IndexOfWorker < 0 || IndexOfWorker >= workers.size())
+   {
+      qDebug() << "Wrong worker index";
+      return false;
+   }
+   if (workers.at(IndexOfWorker)->isRunning())
+   {
+       qDebug() << "Still running - cannot delete";
+       return false;
+   }
 
    delete workers[IndexOfWorker];
    workers.removeAt(IndexOfWorker);
 
-   return "";
+   return true;
 }
 
 AScriptThreadBase::AScriptThreadBase(AScriptManager *ScriptManager) : ScriptManager(ScriptManager) {}
@@ -207,14 +213,22 @@ AScriptThreadFun::AScriptThreadFun(AScriptManager *ScriptManager, const QString 
 void AScriptThreadFun::Run()
 {
     bRunning = true;
-    QScriptValue global = ScriptManager->engine->globalObject();
-    QScriptValue func = global.property(Function);
-    if (!func.isValid())         Result = "Cannot evaluate: Function " + Function + " not found";
-    else if (!func.isFunction()) Result = "Cannot evaluate: " + Function + " is not a function";
+    //QScriptValue global = ScriptManager->engine->globalObject();
+    //QScriptValue func = global.property(Function);
+    QScriptValue func = ScriptManager->getProperty(Function);
+    if (!func.isValid())
+    {
+        Result = "Cannot evaluate: Function " + Function + " not found";
+        emit errorFound(this);
+    }
+    else if (!func.isFunction())
+    {
+        Result = "Cannot evaluate: " + Function + " is not a function";
+        emit errorFound(this);
+    }
     else
     {
-        qDebug() << Arguments;
-
+        //  qDebug() << Arguments;
         QVariantList ArgsVL;
         QString typeArr = Arguments.typeName();
         if (typeArr == "QVariantList") ArgsVL = Arguments.toList();
@@ -222,11 +236,7 @@ void AScriptThreadFun::Run()
 
         QScriptValueList args;
         for (const QVariant& v : ArgsVL)
-        {
-            //to do ***!!! check for objects and array of arrays
-
-            args << ScriptManager->engine->newVariant(v);
-        }
+            args << ScriptManager->registerNewVariant(v);
 
         QScriptValue res = func.call(QScriptValue(), args);
 

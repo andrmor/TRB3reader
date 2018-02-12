@@ -42,8 +42,8 @@ public slots:
 
     QVariant      getResult(int IndexOfWorker);
 
-    bool          deleteAll();
-    const QString deleteOne(int IndexOfWorker);
+    void          deleteAll();
+    bool          deleteOne(int IndexOfWorker);
 
 private:
     AScriptManager *MasterScriptManager;

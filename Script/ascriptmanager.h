@@ -20,7 +20,7 @@ public:
     ~AScriptManager();    
 
     //configuration
-    void            SetInterfaceObject(QObject* interfaceObject, QString name = "");
+    void            SetInterfaceObject(QObject* interfaceObject, QString name = ""); // empty name -> first (master) object
 
     //run
     int             FindSyntaxError(const QString& script); //returns line number of the first syntax error; -1 if no errors found
@@ -33,14 +33,14 @@ public:
     QJsonObject*    CreateJsonOfConfig(); // does not own the created object!
     const QString   getFunctionReturnType(const QString UnitFunction);
     void            CollectGarbage();
-    void            deleteMsgDialog();         //needed in batch mode to force close MSG window if shown
+    void            deleteMsgDialog();         //used in batch mode to force-close MSG window if shown
     void            hideMsgDialog();
     void            restoreMsgDialog();
 
-    QString         LastError;
+    const QString   getLastError() const {return LastError;}
 
-    bool            fEngineIsRunning;
-    bool            fAborted;
+    bool            isEngineRunning() const {return fEngineIsRunning;}
+    bool            isEvalAborted() const {return fAborted;}
 
     //starter dirs
     QString         LibScripts, LastOpenDir, ExamplesDir;
@@ -52,21 +52,24 @@ public:
 
     //for multithread-in-scripting
     AScriptManager* createNewScriptManager();
-    void            abortEvaluation();
+    void            abortEvaluation();    
+    QScriptValue    getProperty(const QString& properyName) const;
+    QScriptValue    registerNewVariant(const QVariant &Variant);
+
     QScriptValue    EvaluationResult;
 
     qint64          getElapsedTime();
 
-//private:
-    QScriptEngine*  engine;
-
 private:
+    QScriptEngine*  engine;
 
     //registered objects
     QVector<QObject*> interfaces;
-    QVector<QString>  interfaceNames;
-
     AInterfaceToCore* coreObj;  //core interface - to forward evaluate-script-in-script
+
+    bool              fEngineIsRunning;
+    bool              fAborted;
+    QString           LastError;
 
     QElapsedTimer*    timer;
     qint64            timeOfStart;

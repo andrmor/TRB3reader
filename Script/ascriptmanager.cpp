@@ -51,7 +51,7 @@ QString AScriptManager::Evaluate(const QString& Script)
             {
               if (!bi->InitOnRun())
                 {
-                  LastError = "Init failed for unit: "+interfaceNames.at(i);
+                  LastError = "Init failed for unit: "+interfaces.at(i)->objectName();
                   emit onFinished(LastError);
                   return LastError;
                 }
@@ -157,14 +157,12 @@ void AScriptManager::SetInterfaceObject(QObject *interfaceObject, QString name)
         engine->globalObject().setProperty(coreName, coreVal);
         interfaces.append(coreObj);  //CORE OBJECT IS FIRST in interfaces!
         coreObj->setObjectName(coreName);
-        interfaceNames.append(coreName);
         //registering math module
         QObject* mathObj = new AInterfaceToMath();
         QScriptValue mathVal = engine->newQObject(mathObj, QScriptEngine::QtOwnership);
         QString mathName = "math";
         engine->globalObject().setProperty(mathName, mathVal);
         interfaces.append(mathObj);
-        interfaceNames.append(mathName);
         mathObj->setObjectName(mathName);
       }
     else
@@ -175,7 +173,6 @@ void AScriptManager::SetInterfaceObject(QObject *interfaceObject, QString name)
     if (interfaceObject)
       {
         interfaces.append(interfaceObject);
-        interfaceNames.append(name);
         interfaceObject->setObjectName(name);
 
         //connecting abort request from main interface to serviceObj
@@ -247,7 +244,14 @@ const QString AScriptManager::getFunctionReturnType(const QString UnitFunction)
   if (f.size() != 2) return "";
 
   QString unit = f.first();
-  int unitIndex = interfaceNames.indexOf(unit);
+  //int unitIndex = interfaceNames.indexOf(unit);
+  int unitIndex = -1;
+  for (int i=0; i<interfaces.size(); i++)
+      if (interfaces.at(i)->objectName() == unit)
+      {
+          unitIndex = i;
+          break;
+      }
   if (unitIndex == -1) return "";
   //qDebug() << "Found unit"<<unit<<" with index"<<unitIndex;
   QString met = f.last();
@@ -450,6 +454,17 @@ AScriptManager *AScriptManager::createNewScriptManager()
 void AScriptManager::abortEvaluation()
 {
     engine->abortEvaluation();
+}
+
+QScriptValue AScriptManager::getProperty(const QString &properyName) const
+{
+    QScriptValue global = engine->globalObject();
+    return global.property(properyName);
+}
+
+QScriptValue AScriptManager::registerNewVariant(const QVariant& Variant)
+{
+    return engine->toScriptValue(Variant);
 }
 
 qint64 AScriptManager::getElapsedTime()
