@@ -14,7 +14,6 @@ class AInterfaceToData : public AScriptInterface
 
 public:
     AInterfaceToData(ADataHub* DataHub);
-    AInterfaceToData(const AInterfaceToData& other);
 
     bool     IsMultithreadCapable() const {return true;}
 

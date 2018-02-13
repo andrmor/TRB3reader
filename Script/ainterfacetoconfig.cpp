@@ -9,7 +9,10 @@
 #include <QJsonValue>
 
 AInterfaceToConfig::AInterfaceToConfig(MasterConfig *Config, ADispatcher *Dispatcher) :
-  Config(Config), Dispatcher(Dispatcher) {}
+  Config(Config), Dispatcher(Dispatcher)
+{
+    Description = "Gives access to all configuration settings.";
+}
 
 QJsonObject* AInterfaceToConfig::MakeConfigJson() const
 {

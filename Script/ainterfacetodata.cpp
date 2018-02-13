@@ -9,11 +9,9 @@
 const double NaN = std::numeric_limits<double>::quiet_NaN();
 
 AInterfaceToData::AInterfaceToData(ADataHub* DataHub) :
-    DataHub(DataHub) {}
-
-AInterfaceToData::AInterfaceToData(const AInterfaceToData &other) : AScriptInterface(other)
+    DataHub(DataHub)
 {
-    DataHub = other.DataHub;
+    Description = "Gives access to DataHub.";
 }
 
 int AInterfaceToData::countEvents() const

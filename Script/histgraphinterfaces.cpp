@@ -21,6 +21,8 @@
 AInterfaceToHist::AInterfaceToHist(TmpObjHubClass* TmpHub)
   : TmpHub(TmpHub)
 {
+    Description = "Module gives access to CERN ROOT histograms.";
+
     H["Draw"] = "Draw the histogram. The second arguments defines how it will be drawn.\nFor available options see:\n"
                 "https://root.cern.ch/doc/master/classTHistPainter.html";
     H["FitGauss"] = "Fit histogram with a Gaussian. The returned result (is successful) contains an array [Constant,Mean,Sigma,ErrConstant,ErrMean,ErrSigma]"
@@ -601,6 +603,8 @@ void AInterfaceToHist::Save(QString HistName, QString FileName)
 AInterfaceToGraph::AInterfaceToGraph(TmpObjHubClass *TmpHub)
   : TmpHub(TmpHub)
 {
+  Description = "Module gives access to CERN ROOT graphs.";
+
   H["NewGraph"] = "Creates a new graph (Root TGraph object)";
   H["SetMarkerProperties"] = "Default marker properties are 1, 20, 1";
   H["SetLineProperties"] = "Default line properties are 1, 1, 2";

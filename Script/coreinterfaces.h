@@ -30,7 +30,7 @@ public slots:
   QVariant      evaluate(const QString script);
 
   void          sleep(int ms);
-  int           elapsedTimeInMs();
+  int           elapsedTimeInMilliseconds();
 
   //output (lower) field of the script window
   void          print(const QString text);

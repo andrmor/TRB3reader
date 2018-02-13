@@ -155,7 +155,7 @@ void AScriptManager::SetInterfaceObject(QObject *interfaceObject, QString name)
         QScriptValue coreVal = engine->newQObject(coreObj, QScriptEngine::QtOwnership);
         QString coreName = "core";
         engine->globalObject().setProperty(coreName, coreVal);
-        interfaces.append(coreObj);  //CORE OBJECT IS FIRST in interfaces!
+        interfaces.append(coreObj);
         coreObj->setObjectName(coreName);
         //registering math module
         QObject* mathObj = new AInterfaceToMath();
@@ -408,7 +408,7 @@ AScriptManager *AScriptManager::createNewScriptManager()
         QObject* copy = AScriptInterfaceFactory::makeCopy(io);
         if (copy)
         {
-            qDebug() << "Making avauilable for multi-thread use: "<<io->objectName();
+            //  qDebug() << "Making avauilable for multi-thread use: "<<io->objectName();
             sm->SetInterfaceObject(copy, io->objectName());
 
             //special for core unit
@@ -417,6 +417,12 @@ AScriptManager *AScriptManager::createNewScriptManager()
             {
                 //qDebug() << "--this is core";
                 core->SetScriptManager(sm);
+            }
+            else
+            {
+                AScriptInterface* base = dynamic_cast<AScriptInterface*>(copy);
+                if (base)
+                    connect(base, &AScriptInterface::AbortScriptEvaluation, coreObj, &AInterfaceToCore::abort);
             }
         }
         else

@@ -11,6 +11,8 @@ static int msgH = 500, msgW = 300, msgX=50, msgY=50;
 
 AInterfaceToMessageWindow::AInterfaceToMessageWindow(QWidget* parent) : D(0), Parent(parent)
 {
+  Description = "Allows to print formatted text on a special text window.";
+
   bEnabled = true;
   bActivated = false;
   init(false);

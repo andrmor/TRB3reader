@@ -17,7 +17,8 @@ public:
   virtual void ForceStop() {}                                 // called when abort was triggered by any other module
 
   virtual bool IsMultithreadCapable() const {return false;}   // should be accessible in multithread script mode?
-  const QString getDescription() const {return Description;}  // description text for the unit in GUI
+  const QString getDescription() const
+    {return Description + (IsMultithreadCapable()?"\nMultithread-capable":"");}  // description text for the unit in GUI
 
 public slots:
   const QString help(QString method) const                    //automatically requested to obtain help strings

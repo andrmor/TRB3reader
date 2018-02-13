@@ -10,7 +10,10 @@
 #include <limits>
 
 AInterfaceToWaveforms::AInterfaceToWaveforms(MasterConfig* Config, Trb3dataReader* Reader) :
-    Config(Config), Reader(Reader) {}
+    Config(Config), Reader(Reader)
+{
+    Description = "Low-level unit giving access to waveforms read from an hld file.";
+}
 
 int AInterfaceToWaveforms::countSamples() const
 {

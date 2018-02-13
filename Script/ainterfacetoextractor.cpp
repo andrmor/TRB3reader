@@ -7,7 +7,10 @@
 #include <QJsonArray>
 
 AInterfaceToExtractor::AInterfaceToExtractor(MasterConfig* Config, Trb3signalExtractor* Extractor) :
-    Config(Config), Extractor(Extractor) {}
+    Config(Config), Extractor(Extractor)
+{
+    Description = "Low-elevel unit for signal extraction. Takes waveworm data from \"wav\" unit.";
+}
 
 int AInterfaceToExtractor::countEvents() const
 {

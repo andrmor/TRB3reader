@@ -239,16 +239,20 @@ void AScriptWindow::SetInterfaceObject(QObject *interfaceObject, QString name)
         trwHelp->clear();
         //fillHelper(interfaceObject, "", "Global object functions"); //forbidden to override master object now.
         AInterfaceToCore core; //dummy to extract methods
-        fillHelper(&core, "core", "Core object functions");
+        fillHelper(&core, "core", core.getDescription());
         newFunctions << getCustomCommandsOfObject(&core, "core", false);
         AInterfaceToMath math; //dummy to extract methods
-        fillHelper(&math, "math", "Basic mathematics: wrapper for std double functions");
+        fillHelper(&math, "math", math.getDescription());
         newFunctions << getCustomCommandsOfObject(&math, "math", false);
         trwHelp->expandItem(trwHelp->itemAt(0,0));
     }
     else
     {
-        fillHelper(interfaceObject, name, "");
+        QString tip;
+        AScriptInterface* si = dynamic_cast<AScriptInterface*>(interfaceObject);
+        if (si) tip = si->getDescription();
+
+        fillHelper(interfaceObject, name, tip);
         newFunctions << getCustomCommandsOfObject(interfaceObject, name, false);
     }
 

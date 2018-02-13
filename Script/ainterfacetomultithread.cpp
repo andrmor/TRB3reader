@@ -7,7 +7,13 @@
 #include <QScriptEngine>
 
 AInterfaceToMultiThread::AInterfaceToMultiThread(AScriptManager *ScriptManager) :
-  MasterScriptManager(ScriptManager) {}
+  MasterScriptManager(ScriptManager)
+{
+    Description = "Allows to evaluate script or function in a new thread.\n"
+                  "Copies all variables defined in the main script (but does not return back changes).\n"
+                  "Only those script units are supported which have \"Multithread-capable\" text in the unit description.\n"
+                  "Script or function can return any type of data, inclusing multi-level arrays and objects.";
+}
 
 void AInterfaceToMultiThread::ForceStop()
 {
@@ -197,6 +203,7 @@ void AScriptThreadScr::Run()
     QScriptValue res = ScriptManager->EvaluationResult;
     if (res.isError())
     {
+        qDebug() << "EEEEEEEEEEEROR";
         Result = res.toString();
         emit errorFound(this);
     }

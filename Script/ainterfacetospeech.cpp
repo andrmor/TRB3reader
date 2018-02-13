@@ -6,6 +6,8 @@
 
 AInterfaceToSpeech::AInterfaceToSpeech() : m_speech(0)
 {
+    Description = "Interface to native text-to-speech engine.";
+
     if (QTextToSpeech::availableEngines().isEmpty())
     {
         qDebug() << "Speech unit: there are no speech engines available!";
@@ -15,9 +17,6 @@ AInterfaceToSpeech::AInterfaceToSpeech() : m_speech(0)
         SelectEngine(0);
     }
 }
-
-AInterfaceToSpeech::AInterfaceToSpeech(const AInterfaceToSpeech& other) : AScriptInterface(other),
-    m_speech(other.m_speech) {}
 
 void AInterfaceToSpeech::Say(QString text)
 {
