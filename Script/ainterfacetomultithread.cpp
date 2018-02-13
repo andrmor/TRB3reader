@@ -187,7 +187,7 @@ const QVariant AScriptThreadBase::resultToQVariant(const QScriptValue &result) c
 }
 
 AScriptThreadScr::AScriptThreadScr(AScriptManager *ScriptManager, const QString &Script) :
-    AScriptThreadBase(ScriptManager), Script(Script) {}
+    AScriptThreadBase(ScriptManager), Script(Script) {bRunning = true;}
 
 void AScriptThreadScr::Run()
 {
@@ -208,7 +208,7 @@ void AScriptThreadScr::Run()
 }
 
 AScriptThreadFun::AScriptThreadFun(AScriptManager *ScriptManager, const QString &Function, const QVariant &Arguments) :
-    AScriptThreadBase(ScriptManager), Function(Function), Arguments(Arguments) {}
+    AScriptThreadBase(ScriptManager), Function(Function), Arguments(Arguments) {bRunning = true;}
 
 void AScriptThreadFun::Run()
 {

@@ -14,8 +14,9 @@ class AInterfaceToData : public AScriptInterface
 
 public:
     AInterfaceToData(ADataHub* DataHub);
+    AInterfaceToData(const AInterfaceToData& other);
 
-    bool IsMultithreadCapable() const {return true;}
+    bool     IsMultithreadCapable() const {return true;}
 
 public slots:
 
@@ -77,6 +78,8 @@ public slots:
 
 private:
     ADataHub* DataHub;
+
+    bool      jsonArrToVector(const QJsonArray &jar, QVector<float> &vec) const;
 };
 
 #endif // AINTERFACETODATA_H

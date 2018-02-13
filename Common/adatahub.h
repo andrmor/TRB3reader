@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QVector>
+#include <QMutex>
 
 class MasterConfig;
 
@@ -80,6 +81,7 @@ public:
 
     // General handling
     void             Clear();
+    void             AddEvent(AOneEvent* Event);
     void             AddEventFast(AOneEvent* Event) {Events << Event;}
     void             RemoveEvent(int ievent);
     void             RemoveEventFast(int ievent) {Events.removeAt(ievent);}
@@ -155,6 +157,8 @@ public:
 private:
     const MasterConfig& Config;
     QVector < AOneEvent* > Events;
+
+    QMutex           Mutex;
 
 signals:
     void             requestGuiUpdate();

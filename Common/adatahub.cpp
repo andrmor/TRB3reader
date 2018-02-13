@@ -154,6 +154,13 @@ void ADataHub::Clear()
     Events.clear();
 }
 
+void ADataHub::AddEvent(AOneEvent *Event)
+{
+    Mutex.lock();
+        Events << Event;
+    Mutex.unlock();
+}
+
 int ADataHub::CountChannels()
 {
     if (Events.isEmpty()) return 0;

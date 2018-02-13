@@ -5,10 +5,16 @@
 #include <QJsonArray>
 
 #include <limits>
+
 const double NaN = std::numeric_limits<double>::quiet_NaN();
 
 AInterfaceToData::AInterfaceToData(ADataHub* DataHub) :
     DataHub(DataHub) {}
+
+AInterfaceToData::AInterfaceToData(const AInterfaceToData &other) : AScriptInterface(other)
+{
+    DataHub = other.DataHub;
+}
 
 int AInterfaceToData::countEvents() const
 {
@@ -45,8 +51,16 @@ void AInterfaceToData::addEvent(const QVariant signalArray)
 
     AOneEvent* ev = new AOneEvent();
     ev->SetRejectedFlag(false);
-    DataHub->AddEventFast(ev);
-    setSignals(DataHub->CountEvents()-1, signalArray); // size is checked there, abort if wrong
+
+    QVector<float> vec;
+    if ( !jsonArrToVector(ar, vec) )
+    {
+        abort("Failed to set signal values - array contains non-numerical data");
+        return;
+    }
+    ev->SetSignals(&vec);
+
+    DataHub->AddEvent(ev);
 }
 
 float AInterfaceToData::getSignal(int ievent, int iLogicalChannel) const
@@ -111,22 +125,27 @@ void AInterfaceToData::setSignals(int ievent, const QVariant arrayOfValues)
         }
 
     QVector<float> vec;
-    vec.reserve(ar.size());
-    for (int i=0; i<ar.size(); ++i)
+    if ( !jsonArrToVector(ar, vec) )
     {
-        if (!ar[i].isDouble())
-        {
-            abort("Failed to set signal values - array contains non-numerical data");
-            return;
-        }
-        vec << ar[i].toDouble();
+        abort("Failed to set signal values - array contains non-numerical data");
+        return;
     }
 
-    bool bOK = DataHub->SetSignals(ievent, &vec);
-    if (!bOK)
+    if ( !DataHub->SetSignals(ievent, &vec) )
     {
         abort("Failed to set signal values - wrong event number");
     }
+}
+
+bool AInterfaceToData::jsonArrToVector(const QJsonArray& jar,  QVector<float>& vec) const
+{
+    vec.resize(jar.size());
+    for (int i=0; i<jar.size(); ++i)
+    {
+        if (!jar[i].isDouble()) return false;
+        vec[i] = jar[i].toDouble();
+    }
+    return true;
 }
 
 void AInterfaceToData::setSignalsFast(int ievent, const QVariant arrayOfValues)
