@@ -83,7 +83,7 @@ void AInterfaceToCore::sleep(int ms)
   while (t.elapsed()<ms);
 }
 
-int AInterfaceToCore::elapsedTimeInMs()
+int AInterfaceToCore::elapsedTimeInMilliseconds()
 {
     return ScriptManager->getElapsedTime();
 }

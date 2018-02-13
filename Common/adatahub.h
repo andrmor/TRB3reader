@@ -149,7 +149,7 @@ public:
     void             SetSumSignalNegativeFast(int ievent, const float* sums);
 
     //save / load
-    const QString    Save(const QString &FileName, bool bSavePositions, bool bSkipRejected) const;
+    const QString    Save(const QString &FileName, bool bSavePositions, bool bSkipRejected);
     const QString    Load(const QString &AppendFromFileName, bool bLoadPositionXYZ);
 
     const MasterConfig& getConfig() {return Config;}

@@ -11,6 +11,7 @@ const float NaN = std::numeric_limits<float>::quiet_NaN();
 
 void ADataHub::RemoveEvent(int ievent)
 {
+    QMutexLocker ml(&Mutex);
     if (ievent<0 || ievent>=Events.size()) return;
     Events.removeAt(ievent);
 }
@@ -146,6 +147,7 @@ ADataHub::~ADataHub()
 
 void ADataHub::Clear()
 {
+    QMutexLocker ml(&Mutex);
     for (AOneEvent* event : Events)
     {
         event->ClearWaveforms();
@@ -156,13 +158,13 @@ void ADataHub::Clear()
 
 void ADataHub::AddEvent(AOneEvent *Event)
 {
-    Mutex.lock();
-        Events << Event;
-    Mutex.unlock();
+    QMutexLocker ml(&Mutex);
+    Events << Event;
 }
 
 int ADataHub::CountChannels()
 {
+    QMutexLocker ml(&Mutex);
     if (Events.isEmpty()) return 0;
     return Events.first()->CountChannels();
 }
@@ -422,8 +424,9 @@ void ADataHub::SetSumSignalNegativeFast(int ievent, const float *sums)
     Events[ievent]->SetSumSigNegative(sums);
 }
 
-const QString ADataHub::Save(const QString& FileName, bool bSavePositions, bool bSkipRejected) const
+const QString ADataHub::Save(const QString& FileName, bool bSavePositions, bool bSkipRejected)
 {
+    QMutexLocker ml(&Mutex);
     if ( Events.isEmpty())   return "There are no events in the DataHub!";
     if ( FileName.isEmpty()) return "File name is empty!";
 
@@ -450,6 +453,7 @@ const QString ADataHub::Save(const QString& FileName, bool bSavePositions, bool 
 
 const QString ADataHub::Load(const QString &AppendFromFileName, bool bLoadPositionXYZ)
 {
+    QMutexLocker ml(&Mutex);
     QFile inFile( AppendFromFileName );
     inFile.open(QIODevice::ReadOnly);
     if(!inFile.isOpen()) return "Unable to open file " +AppendFromFileName+ " for reading!";
