@@ -158,7 +158,7 @@ private:
     const MasterConfig& Config;
     QVector < AOneEvent* > Events;
 
-    QMutex           Mutex;
+    mutable QMutex   Mutex;
 
 signals:
     void             requestGuiUpdate();

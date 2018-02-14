@@ -18,12 +18,14 @@ void ADataHub::RemoveEvent(int ievent)
 
 const AOneEvent *ADataHub::GetEvent(int ievent) const
 {
+    QMutexLocker ml(&Mutex);
     if (ievent<0 || ievent>=Events.size()) return 0;
     return Events.at(ievent);
 }
 
 AOneEvent *ADataHub::GetEvent(int ievent)
 {
+    QMutexLocker ml(&Mutex);
     if (ievent<0 || ievent>=Events.size()) return 0;
     return Events[ievent];
 }
@@ -166,14 +168,14 @@ int ADataHub::CountChannels()
 {
     QMutexLocker ml(&Mutex);
     if (Events.isEmpty()) return 0;
-    return Events.first()->CountChannels();
+    return Events.at(0)->CountChannels();
 }
 
 float ADataHub::GetSignal(int ievent, int ichannel)
 {
-    const AOneEvent* event = GetEvent(ievent);
-    if (!event) return NaN;
-
+    QMutexLocker ml(&Mutex);
+    if (ievent<0 || ievent>=Events.size()) return NaN;
+    const AOneEvent* event = Events.at(ievent);
     return event->GetSignal(ichannel);
 }
 
@@ -184,6 +186,7 @@ float ADataHub::GetSignalFast(int ievent, int ichannel)
 
 const QVector<float> *ADataHub::GetSignals(int ievent) const
 {
+    QMutexLocker ml(&Mutex);
     if (ievent<0 || ievent>=Events.size()) return 0;
     return Events.at(ievent)->GetSignals();
 }
@@ -195,6 +198,7 @@ const QVector<float> *ADataHub::GetSignalsFast(int ievent) const
 
 bool ADataHub::SetSignal(int ievent, int iLogicalChannel, float value)
 {
+    QMutexLocker ml(&Mutex);
     if (ievent<0 || ievent>=Events.size()) return false;
     return Events[ievent]->SetSignal(iLogicalChannel, value);
 }
@@ -206,6 +210,7 @@ void ADataHub::SetSignalFast(int ievent, int iLogicalChannel, float value)
 
 bool ADataHub::SetSignals(int ievent, const QVector<float> *vector)
 {
+    QMutexLocker ml(&Mutex);
     if (ievent<0 || ievent>=Events.size()) return false;
     Events[ievent]->SetSignals(vector);
     return true;
@@ -218,6 +223,7 @@ void ADataHub::SetSignalsFast(int ievent, const QVector<float> *vector)
 
 bool ADataHub::IsRejected(int ievent) const
 {
+    QMutexLocker ml(&Mutex);
     if (ievent<0 || ievent>=Events.size()) return true;
     return Events.at(ievent)->IsRejected();
 }
@@ -229,6 +235,7 @@ bool ADataHub::IsRejectedFast(int ievent) const
 
 bool ADataHub::SetRejectedFlag(int ievent, bool flag)
 {
+    QMutexLocker ml(&Mutex);
     if (ievent<0 || ievent>=Events.size()) return false;
     Events[ievent]->SetRejectedFlag(flag);
     return true;
@@ -241,11 +248,13 @@ void ADataHub::SetRejectedFlagFast(int ievent, bool flag)
 
 void ADataHub::SetAllRejectedFlag(bool flag)
 {
+    QMutexLocker ml(&Mutex);
     for (AOneEvent* event : Events) event->SetRejectedFlag(flag);
 }
 
 const float *ADataHub::GetPosition(int ievent) const
 {
+    QMutexLocker ml(&Mutex);
     if (ievent<0 || ievent>=Events.size()) return 0;
     return Events.at(ievent)->GetPosition();
 }
@@ -257,6 +266,7 @@ const float *ADataHub::GetPositionFast(int ievent) const
 
 bool ADataHub::SetPosition(int ievent, const float *XYZ)
 {
+    QMutexLocker ml(&Mutex);
     if (ievent<0 || ievent>=Events.size()) return false;
     Events[ievent]->SetPosition(XYZ);
     return true;
@@ -264,6 +274,7 @@ bool ADataHub::SetPosition(int ievent, const float *XYZ)
 
 bool ADataHub::SetPosition(int ievent, float x, float y, float z)
 {
+    QMutexLocker ml(&Mutex);
     if (ievent<0 || ievent>=Events.size()) return false;
     Events[ievent]->SetPosition(x, y, z);
     return true;
@@ -281,12 +292,14 @@ void ADataHub::SetPositionFast(int ievent, float x, float y, float z)
 
 const QVector<QVector<float> *>* ADataHub::GetWaveforms(int ievent) const
 {
+    QMutexLocker ml(&Mutex);
     if (ievent<0 || ievent>=Events.size()) return 0;
     return Events.at(ievent)->GetWaveforms();
 }
 
 const QVector<float>* ADataHub::GetWaveform(int ievent, int ichannel) const
 {
+    QMutexLocker ml(&Mutex);
     if (ievent<0 || ievent>=Events.size()) return 0;
     return Events.at(ievent)->GetWaveform(ichannel);
 }
@@ -298,42 +311,49 @@ const QVector<float> *ADataHub::GetWaveformFast(int ievent, int ichannel) const
 
 float ADataHub::GetWaveformMax(int ievent, int ichannel) const
 {
+    QMutexLocker ml(&Mutex);
     if (ievent<0 || ievent>=Events.size()) return NaN;
     return Events.at(ievent)->GetWaveformMax(ichannel);
 }
 
 float ADataHub::GetWaveformMin(int ievent, int ichannel) const
 {
+    QMutexLocker ml(&Mutex);
     if (ievent<0 || ievent>=Events.size()) return NaN;
     return Events.at(ievent)->GetWaveformMin(ichannel);
 }
 
 int ADataHub::GetWaveformMaxSample(int ievent, int ichannel) const
 {
+    QMutexLocker ml(&Mutex);
     if (ievent<0 || ievent>=Events.size()) return -1;
     return Events.at(ievent)->GetWaveformMaxSample(ichannel);
 }
 
 int ADataHub::GetWaveformMinSample(int ievent, int ichannel) const
 {
+    QMutexLocker ml(&Mutex);
     if (ievent<0 || ievent>=Events.size()) return -1;
     return Events.at(ievent)->GetWaveformMinSample(ichannel);
 }
 
 int ADataHub::GetWaveformSampleWhereFirstBelow(int ievent, int ichannel, float threshold) const
 {
+    QMutexLocker ml(&Mutex);
     if (ievent<0 || ievent>=Events.size()) return -1;
     return Events.at(ievent)->GetWaveformSampleWhereFirstBelow(ichannel, threshold);
 }
 
 int ADataHub::GetWaveformSampleWhereFirstAbove(int ievent, int ichannel, float threshold) const
 {
+    QMutexLocker ml(&Mutex);
     if (ievent<0 || ievent>=Events.size()) return -1;
     return Events.at(ievent)->GetWaveformSampleWhereFirstAbove(ichannel, threshold);
 }
 
 const int *ADataHub::GetMultiplicityPositive(int ievent) const
 {
+    QMutexLocker ml(&Mutex);
     if (ievent<0 || ievent>=Events.size()) return 0;
     return Events.at(ievent)->GetMultiplicitiesPositive();
 }
@@ -345,6 +365,7 @@ const int *ADataHub::GetMultiplicityPositiveFast(int ievent) const
 
 const int *ADataHub::GetMultiplicityNegative(int ievent) const
 {
+    QMutexLocker ml(&Mutex);
     if (ievent<0 || ievent>=Events.size()) return 0;
     return Events.at(ievent)->GetMultiplicitiesNegative();
 }
@@ -356,6 +377,7 @@ const int *ADataHub::GetMultiplicityNegativeFast(int ievent) const
 
 bool ADataHub::SetMultiplicityPositive(int ievent, const int *multi)
 {
+    QMutexLocker ml(&Mutex);
     if (ievent<0 || ievent>=Events.size()) return false;
     Events[ievent]->SetMultiplicitiesPositive(multi);
     return true;
@@ -368,6 +390,7 @@ void ADataHub::SetMultiplicityPositiveFast(int ievent, const int *multi)
 
 bool ADataHub::SetMultiplicityNegative(int ievent, const int *multi)
 {
+    QMutexLocker ml(&Mutex);
     if (ievent<0 || ievent>=Events.size()) return false;
     Events[ievent]->SetMultiplicitiesNegative(multi);
     return true;
@@ -380,6 +403,7 @@ void ADataHub::SetMultiplicityNegativeFast(int ievent, const int *multi)
 
 const float *ADataHub::GetSumSignalPositive(int ievent) const
 {
+    QMutexLocker ml(&Mutex);
     if (ievent<0 || ievent>=Events.size()) return 0;
     return Events.at(ievent)->GetSumSigPositive();
 }
@@ -391,6 +415,7 @@ const float *ADataHub::GetSumSignalPositiveFast(int ievent) const
 
 const float *ADataHub::GetSumSignalNegative(int ievent) const
 {
+    QMutexLocker ml(&Mutex);
     if (ievent<0 || ievent>=Events.size()) return 0;
     return Events.at(ievent)->GetSumSigNegative();
 }
@@ -402,6 +427,7 @@ const float *ADataHub::GetSumSignalNegativeFast(int ievent) const
 
 bool ADataHub::SetSumSignalPositive(int ievent, const float *sums)
 {
+    QMutexLocker ml(&Mutex);
     if (ievent<0 || ievent>=Events.size()) return false;
     Events[ievent]->SetSumSigPositive(sums);
     return true;
@@ -414,6 +440,7 @@ void ADataHub::SetSumSignalPositiveFast(int ievent, const float *sums)
 
 bool ADataHub::SetSumSignalNegative(int ievent, const float *sums)
 {
+    QMutexLocker ml(&Mutex);
     if (ievent<0 || ievent>=Events.size()) return false;
     Events[ievent]->SetSumSigNegative(sums);
     return true;
