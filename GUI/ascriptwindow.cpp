@@ -38,8 +38,8 @@
 #include <QFontDialog>
 #include <QHeaderView>
 
-AScriptWindow::AScriptWindow(MasterConfig *Config, QWidget *parent) :
-    QMainWindow(parent), Config(Config),
+AScriptWindow::AScriptWindow(MasterConfig *Config, AScriptManager *ScriptManager, QWidget *parent) :
+    QMainWindow(parent), Config(Config), ScriptManager(ScriptManager),
     ui(new Ui::AScriptWindow)
 {
     if (parent)
@@ -50,7 +50,6 @@ AScriptWindow::AScriptWindow(MasterConfig *Config, QWidget *parent) :
         this->setWindowFlags( windowFlags );
     }
 
-    ScriptManager = new AScriptManager();
     QObject::connect(ScriptManager, &AScriptManager::showMessage, this, &AScriptWindow::ShowText);
     QObject::connect(ScriptManager, &AScriptManager::clearText, this, &AScriptWindow::ClearText);
     //retranslators:
@@ -222,7 +221,6 @@ AScriptWindow::~AScriptWindow()
   clearAllTabs();
   delete ui;
   delete RedIcon;
-  delete ScriptManager;
   //qDebug() << "Script manager deleted";
   delete completitionModel;
   //qDebug() << "Completition model deleted";

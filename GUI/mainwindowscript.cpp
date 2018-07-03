@@ -30,7 +30,7 @@
 void MainWindow::CreateScriptWindow()
 {
     //  qDebug() << "Creating script window...";
-    ScriptWindow = new AScriptWindow(Config, this);
+    ScriptWindow = new AScriptWindow(Config, Network.getScriptManager(), this);
 
     //  qDebug() << "Registering script units...";
 
@@ -73,8 +73,8 @@ void MainWindow::CreateScriptWindow()
     ScriptWindow->SetInterfaceObject(speech, "speech");
 #endif
 
-    AInterfaceToWebSocket* websoc = new AInterfaceToWebSocket();
-    ScriptWindow->SetInterfaceObject(websoc, "websoc");
+    AInterfaceToWebSocket* web = new AInterfaceToWebSocket();
+    ScriptWindow->SetInterfaceObject(web, "web");
 
     AWebServerInterface* server = new AWebServerInterface(*Network.WebSocketServer);
     ScriptWindow->SetInterfaceObject(server, "server");

@@ -13,11 +13,11 @@ class ANetworkModule : public QObject
 {
     Q_OBJECT
 public:
-    ANetworkModule();
+    ANetworkModule(AScriptManager* ScriptManager);
     ~ANetworkModule();
 
+    AScriptManager* getScriptManager() {return ScriptManager;}
     void SetDebug(bool flag) {fDebug = flag;}
-    void SetScriptManager(AScriptManager* man);
 
     bool isWebSocketServerRunning() const;
     int getWebSocketPort() const;
@@ -37,7 +37,7 @@ signals:
   void ReportTextToGUI(const QString text);
 
 private:
-  AScriptManager* ScriptManager = 0;
+  AScriptManager* ScriptManager;
   bool fDebug = true;
 
 };

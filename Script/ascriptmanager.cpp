@@ -40,7 +40,6 @@ QString AScriptManager::Evaluate(const QString& Script)
     LastError = "";
     fAborted = false;
     EvaluationResult = QScriptValue::UndefinedValue;
-
     emit onStart();
 
     //running InitOnRun method (if defined) for all defined interfaces
@@ -61,6 +60,7 @@ QString AScriptManager::Evaluate(const QString& Script)
     timer = new QElapsedTimer;
     timeOfStart = timer->restart();
 
+    //  qDebug() << "Starting evaluation...";
     fEngineIsRunning = true;
     EvaluationResult = engine->evaluate(Script);
     //  qDebug() << "Just finished!" << EvaluationResult.toString();

@@ -11,9 +11,12 @@
 #include "adispatcher.h"
 #include "ahldfileprocessor.h"
 #include "anetworkmodule.h"
+#include "ascriptmanager.h"
 
 int main(int argc, char *argv[])
 {
+    QApplication a(argc, argv);
+
     //SUPPRESS WARNINGS about ssl
     QLoggingCategory::setFilterRules("qt.network.ssl.warning=false");
 
@@ -22,11 +25,11 @@ int main(int argc, char *argv[])
     Trb3dataReader Reader(&Config);
     Trb3signalExtractor Extractor(&Config, &Reader);
     AHldFileProcessor HldFileProcessor(Config, Reader, Extractor, DataHub);
-    ANetworkModule Network;
+    AScriptManager ScriptManager;
+    ANetworkModule Network(&ScriptManager);
 
     ADispatcher Dispatcher(&Config, &Reader, &Extractor, &Network);
 
-    QApplication a(argc, argv);
     MainWindow MW(&Config, &Dispatcher, &DataHub, &Reader, &Extractor, HldFileProcessor, Network);
     MW.show();
 

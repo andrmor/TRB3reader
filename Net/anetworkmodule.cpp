@@ -6,7 +6,7 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 
-ANetworkModule::ANetworkModule()
+ANetworkModule::ANetworkModule(AScriptManager *ScriptManager) : ScriptManager(ScriptManager)
 {
     WebSocketServer = new AWebSocketSessionServer();
 
@@ -18,11 +18,6 @@ ANetworkModule::ANetworkModule()
 ANetworkModule::~ANetworkModule()
 {
     delete WebSocketServer;
-}
-
-void ANetworkModule::SetScriptManager(AScriptManager *man)
-{
-  ScriptManager = man;
 }
 
 bool ANetworkModule::isWebSocketServerRunning() const

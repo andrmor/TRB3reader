@@ -32,7 +32,7 @@ class AScriptWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit AScriptWindow(MasterConfig* Config, QWidget *parent = 0);
+    explicit AScriptWindow(MasterConfig* Config, AScriptManager* ScriptManager, QWidget *parent = 0);
     ~AScriptWindow();
 
     void SetInterfaceObject(QObject *interfaceObject, QString name = "");
@@ -102,8 +102,8 @@ private:
     Ui::AScriptWindow *ui;
     QStringListModel* completitionModel;
     MasterConfig* Config;
-
     AScriptManager* ScriptManager;
+
     QStringList functions;
 
     int CurrentTab;
