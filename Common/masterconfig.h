@@ -65,8 +65,11 @@ public:
 
     bool                bPedestalSubstraction = false;
     bool                bSmoothingBeforePedestals = false;
+    int                 PedestalExtractionMethod = 0;
     int                 PedestalFrom = 0;
     int                 PedestalTo = 0;
+    double              PedestalPeakSigma = 3;
+    double              PedestalPeakThreshold = 0.5;
 
     int                 SignalExtractionMethod = 0; //0 - independent max, 1 - common sample, at global max
     int                 CommonSampleNumber = 0;

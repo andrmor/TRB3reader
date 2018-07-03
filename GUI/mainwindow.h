@@ -162,6 +162,12 @@ private slots:
 
     void on_cbBulkAlsoCopyWaveforms_clicked();
 
+    void on_cobPedestalExtractionMethod_activated(int index);
+
+    void on_ledPedestalPeakSigma_editingFinished();
+
+    void on_ledPedestalPeakThreshold_editingFinished();
+
 protected:
     void closeEvent(QCloseEvent* event);
 

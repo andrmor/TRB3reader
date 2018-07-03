@@ -199,8 +199,11 @@ void MasterConfig::writePedestalsToJson(QJsonObject &json)
     QJsonObject js;
 
     js["SubstractPedestals"] = bPedestalSubstraction;
+    js["Method"] = PedestalExtractionMethod;
     js["PedestalsFrom"] = PedestalFrom;
     js["PedestalsTo"] = PedestalTo;
+    js["PeakSigma"] = PedestalPeakSigma;
+    js["PeakThreshold"] = PedestalPeakThreshold;
 
     json["Pedestals"] = js;
 }
@@ -212,8 +215,11 @@ bool MasterConfig::readPedestalsFromJson(QJsonObject &json)
     QJsonObject js = json["Pedestals"].toObject();
 
     bPedestalSubstraction = js["SubstractPedestals"].toBool();
+    parseJson(js, "Method", PedestalExtractionMethod);
     PedestalFrom = js["PedestalsFrom"].toInt();
     PedestalTo = js["PedestalsTo"].toInt();
+    parseJson(js, "PeakSigma", PedestalPeakSigma);
+    parseJson(js, "PeakThreshold", PedestalPeakThreshold);
 
     return true;
 }

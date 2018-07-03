@@ -464,6 +464,33 @@ QVariant AInterfaceToHist::FitGaussWithInit(QString HistName, QVariant InitialPa
     }
 }
 
+#include "apeakfinder.h"
+QVariant AInterfaceToHist::FindPeaks(const QString &HistName, int numPeaks, double sigma, double threshold, bool bSuppressDraw)
+{
+    int index = TmpHub->ScriptDrawObjects.findIndexOf(HistName);
+    if (index == -1)
+      {
+        abort("Histogram "+HistName+" not found!");
+        return 0;
+      }
+
+    RootDrawObj& r = TmpHub->ScriptDrawObjects.List[index];
+    if (!r.type.startsWith("TH1"))
+    {
+        abort("Histogram "+HistName+" not found!");
+        return 0;
+    }
+
+    TH1* h = static_cast<TH1*>(r.Obj);
+    APeakFinder pf(h);
+
+    const QVector<double> peaks = pf.findPeaks(sigma, threshold, numPeaks, bSuppressDraw);
+
+    QVariantList res;
+    for (const double& d : peaks) res << d;
+    return res;
+}
+
 bool AInterfaceToHist::Delete(QString HistName)
 {
     return TmpHub->ScriptDrawObjects.remove(HistName);

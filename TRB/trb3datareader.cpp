@@ -6,6 +6,8 @@
 #include "hadaq/api.h"
 #endif
 
+#include <stdexcept>
+
 #include <QDebug>
 
 const float NaN = std::numeric_limits<float>::quiet_NaN();
@@ -243,15 +245,47 @@ int Trb3dataReader::GetSampleWhereFirstAboveFast(int ievent, int ichannel, int t
     return -1;
 }
 
+#include "TSpectrum.h"
 void Trb3dataReader::substractPedestals()
 {
     for (int ievent=0; ievent<waveData.size(); ievent++)
         for (int ichannel=0; ichannel<numChannels; ichannel++)
         {
             float pedestal = 0;
-            for (int isample = Config->PedestalFrom; isample <= Config->PedestalTo; isample++)
-                pedestal += waveData.at(ievent).at(ichannel).at(isample);
-            pedestal /= ( Config->PedestalTo + 1 - Config->PedestalFrom );
+
+            switch (Config->PedestalExtractionMethod)
+            {
+            case 0:
+                for (int isample = Config->PedestalFrom; isample <= Config->PedestalTo; isample++)
+                    pedestal += waveData.at(ievent).at(ichannel).at(isample);
+                pedestal /= ( Config->PedestalTo + 1 - Config->PedestalFrom );
+                break;
+            case 1:
+
+/*
+            TH1 *hist;
+
+            //const QVector<double> APeakFinder::findPeaks(const double sigma, const double threshold, const int MaxNumberOfPeaks, bool SuppressDraw) const
+    TSpectrum *s = new TSpectrum(MaxNumberOfPeaks);
+
+    int numPeaks = s->Search(H, sigma, (SuppressDraw ? "goff nodraw" : ""), threshold);
+
+#if ROOT_VERSION_CODE > ROOT_VERSION(6,0,0)
+    double *pos = s->GetPositionX();
+#else
+    float *pos = s->GetPositionX();
+#endif
+
+    QVector<double> peaks;
+    for (int i=0; i<numPeaks; i++) peaks << pos[i];
+*/
+
+                break;
+            default:
+                qDebug() << "Invalid pedestal extraction method index: "<< Config->PedestalExtractionMethod;
+                throw std::invalid_argument( "invalid pedestal extraction method index" );
+                break;
+            }
 
             for (int isample = 0; isample < numSamples; isample++)
                 waveData[ievent][ichannel][isample] -= pedestal;
