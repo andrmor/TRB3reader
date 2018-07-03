@@ -22,7 +22,10 @@ AScriptManager::AScriptManager()
 
 AScriptManager::~AScriptManager()
 {
-    for (int i=0; i<interfaces.size(); i++) delete interfaces[i];
+    for (int i=0; i<interfaces.size(); i++)
+    {
+        delete interfaces[i];
+    }
     interfaces.clear();
 
     if (engine)

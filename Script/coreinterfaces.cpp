@@ -43,8 +43,8 @@ AInterfaceToCore::AInterfaceToCore(AScriptManager* ScriptManager) :
   H["loadArray"] = "Load an array of numerics (or an array of numeric arrays if columns>1).\nColumns parameter can be from 1 to 3.";
   H["evaluate"] = "Evaluate script during another script evaluation. See example ScriptInsideScript.txt";
 
-  H["SetNewFileFinder"] = "Configurer for GetNewFiles() function. dir is the search directory, fileNamePattern: *.* for all files";
-  H["GetNewFiles"] = "Get list (array) of names of new files appeared in the directory configured with SetNewFileFinder()";
+  H["SetNewFileFinder"] = "Configurer for GetNewFiles() function. dir is the search directory, fileNamePattern: *.* for all files. Returns the list of all found files.";
+  H["GetNewFiles"] = "Get list (array) of names of new files appeared in the directory configured with SetNewFileFinder() after the last use of this function.";
 
 }
 
@@ -347,29 +347,36 @@ const QString AInterfaceToCore::GetExamplesDir() const
     return ScriptManager->ExamplesDir;
 }
 
-void AInterfaceToCore::SetNewFileFinder(const QString dir, const QString fileNamePattern)
+QVariant AInterfaceToCore::SetNewFileFinder(const QString dir, const QString fileNamePattern)
 {
-    Finder_Dir = dir;
-    Finder_NamePattern = fileNamePattern;
+  Finder_Dir = dir;
+  Finder_NamePattern = fileNamePattern;
 
-    QDir d(dir);
-    QStringList files = d.entryList( QStringList(fileNamePattern), QDir::Files);
-    //  qDebug() << files;
-    for (auto& n : files) Finder_FileNames << n;
+  QDir d(dir);
+  QStringList files = d.entryList( QStringList(fileNamePattern), QDir::Files);
+  //  qDebug() << files;
+
+  QVariantList res;
+  for (auto& n : files)
+  {
+      Finder_FileNames << n;
+      res << n;
+  }
+  return res;
 }
 
 QVariant AInterfaceToCore::GetNewFiles()
 {
-    QVariantList newFiles;
-    QDir d(Finder_Dir);
-    QStringList files = d.entryList( QStringList(Finder_NamePattern), QDir::Files);
+  QVariantList newFiles;
+  QDir d(Finder_Dir);
+  QStringList files = d.entryList( QStringList(Finder_NamePattern), QDir::Files);
 
-    for (auto& n : files)
-    {
-        if (!Finder_FileNames.contains(n)) newFiles << QVariant(n);
-        Finder_FileNames << n;
-    }
-    return newFiles;
+  for (auto& n : files)
+  {
+      if (!Finder_FileNames.contains(n)) newFiles << QVariant(n);
+      Finder_FileNames << n;
+  }
+  return newFiles;
 }
 
 #include <QProcess>

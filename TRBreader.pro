@@ -55,7 +55,7 @@ QT += widgets
 QT += script
 QT += websockets
 
-TARGET = RootBase
+TARGET = TRBreader
 TEMPLATE = app
 
 
