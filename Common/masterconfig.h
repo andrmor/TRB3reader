@@ -8,6 +8,23 @@
 
 class QJsonObject;
 class ChannelMapper;
+class AHldProcessSettings;
+
+class AHldProcessSettings
+{
+public:
+    int     NumChannels = 0;
+    int     NumSamples = 0;
+    bool    bDoSignalExtraction = true;
+    bool    bDoScript = false;
+    bool    bDoSave = true;
+    QString AddToFileName = "_proc.dat";
+    bool    bDoCopyToDatahub = false;
+    bool    bCopyWaveforms = false;
+
+    const QJsonObject   WriteToJson() const;
+    void                ReadFromJson(const QJsonObject &json);
+};
 
 class MasterConfig
 {
@@ -48,8 +65,11 @@ public:
 
     bool                bPedestalSubstraction = false;
     bool                bSmoothingBeforePedestals = false;
+    int                 PedestalExtractionMethod = 0;
     int                 PedestalFrom = 0;
     int                 PedestalTo = 0;
+    double              PedestalPeakSigma = 3;
+    double              PedestalPeakThreshold = 0.5;
 
     int                 SignalExtractionMethod = 0; //0 - independent max, 1 - common sample, at global max
     int                 CommonSampleNumber = 0;
@@ -81,6 +101,9 @@ public:
 
     QString             FileName;
     QString             WorkingDir;
+
+    // hld file processor settings
+    AHldProcessSettings HldProcessSettings;
 
     // config <-> JSON handling
     void                WriteToJson(QJsonObject& json);

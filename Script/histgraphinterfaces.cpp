@@ -21,6 +21,8 @@
 AInterfaceToHist::AInterfaceToHist(TmpObjHubClass* TmpHub)
   : TmpHub(TmpHub)
 {
+    Description = "Module gives access to CERN ROOT histograms.";
+
     H["Draw"] = "Draw the histogram. The second arguments defines how it will be drawn.\nFor available options see:\n"
                 "https://root.cern.ch/doc/master/classTHistPainter.html";
     H["FitGauss"] = "Fit histogram with a Gaussian. The returned result (is successful) contains an array [Constant,Mean,Sigma,ErrConstant,ErrMean,ErrSigma]"
@@ -44,12 +46,6 @@ AInterfaceToHist::AInterfaceToHist(TmpObjHubClass* TmpHub)
             "e : number of entries printed\n"
             "n : name of histogram is printed\n"
             "Example: SetOptStat(\"ne\"); print only name of histogram and number of entries.";
-}
-
-bool AInterfaceToHist::InitOnRun()
-{
-  //TmpHub->ScriptDrawObjects.clear();
-  return true;
 }
 
 void AInterfaceToHist::NewHist(QString HistName, int bins, double start, double stop)
@@ -468,6 +464,33 @@ QVariant AInterfaceToHist::FitGaussWithInit(QString HistName, QVariant InitialPa
     }
 }
 
+#include "apeakfinder.h"
+QVariant AInterfaceToHist::FindPeaks(const QString &HistName, int numPeaks, double sigma, double threshold, bool bSuppressDraw)
+{
+    int index = TmpHub->ScriptDrawObjects.findIndexOf(HistName);
+    if (index == -1)
+      {
+        abort("Histogram "+HistName+" not found!");
+        return 0;
+      }
+
+    RootDrawObj& r = TmpHub->ScriptDrawObjects.List[index];
+    if (!r.type.startsWith("TH1"))
+    {
+        abort("Histogram "+HistName+" not found!");
+        return 0;
+    }
+
+    TH1* h = static_cast<TH1*>(r.Obj);
+    APeakFinder pf(h);
+
+    const QVector<double> peaks = pf.findPeaks(sigma, threshold, numPeaks, bSuppressDraw);
+
+    QVariantList res;
+    for (const double& d : peaks) res << d;
+    return res;
+}
+
 bool AInterfaceToHist::Delete(QString HistName)
 {
     return TmpHub->ScriptDrawObjects.remove(HistName);
@@ -607,16 +630,12 @@ void AInterfaceToHist::Save(QString HistName, QString FileName)
 AInterfaceToGraph::AInterfaceToGraph(TmpObjHubClass *TmpHub)
   : TmpHub(TmpHub)
 {
+  Description = "Module gives access to CERN ROOT graphs.";
+
   H["NewGraph"] = "Creates a new graph (Root TGraph object)";
   H["SetMarkerProperties"] = "Default marker properties are 1, 20, 1";
   H["SetLineProperties"] = "Default line properties are 1, 1, 2";
   H["Draw"] = "Draws the graph (use \"APL\" options if in doubt)";
-}
-
-bool AInterfaceToGraph::InitOnRun()
-{
-  //TmpHub->ScriptDrawObjects.clear();
-  return true;
 }
 
 void AInterfaceToGraph::NewGraph(QString GraphName)

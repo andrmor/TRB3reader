@@ -12,6 +12,10 @@
 
 AInterfaceToWebSocket::AInterfaceToWebSocket()
 {
+    Description = "Web socket unit give access to both server and client.\n"
+                  "Server listen for the configured port and interpret all incoming messages as script.\n"
+                  "The script is evaluated and result is sent back to the client.";
+
     timeout = 3000;
     ClientSocket = new QWebSocket();
     connect(ClientSocket, &QWebSocket::connected, this, &AInterfaceToWebSocket::onClientConnected);

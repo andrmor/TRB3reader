@@ -15,6 +15,8 @@ class AInterfaceToData : public AScriptInterface
 public:
     AInterfaceToData(ADataHub* DataHub);
 
+    bool     IsMultithreadCapable() const {return true;}
+
 public slots:
 
     int      countEvents() const;
@@ -70,8 +72,13 @@ public slots:
     const QVariant getSumSignals    (int ievent) const;
     const QVariant getSumSignalsFast(int ievent) const;
 
+    void     save(const QString &FileName, bool bSavePositions, bool bSkipRejected) const;
+    void     load(const QString &AppendFromFileName, bool bLoadPositionXYZ);
+
 private:
     ADataHub* DataHub;
+
+    bool      jsonArrToVector(const QJsonArray &jar, QVector<float> &vec) const;
 };
 
 #endif // AINTERFACETODATA_H

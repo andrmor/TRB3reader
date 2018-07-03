@@ -41,6 +41,25 @@ AInterfaceToCore::AInterfaceToCore(AScriptManager* ScriptManager) :
   H["loadColumn"] = "Load a column with ascii numeric data from the file.\nSecond argument is the column number starting from 0.";
   H["loadArray"] = "Load an array of numerics (or an array of numeric arrays if columns>1).\nColumns parameter can be from 1 to 3.";
   H["evaluate"] = "Evaluate script during another script evaluation. See example ScriptInsideScript.txt";
+
+  H["SetNewFileFinder"] = "Configurer for GetNewFiles() function. dir is the search directory, fileNamePattern: *.* for all files";
+  H["GetNewFiles"] = "Get list (array) of names of new files appeared in the directory configured with SetNewFileFinder()";
+
+}
+
+AInterfaceToCore::AInterfaceToCore(const AInterfaceToCore& other) :
+    AScriptInterface(other)
+{
+    Finder_FileNames = other.Finder_FileNames;
+    Finder_Dir = other.Finder_Dir;
+    Finder_NamePattern = other.Finder_NamePattern;
+
+    ScriptManager = 0; //to be set after copy!!!
+}
+
+void AInterfaceToCore::SetScriptManager(AScriptManager *ScriptManager)
+{
+    this->ScriptManager = ScriptManager;
 }
 
 void AInterfaceToCore::abort(const QString message) const
@@ -64,8 +83,14 @@ void AInterfaceToCore::sleep(int ms)
   while (t.elapsed()<ms);
 }
 
+int AInterfaceToCore::elapsedTimeInMilliseconds()
+{
+    return ScriptManager->getElapsedTime();
+}
+
 void AInterfaceToCore::print(const QString text)
 {
+    //  qDebug() << text << "on ScriptManager:"<<ScriptManager;
     emit ScriptManager->showMessage(text);
 }
 
@@ -317,6 +342,31 @@ const QString AInterfaceToCore::GetExamplesDir() const
     return ScriptManager->ExamplesDir;
 }
 
+void AInterfaceToCore::SetNewFileFinder(const QString dir, const QString fileNamePattern)
+{
+    Finder_Dir = dir;
+    Finder_NamePattern = fileNamePattern;
+
+    QDir d(dir);
+    QStringList files = d.entryList( QStringList(fileNamePattern), QDir::Files);
+    //  qDebug() << files;
+    for (auto& n : files) Finder_FileNames << n;
+}
+
+QVariant AInterfaceToCore::GetNewFiles()
+{
+    QVariantList newFiles;
+    QDir d(Finder_Dir);
+    QStringList files = d.entryList( QStringList(Finder_NamePattern), QDir::Files);
+
+    for (auto& n : files)
+    {
+        if (!Finder_FileNames.contains(n)) newFiles << QVariant(n);
+        Finder_FileNames << n;
+    }
+    return newFiles;
+}
+
 #include <QProcess>
 const QString AInterfaceToCore::StartExternalProcess(QString command, QVariant arguments, bool waitToFinish, int milliseconds)
 {
@@ -416,6 +466,7 @@ AInterfaceToMath::AInterfaceToMath()    //TRandom2* RandGen)
 {
   //srand (time(NULL));
 
+  Description = "Custom math module. Uses std library.";
 
   //this->RandGen = RandGen;
 

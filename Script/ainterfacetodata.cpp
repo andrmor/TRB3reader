@@ -1,15 +1,17 @@
 #include "ainterfacetodata.h"
 #include "adatahub.h"
+#include "masterconfig.h"
 
 #include <QJsonArray>
 
 #include <limits>
+
 const double NaN = std::numeric_limits<double>::quiet_NaN();
 
 AInterfaceToData::AInterfaceToData(ADataHub* DataHub) :
     DataHub(DataHub)
 {
-
+    Description = "Gives access to DataHub.";
 }
 
 int AInterfaceToData::countEvents() const
@@ -29,10 +31,34 @@ void AInterfaceToData::Clear()
 
 void AInterfaceToData::addEvent(const QVariant signalArray)
 {
+    QString type = signalArray.typeName();
+    if (type != "QVariantList")
+    {
+        abort("Failed to add event - argument should be an array with signal values");
+        return;
+    }
+
+    QVariantList vl = signalArray.toList();
+    QJsonArray ar = QJsonArray::fromVariantList(vl);
+    const int numChannels = DataHub->getConfig().CountLogicalChannels();
+    if (ar.size() != numChannels)
+        {
+            abort("Failed to add event: signal array size is not equal to the number of logical channels!");
+            return;
+        }
+
     AOneEvent* ev = new AOneEvent();
     ev->SetRejectedFlag(false);
+
+    QVector<float> vec;
+    if ( !jsonArrToVector(ar, vec) )
+    {
+        abort("Failed to set signal values - array contains non-numerical data");
+        return;
+    }
+    ev->SetSignals(&vec);
+
     DataHub->AddEvent(ev);
-    setSignals(DataHub->CountEvents()-1, signalArray); // size is checked there, abort if wrong
 }
 
 float AInterfaceToData::getSignal(int ievent, int iLogicalChannel) const
@@ -88,31 +114,36 @@ void AInterfaceToData::setSignals(int ievent, const QVariant arrayOfValues)
 
     QVariantList vl = arrayOfValues.toList();
     QJsonArray ar = QJsonArray::fromVariantList(vl);
-    const int numChannels = DataHub->CountChannels();
-    if (ar.size() != numChannels)
-        if (numChannels != 0)
+    //const int numChannels = DataHub->CountChannels();
+    const int numChannels = DataHub->getConfig().CountLogicalChannels();
+    if (ar.size() != numChannels)       
         {
             abort("Failed to set signal values - array size mismatch");
             return;
         }
 
     QVector<float> vec;
-    vec.reserve(ar.size());
-    for (int i=0; i<ar.size(); ++i)
+    if ( !jsonArrToVector(ar, vec) )
     {
-        if (!ar[i].isDouble())
-        {
-            abort("Failed to set signal values - array contains non-numerical data");
-            return;
-        }
-        vec << ar[i].toDouble();
+        abort("Failed to set signal values - array contains non-numerical data");
+        return;
     }
 
-    bool bOK = DataHub->SetSignals(ievent, &vec);
-    if (!bOK)
+    if ( !DataHub->SetSignals(ievent, &vec) )
     {
         abort("Failed to set signal values - wrong event number");
     }
+}
+
+bool AInterfaceToData::jsonArrToVector(const QJsonArray& jar,  QVector<float>& vec) const
+{
+    vec.resize(jar.size());
+    for (int i=0; i<jar.size(); ++i)
+    {
+        if (!jar[i].isDouble()) return false;
+        vec[i] = jar[i].toDouble();
+    }
+    return true;
 }
 
 void AInterfaceToData::setSignalsFast(int ievent, const QVariant arrayOfValues)
@@ -447,5 +478,19 @@ const QVariant AInterfaceToData::getSumSignalsFast(int ievent) const
     for (int i=0; i<3; i++) ar << sumNeg[i];
     QJsonValue jv = ar;
     return jv.toVariant();
+}
+
+void AInterfaceToData::save(const QString& FileName, bool bSavePositions, bool bSkipRejected) const
+{
+    const QString ErrStr = DataHub->Save(FileName, bSavePositions, bSkipRejected);
+
+    if (!ErrStr.isEmpty()) abort(ErrStr);
+}
+
+void AInterfaceToData::load(const QString &AppendFromFileName, bool bLoadPositionXYZ)
+{
+    const QString ErrStr = DataHub->Load(AppendFromFileName, bLoadPositionXYZ);
+
+    if (!ErrStr.isEmpty()) abort(ErrStr);
 }
 

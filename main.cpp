@@ -9,21 +9,23 @@
 #include "trb3datareader.h"
 #include "trb3signalextractor.h"
 #include "adispatcher.h"
+#include "ahldfileprocessor.h"
 
 int main(int argc, char *argv[])
 {
     //SUPPRESS WARNINGS about ssl
     QLoggingCategory::setFilterRules("qt.network.ssl.warning=false");
 
-    ADataHub DataHub;    
     MasterConfig Config;
+    ADataHub DataHub(Config);
     Trb3dataReader Reader(&Config);
     Trb3signalExtractor Extractor(&Config, &Reader);
+    AHldFileProcessor HldFileProcessor(Config, Reader, Extractor, DataHub);
 
     ADispatcher Dispatcher(&Config, &Reader, &Extractor);
 
     QApplication a(argc, argv);
-    MainWindow MW(&Config, &Dispatcher, &DataHub, &Reader, &Extractor);
+    MainWindow MW(&Config, &Dispatcher, &DataHub, &Reader, &Extractor, HldFileProcessor);
     MW.show();
 
     QObject::connect(&Dispatcher, &ADispatcher::RequestUpdateGui, &MW, &MainWindow::UpdateGui);

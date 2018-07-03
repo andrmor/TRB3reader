@@ -37,7 +37,7 @@ public:
     bool    IsRejectedEvent(int ievent) const;
     bool    IsRejectedEventFast(int ievent) const {return RejectedEvents.at(ievent);}
 
-    float  extractSignalFromWaveform(int ievent, int ichannel, bool *Rejected = 0);
+    float   extractSignalFromWaveform(int ievent, int ichannel, bool *Rejected = 0);
 
 private:
     const   MasterConfig* Config;

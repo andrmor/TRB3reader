@@ -12,6 +12,8 @@
 #include "adispatcher.h"
 #include "ainterfacetodata.h"
 #include "ainterfacetowebsocket.h"
+#include "ainterfacetohldfileprocessor.h"
+#include "ainterfacetomultithread.h"
 
 #ifdef CERN_ROOT
   #include "cernrootmodule.h"
@@ -37,7 +39,11 @@ void MainWindow::CreateScriptWindow()
     AInterfaceToConfig* conf = new AInterfaceToConfig(Config, Dispatcher);
     ScriptWindow->SetInterfaceObject(conf, "config");
 
-    //  qDebug() << "-> data...";
+    //  qDebug() << "-> hld file processor...";
+    AInterfaceToHldFileProcessor* hld = new AInterfaceToHldFileProcessor(HldFileProcessor);
+    ScriptWindow->SetInterfaceObject(hld, "hld");
+
+    //  qDebug() << "-> data hub...";
     AInterfaceToData* dat = new AInterfaceToData(DataHub);
     ScriptWindow->SetInterfaceObject(dat, "events");
 
@@ -71,6 +77,9 @@ void MainWindow::CreateScriptWindow()
     //  qDebug() << "-> msg...";
     AInterfaceToMessageWindow* txt = new AInterfaceToMessageWindow(ScriptWindow);
     ScriptWindow->SetInterfaceObject(txt, "msg");
+
+    AInterfaceToMultiThread* threads = new AInterfaceToMultiThread(ScriptWindow->GetScriptManager());
+    ScriptWindow->SetInterfaceObject(threads, "threads");
 
     //  qDebug() << "Done!";
 

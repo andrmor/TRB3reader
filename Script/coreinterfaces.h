@@ -6,6 +6,7 @@
 #include <QVariant>
 #include <QString>
 #include <QDesktopServices>
+#include <QSet>
 
 class AScriptManager;
 //class TRandom2;
@@ -14,8 +15,13 @@ class AInterfaceToCore : public AScriptInterface
 {
   Q_OBJECT
 
-public:
-  AInterfaceToCore(AScriptManager *ScriptManager);
+public:  
+  explicit AInterfaceToCore(AScriptManager *ScriptManager = 0);
+  explicit AInterfaceToCore(const AInterfaceToCore& other);
+
+  bool IsMultithreadCapable() const {return true;}
+
+  void SetScriptManager(AScriptManager *ScriptManager);
 
 public slots:
   //abort execution of the script
@@ -24,6 +30,7 @@ public slots:
   QVariant      evaluate(const QString script);
 
   void          sleep(int ms);
+  int           elapsedTimeInMilliseconds();
 
   //output (lower) field of the script window
   void          print(const QString text);
@@ -55,11 +62,20 @@ public slots:
   const QString  GetScriptDir() const;
   const QString  GetExamplesDir() const;
 
+  //file finder
+  void          SetNewFileFinder(const QString dir, const QString fileNamePattern);
+  QVariant      GetNewFiles();
+
   //externals
   const QString  StartExternalProcess(QString command, QVariant arguments, bool waitToFinish = false, int milliseconds = 1000);
 
 private:
   AScriptManager* ScriptManager;
+
+  //file finder
+  QSet<QString>   Finder_FileNames;
+  QString         Finder_Dir;
+  QString         Finder_NamePattern = "*.*";
 };
 
 // ---- M A T H ----
@@ -73,6 +89,8 @@ public:
   AInterfaceToMath();
   //AInterfaceToMath(TRandom2* RandGen);
   //void setRandomGen(TRandom2* RandGen);
+
+  bool IsMultithreadCapable() const {return true;}
 
 public slots:
   double abs(double val);

@@ -1,7 +1,11 @@
 #ifndef ADATAHUB_H
 #define ADATAHUB_H
 
+#include <QObject>
 #include <QVector>
+#include <QMutex>
+
+class MasterConfig;
 
 class AOneEvent
 {
@@ -63,9 +67,12 @@ private:
     float                       SumSigNeg[3];          // sum signals - can be used independently for x y z
 };
 
-class ADataHub
+class ADataHub : public QObject
 {
+    Q_OBJECT
+
 public:
+    ADataHub(const MasterConfig& Config);
     ~ADataHub();
 
     // Counts
@@ -74,7 +81,8 @@ public:
 
     // General handling
     void             Clear();
-    void             AddEvent(AOneEvent* Event) {Events << Event;}
+    void             AddEvent(AOneEvent* Event);
+    void             AddEventFast(AOneEvent* Event) {Events << Event;}
     void             RemoveEvent(int ievent);
     void             RemoveEventFast(int ievent) {Events.removeAt(ievent);}
     const AOneEvent* GetEvent(int ievent) const;
@@ -140,8 +148,21 @@ public:
     bool             SetSumSignalNegative(int ievent, const float* sums);
     void             SetSumSignalNegativeFast(int ievent, const float* sums);
 
+    //save / load
+    const QString    Save(const QString &FileName, bool bSavePositions, bool bSkipRejected);
+    const QString    Load(const QString &AppendFromFileName, bool bLoadPositionXYZ);
+
+    const MasterConfig& getConfig() {return Config;}
+
 private:
+    const MasterConfig& Config;
     QVector < AOneEvent* > Events;
+
+    mutable QMutex   Mutex;
+
+signals:
+    void             requestGuiUpdate();
+    void             reportProgress(int);
 
 };
 

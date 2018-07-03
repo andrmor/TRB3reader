@@ -12,6 +12,7 @@ class CernRootModule;
 class AScriptWindow;
 class ADispatcher;
 class ADataHub;
+class AHldFileProcessor;
 
 namespace Ui {
 class MainWindow;
@@ -22,7 +23,13 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(MasterConfig* Config, ADispatcher* Dispatcher, ADataHub* DataHub, Trb3dataReader* Reader, Trb3signalExtractor* Extractor, QWidget *parent = 0);
+    explicit MainWindow(MasterConfig* Config,
+                        ADispatcher* Dispatcher,
+                        ADataHub* DataHub,
+                        Trb3dataReader* Reader,
+                        Trb3signalExtractor* Extractor,
+                        AHldFileProcessor& HldFileProcessor,
+                        QWidget *parent = 0);
     ~MainWindow();
 
 public slots:
@@ -37,6 +44,9 @@ public slots:
     void onGlobalScriptFinished();
     void saveCompleteState();
 
+    void onShowMessageRequest(const QString message);
+    void onShowActionRequest(const QString action);
+    void onProgressUpdate(int progress);
 private slots:
     //right-click menus
     void on_ptePolarity_customContextMenuRequested(const QPoint &pos);
@@ -136,6 +146,28 @@ private slots:
 
     void on_cobLableType_activated(int index);
 
+    void on_sbNumChannels_editingFinished();
+
+    void on_sbNumSamples_editingFinished();
+
+    void on_cbBulkExtract_clicked();
+
+    void on_cbAutoExecuteScript_clicked();
+
+    void on_cbSaveSignalsToFiles_clicked();
+
+    void on_leAddToProcessed_editingFinished();
+
+    void on_cbBulkCopyToDatahub_clicked();
+
+    void on_cbBulkAlsoCopyWaveforms_clicked();
+
+    void on_cobPedestalExtractionMethod_activated(int index);
+
+    void on_ledPedestalPeakSigma_editingFinished();
+
+    void on_ledPedestalPeakThreshold_editingFinished();
+
 protected:
     void closeEvent(QCloseEvent* event);
 
@@ -146,6 +178,7 @@ private:
     ADataHub* DataHub;
     Trb3dataReader* Reader;
     Trb3signalExtractor* Extractor;
+    AHldFileProcessor& HldFileProcessor;
 
     //owned objects
     Ui::MainWindow* ui;    
@@ -157,8 +190,8 @@ private:
     //gui misc
     bool bStopFlag;
     bool bNeverRemindAppendToHub = false;
-    int  numProcessedEvents;
-    int  numBadEvents;
+    //int  numProcessedEvents;
+    //int  numBadEvents;
 
 private:
     const QString ProcessData(); //returns error message if any
@@ -177,7 +210,7 @@ private:
 
     const QString PackChannelList(QVector<int> vec);
     bool ExtractNumbersFromQString(const QString input, QVector<int>* ToAdd);
-    bool bulkProcessCore();
+    //bool bulkProcessCore();
     void bulkProcessorEnvelope(const QStringList FileNames);
     void updateNumEventsIndication();
 };

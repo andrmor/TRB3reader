@@ -50,12 +50,12 @@ AScriptWindow::AScriptWindow(MasterConfig *Config, QWidget *parent) :
     }
 
     ScriptManager = new AScriptManager();
-    QObject::connect(ScriptManager, SIGNAL(showMessage(QString)), this, SLOT(ShowText(QString)));
-    QObject::connect(ScriptManager, SIGNAL(clearText()), this, SLOT(ClearText()));
+    QObject::connect(ScriptManager, &AScriptManager::showMessage, this, &AScriptWindow::ShowText);
+    QObject::connect(ScriptManager, &AScriptManager::clearText, this, &AScriptWindow::ClearText);
     //retranslators:
-    QObject::connect(ScriptManager, SIGNAL(onStart()), this, SLOT(receivedOnStart()));
-    QObject::connect(ScriptManager, SIGNAL(onAbort()), this, SLOT(receivedOnAbort()));
-    QObject::connect(ScriptManager, SIGNAL(success(QString)), this, SLOT(receivedOnSuccess(QString)));
+    QObject::connect(ScriptManager, &AScriptManager::onStart, this, &AScriptWindow::receivedOnStart);
+    QObject::connect(ScriptManager, &AScriptManager::onAbort, this, &AScriptWindow::receivedOnAbort);
+    QObject::connect(ScriptManager, &AScriptManager::onFinished, this, &AScriptWindow::receivedOnSuccess);
 
     //ScriptManager->LibScripts = Config->LibScripts;
     //ScriptManager->LastOpenDir = Config->LastOpenDir;
@@ -238,17 +238,21 @@ void AScriptWindow::SetInterfaceObject(QObject *interfaceObject, QString name)
         // populating help for main, math and core units
         trwHelp->clear();
         //fillHelper(interfaceObject, "", "Global object functions"); //forbidden to override master object now.
-        AInterfaceToCore core(0); //dummy to extract methods
-        fillHelper(&core, "core", "Core object functions");
+        AInterfaceToCore core; //dummy to extract methods
+        fillHelper(&core, "core", core.getDescription());
         newFunctions << getCustomCommandsOfObject(&core, "core", false);
         AInterfaceToMath math; //dummy to extract methods
-        fillHelper(&math, "math", "Basic mathematics: wrapper for std double functions");
+        fillHelper(&math, "math", math.getDescription());
         newFunctions << getCustomCommandsOfObject(&math, "math", false);
         trwHelp->expandItem(trwHelp->itemAt(0,0));
     }
     else
     {
-        fillHelper(interfaceObject, name, "");
+        QString tip;
+        AScriptInterface* si = dynamic_cast<AScriptInterface*>(interfaceObject);
+        if (si) tip = si->getDescription();
+
+        fillHelper(interfaceObject, name, tip);
         newFunctions << getCustomCommandsOfObject(interfaceObject, name, false);
     }
 
@@ -450,9 +454,9 @@ bool AScriptWindow::ExecuteScript(const QString& Script)
    ui->pbStop->setVisible(false);
    ui->pbRunScript->setVisible(true);
 
-   if (!ScriptManager->LastError.isEmpty())
+   if (!ScriptManager->getLastError().isEmpty())
    {
-       AScriptWindow::ReportError("Script error: "+ScriptManager->LastError, -1);
+       AScriptWindow::ReportError("Script error: "+ScriptManager->getLastError(), -1);
    }
    else if (ScriptManager->isUncaughtException())
    {   //Script has uncaught exception
@@ -466,7 +470,7 @@ bool AScriptWindow::ExecuteScript(const QString& Script)
    else
    {   //success
        //qDebug() << "Script returned:" << result;
-       if (!ScriptManager->fAborted)
+       if (!ScriptManager->isEvalAborted())
          {
             //if (ShowEvalResult && result!="undefined") ShowText("Result:\n"+result);
             //else ShowText("Script evaluation: success");
@@ -535,7 +539,7 @@ void AScriptWindow::onF1pressed(QString text)
 
 void AScriptWindow::on_pbStop_clicked()
 {
-  if (ScriptManager->fEngineIsRunning)
+  if (ScriptManager->isEngineRunning())
     {
       qDebug() << "Stop button pressed!";
       ShowText("Sending stop signal...");

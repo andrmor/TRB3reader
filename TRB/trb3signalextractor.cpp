@@ -13,9 +13,9 @@ Trb3signalExtractor::Trb3signalExtractor(const MasterConfig *Config, const Trb3d
 
 bool Trb3signalExtractor::ExtractSignals()
 {    
-    if ( !Reader->isValid() )
+    if ( Reader->isEmpty() )
     {
-        qDebug() << "--- Cannot start extraction, TRBreader reports not ready status";
+        qDebug() << "--- Cannot start extraction, there are no waveform data";
         return false;
     }
 

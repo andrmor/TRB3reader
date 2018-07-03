@@ -15,6 +15,7 @@ public:
 
       //checks the channel map for any desynchronization, or repetitions
     const QString Validate() const; // return: no error - empty QString, otherwise error string
+    const QString ValidateForAvailableHardwareChannels(int numHardwChannels) const; // return: no error - empty QString, otherwise error string
 
       //safe requests
     int HardwareToLogical(int iHardwareChannel) const;

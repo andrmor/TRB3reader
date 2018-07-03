@@ -21,6 +21,7 @@
 #include "TList.h"
 #include "TPaveText.h"
 #include "TH2D.h"
+#include "TROOT.h"
 
 CernRootModule::CernRootModule(Trb3dataReader *Reader, Trb3signalExtractor *Extractor, MasterConfig *Config, ADataHub* DataHub, int refreshInterval) :
     Reader(Reader), Extractor(Extractor), Config(Config), DataHub(DataHub)
@@ -35,6 +36,8 @@ CernRootModule::CernRootModule(Trb3dataReader *Reader, Trb3signalExtractor *Extr
     QObject::connect(RootUpdateTimer, SIGNAL(timeout()), this, SLOT(timerTimeout()));
     RootUpdateTimer->start();
     //qDebug()<<"->Timer to refresh Root events started";
+
+    qDebug() << "Running CERN ROOT version"<<gROOT->GetVersion();
 
     WOne = WOverNeg = WOverPos = WAllNeg = WAllPos = 0;
     StartGraphWindows();
@@ -514,7 +517,7 @@ bool CernRootModule::DrawAll(bool bFromDataHub, int ievent, bool bNeg, int padsX
                 else
                 {
                     double sig = bFromDataHub ? DataHub->GetSignalFast(ievent, iChannel) : Extractor->GetSignalFast(ievent, iChannel);
-                    s = QString::number(sig, 'g', 2);
+                    s = QString::number(sig, 'g', 4);
                 }
 
                 la->AddText(s.toLocal8Bit().data());

@@ -6,6 +6,8 @@
 #include "hadaq/api.h"
 #endif
 
+#include <stdexcept>
+
 #include <QDebug>
 
 const float NaN = std::numeric_limits<float>::quiet_NaN();
@@ -13,21 +15,26 @@ const float NaN = std::numeric_limits<float>::quiet_NaN();
 Trb3dataReader::Trb3dataReader(MasterConfig *Config) :
     Config(Config), numSamples(0), numChannels(0) {}
 
-bool Trb3dataReader::Read()
+const QString Trb3dataReader::Read(const QString& FileName)
 {
-    if (Config->FileName.isEmpty())
+    qDebug() << "--> Reading hld file...";
+    readRawData(FileName, Config->HldProcessSettings.NumChannels, Config->HldProcessSettings.NumSamples);
+
+    if ( Config->HldProcessSettings.NumChannels != 0)
     {
-        qDebug() << "--- File name is not set!";
-        return false;
+        if ( Config->HldProcessSettings.NumChannels != numChannels )
+        {
+            waveData.clear();
+            numChannels = 0;
+            numSamples = 0;
+            return "--- Number of channels in file is different from requested";
+        }
     }
 
-    qDebug() << "--> Reading hld file...";
-    readRawData();
-    if (!isValid())
-    {
-        qDebug() << "--- Read of hld file failed or all events were rejected!";
-        return false;
-    }
+    if (isEmpty()) return "--- Read of hld file failed or all events were rejected!";
+
+    bool bOK = Config->UpdateNumberOfHardwareChannels(numChannels);
+    if (!bOK) return "The number of hardware channels in the file (" + QString::number(numChannels) + ") is incompatible with the defined number of logical channels";
 
     if (Config->bSmoothingBeforePedestals)
     {
@@ -58,7 +65,7 @@ bool Trb3dataReader::Read()
 
     //qDebug() << "--> Done!";
 
-    return true;
+    return "";
 }
 
 float Trb3dataReader::GetValue(int ievent, int ichannel, int isample) const
@@ -238,29 +245,62 @@ int Trb3dataReader::GetSampleWhereFirstAboveFast(int ievent, int ichannel, int t
     return -1;
 }
 
+#include "TSpectrum.h"
 void Trb3dataReader::substractPedestals()
 {
     for (int ievent=0; ievent<waveData.size(); ievent++)
         for (int ichannel=0; ichannel<numChannels; ichannel++)
         {
             float pedestal = 0;
-            for (int isample = Config->PedestalFrom; isample <= Config->PedestalTo; isample++)
-                pedestal += waveData.at(ievent).at(ichannel).at(isample);
-            pedestal /= ( Config->PedestalTo + 1 - Config->PedestalFrom );
+
+            switch (Config->PedestalExtractionMethod)
+            {
+            case 0:
+                for (int isample = Config->PedestalFrom; isample <= Config->PedestalTo; isample++)
+                    pedestal += waveData.at(ievent).at(ichannel).at(isample);
+                pedestal /= ( Config->PedestalTo + 1 - Config->PedestalFrom );
+                break;
+            case 1:
+
+/*
+            TH1 *hist;
+
+            //const QVector<double> APeakFinder::findPeaks(const double sigma, const double threshold, const int MaxNumberOfPeaks, bool SuppressDraw) const
+    TSpectrum *s = new TSpectrum(MaxNumberOfPeaks);
+
+    int numPeaks = s->Search(H, sigma, (SuppressDraw ? "goff nodraw" : ""), threshold);
+
+#if ROOT_VERSION_CODE > ROOT_VERSION(6,0,0)
+    double *pos = s->GetPositionX();
+#else
+    float *pos = s->GetPositionX();
+#endif
+
+    QVector<double> peaks;
+    for (int i=0; i<numPeaks; i++) peaks << pos[i];
+*/
+
+                break;
+            default:
+                qDebug() << "Invalid pedestal extraction method index: "<< Config->PedestalExtractionMethod;
+                throw std::invalid_argument( "invalid pedestal extraction method index" );
+                break;
+            }
 
             for (int isample = 0; isample < numSamples; isample++)
                 waveData[ievent][ichannel][isample] -= pedestal;
         }
 }
 
-void Trb3dataReader::readRawData()
+void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels, int enforceNumSamples)
 {
 #ifdef DABC
     waveData.clear();
-    numChannels = 0;
-    numSamples = 0;
 
-    hadaq::ReadoutHandle ref = hadaq::ReadoutHandle::Connect(Config->FileName.toLocal8Bit().data());
+    numChannels = enforceNumChannels;
+    numSamples = enforceNumSamples;
+
+    hadaq::ReadoutHandle ref = hadaq::ReadoutHandle::Connect(FileName.toLocal8Bit().data());
     hadaq::RawEvent* evnt = 0;
     //evnt = ref.NextEvent(1.0);
     //evnt = ref.NextEvent(1.0);
@@ -271,6 +311,7 @@ void Trb3dataReader::readRawData()
     while ( (evnt = ref.NextEvent(1.0)) )
     {
         bool bBadEvent = false;
+        int foundChannels = 0;
         QVector < QVector <float> > thisEventData;  //format: [channel] [sample]
 
         // loop over sections
@@ -294,7 +335,6 @@ void Trb3dataReader::readRawData()
 
                 unsigned ixTmp = ix;
 
-                //if (datakind == 0xc313 || datakind == 49152 || datakind == 49155)
                 if (Config->IsGoodDatakind(datakind))
                 {
                     // last word in the data block identifies max. ADC# and max. channel
@@ -319,25 +359,33 @@ void Trb3dataReader::readRawData()
                             for (int is=0; is<samples; is++)
                                 thisEventData[oldSize+ic][is] = (sub->Data(ix++) & 0xFFFF);
                         }
+                        foundChannels = oldSize + channels;
 
-                        if (numSamples!=0 && numSamples!=samples)
-                        {                            
-                            bBadEvent = true;
-                            if (numBadEvents<500) qDebug() << "----- Event #" << waveData.size()-1 << " has wrong number of samples ("<< samples <<")\n";
-                        }
-                        else
+                        if (numSamples != 0)
                         {
-                            numSamples = samples;
-                            numChannels = oldSize + channels;
+                            if (samples != numSamples)
+                            {
+                                bBadEvent = true;
+                                if (numBadEvents<50) qDebug() << "----- Event #" << waveData.size()-1 << " has wrong number of samples ("<< samples <<")\n";
+                            }
                         }
+                        else numSamples = samples;
                     }
                 }
-
-                //else ix+=datalen;
-                ix = ixTmp + datalen;  //more general (and safer) way to do the same
-                //qDebug() << "ix:"<< ix;
+                ix = ixTmp + datalen;
             }            
         }
+
+        if (numChannels != 0)
+        {
+            if (foundChannels != numChannels)
+            {
+                qDebug() << "Found event with wrong number of channels:"<<foundChannels<<"while expecting"<<numChannels;
+                ClearData();
+                break;
+            }
+        }
+        else numChannels = foundChannels;
 
         //qDebug() << "Event processed.\n";
         if (bBadEvent)
@@ -356,22 +404,12 @@ void Trb3dataReader::readRawData()
 
     ref.Disconnect();
 
-    bool bOK = Config->UpdateNumberOfHardwareChannels(numChannels);
-    if (!bOK)
-    {
-        qDebug() << "The number of hardware channels in the file ("<< numChannels << "is incompatible with the defined number of logical channels";
-        waveData.clear();
-        numChannels = 0;
-        numSamples = 0;
-        return;
-    }
-
     qDebug() << "--> Data read completed\n--> Events: "<< waveData.size() <<" Channels: "<<numChannels << "  Samples: "<<numSamples;
     if (numBadEvents > 0) qDebug() << "--> " << numBadEvents << " bad events were disreguarded!";
 #endif
 }
 
-const QString Trb3dataReader::GetFileInfo(const QString FileName) const
+const QString Trb3dataReader::GetFileInfo(const QString& FileName) const
 {
     QString output;
 #ifdef DABC
@@ -501,4 +539,6 @@ void Trb3dataReader::ClearData()
     waveData.clear();
     numChannels = 0;
     numSamples = 0;
+    numBadEvents = 0;
+    numAllEvents = 0;
 }

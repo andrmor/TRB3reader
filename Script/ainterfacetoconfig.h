@@ -14,7 +14,10 @@ class AInterfaceToConfig : public AScriptInterface
 
 public:
     AInterfaceToConfig(MasterConfig* Config, ADispatcher *Dispatcher);
+
     QJsonObject* MakeConfigJson() const;  //does not own this object - delete after use
+
+    bool IsMultithreadCapable() const {return true;}
 
 public slots:
     QVariant getConfigJson();

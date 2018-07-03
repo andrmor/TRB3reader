@@ -29,7 +29,7 @@ public slots:
     void              SetPitch(double Pitch_minus1to1);
     void              SetRate(double Rate_minus1to1);
 
-private:
+public:
     QTextToSpeech* m_speech;
 
 };

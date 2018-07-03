@@ -37,7 +37,7 @@ public:
 
     void SetInterfaceObject(QObject *interfaceObject, QString name = "");
     void SetScript(QString *text);
-    void SetShowEvaluationResult(bool flag) {ShowEvalResult = flag;} //if false, window only reports "success", ptherwise eval result is shown
+    void SetShowEvaluationResult(bool flag) {ShowEvalResult = flag;} //if false, window only reports "success", otherwise eval result is shown
 
     void AddNewTab();
     void OpenFirstTab();
@@ -53,10 +53,12 @@ public:
     void SetMainSplitterSizes(QList<int> values);
 
     bool ExecuteScript(const QString &Script);
-    bool ExecuteScriptInFirstTab();
+
+    AScriptManager* GetScriptManager() {return ScriptManager;}
 
 public slots:
     void updateJsonTree();       //update "config" tree widget
+    bool ExecuteScriptInFirstTab();
 
     void ShowText(QString text); //shows text in the output box
     void ClearText(); //clears text in the output box
