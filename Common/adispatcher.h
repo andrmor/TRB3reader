@@ -8,6 +8,7 @@ class MasterConfig;
 class Trb3dataReader;
 class Trb3signalExtractor;
 class QJsonObject;
+class ANetworkModule;
 
 class MainWindow;
 
@@ -18,7 +19,7 @@ class ADispatcher : public QObject
     Q_OBJECT
 
 public:
-    ADispatcher(MasterConfig* Config, Trb3dataReader* Reader, Trb3signalExtractor* Extractor);
+    ADispatcher(MasterConfig* Config, Trb3dataReader* Reader, Trb3signalExtractor* Extractor, ANetworkModule* Network);
 
     void ClearData();
 
@@ -40,6 +41,7 @@ private:
     MasterConfig* Config;
     Trb3dataReader* Reader;
     Trb3signalExtractor* Extractor;
+    ANetworkModule* Network;
 
     //interaction with GUI through the signals/slots
 signals:

@@ -8,53 +8,47 @@
 
 class QWebSocketServer;
 class QWebSocket;
+class AWebSocketSession;
 
 class AInterfaceToWebSocket: public AScriptInterface
 {
   Q_OBJECT
 
 public:
-    enum ServerState {Idle=0, Sending, WaitingForAnswer};
     AInterfaceToWebSocket();
+    AInterfaceToWebSocket(const AInterfaceToWebSocket& other);
     ~AInterfaceToWebSocket();
 
-public slots:
-    void setTimeout(int milliseconds) {timeout = milliseconds;}
-    QString SendTextMessage(QString Url, QVariant message, bool WaitForAnswer=true);
-    QString Ping(QString Url);
+    virtual bool IsMultithreadCapable() const {return true;}
+    virtual void ForceStop();
 
-    bool StartListen(quint16 port);
-    void StopListen();
+public slots:    
+    const QString  Connect(const QString& Url, bool GetAnswerOnConnection);
+    void           Disconnect();
 
-private slots:
-    void onClientConnected();
-    void onTextMessageReceived(QString message);
+    const QString  SendText(const QString& message);
+    const QString  SendObject(const QVariant& object);
+    const QString  SendFile(const QString& fileName);
 
-    void onNewConnection();
-    void processTextMessage(QString message);
-    //void processBinaryMessage(QByteArray message);
-    void socketDisconnected();
+    const QString  ResumeWaitForAnswer();
+
+    const QVariant GetBinaryReplyAsObject();
+    bool           SaveBinaryReplyToFile(const QString& fileName);
+
+    void           SetTimeout(int milliseconds);
 
 signals:
-    void RequestEvaluate(const QString& script, QVariant& result);
+    void showTextOnMessageWindow(const QString& text);
+    void clearTextOnMessageWindow();
 
 private:
-    QWebSocketServer *Server;
-    QWebSocket *ClientSocket;
+    AWebSocketSession* socket = 0;
 
-    QList<QWebSocket *> ServerListOfClients;
-    QWebSocket* ServerReplyClient;
+    int TimeOut = 3000; //milliseconds
 
-    int timeout;
-    int lastExchangeDuration;
-
-    ServerState State;
-    QString MessageToSend;
-    QString MessageReceived;
-    bool fWaitForAnswer;
-
-    const QString variantToString(QVariant val) const;
-    void ReplyAndClose(QString message);
+private:
+    const QString sendQJsonObject(const QJsonObject &json);
+    const QString sendQByteArray(const QByteArray &ba);
 };
 
 #endif // AINTERFACETOWEBSOCKET_H

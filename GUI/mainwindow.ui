@@ -3117,7 +3117,7 @@
      <x>0</x>
      <y>0</y>
      <width>732</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -3140,9 +3140,16 @@
     </property>
     <addaction name="actionOpen_script_window"/>
    </widget>
+   <widget class="QMenu" name="menuServer">
+    <property name="title">
+     <string>Server</string>
+    </property>
+    <addaction name="actionConfigure_WebSocket_server"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
    <addaction name="menuScript"/>
+   <addaction name="menuServer"/>
   </widget>
   <action name="actionLoad_config">
    <property name="text">
@@ -3162,6 +3169,11 @@
   <action name="actionOpen_script_window">
    <property name="text">
     <string>Open script window</string>
+   </property>
+  </action>
+  <action name="actionConfigure_WebSocket_server">
+   <property name="text">
+    <string>Configure WebSocket server</string>
    </property>
   </action>
  </widget>

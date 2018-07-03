@@ -10,6 +10,7 @@
 #include "trb3signalextractor.h"
 #include "adispatcher.h"
 #include "ahldfileprocessor.h"
+#include "anetworkmodule.h"
 
 int main(int argc, char *argv[])
 {
@@ -21,11 +22,12 @@ int main(int argc, char *argv[])
     Trb3dataReader Reader(&Config);
     Trb3signalExtractor Extractor(&Config, &Reader);
     AHldFileProcessor HldFileProcessor(Config, Reader, Extractor, DataHub);
+    ANetworkModule Network;
 
-    ADispatcher Dispatcher(&Config, &Reader, &Extractor);
+    ADispatcher Dispatcher(&Config, &Reader, &Extractor, &Network);
 
     QApplication a(argc, argv);
-    MainWindow MW(&Config, &Dispatcher, &DataHub, &Reader, &Extractor, HldFileProcessor);
+    MainWindow MW(&Config, &Dispatcher, &DataHub, &Reader, &Extractor, HldFileProcessor, Network);
     MW.show();
 
     QObject::connect(&Dispatcher, &ADispatcher::RequestUpdateGui, &MW, &MainWindow::UpdateGui);

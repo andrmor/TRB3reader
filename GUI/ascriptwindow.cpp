@@ -36,6 +36,7 @@
 #include <QJsonArray>
 #include <QMessageBox>
 #include <QFontDialog>
+#include <QHeaderView>
 
 AScriptWindow::AScriptWindow(MasterConfig *Config, QWidget *parent) :
     QMainWindow(parent), Config(Config),

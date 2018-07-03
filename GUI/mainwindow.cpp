@@ -9,6 +9,7 @@
 #include "adispatcher.h"
 #include "aeditchannelsdialog.h"
 #include "adatahub.h"
+#include "aservermonitorwindow.h"
 
 #ifdef CERN_ROOT
 #include "cernrootmodule.h"
@@ -17,6 +18,7 @@
 #include "trb3datareader.h"
 #include "trb3signalextractor.h"
 #include "ahldfileprocessor.h"
+#include "anetworkmodule.h"
 
 #include <QDebug>
 #include <QFileDialog>
@@ -32,10 +34,10 @@ MainWindow::MainWindow(MasterConfig* Config,
                        ADataHub* DataHub,
                        Trb3dataReader* Reader,
                        Trb3signalExtractor* Extractor,
-                       AHldFileProcessor& HldFileProcessor,
+                       AHldFileProcessor& HldFileProcessor, ANetworkModule &Network,
                        QWidget *parent) :
     QMainWindow(parent),
-    Config(Config), Dispatcher(Dispatcher), DataHub(DataHub), Reader(Reader), Extractor(Extractor), HldFileProcessor(HldFileProcessor),
+    Config(Config), Dispatcher(Dispatcher), DataHub(DataHub), Reader(Reader), Extractor(Extractor), HldFileProcessor(HldFileProcessor), Network(Network),
     ui(new Ui::MainWindow)
 {
     bStopFlag = false;
@@ -81,6 +83,10 @@ MainWindow::MainWindow(MasterConfig* Config,
     ui->pbStop->setVisible(false);
     on_cobSignalExtractionMethod_currentIndexChanged(ui->cobSignalExtractionMethod->currentIndex());
     OnEventOrChannelChanged(); // to update channel mapping indication
+
+    ServerWindow = new AServerMonitorWindow(*this, Network, this);
+    QObject::connect(&Network, &ANetworkModule::StatusChanged, ServerWindow, &AServerMonitorWindow::onServerstatusChanged);
+    QObject::connect(&Network, &ANetworkModule::ReportTextToGUI, ServerWindow, &AServerMonitorWindow::appendText);
 }
 
 MainWindow::~MainWindow()
@@ -91,6 +97,14 @@ MainWindow::~MainWindow()
 
     delete ScriptWindow;
     delete ui;
+}
+
+void MainWindow::SetEnabled(bool flag)
+{
+    ui->twMain->setEnabled(flag);
+    menuBar()->setEnabled(flag);
+
+    ScriptWindow->setEnabled(flag);
 }
 
 void MainWindow::on_pbSelectFile_clicked()
@@ -1431,4 +1445,9 @@ void MainWindow::on_cobLableType_activated(int)
 void MainWindow::onProgressUpdate(int progress)
 {
     ui->prbMainBar->setValue(progress);
+}
+
+void MainWindow::on_actionConfigure_WebSocket_server_triggered()
+{
+    ServerWindow->show();
 }

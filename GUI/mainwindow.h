@@ -13,6 +13,8 @@ class AScriptWindow;
 class ADispatcher;
 class ADataHub;
 class AHldFileProcessor;
+class ANetworkModule;
+class AServerMonitorWindow;
 
 namespace Ui {
 class MainWindow;
@@ -29,8 +31,11 @@ public:
                         Trb3dataReader* Reader,
                         Trb3signalExtractor* Extractor,
                         AHldFileProcessor& HldFileProcessor,
+                        ANetworkModule& Network,
                         QWidget *parent = 0);
     ~MainWindow();
+
+    void SetEnabled(bool flag);
 
 public slots:
     void UpdateGui();                               // slot since used by Dispatcher
@@ -168,6 +173,8 @@ private slots:
 
     void on_ledPedestalPeakThreshold_editingFinished();
 
+    void on_actionConfigure_WebSocket_server_triggered();
+
 protected:
     void closeEvent(QCloseEvent* event);
 
@@ -179,6 +186,7 @@ private:
     Trb3dataReader* Reader;
     Trb3signalExtractor* Extractor;
     AHldFileProcessor& HldFileProcessor;
+    ANetworkModule& Network;
 
     //owned objects
     Ui::MainWindow* ui;    
@@ -186,6 +194,7 @@ private:
 #ifdef CERN_ROOT
     CernRootModule* RootModule;
 #endif
+    AServerMonitorWindow* ServerWindow = 0;
 
     //gui misc
     bool bStopFlag;

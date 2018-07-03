@@ -14,6 +14,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QThread>
 
 // ------------------- CORE ----------------------
 
@@ -79,7 +80,11 @@ void AInterfaceToCore::sleep(int ms)
   if (ms == 0) return;
   QTime t;
   t.restart();
-  do qApp->processEvents();
+  do
+  {
+      qApp->processEvents();
+      QThread::usleep(100);
+  }
   while (t.elapsed()<ms);
 }
 
