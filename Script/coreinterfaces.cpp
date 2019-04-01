@@ -4,6 +4,8 @@
 
 //#include "TRandom2.h"
 
+#include <cmath>
+
 #include <QScriptEngine>
 #include <QDateTime>
 #include <QFileInfo>

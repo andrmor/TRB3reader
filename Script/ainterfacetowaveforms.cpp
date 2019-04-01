@@ -8,6 +8,7 @@
 #include <QDebug>
 
 #include <limits>
+#include <cmath>
 
 AInterfaceToWaveforms::AInterfaceToWaveforms(MasterConfig* Config, Trb3dataReader* Reader) :
     Config(Config), Reader(Reader)

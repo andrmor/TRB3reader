@@ -7,11 +7,8 @@ CONFIG += cern_root        #enable CERN ROOT for graph drawing
 cern_root {
     DEFINES += CERN_ROOT
 
-#    INCLUDEPATH += $$system(/home/andr/root/bin/root-config --incdir)
-#    LIBS += $$system(/home/andr/root/bin/root-config --libs) -lSpectrum #-lGeom -lGeomPainter -lGeomBuilder -lMathMore -lMinuit2
-
-    INCLUDEPATH += c:/root/include
-    LIBS += -Lc:/root/lib/ -llibCore -llibCint -llibRIO -llibNet -llibHist -llibGraf -llibGraf3d -llibGpad -llibTree -llibRint -llibPostscript -llibMatrix -llibPhysics -llibRint -llibMathCore -llibGeom -llibGeomPainter -llibGeomBuilder -llibMathMore -llibMinuit2 -llibThread -llibSpectrum
+     INCLUDEPATH += $$system(root-config --incdir)
+     LIBS += $$system(root-config --libs) -lSpectrum #-lGeom -lGeomPainter -lGeomBuilder -lMinuit2
 
     SOURCES += ROOT/cernrootmodule.cpp \
                ROOT/GUI/arasterwindow.cpp \
@@ -35,9 +32,9 @@ cern_root {
 #-----------
 
 #---DABC---
-#DEFINES += DABC
-#INCLUDEPATH += /home/andr/Soft/DABC/dabc_debug/include
-#LIBS += -L/home/andr/Soft/DABC/dabc_debug/lib/ -lDabcBase -lDabcMbs -lDabcHadaq
+DEFINES += DABC
+INCLUDEPATH += /home/andr/trb3/dabc/include
+LIBS += -L/home/andr/trb3/dabc/lib/ -lDabcBase -lDabcMbs -lDabcHadaq
 #-----------
 
 #---Speech---

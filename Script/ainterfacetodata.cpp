@@ -5,6 +5,7 @@
 #include <QJsonArray>
 
 #include <limits>
+#include <cmath>
 
 const double NaN = std::numeric_limits<double>::quiet_NaN();
 
