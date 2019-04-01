@@ -229,6 +229,8 @@ void MasterConfig::writeSignalExtractionToJson(QJsonObject &json)
     QJsonObject js;
         js["ExtractionMethod"] = SignalExtractionMethod;
         js["CommonSample"] = CommonSampleNumber;
+        js["IntegrateFrom"] = IntegrateFrom;
+        js["IntegrateTo"] = IntegrateTo;
 
         QJsonObject rm_js;
             rm_js["On"] = bZeroSignalIfReverse;
@@ -261,6 +263,8 @@ bool MasterConfig::readSignalExtractionFromJson(QJsonObject &json)
 
     parseJson(js, "ExtractionMethod", SignalExtractionMethod);
     parseJson(js, "CommonSample", CommonSampleNumber);
+    parseJson(js, "IntegrateFrom", IntegrateFrom);
+    parseJson(js, "IntegrateTo", IntegrateTo);
 
     parseJson(js, "ApplyPositiveThreshold", bPositiveThreshold);
     parseJson(js, "PositiveThreshold", PositiveThreshold);
