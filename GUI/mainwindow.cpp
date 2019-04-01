@@ -1451,3 +1451,33 @@ void MainWindow::on_actionConfigure_WebSocket_server_triggered()
 {
     ServerWindow->show();
 }
+
+#include <QProcess>
+//https://www.ssh.com/ssh/keygen/
+void MainWindow::on_pbSSH_clicked()
+{
+    QString user = ui->leUser->text();
+    QString host = ui->leHost->text();
+    QStringList commands;
+    //commands << "-hold";
+    commands << "-iconic";
+    commands << "-e";
+    QString s = QString("ssh %1@%2 'mkdir /home/rpcuser/test_dir'").arg(user).arg(host);
+    //commands << "ssh username@host 'cd /home/user/backups; mysqldump -u root -p mydb > mydb.sql; echo DONE!'";
+    commands << s;
+
+    QProcess *process = new QProcess(0);
+    process->setProcessChannelMode(QProcess::MergedChannels);
+    process->start("xterm", commands);
+
+    if(!process->waitForStarted()){
+        qDebug() << "Could not wait to start...";
+    }
+
+    if(!process->waitForFinished()) {
+        qDebug() << "Could not wait to finish...";
+    }
+
+    process->closeWriteChannel();
+    qDebug() << process->readAll();
+}

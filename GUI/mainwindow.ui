@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>732</width>
-    <height>689</height>
+    <height>738</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,7 +30,7 @@
     <item>
      <widget class="QTabWidget" name="twMain">
       <property name="currentIndex">
-       <number>5</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tab_6">
        <attribute name="title">
@@ -1608,6 +1608,102 @@
        <zorder>verticalSpacer_20</zorder>
        <zorder>verticalSpacer_21</zorder>
       </widget>
+      <widget class="QWidget" name="tab_7">
+       <attribute name="title">
+        <string>Page</string>
+       </attribute>
+       <widget class="QPushButton" name="pbSSH">
+        <property name="geometry">
+         <rect>
+          <x>60</x>
+          <y>110</y>
+          <width>99</width>
+          <height>27</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>SSH</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="leComm">
+        <property name="geometry">
+         <rect>
+          <x>180</x>
+          <y>110</y>
+          <width>113</width>
+          <height>27</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="cbLocalRun">
+        <property name="geometry">
+         <rect>
+          <x>17</x>
+          <y>16</y>
+          <width>401</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>TRB is running on locally</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+       <widget class="QFrame" name="frame_2">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>50</y>
+          <width>651</width>
+          <height>47</height>
+         </rect>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_47">
+         <item>
+          <widget class="QLabel" name="label_43">
+           <property name="text">
+            <string>User</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="leUser">
+           <property name="maximumSize">
+            <size>
+             <width>200</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>rpcuser</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_45">
+           <property name="text">
+            <string>@</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="leHost">
+           <property name="text">
+            <string>192.168.3.214</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
       <widget class="QWidget" name="tab_2">
        <attribute name="title">
         <string>Explore</string>
@@ -3117,7 +3213,7 @@
      <x>0</x>
      <y>0</y>
      <width>732</width>
-     <height>21</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -3187,12 +3283,12 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>99</x>
-     <y>503</y>
+     <x>105</x>
+     <y>540</y>
     </hint>
     <hint type="destinationlabel">
      <x>306</x>
-     <y>572</y>
+     <y>615</y>
     </hint>
    </hints>
   </connection>
@@ -3203,12 +3299,12 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>99</x>
-     <y>503</y>
+     <x>105</x>
+     <y>540</y>
     </hint>
     <hint type="destinationlabel">
      <x>306</x>
-     <y>539</y>
+     <y>580</y>
     </hint>
    </hints>
   </connection>
@@ -3219,12 +3315,12 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>99</x>
-     <y>503</y>
+     <x>105</x>
+     <y>540</y>
     </hint>
     <hint type="destinationlabel">
      <x>426</x>
-     <y>572</y>
+     <y>615</y>
     </hint>
    </hints>
   </connection>
@@ -3235,12 +3331,12 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>99</x>
-     <y>503</y>
+     <x>105</x>
+     <y>540</y>
     </hint>
     <hint type="destinationlabel">
      <x>426</x>
-     <y>539</y>
+     <y>580</y>
     </hint>
    </hints>
   </connection>
@@ -3299,12 +3395,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>457</x>
-     <y>503</y>
+     <x>462</x>
+     <y>540</y>
     </hint>
     <hint type="destinationlabel">
      <x>716</x>
-     <y>504</y>
+     <y>543</y>
     </hint>
    </hints>
   </connection>
@@ -3319,8 +3415,24 @@
      <y>109</y>
     </hint>
     <hint type="destinationlabel">
-     <x>453</x>
-     <y>133</y>
+     <x>463</x>
+     <y>160</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cbLocalRun</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>frame_2</receiver>
+   <slot>setHidden(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>65</x>
+     <y>91</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>55</x>
+     <y>114</y>
     </hint>
    </hints>
   </connection>

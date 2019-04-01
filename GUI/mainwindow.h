@@ -175,6 +175,8 @@ private slots:
 
     void on_actionConfigure_WebSocket_server_triggered();
 
+    void on_pbSSH_clicked();
+
 protected:
     void closeEvent(QCloseEvent* event);
 
