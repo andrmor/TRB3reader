@@ -10,6 +10,7 @@
 #include "aeditchannelsdialog.h"
 #include "adatahub.h"
 #include "aservermonitorwindow.h"
+#include "atrbruncontrol.h"
 
 #ifdef CERN_ROOT
 #include "cernrootmodule.h"
@@ -26,6 +27,7 @@
 #include <QDirIterator>
 #include <QInputDialog>
 #include <QProgressBar>
+#include <QTimer>
 
 #include <cmath>
 
@@ -42,6 +44,12 @@ MainWindow::MainWindow(MasterConfig* Config,
 {
     bStopFlag = false;
     ui->setupUi(this);
+
+    TrbRunManager = new ATrbRunControl();
+
+    watchdogTimer = new QTimer();
+    watchdogTimer->setInterval(1000);
+    QObject::connect(watchdogTimer, &QTimer::timeout, this, &MainWindow::onWatchdogFailed);
 
     QDoubleValidator* dv = new QDoubleValidator(this);
     dv->setNotation(QDoubleValidator::ScientificNotation);
@@ -87,6 +95,8 @@ MainWindow::MainWindow(MasterConfig* Config,
     ServerWindow = new AServerMonitorWindow(*this, Network, this);
     QObject::connect(&Network, &ANetworkModule::StatusChanged, ServerWindow, &AServerMonitorWindow::onServerstatusChanged);
     QObject::connect(&Network, &ANetworkModule::ReportTextToGUI, ServerWindow, &AServerMonitorWindow::appendText);
+
+    QObject::connect(TrbRunManager, &ATrbRunControl::boardLogReady, this, &MainWindow::onBoardLogNewText);
 }
 
 MainWindow::~MainWindow()
@@ -95,6 +105,7 @@ MainWindow::~MainWindow()
     delete RootModule;
 #endif
 
+    delete TrbRunManager;
     delete ScriptWindow;
     delete ui;
 }
@@ -1332,6 +1343,11 @@ void MainWindow::updateNumEventsIndication()
     ui->leNumEvents->setText( QString::number(numEvents) );
 }
 
+void MainWindow::onBoardLogNewText(const QString text)
+{
+    ui->teBoardLog->append(text);
+}
+
 void MainWindow::on_pbClearDataHub_clicked()
 {
     DataHub->Clear();
@@ -1452,17 +1468,16 @@ void MainWindow::on_actionConfigure_WebSocket_server_triggered()
     ServerWindow->show();
 }
 
-#include <QProcess>
 //https://www.ssh.com/ssh/keygen/
-void MainWindow::on_pbSSH_clicked()
-{
-    QString user = ui->leUser->text();
-    QString host = ui->leHost->text();
+    /*
+
     QStringList commands;
     //commands << "-hold";
     commands << "-iconic";
+    //commands << "-C";
     commands << "-e";
-    QString s = QString("ssh %1@%2 'mkdir /home/rpcuser/test_dir'").arg(user).arg(host);
+    //QString s = QString("ssh %1@%2 'mkdir /home/rpcuser/test_dir'").arg(user).arg(host);
+    QString s = QString("ssh %1@%2 '%3'").arg(user).arg(host).arg(start_script);
     //commands << "ssh username@host 'cd /home/user/backups; mysqldump -u root -p mydb > mydb.sql; echo DONE!'";
     commands << s;
 
@@ -1480,4 +1495,39 @@ void MainWindow::on_pbSSH_clicked()
 
     process->closeWriteChannel();
     qDebug() << process->readAll();
+
+    */
+
+void MainWindow::on_pbBoardOn_clicked()
+{
+    TrbRunManager->User = ui->leUser->text();
+    TrbRunManager->Host = ui->leHost->text();
+    TrbRunManager->StartupScript = ui->leStartup->text();
+
+    TrbRunManager->StartBoard();
+}
+
+void MainWindow::on_pbBoardOff_clicked()
+{
+    TrbRunManager->StopBoard();
+}
+
+void MainWindow::on_pbStartAcquire_clicked()
+{
+    TrbRunManager->StartAcquire();
+}
+
+void MainWindow::on_pbStopAcquire_clicked()
+{
+    TrbRunManager->StopAcquire();
+}
+
+void MainWindow::onBoardIsAlive()
+{
+    watchdogTimer->start();
+}
+
+void MainWindow::onWatchdogFailed()
+{
+    qDebug() << "Watchdog timer!";
 }

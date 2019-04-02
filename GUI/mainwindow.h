@@ -15,6 +15,8 @@ class ADataHub;
 class AHldFileProcessor;
 class ANetworkModule;
 class AServerMonitorWindow;
+class ATrbRunControl;
+class QTimer;
 
 namespace Ui {
 class MainWindow;
@@ -175,7 +177,9 @@ private slots:
 
     void on_actionConfigure_WebSocket_server_triggered();
 
-    void on_pbSSH_clicked();
+    void on_pbBoardOn_clicked();
+
+    void on_pbBoardOff_clicked();
 
 protected:
     void closeEvent(QCloseEvent* event);
@@ -204,6 +208,8 @@ private:
     //int  numProcessedEvents;
     //int  numBadEvents;
 
+    QTimer * watchdogTimer = 0;
+
 private:
     const QString ProcessData(); //returns error message if any
     void LogMessage(const QString message);
@@ -224,6 +230,15 @@ private:
     //bool bulkProcessCore();
     void bulkProcessorEnvelope(const QStringList FileNames);
     void updateNumEventsIndication();
+
+private:
+    ATrbRunControl * TrbRunManager = 0;
+private slots:
+    void onBoardLogNewText(const QString text);
+    void on_pbStartAcquire_clicked();
+    void on_pbStopAcquire_clicked();
+    void onBoardIsAlive();
+    void onWatchdogFailed();
 };
 
 #endif // MAINWINDOW_H
