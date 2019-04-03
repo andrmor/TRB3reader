@@ -247,6 +247,7 @@ private slots:
     void onWatchdogFailed();
     void on_cbLimitedTime_clicked(bool checked);
     void on_cbLimitEvents_clicked(bool checked);
+    void on_pbUpdateXML_clicked();
 };
 
 #endif // MAINWINDOW_H

@@ -4,6 +4,11 @@
 #include <QObject>
 #include <QElapsedTimer>
 
+ATrbRunControl::ATrbRunControl(const QString &exchangeDir)
+{
+    sExchangeDir = exchangeDir;
+}
+
 bool ATrbRunControl::StartBoard()
 {
     if (prBoard)
@@ -57,6 +62,8 @@ bool ATrbRunControl::StartAcquire()
     StatEvents = 0;
     StatRate = 0;
     StatData = 0;
+
+
 
     QString command = "ssh";
     QStringList args;
@@ -157,4 +164,30 @@ void ATrbRunControl::onReadyAcquireLog()
 
     //qDebug() << log;
     emit sigAcquireIsAlive();
+}
+
+void ATrbRunControl::updateXML()
+{
+    QString command = "scp";
+    QStringList args;
+    //args << QString("%1@%2:%3").arg(User).arg(Host).arg(StorageXML) << sExchangeDir;
+    args << QString("%1@%2:%3").arg(User).arg(Host).arg(StorageXML) << "/home/andr/tmp";
+    qDebug() << "Transfer command:"<<command << args;
+    QProcess * pr = new QProcess();
+    pr->setProcessChannelMode(QProcess::MergedChannels);
+    pr->start(command, args);
+
+    if(!pr->waitForStarted(1000)){
+        qDebug() << "Could not wait to start...";
+    }
+
+    if(!pr->waitForFinished(3000)) {
+        qDebug() << "Could not wait to finish...";
+    }
+
+    pr->closeWriteChannel();
+    qDebug() << pr->readAll();
+
+    delete pr;
+    qDebug() << "-----Transfer finished";
 }

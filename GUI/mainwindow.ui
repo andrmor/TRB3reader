@@ -1615,8 +1615,8 @@
        <widget class="QCheckBox" name="cbLocalRun">
         <property name="geometry">
          <rect>
-          <x>17</x>
-          <y>16</y>
+          <x>10</x>
+          <y>7</y>
           <width>401</width>
           <height>22</height>
          </rect>
@@ -1632,7 +1632,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>50</y>
+          <y>31</y>
           <width>651</width>
           <height>47</height>
          </rect>
@@ -1683,8 +1683,8 @@
        <widget class="QLabel" name="label_44">
         <property name="geometry">
          <rect>
-          <x>20</x>
-          <y>400</y>
+          <x>310</x>
+          <y>410</y>
           <width>241</width>
           <height>17</height>
          </rect>
@@ -1693,11 +1693,50 @@
          <string>Acquisition</string>
         </property>
        </widget>
+       <widget class="QWidget" name="layoutWidget_2">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>152</y>
+          <width>670</width>
+          <height>29</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_58">
+         <item>
+          <widget class="QLabel" name="label_58">
+           <property name="text">
+            <string>Storage XML on host:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="leStorageXML">
+           <property name="text">
+            <string>/home/rpcuser/trbsoft/userscripts/trb130/EventBuilder_Andr.xml</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QPushButton" name="pbUpdateXML">
+        <property name="geometry">
+         <rect>
+          <x>400</x>
+          <y>360</y>
+          <width>134</width>
+          <height>27</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Update</string>
+        </property>
+       </widget>
        <widget class="QWidget" name="">
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>120</y>
+          <y>90</y>
           <width>671</width>
           <height>29</height>
          </rect>
@@ -1927,7 +1966,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>270</y>
+          <y>200</y>
           <width>701</width>
           <height>121</height>
          </rect>
@@ -1965,9 +2004,9 @@
        <widget class="QWidget" name="">
         <property name="geometry">
          <rect>
-          <x>20</x>
-          <y>160</y>
-          <width>661</width>
+          <x>10</x>
+          <y>121</y>
+          <width>670</width>
           <height>29</height>
          </rect>
         </property>
@@ -1983,6 +2022,61 @@
           <widget class="QLineEdit" name="leRunScriptOnHost">
            <property name="text">
             <string>/home/rpcuser/trbsoft/userscripts/trb130/acquire_Andr.sh</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="">
+        <property name="geometry">
+         <rect>
+          <x>19</x>
+          <y>333</y>
+          <width>691</width>
+          <height>29</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_56">
+         <item>
+          <widget class="QLabel" name="label_50">
+           <property name="text">
+            <string>HLD file folder (as seen by host):</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="leFolderForHldFiles">
+           <property name="text">
+            <string>/media/externalDrive/hlds/</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="">
+        <property name="geometry">
+         <rect>
+          <x>19</x>
+          <y>363</y>
+          <width>241</width>
+          <height>29</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_57">
+         <item>
+          <widget class="QLabel" name="label_56">
+           <property name="text">
+            <string>File size:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="ledHldFileSize"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_57">
+           <property name="text">
+            <string>Mb</string>
            </property>
           </widget>
          </item>

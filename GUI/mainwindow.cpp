@@ -46,7 +46,7 @@ MainWindow::MainWindow(MasterConfig* Config,
     bStopFlag = false;
     ui->setupUi(this);
 
-    TrbRunManager = new ATrbRunControl();
+    TrbRunManager = new ATrbRunControl(Dispatcher->ConfigDir);
     QObject::connect(TrbRunManager, &ATrbRunControl::boardLogReady, this, &MainWindow::onBoardLogNewText);
     QObject::connect(TrbRunManager, &ATrbRunControl::sigAcquireIsAlive, this, &MainWindow::onAcquireIsAlive);
 
@@ -1579,4 +1579,16 @@ void MainWindow::on_cbLimitedTime_clicked(bool checked)
 void MainWindow::on_cbLimitEvents_clicked(bool checked)
 {
     if (checked) ui->cbLimitedTime->setChecked(false);
+}
+
+void MainWindow::on_pbUpdateXML_clicked()
+{
+    TrbRunManager->User = ui->leUser->text();
+    TrbRunManager->Host = ui->leHost->text();
+
+    TrbRunManager->HldFolder = ui->leFolderForHldFiles->text();
+    TrbRunManager->HildFileSize = ui->ledHldFileSize->text().toDouble();
+    TrbRunManager->StorageXML = ui->leStorageXML->text();
+
+    TrbRunManager->updateXML();
 }

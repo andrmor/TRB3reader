@@ -8,10 +8,16 @@ class ATrbRunControl : public QObject
 {
     Q_OBJECT
 public:
+    ATrbRunControl(const QString & exchangeDir);
+
     QString Host;
     QString User;
     QString StartupScript;
     QString AcquireScript;
+
+    QString HldFolder;
+    double HildFileSize;
+    QString StorageXML;
 
     int StatEvents = 0;
     double StatRate = 0;
@@ -23,6 +29,8 @@ public:
 
     bool StartAcquire();
     void StopAcquire();
+
+    void updateXML();
 
 private slots:
     void onBoardFinished(int exitCode, QProcess::ExitStatus exitStatus);
@@ -40,10 +48,13 @@ signals:
 
     void boardLogReady(const QString txt);
 
+
 private:
     QProcess * prBoard = 0;
     QProcess * prAcquire = 0;
     bool bStartLogFinished = false;
+
+    QString sExchangeDir;
 
 };
 
