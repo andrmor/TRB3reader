@@ -28,6 +28,7 @@
 #include <QInputDialog>
 #include <QProgressBar>
 #include <QTimer>
+#include <QElapsedTimer>
 
 #include <cmath>
 
@@ -46,10 +47,18 @@ MainWindow::MainWindow(MasterConfig* Config,
     ui->setupUi(this);
 
     TrbRunManager = new ATrbRunControl();
+    QObject::connect(TrbRunManager, &ATrbRunControl::boardLogReady, this, &MainWindow::onBoardLogNewText);
+    QObject::connect(TrbRunManager, &ATrbRunControl::sigAcquireIsAlive, this, &MainWindow::onAcquireIsAlive);
 
     watchdogTimer = new QTimer();
     watchdogTimer->setInterval(1000);
     QObject::connect(watchdogTimer, &QTimer::timeout, this, &MainWindow::onWatchdogFailed);
+
+    aTimer = new QTimer();
+    aTimer->setSingleShot(true);
+    QObject::connect(aTimer, &QTimer::timeout, this, &MainWindow::on_pbStopAcquire_clicked);
+
+    elTimer = new QElapsedTimer();
 
     QDoubleValidator* dv = new QDoubleValidator(this);
     dv->setNotation(QDoubleValidator::ScientificNotation);
@@ -96,7 +105,6 @@ MainWindow::MainWindow(MasterConfig* Config,
     QObject::connect(&Network, &ANetworkModule::StatusChanged, ServerWindow, &AServerMonitorWindow::onServerstatusChanged);
     QObject::connect(&Network, &ANetworkModule::ReportTextToGUI, ServerWindow, &AServerMonitorWindow::appendText);
 
-    QObject::connect(TrbRunManager, &ATrbRunControl::boardLogReady, this, &MainWindow::onBoardLogNewText);
 }
 
 MainWindow::~MainWindow()
@@ -104,6 +112,10 @@ MainWindow::~MainWindow()
 #ifdef CERN_ROOT
     delete RootModule;
 #endif
+
+    delete watchdogTimer;
+    delete aTimer;
+    delete elTimer;
 
     delete TrbRunManager;
     delete ScriptWindow;
@@ -1510,11 +1522,24 @@ void MainWindow::on_pbBoardOn_clicked()
 void MainWindow::on_pbBoardOff_clicked()
 {
     TrbRunManager->StopBoard();
+    ui->teBoardLog->clear();
+    ui->teBoardLog->append("Board is not connected");
 }
 
 void MainWindow::on_pbStartAcquire_clicked()
 {
+    TrbRunManager->AcquireScript = ui->leRunScriptOnHost->text();
+    if (ui->cbLimitedTime->isChecked())
+    {
+        int sec = ui->leiTimeSpan->text().toDouble();
+        aTimer->start(sec * 1000);
+    }
+
+    bLimitMaxEvents = ui->cbLimitEvents->isChecked();
+    MaxEventsToRun = ui->leiMaxEvents->text().toInt();
+
     TrbRunManager->StartAcquire();
+    elTimer->start();
 }
 
 void MainWindow::on_pbStopAcquire_clicked()
@@ -1524,10 +1549,34 @@ void MainWindow::on_pbStopAcquire_clicked()
 
 void MainWindow::onBoardIsAlive()
 {
+    ui->teBoardLog->append("Board is connected");
     watchdogTimer->start();
+}
+
+void MainWindow::onAcquireIsAlive()
+{
+    int iSec = elTimer->elapsed()*0.001;
+    ui->leStatTime->setText( QString::number(iSec) );
+    ui->leStatNumEv->setText( QString::number(TrbRunManager->StatEvents) );
+    ui->leStatData->setText( QString::number(TrbRunManager->StatData, 'g', 4) );
+    ui->leStatRate->setText( QString::number(TrbRunManager->StatRate, 'g', 4) );
+    ui->labDataUnits->setText( TrbRunManager->StatDataUnits );
+
+    if (bLimitMaxEvents && TrbRunManager->StatEvents >= MaxEventsToRun)
+        on_pbStopAcquire_clicked();
 }
 
 void MainWindow::onWatchdogFailed()
 {
     qDebug() << "Watchdog timer!";
+}
+
+void MainWindow::on_cbLimitedTime_clicked(bool checked)
+{
+    if (checked) ui->cbLimitEvents->setChecked(false);
+}
+
+void MainWindow::on_cbLimitEvents_clicked(bool checked)
+{
+    if (checked) ui->cbLimitedTime->setChecked(false);
 }

@@ -2,6 +2,7 @@
 
 #include <QDebug>
 #include <QObject>
+#include <QElapsedTimer>
 
 bool ATrbRunControl::StartBoard()
 {
@@ -11,8 +12,9 @@ bool ATrbRunControl::StartBoard()
         return false;
     }
 
-    qDebug() << "Starting up...";
     bStartLogFinished = false;
+
+    qDebug() << "Starting up...";
     QString command = "ssh";
     QStringList args;
     args << QString("%1@%2").arg(User).arg(Host) << QString("'%1'").arg(StartupScript);
@@ -52,9 +54,13 @@ bool ATrbRunControl::StartAcquire()
         return false;
     }
 
+    StatEvents = 0;
+    StatRate = 0;
+    StatData = 0;
+
     QString command = "ssh";
     QStringList args;
-    args << QString("%1@%2").arg(User).arg(Host) << QString("'/home/rpcuser/trbsoft/userscripts/trb130/acquire_Andr.sh'");
+    args << QString("%1@%2").arg(User).arg(Host) << AcquireScript;
     qDebug() << "Starting acquisition:"<<command << args;
 
     prAcquire = new QProcess();
@@ -122,13 +128,33 @@ void ATrbRunControl::onReadyBoardLog()
     }
 
     QString log(prBoard->readAll());
-    if (log == "Starting trigger\n")
+    if (log == "Starting CTS\n")
         bStartLogFinished = true;
     boardLogReady(log);
 }
 
 void ATrbRunControl::onReadyAcquireLog()
 {
-    QString log(prAcquire->readAll());
-    qDebug() << log;
+    QString txt = prAcquire->readAll();
+    QString log(txt);
+
+    if (txt.startsWith("---------------------------------------------\nEvents"))
+    {
+        QStringList f = log.split('\n');
+        if (f.size()>2)
+        {
+            QString st = f.at(1);
+            QStringList ff = st.split(' ', QString::SkipEmptyParts);
+            if (ff.size() > 7)
+            {
+                StatEvents = ff.at(1).toInt();
+                StatRate = ff.at(3).toDouble();
+                StatData = ff.at(6).toDouble();
+                StatDataUnits = ff.at(7);
+            }
+        }
+    }
+
+    //qDebug() << log;
+    emit sigAcquireIsAlive();
 }

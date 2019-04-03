@@ -17,6 +17,7 @@ class ANetworkModule;
 class AServerMonitorWindow;
 class ATrbRunControl;
 class QTimer;
+class QElapsedTimer;
 
 namespace Ui {
 class MainWindow;
@@ -209,6 +210,10 @@ private:
     //int  numBadEvents;
 
     QTimer * watchdogTimer = 0;
+    QTimer * aTimer = 0;
+    QElapsedTimer * elTimer = 0;
+    bool bLimitMaxEvents = false;
+    int MaxEventsToRun = 0;
 
 private:
     const QString ProcessData(); //returns error message if any
@@ -238,7 +243,10 @@ private slots:
     void on_pbStartAcquire_clicked();
     void on_pbStopAcquire_clicked();
     void onBoardIsAlive();
+    void onAcquireIsAlive();
     void onWatchdogFailed();
+    void on_cbLimitedTime_clicked(bool checked);
+    void on_cbLimitEvents_clicked(bool checked);
 };
 
 #endif // MAINWINDOW_H

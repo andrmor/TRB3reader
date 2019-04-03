@@ -8,11 +8,15 @@ class ATrbRunControl : public QObject
 {
     Q_OBJECT
 public:
-    ATrbRunControl(){}
-
     QString Host;
     QString User;
     QString StartupScript;
+    QString AcquireScript;
+
+    int StatEvents = 0;
+    double StatRate = 0;
+    double StatData = 0;
+    QString StatDataUnits;
 
     bool StartBoard();
     void StopBoard();
@@ -30,7 +34,9 @@ private slots:
 signals:
     void sigBoardOn();
     void sigBoardOff();
+
     void sigBoardIsAlive();
+    void sigAcquireIsAlive();
 
     void boardLogReady(const QString txt);
 
