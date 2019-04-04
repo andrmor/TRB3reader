@@ -250,6 +250,12 @@ private slots:
     void on_cbLimitEvents_clicked(bool checked);
     void on_pbOpenCTS_clicked();
     void on_pbOpenBufferControl_clicked();
+
+    void on_leUser_editingFinished();
+    void on_leHost_editingFinished();
+    void on_leStartupScriptOnHost_editingFinished();
+    void on_leAcquireScriptOnHost_editingFinished();
+    void on_leStorageXmlOnHost_editingFinished();
 };
 
 #endif // MAINWINDOW_H

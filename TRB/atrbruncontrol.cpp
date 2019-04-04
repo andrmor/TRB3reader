@@ -1,28 +1,25 @@
 #include "atrbruncontrol.h"
+#include "atrbrunsettings.h"
 
 #include <QDebug>
 #include <QObject>
 #include <QElapsedTimer>
 
-ATrbRunControl::ATrbRunControl(const QString &exchangeDir)
-{
-    sExchangeDir = exchangeDir;
-}
+ATrbRunControl::ATrbRunControl(ATrbRunSettings & settings, const QString & exchangeDir) :
+    QObject(), Settings(settings),
+    Host(settings.Host), User(settings.User),
+    sExchangeDir(exchangeDir) {}
 
-bool ATrbRunControl::StartBoard()
+const QString ATrbRunControl::StartBoard()
 {
-    if (prBoard)
-    {
-        qDebug() << "Already started";
-        return false;
-    }
+    if (prBoard) return "Already started";
 
     bStartLogFinished = false;
 
     qDebug() << "Starting up...";
     QString command = "ssh";
     QStringList args;
-    args << QString("%1@%2").arg(User).arg(Host) << QString("'%1'").arg(StartupScript);
+    args << QString("%1@%2").arg(User).arg(Host) << QString("'%1'").arg(Settings.StartupScriptOnHost);
 
     qDebug() << "Init board:"<<command << args;
 
@@ -32,7 +29,7 @@ bool ATrbRunControl::StartBoard()
     prBoard->setProcessChannelMode(QProcess::MergedChannels);
     prBoard->start(command, args);
 
-    return true;
+    return "";
 }
 
 void ATrbRunControl::StopBoard()
@@ -60,7 +57,7 @@ const QString ATrbRunControl::StartAcquire()
 
     QString command = "ssh";
     QStringList args;
-    args << QString("%1@%2").arg(User).arg(Host) << AcquireScript;
+    args << QString("%1@%2").arg(User).arg(Host) << Settings.AcquireScriptOnHost;
 
     qDebug() << "Starting acquisition:"<<command << args;
 
@@ -223,10 +220,10 @@ const QString ATrbRunControl::updateXML()
     QString where = sExchangeDir;
     if (!where.endsWith('/')) where += '/';
 
-    QString err = sshCopyFileFromHost(StorageXML, where);
+    QString err = sshCopyFileFromHost(Settings.StorageXMLOnHost, where);
     if (!err.isEmpty()) return err;
 
-    QFileInfo hostFileInfo(StorageXML);
+    QFileInfo hostFileInfo(Settings.StorageXMLOnHost);
     QString localFileName = where + hostFileInfo.fileName();
     QString hostDir = hostFileInfo.absolutePath();
 

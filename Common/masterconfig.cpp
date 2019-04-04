@@ -67,6 +67,8 @@ void MasterConfig::WriteToJson(QJsonObject &json)
 
     json["HldProcessSettings"] = HldProcessSettings.WriteToJson();
 
+    json["TrbRunSettings"] = TrbRunSettings.WriteToJson();
+
     json["FileName"] = FileName;
     json["WorkingDir"] = WorkingDir;
 
@@ -86,6 +88,9 @@ bool MasterConfig::ReadFromJson(QJsonObject &json)
     readMaxGateFromJson(json);
 
     HldProcessSettings.ReadFromJson( json["HldProcessSettings"].toObject() );
+
+    if (json.contains("TrbRunSettings"))
+        TrbRunSettings.ReadFromJson( json["TrbRunSettings"].toObject() );
 
     parseJson(json, "FileName", FileName);
     parseJson(json, "WorkingDir", WorkingDir);

@@ -48,14 +48,17 @@
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout_33">
             <item>
-             <widget class="QCheckBox" name="cbLocalRun">
-              <property name="text">
-               <string>TRB is running locally</string>
+             <spacer name="verticalSpacer_28">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
               </property>
-              <property name="checked">
-               <bool>false</bool>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
               </property>
-             </widget>
+             </spacer>
             </item>
             <item>
              <widget class="QFrame" name="frame_2">
@@ -82,7 +85,7 @@
                   </size>
                  </property>
                  <property name="text">
-                  <string>rpcuser</string>
+                  <string/>
                  </property>
                 </widget>
                </item>
@@ -96,7 +99,7 @@
                <item>
                 <widget class="QLineEdit" name="leHost">
                  <property name="text">
-                  <string>192.168.3.214</string>
+                  <string/>
                  </property>
                 </widget>
                </item>
@@ -126,9 +129,9 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="leStartup">
+               <widget class="QLineEdit" name="leStartupScriptOnHost">
                 <property name="text">
-                 <string>/home/rpcuser/trbsoft/userscripts/trb130/startup_Andr.sh</string>
+                 <string/>
                 </property>
                </widget>
               </item>
@@ -144,9 +147,9 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="leRunScriptOnHost">
+               <widget class="QLineEdit" name="leAcquireScriptOnHost">
                 <property name="text">
-                 <string>/home/rpcuser/trbsoft/userscripts/trb130/acquire_Andr.sh</string>
+                 <string/>
                 </property>
                </widget>
               </item>
@@ -162,9 +165,9 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="leStorageXML">
+               <widget class="QLineEdit" name="leStorageXmlOnHost">
                 <property name="text">
-                 <string>/home/rpcuser/trbsoft/userscripts/trb130/EventBuilder_Andr.xml</string>
+                 <string/>
                 </property>
                </widget>
               </item>
@@ -281,7 +284,7 @@
            </layout>
           </item>
           <item>
-           <widget class="QTextEdit" name="teBoardLog"/>
+           <widget class="QPlainTextEdit" name="pteBoardLog"/>
           </item>
          </layout>
         </item>
@@ -3875,12 +3878,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>99</x>
-     <y>487</y>
+     <x>88</x>
+     <y>591</y>
     </hint>
     <hint type="destinationlabel">
-     <x>269</x>
-     <y>486</y>
+     <x>258</x>
+     <y>589</y>
     </hint>
    </hints>
   </connection>
@@ -3891,12 +3894,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>82</x>
-     <y>492</y>
+     <x>71</x>
+     <y>596</y>
     </hint>
     <hint type="destinationlabel">
-     <x>326</x>
-     <y>491</y>
+     <x>315</x>
+     <y>594</y>
     </hint>
    </hints>
   </connection>

@@ -285,6 +285,13 @@ void MainWindow::UpdateGui()
 
     updateNumEventsIndication();
     OnEventOrChannelChanged();
+
+    ui->leUser->setText(Config->TrbRunSettings.User);
+    ui->leHost->setText(Config->TrbRunSettings.Host);
+
+    ui->leStartupScriptOnHost->setText(Config->TrbRunSettings.StartupScriptOnHost);
+    ui->leAcquireScriptOnHost->setText(Config->TrbRunSettings.AcquireScriptOnHost);
+    ui->leStorageXmlOnHost->setText(Config->TrbRunSettings.StorageXMLOnHost);
 }
 
 // --- update Config on GUI operated by user ---

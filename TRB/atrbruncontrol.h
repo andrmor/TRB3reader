@@ -4,27 +4,26 @@
 #include <QObject>
 #include <QProcess>
 
+class ATrbRunSettings;
+
 class ATrbRunControl : public QObject
 {
     Q_OBJECT
 public:
-    ATrbRunControl(const QString & exchangeDir);
+    ATrbRunControl(ATrbRunSettings & settings, const QString & exchangeDir);
 
-    QString Host;
-    QString User;
-    QString StartupScript;
-    QString AcquireScript;
+    const QString & Host;
+    const QString & User;
 
     QString HldFolder;
     int HldFileSize;
-    QString StorageXML;
 
     int StatEvents = 0;
     double StatRate = 0;
     double StatData = 0;
     QString StatDataUnits;
 
-    bool StartBoard();
+    const QString StartBoard();
     void StopBoard();
 
     const QString StartAcquire(); //returns error string, empty if all is ok
@@ -50,11 +49,12 @@ signals:
 
 
 private:
+    const ATrbRunSettings & Settings;
+    const QString sExchangeDir;
     QProcess * prBoard = 0;
     QProcess * prAcquire = 0;
     bool bStartLogFinished = false;
 
-    QString sExchangeDir;
 
 private:
     const QString sshCopyFileToHost(const QString & localFileName, const QString & hostDir);  // returns error message, empty if success

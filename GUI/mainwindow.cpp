@@ -46,7 +46,7 @@ MainWindow::MainWindow(MasterConfig* Config,
     bStopFlag = false;
     ui->setupUi(this);
 
-    TrbRunManager = new ATrbRunControl(Dispatcher->ConfigDir);
+    TrbRunManager = new ATrbRunControl(Config->TrbRunSettings, Dispatcher->ConfigDir);
     QObject::connect(TrbRunManager, &ATrbRunControl::sigBoardIsAlive, this, &MainWindow::onBoardIsAlive);
     QObject::connect(TrbRunManager, &ATrbRunControl::sigBoardOff, this, &MainWindow::onBoardDisconnected);
     QObject::connect(TrbRunManager, &ATrbRunControl::boardLogReady, this, &MainWindow::onBoardLogNewText);
@@ -1367,11 +1367,12 @@ void MainWindow::onBoardLogNewText(const QString text)
     {
         txt.remove(warning);
         txt += "\n<font color='red'>" + warning + "</font>";
+        ui->pteBoardLog->appendHtml(txt);
     }
-    ui->teBoardLog->append(txt);
+    else ui->pteBoardLog->appendPlainText(txt);
 
     if (txt.contains("Your board should be working now..."))
-        ui->teBoardLog->append("Waiting for ready status...");
+        ui->pteBoardLog->appendPlainText("Waiting for ready status...");
 
 }
 
@@ -1527,29 +1528,29 @@ void MainWindow::on_actionConfigure_WebSocket_server_triggered()
 
 void MainWindow::on_pbBoardOn_clicked()
 {
-    TrbRunManager->User = ui->leUser->text();
-    TrbRunManager->Host = ui->leHost->text();
-    TrbRunManager->StartupScript = ui->leStartup->text();
-
     ui->labConnectionStatus->setText("Connecting");
 
-    TrbRunManager->StartBoard();
+    QString err = TrbRunManager->StartBoard();
+    if (!err.isEmpty())
+        message(err, this);
+    else
+    {
+        ui->leHost->setEnabled(false);
+        ui->leUser->setEnabled(false);
+    }
 }
 
 void MainWindow::on_pbBoardOff_clicked()
 {
     watchdogTimer->stop();
     TrbRunManager->StopBoard();
-    ui->teBoardLog->append("Disconnecting...");
+    ui->pteBoardLog->appendPlainText("Disconnecting...");
 }
 
 void MainWindow::on_pbStartAcquire_clicked()
 {
-    TrbRunManager->AcquireScript = ui->leRunScriptOnHost->text();
-
     TrbRunManager->HldFolder = ui->leFolderForHldFiles->text();
     TrbRunManager->HldFileSize = ui->leiHldFileSize->text().toInt();
-    TrbRunManager->StorageXML = ui->leStorageXML->text();
 
     if (ui->cbLimitedTime->isChecked())
     {
@@ -1594,8 +1595,11 @@ void MainWindow::onBoardIsAlive()
 
 void MainWindow::onBoardDisconnected()
 {
-    ui->teBoardLog->clear();
+    ui->pteBoardLog->clear();
     ui->labConnectionStatus->setText("Not connected");
+
+    ui->leHost->setEnabled(true);
+    ui->leUser->setEnabled(true);
 }
 
 void MainWindow::onAcquireIsAlive()
@@ -1635,4 +1639,29 @@ void MainWindow::on_pbOpenCTS_clicked()
 void MainWindow::on_pbOpenBufferControl_clicked()
 {
     QDesktopServices::openUrl( QString("http://%1:1234/addons/adc.pl?BufferConfig").arg(TrbRunManager->Host));
+}
+
+void MainWindow::on_leUser_editingFinished()
+{
+    Config->TrbRunSettings.User = ui->leUser->text();
+}
+
+void MainWindow::on_leHost_editingFinished()
+{
+    Config->TrbRunSettings.Host = ui->leHost->text();
+}
+
+void MainWindow::on_leStartupScriptOnHost_editingFinished()
+{
+    Config->TrbRunSettings.StartupScriptOnHost = ui->leStartupScriptOnHost->text();
+}
+
+void MainWindow::on_leAcquireScriptOnHost_editingFinished()
+{
+    Config->TrbRunSettings.AcquireScriptOnHost = ui->leAcquireScriptOnHost->text();
+}
+
+void MainWindow::on_leStorageXmlOnHost_editingFinished()
+{
+    Config->TrbRunSettings.StorageXMLOnHost = ui->leStorageXmlOnHost->text();
 }

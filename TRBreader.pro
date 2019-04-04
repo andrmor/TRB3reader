@@ -89,7 +89,8 @@ SOURCES += main.cpp \
     Script/awebserverinterface.cpp \
     Net/anetworkmodule.cpp \
     aservermonitorwindow.cpp \
-    TRB/atrbruncontrol.cpp
+    TRB/atrbruncontrol.cpp \
+    TRB/atrbrunsettings.cpp
 
 HEADERS  += GUI/mainwindow.h \    
     TRB/trb3datareader.h \
@@ -123,7 +124,8 @@ HEADERS  += GUI/mainwindow.h \
     Script/awebserverinterface.h \
     Net/anetworkmodule.h \
     aservermonitorwindow.h \
-    TRB/atrbruncontrol.h
+    TRB/atrbruncontrol.h \
+    TRB/atrbrunsettings.h
 
 FORMS    += GUI/mainwindow.ui \
     GUI/ascriptwindow.ui \

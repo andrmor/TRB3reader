@@ -1,6 +1,8 @@
 #ifndef MASTERCONFIG_H
 #define MASTERCONFIG_H
 
+#include "atrbrunsettings.h"
+
 #include <QVector>
 #include <QSet>
 #include <QList>
@@ -8,7 +10,6 @@
 
 class QJsonObject;
 class ChannelMapper;
-class AHldProcessSettings;
 
 class AHldProcessSettings
 {
@@ -104,6 +105,9 @@ public:
 
     // hld file processor settings
     AHldProcessSettings HldProcessSettings;
+
+    //trb acqusition-related settings
+    ATrbRunSettings     TrbRunSettings;
 
     // config <-> JSON handling
     void                WriteToJson(QJsonObject& json);
