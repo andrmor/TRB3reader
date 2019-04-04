@@ -45,29 +45,23 @@ void ATrbRunControl::StopBoard()
     }
 }
 
-bool ATrbRunControl::StartAcquire()
+const QString ATrbRunControl::StartAcquire()
 {
-    if (!prBoard)
-    {
-        qDebug() << "Board not ready!";
-        return false;
-    }
-    if (prAcquire)
-    {
-        qDebug() << "Already acquiring";
+    if (!prBoard) return "Board not ready!";
+    if (prAcquire) return "Acquisition is already running";
 
-        return false;
-    }
+    QString err = updateXML();
+    if (!err.isEmpty())
+        return "Failed to update file storage settings on host:\n" + err;
 
     StatEvents = 0;
     StatRate = 0;
     StatData = 0;
 
-
-
     QString command = "ssh";
     QStringList args;
     args << QString("%1@%2").arg(User).arg(Host) << AcquireScript;
+
     qDebug() << "Starting acquisition:"<<command << args;
 
     prAcquire = new QProcess();
@@ -77,7 +71,7 @@ bool ATrbRunControl::StartAcquire()
 
     prAcquire->start(command, args);
 
-    return true;
+    return "";
 }
 
 void ATrbRunControl::StopAcquire()
@@ -135,6 +129,7 @@ void ATrbRunControl::onReadyBoardLog()
     }
 
     QString log(prBoard->readAll());
+    if (log == '\n') return;
     if (log == "Starting CTS\n")
         bStartLogFinished = true;
     boardLogReady(log);
@@ -202,19 +197,34 @@ const QString ATrbRunControl::sshCopyFileFromHost(const QString & hostFileName, 
     return "";
 }
 
+const QString ATrbRunControl::makeDirOnHost(const QString & hostDir)
+{
+    QString command = "ssh";
+    QStringList args;
+    args << QString("%1@%2").arg(User).arg(Host) << "mkdir" << "-p" << hostDir;
+    qDebug() << "mkdir command:"<<command << args;
+
+    QProcess pr;
+    //pr.setProcessChannelMode(QProcess::MergedChannels);
+    pr.start(command, args);
+
+    if (!pr.waitForStarted(500)) return "Could not start mkdir process";
+    if (!pr.waitForFinished(2000)) return "Timeout on mkdir on host";
+
+    //pr.closeWriteChannel();
+    //qDebug() << pr.readAll();
+    return "";
+}
+
 #include <QXmlStreamReader>
 #include <QFileInfo>
-void ATrbRunControl::updateXML(const QString & NewDir, int NewSizeMb)
+const QString ATrbRunControl::updateXML()
 {
     QString where = sExchangeDir;
     if (!where.endsWith('/')) where += '/';
 
     QString err = sshCopyFileFromHost(StorageXML, where);
-    if (!err.isEmpty())
-    {
-        qDebug() << err;
-        return;
-    }
+    if (!err.isEmpty()) return err;
 
     QFileInfo hostFileInfo(StorageXML);
     QString localFileName = where + hostFileInfo.fileName();
@@ -240,31 +250,31 @@ void ATrbRunControl::updateXML(const QString & NewDir, int NewSizeMb)
                     qDebug() << "Found!";
                     //<OutputPort name="Output1" url="hld://${HOME}/hlds/dabc.hld?maxsize=10"/>
                     //<OutputPort name="Output1" url="hld:///media/externalDrive/data/hlds/dabc.hld?maxsize=10"/>
-                    QString dir = NewDir;
+                    QString dir = HldFolder;
                     if (!dir.endsWith('/')) dir += '/';
-                    line = QString("<OutputPort name=\"Output1\" url=\"hld://%1dabc.hld?maxsize=%2\"/>").arg(dir).arg(NewSizeMb);
+                    line = QString("<OutputPort name=\"Output1\" url=\"hld://%1dabc.hld?maxsize=%2\"/>\n").arg(dir).arg(HldFileSize);
                 }
             }
             newXml += line;
         }
     }
-    else qDebug() << "Cannot open file" << localFileName;
+    else return "Cannot open file" + localFileName;
     file.close();
 
-    //QFile fout(fName);
     if (file.open(QIODevice::WriteOnly | QIODevice::Text))
     {
         QByteArray ar = newXml.toLocal8Bit().data();
         file.write(ar);
     }
-    else qDebug() << "Cannot write";
+    else return "Cannot write to " + localFileName;
     file.close();
 
     err = sshCopyFileToHost(localFileName, hostDir);
-    if (!err.isEmpty())
-    {
-        qDebug() << err;
-        return;
-    }
+    if (!err.isEmpty()) return err;
 
+    //making dir on host
+    err = makeDirOnHost(HldFolder);
+    if (!err.isEmpty()) return "Failed to create target folder on host";
+
+    return "";
 }

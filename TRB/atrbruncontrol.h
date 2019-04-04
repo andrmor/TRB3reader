@@ -16,7 +16,7 @@ public:
     QString AcquireScript;
 
     QString HldFolder;
-    int HildFileSize;
+    int HldFileSize;
     QString StorageXML;
 
     int StatEvents = 0;
@@ -27,10 +27,10 @@ public:
     bool StartBoard();
     void StopBoard();
 
-    bool StartAcquire();
+    const QString StartAcquire(); //returns error string, empty if all is ok
     void StopAcquire();
 
-    void updateXML(const QString & NewDir, int NewSizeMb);
+    const QString updateXML();
 
 private slots:
     void onBoardFinished(int exitCode, QProcess::ExitStatus exitStatus);
@@ -40,7 +40,7 @@ private slots:
     void onReadyAcquireLog();
 
 signals:
-    void sigBoardOn();
+    //void sigBoardOn();
     void sigBoardOff();
 
     void sigBoardIsAlive();
@@ -59,6 +59,7 @@ private:
 private:
     const QString sshCopyFileToHost(const QString & localFileName, const QString & hostDir);  // returns error message, empty if success
     const QString sshCopyFileFromHost(const QString & hostFileName, const QString & localDir);  // returns error message, empty if success
+    const QString makeDirOnHost(const QString & hostDir);  // returns error message, empty if success
 
 };
 

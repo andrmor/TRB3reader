@@ -48,6 +48,7 @@ MainWindow::MainWindow(MasterConfig* Config,
 
     TrbRunManager = new ATrbRunControl(Dispatcher->ConfigDir);
     QObject::connect(TrbRunManager, &ATrbRunControl::sigBoardIsAlive, this, &MainWindow::onBoardIsAlive);
+    QObject::connect(TrbRunManager, &ATrbRunControl::sigBoardOff, this, &MainWindow::onBoardDisconnected);
     QObject::connect(TrbRunManager, &ATrbRunControl::boardLogReady, this, &MainWindow::onBoardLogNewText);
     QObject::connect(TrbRunManager, &ATrbRunControl::sigAcquireIsAlive, this, &MainWindow::onAcquireIsAlive);
 
@@ -1358,7 +1359,20 @@ void MainWindow::updateNumEventsIndication()
 
 void MainWindow::onBoardLogNewText(const QString text)
 {
-    ui->teBoardLog->append(text);
+    QString txt = text;
+    if (txt.endsWith('\n')) txt.chop(1);
+
+    const QString warning = "WARNING: Could not get all ADCs to work despite retrying...";
+    if (txt.contains(warning))
+    {
+        txt.remove(warning);
+        txt += "\n<font color='red'>" + warning + "</font>";
+    }
+    ui->teBoardLog->append(txt);
+
+    if (txt.contains("Your board should be working now..."))
+        ui->teBoardLog->append("Waiting for ready status...");
+
 }
 
 void MainWindow::on_pbClearDataHub_clicked()
@@ -1524,25 +1538,47 @@ void MainWindow::on_pbBoardOn_clicked()
 
 void MainWindow::on_pbBoardOff_clicked()
 {
+    watchdogTimer->stop();
     TrbRunManager->StopBoard();
-    ui->teBoardLog->clear();
-    ui->teBoardLog->append("Board is not connected");
+    ui->teBoardLog->append("Disconnecting...");
 }
 
 void MainWindow::on_pbStartAcquire_clicked()
 {
     TrbRunManager->AcquireScript = ui->leRunScriptOnHost->text();
+
+    TrbRunManager->HldFolder = ui->leFolderForHldFiles->text();
+    TrbRunManager->HldFileSize = ui->leiHldFileSize->text().toInt();
+    TrbRunManager->StorageXML = ui->leStorageXML->text();
+
     if (ui->cbLimitedTime->isChecked())
     {
         int sec = ui->leiTimeSpan->text().toDouble();
-        aTimer->start(sec * 1000);
+
+        int multiplier = 0;
+        switch (ui->cobTimeUnits->currentIndex())
+        {
+        case 0:
+            multiplier = 1;
+            break;
+        case 1:
+            multiplier = 60;
+            break;
+        case 2:
+            multiplier = 60*60;
+            break;
+        default:;
+        }
+        aTimer->start(sec * multiplier * 1000);
     }
 
     bLimitMaxEvents = ui->cbLimitEvents->isChecked();
     MaxEventsToRun = ui->leiMaxEvents->text().toInt();
 
-    TrbRunManager->StartAcquire();
-    elTimer->start();
+    QString err = TrbRunManager->StartAcquire();
+    if (!err.isEmpty())
+        message(err, this);
+    else elTimer->start();
 }
 
 void MainWindow::on_pbStopAcquire_clicked()
@@ -1554,6 +1590,12 @@ void MainWindow::onBoardIsAlive()
 {
     ui->labConnectionStatus->setText("<font color='green'>Connected</font>");
     watchdogTimer->start();
+}
+
+void MainWindow::onBoardDisconnected()
+{
+    ui->teBoardLog->clear();
+    ui->labConnectionStatus->setText("Not connected");
 }
 
 void MainWindow::onAcquireIsAlive()
@@ -1571,7 +1613,6 @@ void MainWindow::onAcquireIsAlive()
 
 void MainWindow::onWatchdogFailed()
 {
-    qDebug() << "Watchdog timer!";
     ui->labConnectionStatus->setText("<font color='red'>Not responding</font>");
 }
 
@@ -1585,14 +1626,13 @@ void MainWindow::on_cbLimitEvents_clicked(bool checked)
     if (checked) ui->cbLimitedTime->setChecked(false);
 }
 
-void MainWindow::on_pbUpdateXML_clicked()
+#include <QDesktopServices>
+void MainWindow::on_pbOpenCTS_clicked()
 {
-    TrbRunManager->User = ui->leUser->text();
-    TrbRunManager->Host = ui->leHost->text();
+    QDesktopServices::openUrl( QString("http://%1:1234/cts/cts.htm").arg(TrbRunManager->Host) );
+}
 
-    TrbRunManager->HldFolder = ui->leFolderForHldFiles->text();
-    TrbRunManager->HildFileSize = ui->leiHldFileSize->text().toInt();
-    TrbRunManager->StorageXML = ui->leStorageXML->text();
-
-    TrbRunManager->updateXML(TrbRunManager->HldFolder, TrbRunManager->HildFileSize);
+void MainWindow::on_pbOpenBufferControl_clicked()
+{
+    QDesktopServices::openUrl( QString("http://%1:1234/addons/adc.pl?BufferConfig").arg(TrbRunManager->Host));
 }

@@ -243,11 +243,13 @@ private slots:
     void on_pbStartAcquire_clicked();
     void on_pbStopAcquire_clicked();
     void onBoardIsAlive();
+    void onBoardDisconnected();
     void onAcquireIsAlive();
     void onWatchdogFailed();
     void on_cbLimitedTime_clicked(bool checked);
     void on_cbLimitEvents_clicked(bool checked);
-    void on_pbUpdateXML_clicked();
+    void on_pbOpenCTS_clicked();
+    void on_pbOpenBufferControl_clicked();
 };
 
 #endif // MAINWINDOW_H
