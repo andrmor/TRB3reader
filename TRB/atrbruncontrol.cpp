@@ -166,28 +166,105 @@ void ATrbRunControl::onReadyAcquireLog()
     emit sigAcquireIsAlive();
 }
 
-void ATrbRunControl::updateXML()
+const QString ATrbRunControl::sshCopyFileToHost(const QString &localFileName, const QString &hostDir)
 {
     QString command = "scp";
     QStringList args;
-    //args << QString("%1@%2:%3").arg(User).arg(Host).arg(StorageXML) << sExchangeDir;
-    args << QString("%1@%2:%3").arg(User).arg(Host).arg(StorageXML) << "/home/andr/tmp";
+    args << localFileName << QString("%1@%2:%3").arg(User).arg(Host).arg(hostDir) ;
     qDebug() << "Transfer command:"<<command << args;
-    QProcess * pr = new QProcess();
-    pr->setProcessChannelMode(QProcess::MergedChannels);
-    pr->start(command, args);
+    QProcess pr;
+    //pr.setProcessChannelMode(QProcess::MergedChannels);
+    pr.start(command, args);
 
-    if(!pr->waitForStarted(1000)){
-        qDebug() << "Could not wait to start...";
+    if (!pr.waitForStarted(500)) return "Could not start copy process";
+    if (!pr.waitForFinished(2000)) return "Timeout on copy to host";
+
+    //pr.closeWriteChannel();
+    //qDebug() << pr.readAll();
+    return "";
+}
+
+const QString ATrbRunControl::sshCopyFileFromHost(const QString & hostFileName, const QString & localDir)
+{
+    QString command = "scp";
+    QStringList args;
+    args << QString("%1@%2:%3").arg(User).arg(Host).arg(hostFileName) << localDir;
+    qDebug() << "Transfer command:"<<command << args;
+    QProcess pr;
+    //pr.setProcessChannelMode(QProcess::MergedChannels);
+    pr.start(command, args);
+
+    if (!pr.waitForStarted(500)) return "Could not start copy process";
+    if (!pr.waitForFinished(2000)) return "Timeout on copy from host";
+
+    //pr.closeWriteChannel();
+    //qDebug() << pr.readAll();
+    return "";
+}
+
+#include <QXmlStreamReader>
+#include <QFileInfo>
+void ATrbRunControl::updateXML(const QString & NewDir, int NewSizeMb)
+{
+    QString where = sExchangeDir;
+    if (!where.endsWith('/')) where += '/';
+
+    QString err = sshCopyFileFromHost(StorageXML, where);
+    if (!err.isEmpty())
+    {
+        qDebug() << err;
+        return;
     }
 
-    if(!pr->waitForFinished(3000)) {
-        qDebug() << "Could not wait to finish...";
+    QFileInfo hostFileInfo(StorageXML);
+    QString localFileName = where + hostFileInfo.fileName();
+    QString hostDir = hostFileInfo.absolutePath();
+
+    qDebug() << "On host:" << hostDir << localFileName;
+
+    QString newXml;
+    QFile file(localFileName);
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        int NumComment = 0;
+        while (!file.atEnd())
+        {
+            QString line = file.readLine();
+            //qDebug() << line;
+            NumComment += line.count("<!--");
+            NumComment -= line.count("-->");
+            if (!line.contains("<!--") && NumComment == 0)
+            {
+                if (line.contains("Output1"))
+                {
+                    qDebug() << "Found!";
+                    //<OutputPort name="Output1" url="hld://${HOME}/hlds/dabc.hld?maxsize=10"/>
+                    //<OutputPort name="Output1" url="hld:///media/externalDrive/data/hlds/dabc.hld?maxsize=10"/>
+                    QString dir = NewDir;
+                    if (!dir.endsWith('/')) dir += '/';
+                    line = QString("<OutputPort name=\"Output1\" url=\"hld://%1dabc.hld?maxsize=%2\"/>").arg(dir).arg(NewSizeMb);
+                }
+            }
+            newXml += line;
+        }
+    }
+    else qDebug() << "Cannot open file" << localFileName;
+    file.close();
+
+    //QFile fout(fName);
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        QByteArray ar = newXml.toLocal8Bit().data();
+        file.write(ar);
+    }
+    else qDebug() << "Cannot write";
+    file.close();
+
+    err = sshCopyFileToHost(localFileName, hostDir);
+    if (!err.isEmpty())
+    {
+        qDebug() << err;
+        return;
     }
 
-    pr->closeWriteChannel();
-    qDebug() << pr->readAll();
-
-    delete pr;
-    qDebug() << "-----Transfer finished";
 }

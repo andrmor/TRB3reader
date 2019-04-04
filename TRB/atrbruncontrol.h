@@ -16,7 +16,7 @@ public:
     QString AcquireScript;
 
     QString HldFolder;
-    double HildFileSize;
+    int HildFileSize;
     QString StorageXML;
 
     int StatEvents = 0;
@@ -30,7 +30,7 @@ public:
     bool StartAcquire();
     void StopAcquire();
 
-    void updateXML();
+    void updateXML(const QString & NewDir, int NewSizeMb);
 
 private slots:
     void onBoardFinished(int exitCode, QProcess::ExitStatus exitStatus);
@@ -55,6 +55,10 @@ private:
     bool bStartLogFinished = false;
 
     QString sExchangeDir;
+
+private:
+    const QString sshCopyFileToHost(const QString & localFileName, const QString & hostDir);  // returns error message, empty if success
+    const QString sshCopyFileFromHost(const QString & hostFileName, const QString & localDir);  // returns error message, empty if success
 
 };
 

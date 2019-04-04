@@ -47,11 +47,12 @@ MainWindow::MainWindow(MasterConfig* Config,
     ui->setupUi(this);
 
     TrbRunManager = new ATrbRunControl(Dispatcher->ConfigDir);
+    QObject::connect(TrbRunManager, &ATrbRunControl::sigBoardIsAlive, this, &MainWindow::onBoardIsAlive);
     QObject::connect(TrbRunManager, &ATrbRunControl::boardLogReady, this, &MainWindow::onBoardLogNewText);
     QObject::connect(TrbRunManager, &ATrbRunControl::sigAcquireIsAlive, this, &MainWindow::onAcquireIsAlive);
 
     watchdogTimer = new QTimer();
-    watchdogTimer->setInterval(1000);
+    watchdogTimer->setInterval(2000);
     QObject::connect(watchdogTimer, &QTimer::timeout, this, &MainWindow::onWatchdogFailed);
 
     aTimer = new QTimer();
@@ -1516,6 +1517,8 @@ void MainWindow::on_pbBoardOn_clicked()
     TrbRunManager->Host = ui->leHost->text();
     TrbRunManager->StartupScript = ui->leStartup->text();
 
+    ui->labConnectionStatus->setText("Connecting");
+
     TrbRunManager->StartBoard();
 }
 
@@ -1549,7 +1552,7 @@ void MainWindow::on_pbStopAcquire_clicked()
 
 void MainWindow::onBoardIsAlive()
 {
-    ui->teBoardLog->append("Board is connected");
+    ui->labConnectionStatus->setText("<font color='green'>Connected</font>");
     watchdogTimer->start();
 }
 
@@ -1569,6 +1572,7 @@ void MainWindow::onAcquireIsAlive()
 void MainWindow::onWatchdogFailed()
 {
     qDebug() << "Watchdog timer!";
+    ui->labConnectionStatus->setText("<font color='red'>Not responding</font>");
 }
 
 void MainWindow::on_cbLimitedTime_clicked(bool checked)
@@ -1587,8 +1591,8 @@ void MainWindow::on_pbUpdateXML_clicked()
     TrbRunManager->Host = ui->leHost->text();
 
     TrbRunManager->HldFolder = ui->leFolderForHldFiles->text();
-    TrbRunManager->HildFileSize = ui->ledHldFileSize->text().toDouble();
+    TrbRunManager->HildFileSize = ui->leiHldFileSize->text().toInt();
     TrbRunManager->StorageXML = ui->leStorageXML->text();
 
-    TrbRunManager->updateXML();
+    TrbRunManager->updateXML(TrbRunManager->HldFolder, TrbRunManager->HildFileSize);
 }
