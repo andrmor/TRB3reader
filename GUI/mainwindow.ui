@@ -425,7 +425,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="leiTimeSpan">
+               <widget class="QLineEdit" name="ledTimeSpan">
                 <property name="text">
                  <string>10</string>
                 </property>
@@ -3874,7 +3874,7 @@
   <connection>
    <sender>cbLimitedTime</sender>
    <signal>toggled(bool)</signal>
-   <receiver>leiTimeSpan</receiver>
+   <receiver>ledTimeSpan</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">

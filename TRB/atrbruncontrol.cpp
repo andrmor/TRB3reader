@@ -247,9 +247,9 @@ const QString ATrbRunControl::updateXML()
                     qDebug() << "Found!";
                     //<OutputPort name="Output1" url="hld://${HOME}/hlds/dabc.hld?maxsize=10"/>
                     //<OutputPort name="Output1" url="hld:///media/externalDrive/data/hlds/dabc.hld?maxsize=10"/>
-                    QString dir = HldFolder;
+                    QString dir = Settings.HldDirOnHost;
                     if (!dir.endsWith('/')) dir += '/';
-                    line = QString("<OutputPort name=\"Output1\" url=\"hld://%1dabc.hld?maxsize=%2\"/>\n").arg(dir).arg(HldFileSize);
+                    line = QString("<OutputPort name=\"Output1\" url=\"hld://%1dabc.hld?maxsize=%2\"/>\n").arg(dir).arg(Settings.MaxHldSizeMb);
                 }
             }
             newXml += line;
@@ -270,7 +270,7 @@ const QString ATrbRunControl::updateXML()
     if (!err.isEmpty()) return err;
 
     //making dir on host
-    err = makeDirOnHost(HldFolder);
+    err = makeDirOnHost(Settings.HldDirOnHost);
     if (!err.isEmpty()) return "Failed to create target folder on host";
 
     return "";

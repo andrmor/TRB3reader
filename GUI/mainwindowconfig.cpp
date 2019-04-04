@@ -292,6 +292,18 @@ void MainWindow::UpdateGui()
     ui->leStartupScriptOnHost->setText(Config->TrbRunSettings.StartupScriptOnHost);
     ui->leAcquireScriptOnHost->setText(Config->TrbRunSettings.AcquireScriptOnHost);
     ui->leStorageXmlOnHost->setText(Config->TrbRunSettings.StorageXMLOnHost);
+
+    ui->leFolderForHldFiles->setText(Config->TrbRunSettings.HldDirOnHost);
+    ui->leiHldFileSize->setText( QString::number(Config->TrbRunSettings.MaxHldSizeMb) );
+
+    ui->ledTimeSpan->setText( QString::number(Config->TrbRunSettings.TimeLimit, 'g', 4 ) );
+    int index = 0;
+    if (Config->TrbRunSettings.TimeMultiplier == 60) index = 1;
+    else if (Config->TrbRunSettings.TimeMultiplier == 60*60) index = 2;
+    ui->cobTimeUnits->setCurrentIndex(index);
+    ui->cbLimitedTime->setChecked(Config->TrbRunSettings.bLimitTime);
+    ui->cbLimitEvents->setChecked(Config->TrbRunSettings.bLimitEvents);
+    ui->leiMaxEvents->setText( QString::number(Config->TrbRunSettings.MaxEvents) );
 }
 
 // --- update Config on GUI operated by user ---

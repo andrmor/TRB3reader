@@ -256,6 +256,11 @@ private slots:
     void on_leStartupScriptOnHost_editingFinished();
     void on_leAcquireScriptOnHost_editingFinished();
     void on_leStorageXmlOnHost_editingFinished();
+    void on_leFolderForHldFiles_editingFinished();
+    void on_leiHldFileSize_editingFinished();
+    void on_ledTimeSpan_editingFinished();
+    void on_cobTimeUnits_activated(int index);
+    void on_leiMaxEvents_editingFinished();
 };
 
 #endif // MAINWINDOW_H

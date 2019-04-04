@@ -1549,12 +1549,9 @@ void MainWindow::on_pbBoardOff_clicked()
 
 void MainWindow::on_pbStartAcquire_clicked()
 {
-    TrbRunManager->HldFolder = ui->leFolderForHldFiles->text();
-    TrbRunManager->HldFileSize = ui->leiHldFileSize->text().toInt();
-
     if (ui->cbLimitedTime->isChecked())
     {
-        int sec = ui->leiTimeSpan->text().toDouble();
+        double sec = ui->ledTimeSpan->text().toDouble();
 
         int multiplier = 0;
         switch (ui->cobTimeUnits->currentIndex())
@@ -1620,16 +1617,6 @@ void MainWindow::onWatchdogFailed()
     ui->labConnectionStatus->setText("<font color='red'>Not responding</font>");
 }
 
-void MainWindow::on_cbLimitedTime_clicked(bool checked)
-{
-    if (checked) ui->cbLimitEvents->setChecked(false);
-}
-
-void MainWindow::on_cbLimitEvents_clicked(bool checked)
-{
-    if (checked) ui->cbLimitedTime->setChecked(false);
-}
-
 #include <QDesktopServices>
 void MainWindow::on_pbOpenCTS_clicked()
 {
@@ -1664,4 +1651,42 @@ void MainWindow::on_leAcquireScriptOnHost_editingFinished()
 void MainWindow::on_leStorageXmlOnHost_editingFinished()
 {
     Config->TrbRunSettings.StorageXMLOnHost = ui->leStorageXmlOnHost->text();
+}
+
+void MainWindow::on_leFolderForHldFiles_editingFinished()
+{
+    Config->TrbRunSettings.HldDirOnHost = ui->leFolderForHldFiles->text();
+}
+
+void MainWindow::on_leiHldFileSize_editingFinished()
+{
+    Config->TrbRunSettings.MaxHldSizeMb = ui->leiHldFileSize->text().toInt();
+}
+
+void MainWindow::on_ledTimeSpan_editingFinished()
+{
+    Config->TrbRunSettings.TimeLimit = ui->ledTimeSpan->text().toDouble();
+}
+
+void MainWindow::on_cobTimeUnits_activated(int index)
+{
+         if (index == 1)  Config->TrbRunSettings.TimeMultiplier = 60;
+    else if (index == 2)  Config->TrbRunSettings.TimeMultiplier = 60*60;
+    else                  Config->TrbRunSettings.TimeMultiplier = 1;
+}
+
+void MainWindow::on_cbLimitedTime_clicked(bool checked)
+{
+    Config->TrbRunSettings.bLimitTime = checked;
+    //if (checked) ui->cbLimitEvents->setChecked(false);
+}
+
+void MainWindow::on_cbLimitEvents_clicked(bool checked)
+{
+    Config->TrbRunSettings.bLimitEvents = checked;
+    //if (checked) ui->cbLimitedTime->setChecked(false);
+}
+void MainWindow::on_leiMaxEvents_editingFinished()
+{
+    Config->TrbRunSettings.MaxEvents = ui->leiMaxEvents->text().toInt();
 }

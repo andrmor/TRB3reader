@@ -15,9 +15,6 @@ public:
     const QString & Host;
     const QString & User;
 
-    QString HldFolder;
-    int HldFileSize;
-
     int StatEvents = 0;
     double StatRate = 0;
     double StatData = 0;
