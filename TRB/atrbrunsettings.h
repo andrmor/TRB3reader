@@ -24,6 +24,8 @@ public:
     bool    bLimitEvents = false;
     int     MaxEvents  = 100;
 
+    QString CtsControl;
+
     const QJsonObject   WriteToJson() const;
     void                ReadFromJson(const QJsonObject &json);
 };

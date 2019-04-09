@@ -201,7 +201,7 @@ void MainWindow::UpdateGui()
     if ( datakinds.size() > 1 ) std::sort(datakinds.begin(), datakinds.end());
     for (int i : datakinds)
     {
-        QString s = QString::number(i) + "   (hex: " + QString::number(i, 16) + ")";
+        QString s = QString("0x%1 (%2)").arg(QString::number(i, 16)).arg(QString::number(i));
         QListWidgetItem* item = new QListWidgetItem(s);
         item->setTextAlignment(Qt::AlignCenter);
         ui->lwDatakinds->addItem(item);

@@ -16,7 +16,7 @@ const QJsonObject strToObject(const QString& s)
 
 AInterfaceToWebSocket::AInterfaceToWebSocket() : AScriptInterface() {}
 
-AInterfaceToWebSocket::AInterfaceToWebSocket(const AInterfaceToWebSocket &)
+AInterfaceToWebSocket::AInterfaceToWebSocket(const AInterfaceToWebSocket &) : AScriptInterface()
 {
     socket = 0;
 }
@@ -83,7 +83,7 @@ const QString AInterfaceToWebSocket::SendText(const QString &message)
 
 const QString AInterfaceToWebSocket::SendObject(const QVariant &object)
 {
-    if (object.type() != QMetaType::QVariantMap)
+    if (object.type() != QVariant::Map)
     {
         abort("Argument type of SendObject() method should be object!");
         return "";

@@ -5,6 +5,8 @@
 #include <QDebug>
 #include <QJsonObject>
 #include <QJsonDocument>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
 
 ANetworkModule::ANetworkModule(AScriptManager *ScriptManager) : ScriptManager(ScriptManager)
 {
@@ -13,10 +15,12 @@ ANetworkModule::ANetworkModule(AScriptManager *ScriptManager) : ScriptManager(Sc
     QObject::connect(WebSocketServer, &AWebSocketSessionServer::textMessageReceived, this, &ANetworkModule::OnWebSocketTextMessageReceived);
     QObject::connect(WebSocketServer, &AWebSocketSessionServer::reportToGUI, this, &ANetworkModule::ReportTextToGUI);
     QObject::connect(WebSocketServer, &AWebSocketSessionServer::clientDisconnected, this, &ANetworkModule::OnClientDisconnected);
+
 }
 
 ANetworkModule::~ANetworkModule()
 {
+    delete HttpManager;
     delete WebSocketServer;
 }
 
@@ -85,4 +89,59 @@ void ANetworkModule::OnWebSocketTextMessageReceived(QString message)
 void ANetworkModule::OnClientDisconnected()
 {
     qDebug() << "Client disconnected";
+}
+
+void ANetworkModule::replyFinished(QNetworkReply * reply)
+{
+    if (reply->error())
+    {
+        HttpError = reply->errorString();
+        bHttpError = true;
+    }
+    else HttpReply = reply->readAll();
+
+    reply->deleteLater();
+    bHttpReplyReceived = true;
+}
+
+#include <QElapsedTimer>
+#include <QApplication>
+#include <QThread>
+bool ANetworkModule::makeHttpRequest(const QString & url, QString & replyOrError, int timeout_ms)
+{
+    if (HttpManager) delete HttpManager;
+    HttpManager = new QNetworkAccessManager();
+    connect(HttpManager, &QNetworkAccessManager::finished, this, &ANetworkModule::replyFinished);
+
+    bHttpReplyReceived = false;
+    bHttpError = false;
+    HttpReply.clear();
+    HttpError.clear();
+
+    QNetworkRequest request;
+    request.setUrl(QUrl(url));
+    HttpManager->get(request);
+
+    QElapsedTimer * elap = new QElapsedTimer();
+    elap->start();
+    while (!bHttpReplyReceived)
+    {
+        qApp->processEvents();
+        if (elap->elapsed() > timeout_ms) break;
+        QThread::usleep(100);
+    }
+
+    delete HttpManager; HttpManager = nullptr;
+    if (!bHttpReplyReceived)
+    {
+        replyOrError = "Timeout";
+        return false;
+    }
+    if (!HttpError.isEmpty())
+    {
+        replyOrError = HttpError;
+        return false;
+    }
+    replyOrError = HttpReply;
+    return true;
 }

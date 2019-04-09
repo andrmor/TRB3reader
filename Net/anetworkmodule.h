@@ -8,6 +8,8 @@
 class AWebSocketSessionServer;
 class TObject;
 class AScriptManager;
+class QNetworkAccessManager;
+class QNetworkReply;
 
 class ANetworkModule : public QObject
 {
@@ -28,9 +30,14 @@ public:
     void StartWebSocketServer(QHostAddress ip, quint16 port);
     void StopWebSocketServer();
 
+    bool makeHttpRequest(const QString & url, QString & replyOrError, int timeout_ms);
+
 public slots:
   void OnWebSocketTextMessageReceived(QString message);
   void OnClientDisconnected();
+
+private slots:
+  void replyFinished(QNetworkReply *reply);
 
 signals:
   void StatusChanged();
@@ -39,6 +46,12 @@ signals:
 private:
   AScriptManager* ScriptManager;
   bool fDebug = true;
+
+  QNetworkAccessManager * HttpManager = nullptr;
+  bool bHttpReplyReceived = false;
+  bool bHttpError = false;
+  QString HttpReply;
+  QString HttpError;
 
 };
 

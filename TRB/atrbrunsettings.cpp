@@ -21,6 +21,8 @@ const QJsonObject ATrbRunSettings::WriteToJson() const
     json["bLimitEvents"] = bLimitEvents;
     json["MaxEvents"] = MaxEvents;
 
+    json["CtsControl"] = CtsControl;
+
     return json;
 }
 
@@ -41,4 +43,6 @@ void ATrbRunSettings::ReadFromJson(const QJsonObject &json)
     parseJson(json, "TimeMultiplier", TimeMultiplier);
     parseJson(json, "bLimitEvents", bLimitEvents);
     parseJson(json, "MaxEvents", MaxEvents);
+
+    parseJson(json, "CtsControl", CtsControl);
 }

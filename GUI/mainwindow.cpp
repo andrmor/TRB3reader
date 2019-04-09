@@ -1071,7 +1071,15 @@ const QString MainWindow::PackChannelList(QVector<int> vec)
 void MainWindow::on_pbAddDatakind_clicked()
 {
     bool bOK;
-    int datakind = QInputDialog::getInt(this, "TRBreader", "Input new datakind to add", 0, 0, 0xFFFF, 1, &bOK);
+    //int datakind = QInputDialog::getInt(this, "TRBreader", "Input new datakind to add", 0, 0, 0xFFFF, 1, &bOK);
+    QString datakindStr = QInputDialog::getText(this, "TRBreader", "Input new address (start with 0x for hexadecimal)", QLineEdit::Normal,
+                                             QString(), &bOK);
+    int datakind = 0;
+    if (datakindStr.startsWith("0x"))
+        datakind = datakindStr.toInt(&bOK, 16);
+    else
+        datakind = datakindStr.toInt(&bOK, 10);
+
     if (bOK)
         Config->AddDatakind(datakind);
     UpdateGui();
@@ -1082,7 +1090,7 @@ void MainWindow::on_pbRemoveDatakind_clicked()
     int raw = ui->lwDatakinds->currentRow();
     if (raw < 0)
     {
-        message("Select datakind to remove by left-clicking on it in the list above", this);
+        message("Select datakind in th elist to remove by left-clicking on it", this);
         return;
     }
     QString sel = ui->lwDatakinds->currentItem()->text();
@@ -1090,7 +1098,7 @@ void MainWindow::on_pbRemoveDatakind_clicked()
     if (sl.size()>1)
     {
         QString dk = sl.first();
-        int datakind = dk.toInt();
+        int datakind = dk.toInt(0, 16);
         Config->RemoveDatakind(datakind);
     }
     UpdateGui();
@@ -1689,4 +1697,42 @@ void MainWindow::on_cbLimitEvents_clicked(bool checked)
 void MainWindow::on_leiMaxEvents_editingFinished()
 {
     Config->TrbRunSettings.MaxEvents = ui->leiMaxEvents->text().toInt();
+}
+
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+void MainWindow::on_pbReadTriggerSettingsFromTrb_clicked()
+{
+
+    QString err = Dispatcher->ReadTriggerSettingsFromBoard();
+    if (err.isEmpty())
+    {
+        message("Triggering configuration received", this);
+        ui->pteCTS->clear();
+        ui->pteCTS->appendPlainText(Config->TrbRunSettings.CtsControl);
+    }
+    else message(err, this);
+}
+
+void MainWindow::on_pbUpdateStartup_clicked()
+{
+    QString err = TrbRunManager->updateCTSsetupScript();
+    if (err.isEmpty())
+        message("Done!", this);
+    else
+        message(err, this);
+}
+
+void MainWindow::on_pbOpenCtsWebPage_clicked()
+{
+    QDesktopServices::openUrl( QString("http://%1:1234/cts/cts.htm").arg(TrbRunManager->Host) );
+}
+
+void MainWindow::on_pbSendCTStoTRB_clicked()
+{
+    QString err = TrbRunManager->sendCTStoTRB();
+    if (err.isEmpty())
+        message("Done!", this);
+    else
+        message(err, this);
 }

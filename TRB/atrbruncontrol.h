@@ -28,6 +28,9 @@ public:
 
     const QString updateXML();
 
+    const QString updateCTSsetupScript();
+    const QString sendCTStoTRB();
+
 private slots:
     void onBoardFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void onAcquireFinished(int exitCode, QProcess::ExitStatus exitStatus);

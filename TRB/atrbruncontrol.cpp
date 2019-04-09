@@ -275,3 +275,87 @@ const QString ATrbRunControl::updateXML()
 
     return "";
 }
+
+#include "afiletools.h"
+const QString ATrbRunControl::updateCTSsetupScript()
+{
+    if (Settings.CtsControl.isEmpty())
+        return "Error: CTS settings are absent in configuration";
+
+    QString where = sExchangeDir;
+    if (!where.endsWith('/')) where += '/';
+    QString localCtsFileName = where + "TriggerSetup_Andr.sh";
+
+    bool bOK = SaveTextToFile(localCtsFileName, Settings.CtsControl);
+    if (!bOK) return "Cannot save CTS settings to file " + localCtsFileName;
+
+    QFileInfo hostFileInfo(Settings.StorageXMLOnHost);
+    QString hostDir = hostFileInfo.absolutePath();
+
+    qDebug() << "On host:" << hostDir << localCtsFileName;
+
+    QString err = sshCopyFileToHost(localCtsFileName, hostDir);
+    if (!err.isEmpty()) return err;
+
+    return "";
+}
+
+const QString ATrbRunControl::sendCTStoTRB()
+{
+    if (Settings.CtsControl.isEmpty())
+        return "Error: CTS settings are absent in configuration";
+
+    const QString tmpFileName = "tmp.sh";
+
+    QString where = sExchangeDir;
+    if (!where.endsWith('/')) where += '/';
+    QString localCtsFileName = where + tmpFileName;
+
+    QFileInfo hostFileInfo(Settings.StorageXMLOnHost);
+    QString hostDir = hostFileInfo.absolutePath();
+
+    //QString txt = "#!/bin/bash\n";
+    //txt += Settings.CtsControl;
+    //bool bOK = SaveTextToFile(localCtsFileName, txt);
+    //if (!bOK) return "Cannot save CTS settings to file " + localCtsFileName;
+
+    qDebug() << "Dir on host:" << hostDir << "local file:"<<localCtsFileName;
+
+    QString err = sshCopyFileToHost(localCtsFileName, hostDir);
+    if (!err.isEmpty()) return err;
+
+    //executing the script
+
+    QString command = "ssh";
+    QStringList args;
+    args << QString("%1@%2").arg(User).arg(Host) << QString("'%1/%2'").arg(hostDir).arg(tmpFileName);
+    //args << QString("%1@%2").arg(User).arg(Host) << "bash" << "-c" << QString("'%1/%2'").arg(hostDir).arg(tmpFileName);
+    //args << QString("%1@%2").arg(User).arg(Host) << "bash" << "-s" << "<" << QString("'%1/%2'").arg(hostDir).arg(tmpFileName);
+    //args << QString("%1@%2").arg(User).arg(Host) << "bash" << "-s" << "<" << "/home/andr/.config/TRBreader/tmp.sh";
+
+
+    /*
+    QString command = "cat";
+    //cat tmp.sh | ssh rpcuser@192.168.3.214 "/bin/bash"
+    QStringList args;
+    //args << localCtsFileName << "|" << "ssh" << QString("%1@%2").arg(User).arg(Host) << "\"/bin/bash\"";
+    args << localCtsFileName << "|" << "ssh" << QString("%1@%2").arg(User).arg(Host) << "\"/bin/bash\"";
+    */
+
+    qDebug() << "execute command:"<<command << args;
+
+    QProcess pr;
+    pr.setProcessChannelMode(QProcess::MergedChannels);
+    pr.start(command, args);
+
+    if (!pr.waitForStarted(500)) return "Could not start send";
+    if (!pr.waitForFinished(2000)) return "Timeout on attempt to execute CTS configuration";
+
+    pr.closeWriteChannel();
+    QString reply = pr.readAll();
+    qDebug() << reply;
+    //if (reply.contains("No such file or directory")) return "Cannot find temporary file with CTS script on host";
+    //if (reply.contains("Permission denied")) return "Cannot start temporary file with CTS script on host";
+
+    return "";
+}

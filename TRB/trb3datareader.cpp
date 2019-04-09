@@ -438,7 +438,7 @@ const QString Trb3dataReader::GetFileInfo(const QString& FileName) const
                 unsigned datalen = (hadata >> 16) & 0xFFFF;
                 int datakind = hadata & 0xFFFF;
 
-                if (bReportOnStart) output += "Data block with datakind: " + QString::number(datakind) + "\n";
+                if (bReportOnStart) output += "Data block with datakind: 0x" + QString::number(datakind, 16) + "\n";
 
                 unsigned ixTmp = ix;
 

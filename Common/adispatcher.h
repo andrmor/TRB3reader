@@ -32,6 +32,8 @@ public:
     void ClearMapping();
     void ClearIgnoreChannels();
 
+    const QString ReadTriggerSettingsFromBoard(); //returns "" if no error
+
 public:
     QString ConfigDir;
     QString AutosaveFile;

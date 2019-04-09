@@ -261,6 +261,10 @@ private slots:
     void on_ledTimeSpan_editingFinished();
     void on_cobTimeUnits_activated(int index);
     void on_leiMaxEvents_editingFinished();
+    void on_pbReadTriggerSettingsFromTrb_clicked();
+    void on_pbUpdateStartup_clicked();
+    void on_pbOpenCtsWebPage_clicked();
+    void on_pbSendCTStoTRB_clicked();
 };
 
 #endif // MAINWINDOW_H
