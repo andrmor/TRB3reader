@@ -1536,7 +1536,7 @@ void MainWindow::on_actionConfigure_WebSocket_server_triggered()
 
 void MainWindow::on_pbBoardOn_clicked()
 {
-    ui->labConnectionStatus->setText("Connecting");
+    ui->labConnectionStatus->setText("<font color='orange'>Connecting</font>");
 
     QString err = TrbRunManager->StartBoard();
     if (!err.isEmpty())
@@ -1659,11 +1659,6 @@ void MainWindow::on_leDirOnHost_editingFinished()
 void MainWindow::on_leStartupScriptOnHost_editingFinished()
 {
     Config->TrbRunSettings.StartupScriptOnHost = ui->leStartupScriptOnHost->text();
-}
-
-void MainWindow::on_leAcquireScriptOnHost_editingFinished()
-{
-    Config->TrbRunSettings.AcquireScriptOnHost = ui->leAcquireScriptOnHost->text();
 }
 
 void MainWindow::on_leStorageXmlOnHost_editingFinished()

@@ -14,7 +14,6 @@ public:
     QString ScriptDirOnHost;
     QString StartupScriptOnHost;
     const QString getScriptDir() const;
-    QString AcquireScriptOnHost;
     QString StorageXML;
 
     QString HldDirOnHost;

@@ -30,7 +30,7 @@
     <item>
      <widget class="QTabWidget" name="twMain">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_8">
        <attribute name="title">
@@ -40,7 +40,7 @@
         <item>
          <widget class="QTabWidget" name="tabWidget">
           <property name="currentIndex">
-           <number>2</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="tab_11">
            <attribute name="title">
@@ -268,13 +268,6 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLabel" name="label_55">
-                  <property name="text">
-                   <string>Acquire script:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
                  <widget class="QLabel" name="label_58">
                   <property name="text">
                    <string>Storage XML:</string>
@@ -290,13 +283,6 @@
                 </item>
                 <item>
                  <widget class="QLineEdit" name="leStartupScriptOnHost">
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QLineEdit" name="leAcquireScriptOnHost">
                   <property name="text">
                    <string/>
                   </property>

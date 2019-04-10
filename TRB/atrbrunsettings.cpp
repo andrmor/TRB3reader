@@ -17,7 +17,6 @@ const QJsonObject ATrbRunSettings::WriteToJson() const
 
     json["ScriptDirOnHost"] = ScriptDirOnHost;
     json["StartupScriptOnHost"] = StartupScriptOnHost;
-    json["AcquireScriptOnHost"] = AcquireScriptOnHost;
     json["StorageXMLOnHost"] = StorageXML;
 
     json["HldDirOnHost"] = HldDirOnHost;
@@ -41,7 +40,6 @@ void ATrbRunSettings::ReadFromJson(const QJsonObject &json)
 
     parseJson(json, "ScriptDirOnHost", ScriptDirOnHost);
     parseJson(json, "StartupScriptOnHost", StartupScriptOnHost);
-    parseJson(json, "AcquireScriptOnHost", AcquireScriptOnHost);
     parseJson(json, "StorageXMLOnHost", StorageXML);
 
     parseJson(json, "HldDirOnHost", HldDirOnHost);

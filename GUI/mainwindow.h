@@ -254,7 +254,6 @@ private slots:
     void on_leUser_editingFinished();
     void on_leHost_editingFinished();
     void on_leStartupScriptOnHost_editingFinished();
-    void on_leAcquireScriptOnHost_editingFinished();
     void on_leStorageXmlOnHost_editingFinished();
     void on_leFolderForHldFiles_editingFinished();
     void on_leiHldFileSize_editingFinished();
