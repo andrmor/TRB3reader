@@ -292,7 +292,7 @@ void MainWindow::UpdateGui()
     ui->leDirOnHost->setText(Config->TrbRunSettings.ScriptDirOnHost);
     ui->leStartupScriptOnHost->setText(Config->TrbRunSettings.StartupScriptOnHost);
     ui->leAcquireScriptOnHost->setText(Config->TrbRunSettings.AcquireScriptOnHost);
-    ui->leStorageXmlOnHost->setText(Config->TrbRunSettings.StorageXMLOnHost);
+    ui->leStorageXmlOnHost->setText(Config->TrbRunSettings.StorageXML);
 
     ui->leFolderForHldFiles->setText(Config->TrbRunSettings.HldDirOnHost);
     ui->leiHldFileSize->setText( QString::number(Config->TrbRunSettings.MaxHldSizeMb) );

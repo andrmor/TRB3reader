@@ -1557,6 +1557,7 @@ void MainWindow::on_pbBoardOff_clicked()
 
 void MainWindow::on_pbStartAcquire_clicked()
 {
+    int time_ms = -1;
     if (ui->cbLimitedTime->isChecked())
     {
         double sec = ui->ledTimeSpan->text().toDouble();
@@ -1575,16 +1576,20 @@ void MainWindow::on_pbStartAcquire_clicked()
             break;
         default:;
         }
-        aTimer->start(sec * multiplier * 1000);
+        time_ms = sec * multiplier * 1000;
     }
 
     bLimitMaxEvents = ui->cbLimitEvents->isChecked();
     MaxEventsToRun = ui->leiMaxEvents->text().toInt();
 
     QString err = TrbRunManager->StartAcquire();
-    if (!err.isEmpty())
-        message(err, this);
-    else elTimer->start();
+    if (err.isEmpty())
+    {
+        elTimer->start();
+        if (ui->cbLimitedTime->isChecked()) aTimer->start(time_ms);
+    }
+    else message(err, this);
+
 }
 
 void MainWindow::on_pbStopAcquire_clicked()
@@ -1663,7 +1668,7 @@ void MainWindow::on_leAcquireScriptOnHost_editingFinished()
 
 void MainWindow::on_leStorageXmlOnHost_editingFinished()
 {
-    Config->TrbRunSettings.StorageXMLOnHost = ui->leStorageXmlOnHost->text();
+    Config->TrbRunSettings.StorageXML = ui->leStorageXmlOnHost->text();
 }
 
 void MainWindow::on_leFolderForHldFiles_editingFinished()

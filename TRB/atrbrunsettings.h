@@ -15,7 +15,7 @@ public:
     QString StartupScriptOnHost;
     const QString getScriptDir() const;
     QString AcquireScriptOnHost;
-    QString StorageXMLOnHost;
+    QString StorageXML;
 
     QString HldDirOnHost;
     int     MaxHldSizeMb = 20;

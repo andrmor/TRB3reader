@@ -55,11 +55,20 @@ const QString ATrbRunControl::StartAcquire()
     StatRate = 0;
     StatData = 0;
 
+    /*
     QString command = "ssh";
     QStringList args;
     args << QString("%1@%2").arg(User).arg(Host) << QString("'%1%2'").arg(Settings.getScriptDir()).arg(Settings.AcquireScriptOnHost);
-
     qDebug() << "Starting acquisition:"<<command << args;
+    */
+
+    QStringList txt;
+    txt << ". dabclogin\n";
+    txt << QString("dabc_exe %1%2\n").arg(Settings.getScriptDir()).arg(Settings.StorageXML);
+
+    QString command = "ssh";
+    QStringList args;
+    args << QString("%1@%2").arg(User).arg(Host);
 
     prAcquire = new QProcess();
     connect(prAcquire, SIGNAL(finished(int, QProcess::ExitStatus )), this, SLOT(onAcquireFinished(int,QProcess::ExitStatus)));
@@ -67,6 +76,18 @@ const QString ATrbRunControl::StartAcquire()
     prAcquire->setProcessChannelMode(QProcess::MergedChannels);
 
     prAcquire->start(command, args);
+
+
+    if (!prAcquire->waitForStarted(500))
+    {
+        delete prAcquire; prAcquire = nullptr;
+        return "Could not start send";
+    }
+
+    for (const QString & s : txt)
+        prAcquire->write(QByteArray(s.toLocal8Bit().data()));
+
+
 
     return "";
 }
@@ -95,6 +116,11 @@ void ATrbRunControl::StopAcquire()
 
     delete pr;
     qDebug() << "-----KILL finished";
+
+    if (prAcquire)
+    {
+        prAcquire->closeWriteChannel();
+    }
 }
 
 void ATrbRunControl::onBoardFinished(int exitCode, QProcess::ExitStatus exitStatus)
@@ -234,10 +260,10 @@ const QString ATrbRunControl::updateXML()
     QString where = sExchangeDir;
     if (!where.endsWith('/')) where += '/';
 
-    QString err = sshCopyFileFromHost( QString("%1%2").arg(Settings.getScriptDir()).arg(Settings.StorageXMLOnHost), where);
+    QString err = sshCopyFileFromHost( QString("%1%2").arg(Settings.getScriptDir()).arg(Settings.StorageXML), where);
     if (!err.isEmpty()) return err;
 
-    QString localFileName = where + Settings.StorageXMLOnHost;
+    QString localFileName = where + Settings.StorageXML;
     QString hostDir = Settings.getScriptDir();
 
     qDebug() << "On host:" << hostDir << localFileName;
@@ -302,7 +328,7 @@ const QString ATrbRunControl::updateCTSsetupScript()
     bool bOK = SaveTextToFile(localCtsFileName, Settings.CtsControl);
     if (!bOK) return "Cannot save CTS settings to file " + localCtsFileName;
 
-    QFileInfo hostFileInfo(Settings.StorageXMLOnHost);
+    QFileInfo hostFileInfo(Settings.StorageXML);
     QString hostDir = hostFileInfo.absolutePath();
 
     qDebug() << "On host:" << hostDir << localCtsFileName;
