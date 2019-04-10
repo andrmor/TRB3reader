@@ -2,12 +2,20 @@
 
 #include "ajsontools.h"
 
+const QString ATrbRunSettings::getScriptDir() const
+{
+    QString dir = ScriptDirOnHost;
+    if (!dir.endsWith('/')) dir += '/';
+    return dir;
+}
+
 const QJsonObject ATrbRunSettings::WriteToJson() const
 {
     QJsonObject json;
     json["User"] = User;
     json["Host"] = Host;
 
+    json["ScriptDirOnHost"] = ScriptDirOnHost;
     json["StartupScriptOnHost"] = StartupScriptOnHost;
     json["AcquireScriptOnHost"] = AcquireScriptOnHost;
     json["StorageXMLOnHost"] = StorageXMLOnHost;
@@ -31,6 +39,7 @@ void ATrbRunSettings::ReadFromJson(const QJsonObject &json)
     parseJson(json, "User", User);
     parseJson(json, "Host", Host);
 
+    parseJson(json, "ScriptDirOnHost", ScriptDirOnHost);
     parseJson(json, "StartupScriptOnHost", StartupScriptOnHost);
     parseJson(json, "AcquireScriptOnHost", AcquireScriptOnHost);
     parseJson(json, "StorageXMLOnHost", StorageXMLOnHost);

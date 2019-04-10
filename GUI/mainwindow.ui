@@ -30,7 +30,7 @@
     <item>
      <widget class="QTabWidget" name="twMain">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_8">
        <attribute name="title">
@@ -40,7 +40,7 @@
         <item>
          <widget class="QTabWidget" name="tabWidget">
           <property name="currentIndex">
-           <number>2</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="tab_11">
            <attribute name="title">
@@ -254,23 +254,30 @@
                  <number>0</number>
                 </property>
                 <item>
+                 <widget class="QLabel" name="label_62">
+                  <property name="text">
+                   <string>Script dir on host:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
                  <widget class="QLabel" name="label_51">
                   <property name="text">
-                   <string>Startup script on host:</string>
+                   <string>Startup script:</string>
                   </property>
                  </widget>
                 </item>
                 <item>
                  <widget class="QLabel" name="label_55">
                   <property name="text">
-                   <string>Acquire script on host:</string>
+                   <string>Acquire script:</string>
                   </property>
                  </widget>
                 </item>
                 <item>
                  <widget class="QLabel" name="label_58">
                   <property name="text">
-                   <string>Storage XML on host:</string>
+                   <string>Storage XML:</string>
                   </property>
                  </widget>
                 </item>
@@ -278,6 +285,9 @@
               </item>
               <item>
                <layout class="QVBoxLayout" name="verticalLayout_35">
+                <item>
+                 <widget class="QLineEdit" name="leDirOnHost"/>
+                </item>
                 <item>
                  <widget class="QLineEdit" name="leStartupScriptOnHost">
                   <property name="text">

@@ -265,6 +265,7 @@ private slots:
     void on_pbUpdateStartup_clicked();
     void on_pbOpenCtsWebPage_clicked();
     void on_pbSendCTStoTRB_clicked();
+    void on_leDirOnHost_editingFinished();
 };
 
 #endif // MAINWINDOW_H

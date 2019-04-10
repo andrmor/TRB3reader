@@ -11,7 +11,9 @@ public:
     QString User;
     QString Host;
 
+    QString ScriptDirOnHost;
     QString StartupScriptOnHost;
+    const QString getScriptDir() const;
     QString AcquireScriptOnHost;
     QString StorageXMLOnHost;
 

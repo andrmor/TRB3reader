@@ -289,6 +289,7 @@ void MainWindow::UpdateGui()
     ui->leUser->setText(Config->TrbRunSettings.User);
     ui->leHost->setText(Config->TrbRunSettings.Host);
 
+    ui->leDirOnHost->setText(Config->TrbRunSettings.ScriptDirOnHost);
     ui->leStartupScriptOnHost->setText(Config->TrbRunSettings.StartupScriptOnHost);
     ui->leAcquireScriptOnHost->setText(Config->TrbRunSettings.AcquireScriptOnHost);
     ui->leStorageXmlOnHost->setText(Config->TrbRunSettings.StorageXMLOnHost);

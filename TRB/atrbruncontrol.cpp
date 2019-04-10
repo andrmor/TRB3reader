@@ -14,12 +14,12 @@ const QString ATrbRunControl::StartBoard()
 {
     if (prBoard) return "Already started";
 
-    bStartLogFinished = false;
+    ConnectStatus = Connecting;
 
     qDebug() << "Starting up...";
     QString command = "ssh";
     QStringList args;
-    args << QString("%1@%2").arg(User).arg(Host) << QString("'%1'").arg(Settings.StartupScriptOnHost);
+    args << QString("%1@%2").arg(User).arg(Host) << QString("'%1%2'").arg(Settings.getScriptDir()).arg(Settings.StartupScriptOnHost);
 
     qDebug() << "Init board:"<<command << args;
 
@@ -57,7 +57,7 @@ const QString ATrbRunControl::StartAcquire()
 
     QString command = "ssh";
     QStringList args;
-    args << QString("%1@%2").arg(User).arg(Host) << Settings.AcquireScriptOnHost;
+    args << QString("%1@%2").arg(User).arg(Host) << QString("'%1%2'").arg(Settings.getScriptDir()).arg(Settings.AcquireScriptOnHost);
 
     qDebug() << "Starting acquisition:"<<command << args;
 
@@ -102,7 +102,7 @@ void ATrbRunControl::onBoardFinished(int exitCode, QProcess::ExitStatus exitStat
     qDebug() << "Board process finished!";
     qDebug() << "Exit code:"<<exitCode;
     qDebug() << "Exit status"<< exitStatus;
-    bStartLogFinished = false;
+    ConnectStatus = Disconnected;
     delete prBoard; prBoard = 0;
     emit sigBoardOff();
 }
@@ -118,18 +118,32 @@ void ATrbRunControl::onAcquireFinished(int exitCode, QProcess::ExitStatus exitSt
 
 void ATrbRunControl::onReadyBoardLog()
 {
-    if (bStartLogFinished)
-    {
-        //qDebug() << "Expecting text every second - inicates the board is alive";
-        emit sigBoardIsAlive();
-        return;
-    }
-
     QString log(prBoard->readAll());
-    if (log == '\n') return;
-    if (log == "Starting CTS\n")
-        bStartLogFinished = true;
-    boardLogReady(log);
+    //qDebug() << "=========================";
+    //qDebug() << log;
+    //qDebug() << "=========================";
+
+    switch (ConnectStatus)
+    {
+    case Disconnected:
+        break;
+    case Connecting:
+        if (log == '\n') return;
+        if (log == "Starting CTS\n")
+            ConnectStatus = WaitingFirstReply;
+        boardLogReady(log);
+        break;
+    case WaitingFirstReply:
+        if (log.contains("Label                                | Register"))
+        {
+            ConnectStatus = Connected;
+            emit sigBoardIsAlive();
+        }
+        break;
+    case Connected:
+        emit sigBoardIsAlive(); //"Expecting text every second - inicates the board is alive";
+        break;
+    }
 }
 
 void ATrbRunControl::onReadyAcquireLog()
@@ -302,17 +316,45 @@ const QString ATrbRunControl::updateCTSsetupScript()
 
 const QString ATrbRunControl::sendCTStoTRB()
 {
-    if (Settings.CtsControl.isEmpty())
-        return "Error: CTS settings are absent in configuration";
+    QStringList txt;
+    txt << "trbcmd setbit 0xc001 0xa00c 0x80000000\n";
+    txt << "trbcmd w 0xc001 0xa101 0xffff0040\n";
+    txt << "trbcmd clearbit 0xc001 0xa00c 0x80000000\n";
+
+    QString command = "ssh";
+    QStringList args;
+    args << QString("%1@%2").arg(User).arg(Host);
+
+    QProcess pr;
+    pr.setProcessChannelMode(QProcess::MergedChannels);
+    pr.start(command, args);
+
+    if (!pr.waitForStarted(500)) return "Could not start send";
+
+    for (const QString & s : txt)
+        pr.write(QByteArray(s.toLocal8Bit().data()));
+
+    pr.closeWriteChannel();
+    if (!pr.waitForFinished(2000)) return "Timeout on attempt to execute CTS configuration";
+
+    QString reply1 = pr.readAll();
+
+    pr.close();
+
+    qDebug() << reply1;
+    return "";
+}
+
+/*
+const QString ATrbRunControl::sendCTStoTRB()
+{
+    //if (Settings.CtsControl.isEmpty()) return "Error: CTS settings are absent in configuration";
 
     const QString tmpFileName = "tmp.sh";
 
-    QString where = sExchangeDir;
-    if (!where.endsWith('/')) where += '/';
-    QString localCtsFileName = where + tmpFileName;
-
     QFileInfo hostFileInfo(Settings.StorageXMLOnHost);
-    QString hostDir = hostFileInfo.absolutePath();
+
+    QString hostDir = Settings.getScriptDir();
 
     //QString txt = "#!/bin/bash\n";
     //txt += Settings.CtsControl;
@@ -326,36 +368,69 @@ const QString ATrbRunControl::sendCTStoTRB()
 
     //executing the script
 
+    QStringList txt;
+    //txt << "export PATH=${HOME}/trbsoft/trbnettools/bin:${PATH}\n";
+       //txt << "export PATH=${PATH}:${HOME}/trbsoft/daqdata/bin\n";
+       //txt << "export LD_LIBRARY_PATH=$HOME/trbsoft/trbnettools/liblocal/\n";
+       //txt << "export PERL5LIB=~/trbsoft/daqtools/perllibs\n";
+    //txt << "export DAQOPSERVER=localhost:1\n";
+
+    txt << "trbcmd setbit 0xc001 0xa00c 0x80000000\n";
+    txt << "trbcmd w 0xc001 0xa101 0xffff0040\n";
+    txt << "trbcmd clearbit 0xc001 0xa00c 0x80000000\n";
+
     QString command = "ssh";
     QStringList args;
-    args << QString("%1@%2").arg(User).arg(Host) << QString("'%1/%2'").arg(hostDir).arg(tmpFileName);
+    //args << QString("%1@%2").arg(User).arg(Host) << QString("'%1/%2'").arg(hostDir).arg(tmpFileName);
     //args << QString("%1@%2").arg(User).arg(Host) << "bash" << "-c" << QString("'%1/%2'").arg(hostDir).arg(tmpFileName);
     //args << QString("%1@%2").arg(User).arg(Host) << "bash" << "-s" << "<" << QString("'%1/%2'").arg(hostDir).arg(tmpFileName);
     //args << QString("%1@%2").arg(User).arg(Host) << "bash" << "-s" << "<" << "/home/andr/.config/TRBreader/tmp.sh";
 
-
-    /*
-    QString command = "cat";
-    //cat tmp.sh | ssh rpcuser@192.168.3.214 "/bin/bash"
-    QStringList args;
-    //args << localCtsFileName << "|" << "ssh" << QString("%1@%2").arg(User).arg(Host) << "\"/bin/bash\"";
-    args << localCtsFileName << "|" << "ssh" << QString("%1@%2").arg(User).arg(Host) << "\"/bin/bash\"";
-    */
-
-    qDebug() << "execute command:"<<command << args;
+    //args << "-t" << QString("%1@%2").arg(User).arg(Host);
+    args << QString("%1@%2").arg(User).arg(Host);
 
     QProcess pr;
     pr.setProcessChannelMode(QProcess::MergedChannels);
     pr.start(command, args);
 
     if (!pr.waitForStarted(500)) return "Could not start send";
-    if (!pr.waitForFinished(2000)) return "Timeout on attempt to execute CTS configuration";
+
+    for (const QString & s : txt)
+        pr.write(QByteArray(s.toLocal8Bit().data()));
 
     pr.closeWriteChannel();
-    QString reply = pr.readAll();
-    qDebug() << reply;
-    //if (reply.contains("No such file or directory")) return "Cannot find temporary file with CTS script on host";
-    //if (reply.contains("Permission denied")) return "Cannot start temporary file with CTS script on host";
 
+    if (!pr.waitForFinished(2000)) return "Timeout on attempt to execute CTS configuration";
+
+    QString reply1 = pr.readAll();
+
+    pr.close();
+
+    qDebug() << reply1;
     return "";
+
+//    QString command = "cat";
+//    //cat tmp.sh | ssh rpcuser@192.168.3.214 "/bin/bash"
+//    QStringList args;
+//    //args << localCtsFileName << "|" << "ssh" << QString("%1@%2").arg(User).arg(Host) << "\"/bin/bash\"";
+//    args << localCtsFileName << "|" << "ssh" << QString("%1@%2").arg(User).arg(Host) << "\"/bin/bash\"";
+
+
+//    qDebug() << "execute command:"<<command << args;
+
+//    QProcess pr;
+//    pr.setProcessChannelMode(QProcess::MergedChannels);
+//    pr.start(command, args);
+
+//    if (!pr.waitForStarted(500)) return "Could not start send";
+//    if (!pr.waitForFinished(2000)) return "Timeout on attempt to execute CTS configuration";
+
+//    pr.closeWriteChannel();
+//    QString reply = pr.readAll();
+//    qDebug() << reply;
+//    //if (reply.contains("No such file or directory")) return "Cannot find temporary file with CTS script on host";
+//    //if (reply.contains("Permission denied")) return "Cannot start temporary file with CTS script on host";
+
+//    return "";
 }
+*/

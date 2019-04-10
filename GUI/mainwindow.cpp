@@ -1646,6 +1646,11 @@ void MainWindow::on_leHost_editingFinished()
     Config->TrbRunSettings.Host = ui->leHost->text();
 }
 
+void MainWindow::on_leDirOnHost_editingFinished()
+{
+    Config->TrbRunSettings.ScriptDirOnHost = ui->leDirOnHost->text();
+}
+
 void MainWindow::on_leStartupScriptOnHost_editingFinished()
 {
     Config->TrbRunSettings.StartupScriptOnHost = ui->leStartupScriptOnHost->text();
@@ -1730,9 +1735,12 @@ void MainWindow::on_pbOpenCtsWebPage_clicked()
 
 void MainWindow::on_pbSendCTStoTRB_clicked()
 {
+    this->SetEnabled(false);
+    qApp->processEvents();
+
     QString err = TrbRunManager->sendCTStoTRB();
-    if (err.isEmpty())
-        message("Done!", this);
-    else
+
+    this->SetEnabled(true);
+    if (!err.isEmpty())
         message(err, this);
 }

@@ -48,12 +48,15 @@ signals:
     void boardLogReady(const QString txt);
 
 
-private:
+private:    
     const ATrbRunSettings & Settings;
     const QString sExchangeDir;
     QProcess * prBoard = 0;
     QProcess * prAcquire = 0;
-    bool bStartLogFinished = false;
+    //bool bStartLogFinished = false;
+
+    enum eConnectStatus {Disconnected, Connecting, WaitingFirstReply, Connected};
+    eConnectStatus ConnectStatus = Disconnected;
 
 
 private:
