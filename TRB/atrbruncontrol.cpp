@@ -234,12 +234,11 @@ const QString ATrbRunControl::updateXML()
     QString where = sExchangeDir;
     if (!where.endsWith('/')) where += '/';
 
-    QString err = sshCopyFileFromHost(Settings.StorageXMLOnHost, where);
+    QString err = sshCopyFileFromHost( QString("%1%2").arg(Settings.getScriptDir()).arg(Settings.StorageXMLOnHost), where);
     if (!err.isEmpty()) return err;
 
-    QFileInfo hostFileInfo(Settings.StorageXMLOnHost);
-    QString localFileName = where + hostFileInfo.fileName();
-    QString hostDir = hostFileInfo.absolutePath();
+    QString localFileName = where + Settings.StorageXMLOnHost;
+    QString hostDir = Settings.getScriptDir();
 
     qDebug() << "On host:" << hostDir << localFileName;
 
