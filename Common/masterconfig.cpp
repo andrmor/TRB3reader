@@ -9,8 +9,6 @@
 MasterConfig::MasterConfig()
 {
     Map = new ChannelMapper();
-
-    Datakinds << 0xc313 << 49152 << 49155;
 }
 
 MasterConfig::~MasterConfig()
@@ -18,28 +16,41 @@ MasterConfig::~MasterConfig()
     delete Map;
 }
 
+ABufferRecord *MasterConfig::findBufferRecord(int datakind)
+{
+    for (int i=0; i<DatakindSet.size(); i++)
+    {
+        if (DatakindSet.at(i).Datakind == datakind)
+            return &DatakindSet[i];
+    }
+    return nullptr;
+}
+
 const QVector<int> MasterConfig::GetListOfDatakinds() const
 {
     QVector<int> vec;
-    for (int i : Datakinds) vec << i;
+    for (const int & i : ValidDatakinds)
+        vec << i;
+
     if ( vec.size() > 1 ) std::sort(vec.begin(), vec.end());
     return vec;
 }
 
-void MasterConfig::SetListOfDatakinds(const QVector<int> &list)
-{
-    Datakinds.clear();
-    for (int i : list) Datakinds << i;
-}
-
 void MasterConfig::AddDatakind(int datakind)
 {
-    Datakinds << datakind;
+    if (ValidDatakinds.contains(datakind)) return;
+
+    DatakindSet << ABufferRecord(datakind);
+    ValidDatakinds << datakind;
 }
 
 void MasterConfig::RemoveDatakind(int datakind)
 {
-    Datakinds.remove(datakind);
+    for (int i=0; i<DatakindSet.size(); i++)
+        if (DatakindSet.at(i).Datakind == datakind)
+            DatakindSet.remove(i);
+
+    ValidDatakinds.remove(datakind);
 }
 
 void MasterConfig::SetNegativeChannels(const QVector<int> &list)
@@ -73,8 +84,9 @@ void MasterConfig::WriteToJson(QJsonObject &json)
     json["WorkingDir"] = WorkingDir;
 
     QJsonArray ar;
-    for (int i : Datakinds) ar << i;
-    json["Datakinds"] = ar;
+    for (const ABufferRecord & r : DatakindSet)
+        ar << r.toJson();
+    json["DatakindSets"] = ar;
 }
 
 bool MasterConfig::ReadFromJson(QJsonObject &json)
@@ -95,11 +107,29 @@ bool MasterConfig::ReadFromJson(QJsonObject &json)
     parseJson(json, "FileName", FileName);
     parseJson(json, "WorkingDir", WorkingDir);
 
-    if (json.contains("Datakinds"))
+    DatakindSet.clear();
+    ValidDatakinds.clear();
+    if (json.contains("DatakindSets"))
+    {
+        QJsonArray ar = json["DatakindSets"].toArray();
+        for (int i=0; i<ar.size(); i++)
+        {
+            QJsonObject js = ar[i].toObject();
+            ABufferRecord rec;
+            rec.readFromJson(js);
+            DatakindSet << rec;
+            ValidDatakinds << rec.Datakind;
+        }
+    }
+    else if (json.contains("Datakinds")) //compatibility
     {
         QJsonArray ar = json["Datakinds"].toArray();
-        Datakinds.clear();
-        for (int i=0; i<ar.size(); i++) Datakinds << ar[i].toInt();
+        for (int i=0; i<ar.size(); i++)
+        {
+            int dk = ar[i].toInt();
+            DatakindSet << ABufferRecord(dk);
+            ValidDatakinds << dk;
+        }
     }
 
     return true;
@@ -411,4 +441,33 @@ void AHldProcessSettings::ReadFromJson(const QJsonObject &json)
     parseJson(json, "AddToFileName",    AddToFileName);
     parseJson(json, "DoCopyToDatahub",  bDoCopyToDatahub);
     parseJson(json, "IncludeWaveforms", bCopyWaveforms);
+}
+
+bool ABufferRecord::updateValues(int samples, int delay, int downs)
+{
+    if (Samples == samples && Delay == delay && Downsampling == downs) return false;
+
+    Samples = samples;
+    Delay = delay;
+    Downsampling = downs;
+
+    return true;
+}
+
+const QJsonObject ABufferRecord::toJson() const
+{
+    QJsonObject j;
+    j["Datakind"] = Datakind;
+    j["Samples"] = Samples;
+    j["Delay"] = Delay;
+    j["Downsampling"] = Downsampling;
+    return j;
+}
+
+void ABufferRecord::readFromJson(const QJsonObject &json)
+{
+    parseJson(json, "Datakind", Datakind);
+    parseJson(json, "Samples", Samples);
+    parseJson(json, "Delay", Delay);
+    parseJson(json, "Downsampling", Downsampling);
 }

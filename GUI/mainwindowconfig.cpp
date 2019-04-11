@@ -304,6 +304,8 @@ void MainWindow::UpdateGui()
     ui->cbLimitedTime->setChecked(Config->TrbRunSettings.bLimitTime);
     ui->cbLimitEvents->setChecked(Config->TrbRunSettings.bLimitEvents);
     ui->leiMaxEvents->setText( QString::number(Config->TrbRunSettings.MaxEvents) );
+
+    on_pbRefreshBufferIndication_clicked();
 }
 
 // --- update Config on GUI operated by user ---

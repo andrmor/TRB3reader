@@ -18,6 +18,7 @@ class AServerMonitorWindow;
 class ATrbRunControl;
 class QTimer;
 class QElapsedTimer;
+class ABufferDelegate;
 
 namespace Ui {
 class MainWindow;
@@ -265,6 +266,13 @@ private slots:
     void on_pbOpenCtsWebPage_clicked();
     void on_pbSendCTStoTRB_clicked();
     void on_leDirOnHost_editingFinished();
+    void on_pbRefreshBufferIndication_clicked();
+    void on_cbBufferSameValues_clicked(bool checked);
+    void on_cbBufferReadFromTRB_clicked();
+    void on_pbBufferSendToTRB_clicked();
+    void on_pbBufferUpdateScript_clicked();
+
+    void onBufferDeleagateChanged(ABufferDelegate *del);
 };
 
 #endif // MAINWINDOW_H

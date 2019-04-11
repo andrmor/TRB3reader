@@ -90,7 +90,8 @@ SOURCES += main.cpp \
     Net/anetworkmodule.cpp \
     aservermonitorwindow.cpp \
     TRB/atrbruncontrol.cpp \
-    TRB/atrbrunsettings.cpp
+    TRB/atrbrunsettings.cpp \
+    GUI/abufferdelegate.cpp
 
 HEADERS  += GUI/mainwindow.h \    
     TRB/trb3datareader.h \
@@ -125,12 +126,14 @@ HEADERS  += GUI/mainwindow.h \
     Net/anetworkmodule.h \
     aservermonitorwindow.h \
     TRB/atrbruncontrol.h \
-    TRB/atrbrunsettings.h
+    TRB/atrbrunsettings.h \
+    GUI/abufferdelegate.h
 
 FORMS    += GUI/mainwindow.ui \
     GUI/ascriptwindow.ui \
     GUI/aeditchannelsdialog.ui \
-    aservermonitorwindow.ui
+    aservermonitorwindow.ui \
+    GUI/abufferdelegate.ui
 
 INCLUDEPATH += Common
 INCLUDEPATH += Script

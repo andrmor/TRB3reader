@@ -40,11 +40,11 @@
         <item>
          <widget class="QTabWidget" name="tabWidget">
           <property name="currentIndex">
-           <number>1</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="tab_11">
            <attribute name="title">
-            <string>FPGAs</string>
+            <string>AddOns</string>
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout_36">
             <item>
@@ -314,9 +314,88 @@
             </item>
            </layout>
           </widget>
+          <widget class="QWidget" name="tab_6">
+           <attribute name="title">
+            <string>ADC</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout_38">
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_58">
+              <item>
+               <widget class="QListWidget" name="lwBufferControl"/>
+              </item>
+              <item>
+               <layout class="QVBoxLayout" name="verticalLayout_37">
+                <item>
+                 <widget class="QCheckBox" name="cbBufferSameValues">
+                  <property name="text">
+                   <string>Same values for all</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="cbBufferReadFromTRB">
+                  <property name="text">
+                   <string>Read from TRB</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pbBufferSendToTRB">
+                  <property name="text">
+                   <string>Send to TRB</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pbBufferUpdateScript">
+                  <property name="text">
+                   <string>Update startup</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer_31">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pbRefreshBufferIndication">
+              <property name="text">
+               <string>RefreshBufferIndication</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_32">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>247</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
           <widget class="QWidget" name="tab_10">
            <attribute name="title">
-            <string>ADCs and trigger</string>
+            <string>Trigger</string>
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout_21">
             <item>

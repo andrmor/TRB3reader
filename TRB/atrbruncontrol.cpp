@@ -1,13 +1,14 @@
 #include "atrbruncontrol.h"
+#include "masterconfig.h"
 #include "atrbrunsettings.h"
 
 #include <QDebug>
 #include <QObject>
 #include <QElapsedTimer>
 
-ATrbRunControl::ATrbRunControl(ATrbRunSettings & settings, const QString & exchangeDir) :
-    QObject(), Settings(settings),
-    Host(settings.Host), User(settings.User),
+ATrbRunControl::ATrbRunControl(MasterConfig & settings, const QString & exchangeDir) :
+    QObject(), Settings(settings), RunSettings(settings.TrbRunSettings),
+    Host(settings.TrbRunSettings.Host), User(settings.TrbRunSettings.User),
     sExchangeDir(exchangeDir) {}
 
 const QString ATrbRunControl::StartBoard()
@@ -19,7 +20,7 @@ const QString ATrbRunControl::StartBoard()
     qDebug() << "Starting up...";
     QString command = "ssh";
     QStringList args;
-    args << QString("%1@%2").arg(User).arg(Host) << QString("'%1%2'").arg(Settings.getScriptDir()).arg(Settings.StartupScriptOnHost);
+    args << QString("%1@%2").arg(User).arg(Host) << QString("'%1%2'").arg(RunSettings.getScriptDir()).arg(RunSettings.StartupScriptOnHost);
 
     qDebug() << "Init board:"<<command << args;
 
@@ -64,7 +65,7 @@ const QString ATrbRunControl::StartAcquire()
 
     QStringList txt;
     txt << ". dabclogin\n";
-    txt << QString("dabc_exe %1%2\n").arg(Settings.getScriptDir()).arg(Settings.StorageXML);
+    txt << QString("dabc_exe %1%2\n").arg(RunSettings.getScriptDir()).arg(RunSettings.StorageXML);
 
     QString command = "ssh";
     QStringList args;
@@ -260,11 +261,11 @@ const QString ATrbRunControl::updateXML()
     QString where = sExchangeDir;
     if (!where.endsWith('/')) where += '/';
 
-    QString err = sshCopyFileFromHost( QString("%1%2").arg(Settings.getScriptDir()).arg(Settings.StorageXML), where);
+    QString err = sshCopyFileFromHost( QString("%1%2").arg(RunSettings.getScriptDir()).arg(RunSettings.StorageXML), where);
     if (!err.isEmpty()) return err;
 
-    QString localFileName = where + Settings.StorageXML;
-    QString hostDir = Settings.getScriptDir();
+    QString localFileName = where + RunSettings.StorageXML;
+    QString hostDir = RunSettings.getScriptDir();
 
     qDebug() << "On host:" << hostDir << localFileName;
 
@@ -286,9 +287,9 @@ const QString ATrbRunControl::updateXML()
                     qDebug() << "Found!";
                     //<OutputPort name="Output1" url="hld://${HOME}/hlds/dabc.hld?maxsize=10"/>
                     //<OutputPort name="Output1" url="hld:///media/externalDrive/data/hlds/dabc.hld?maxsize=10"/>
-                    QString dir = Settings.HldDirOnHost;
+                    QString dir = RunSettings.HldDirOnHost;
                     if (!dir.endsWith('/')) dir += '/';
-                    line = QString("<OutputPort name=\"Output1\" url=\"hld://%1dabc.hld?maxsize=%2\"/>\n").arg(dir).arg(Settings.MaxHldSizeMb);
+                    line = QString("<OutputPort name=\"Output1\" url=\"hld://%1dabc.hld?maxsize=%2\"/>\n").arg(dir).arg(RunSettings.MaxHldSizeMb);
                 }
             }
             newXml += line;
@@ -309,7 +310,7 @@ const QString ATrbRunControl::updateXML()
     if (!err.isEmpty()) return err;
 
     //making dir on host
-    err = makeDirOnHost(Settings.HldDirOnHost);
+    err = makeDirOnHost(RunSettings.HldDirOnHost);
     if (!err.isEmpty()) return "Failed to create target folder on host";
 
     return "";
@@ -318,17 +319,17 @@ const QString ATrbRunControl::updateXML()
 #include "afiletools.h"
 const QString ATrbRunControl::updateCTSsetupScript()
 {
-    if (Settings.CtsControl.isEmpty())
+    if (RunSettings.CtsControl.isEmpty())
         return "Error: CTS settings are absent in configuration";
 
     QString where = sExchangeDir;
     if (!where.endsWith('/')) where += '/';
     QString localCtsFileName = where + "TriggerSetup_Andr.sh";
 
-    bool bOK = SaveTextToFile(localCtsFileName, Settings.CtsControl);
+    bool bOK = SaveTextToFile(localCtsFileName, RunSettings.CtsControl);
     if (!bOK) return "Cannot save CTS settings to file " + localCtsFileName;
 
-    QFileInfo hostFileInfo(Settings.StorageXML);
+    QFileInfo hostFileInfo(RunSettings.StorageXML);
     QString hostDir = hostFileInfo.absolutePath();
 
     qDebug() << "On host:" << hostDir << localCtsFileName;
@@ -361,6 +362,47 @@ const QString ATrbRunControl::sendCTStoTRB()
 
     pr.closeWriteChannel();
     if (!pr.waitForFinished(2000)) return "Timeout on attempt to execute CTS configuration";
+
+    QString reply1 = pr.readAll();
+
+    pr.close();
+
+    qDebug() << reply1;
+    return "";
+}
+
+const QString ATrbRunControl::sendBufferControlToTRB()
+{
+    QStringList txt;
+
+    const QVector<ABufferRecord> & BufRec = Settings.getBufferRecords();
+    for (const ABufferRecord & r : BufRec)
+    {
+        const QString addr = "0x" + QString::number(r.Datakind, 16);
+        txt << QString("trbcmd w %1 0xa010 0x%2\n").arg(addr).arg(QString::number(r.Samples, 16));
+        txt << QString("trbcmd w %1 0xa011 0x%2\n").arg(addr).arg(QString::number(r.Delay, 16));
+        txt << QString("trbcmd w %1 0xa015 0x%2\n").arg(addr).arg(QString::number(r.Downsampling - 1, 16));
+    }
+
+    qDebug() << txt;
+
+    QString command = "ssh";
+    QStringList args;
+    args << QString("%1@%2").arg(User).arg(Host);
+
+    qDebug() << "Sending command/args:" << command << args;
+
+    QProcess pr;
+    pr.setProcessChannelMode(QProcess::MergedChannels);
+    pr.start(command, args);
+
+    if (!pr.waitForStarted(500)) return "Could not start send";
+
+    for (const QString & s : txt)
+        pr.write(QByteArray(s.toLocal8Bit().data()));
+
+    pr.closeWriteChannel();
+    if (!pr.waitForFinished(2000)) return "Timeout on attempt to execute Buffer configuration";
 
     QString reply1 = pr.readAll();
 

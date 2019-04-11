@@ -4,13 +4,14 @@
 #include <QObject>
 #include <QProcess>
 
+class MasterConfig;
 class ATrbRunSettings;
 
 class ATrbRunControl : public QObject
 {
     Q_OBJECT
 public:
-    ATrbRunControl(ATrbRunSettings & settings, const QString & exchangeDir);
+    ATrbRunControl(MasterConfig & settings, const QString & exchangeDir);
 
     const QString & Host;
     const QString & User;
@@ -30,6 +31,7 @@ public:
 
     const QString updateCTSsetupScript();
     const QString sendCTStoTRB();
+    const QString sendBufferControlToTRB();
 
 private slots:
     void onBoardFinished(int exitCode, QProcess::ExitStatus exitStatus);
@@ -49,11 +51,11 @@ signals:
 
 
 private:    
-    const ATrbRunSettings & Settings;
+    const MasterConfig & Settings;
+    const ATrbRunSettings & RunSettings;
     const QString sExchangeDir;
     QProcess * prBoard = 0;
     QProcess * prAcquire = 0;
-    //bool bStartLogFinished = false;
 
     enum eConnectStatus {Disconnected, Connecting, WaitingFirstReply, Connected};
     eConnectStatus ConnectStatus = Disconnected;

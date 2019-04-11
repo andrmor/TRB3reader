@@ -27,6 +27,24 @@ public:
     void                ReadFromJson(const QJsonObject &json);
 };
 
+class ABufferRecord
+{
+public:
+    ABufferRecord(){}
+    ABufferRecord(int datakind) : Datakind(datakind) {}
+
+    int Datakind = 0;
+
+    int Samples = 80;
+    int Delay = 1023;
+    int Downsampling = 10;
+
+    bool updateValues(int samples, int delay, int downs); // return false if the new values are the same as old
+
+    const QJsonObject toJson() const;
+    void readFromJson(const QJsonObject & json);
+};
+
 class MasterConfig
 {
 public:
@@ -34,9 +52,10 @@ public:
     ~MasterConfig();
 
     //recognized datakinds
+    const QVector<ABufferRecord> & getBufferRecords() const {return DatakindSet;}
+    ABufferRecord *     findBufferRecord(int datakind);
     const QVector<int>  GetListOfDatakinds() const;
-    void                SetListOfDatakinds(const QVector<int> &list);
-    bool                IsGoodDatakind(int datakind) const {return Datakinds.contains(datakind);}
+    bool                IsGoodDatakind(int datakind) const {return ValidDatakinds.contains(datakind);}
     void                AddDatakind(int datakind);
     void                RemoveDatakind(int datakind);
 
@@ -114,7 +133,8 @@ public:
     bool                ReadFromJson(QJsonObject& json);
 
 private:
-    QSet<int>           Datakinds;
+    QVector<ABufferRecord> DatakindSet;
+    QSet<int>           ValidDatakinds; // must be synchronized with DatakindSet
 
     QVector<int>        ListNegativeChannels;
     QVector<bool>       NegPol; //Quick access

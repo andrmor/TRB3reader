@@ -46,7 +46,7 @@ MainWindow::MainWindow(MasterConfig* Config,
     bStopFlag = false;
     ui->setupUi(this);
 
-    TrbRunManager = new ATrbRunControl(Config->TrbRunSettings, Dispatcher->ConfigDir);
+    TrbRunManager = new ATrbRunControl(*Config, Dispatcher->ConfigDir);
     QObject::connect(TrbRunManager, &ATrbRunControl::sigBoardIsAlive, this, &MainWindow::onBoardIsAlive);
     QObject::connect(TrbRunManager, &ATrbRunControl::sigBoardOff, this, &MainWindow::onBoardDisconnected);
     QObject::connect(TrbRunManager, &ATrbRunControl::boardLogReady, this, &MainWindow::onBoardLogNewText);
@@ -106,7 +106,6 @@ MainWindow::MainWindow(MasterConfig* Config,
     ServerWindow = new AServerMonitorWindow(*this, Network, this);
     QObject::connect(&Network, &ANetworkModule::StatusChanged, ServerWindow, &AServerMonitorWindow::onServerstatusChanged);
     QObject::connect(&Network, &ANetworkModule::ReportTextToGUI, ServerWindow, &AServerMonitorWindow::appendText);
-
 }
 
 MainWindow::~MainWindow()
@@ -1743,4 +1742,72 @@ void MainWindow::on_pbSendCTStoTRB_clicked()
     this->SetEnabled(true);
     if (!err.isEmpty())
         message(err, this);
+}
+
+#include "abufferdelegate.h"
+#include <QListWidgetItem>
+#include <QListWidget>
+void MainWindow::on_pbRefreshBufferIndication_clicked()
+{
+    ui->lwBufferControl->clear();
+
+    const QVector<ABufferRecord> & recs = Config->getBufferRecords();
+    for (const ABufferRecord & r : recs)
+    {
+        QListWidgetItem * item = new QListWidgetItem();
+        ui->lwBufferControl->addItem(item);
+        ABufferDelegate * wid = new ABufferDelegate();
+        QObject::connect(wid, &ABufferDelegate::contentChanged, this, &MainWindow::onBufferDeleagateChanged);
+        wid->setValues(r.Datakind, r.Samples, r.Delay, r.Downsampling);
+        ui->lwBufferControl->setItemWidget(item, wid);
+        item->setSizeHint( wid->sizeHint());
+    }
+}
+
+void MainWindow::on_cbBufferSameValues_clicked(bool checked)
+{
+
+}
+
+void MainWindow::on_cbBufferReadFromTRB_clicked()
+{
+
+}
+
+void MainWindow::on_pbBufferSendToTRB_clicked()
+{
+    this->SetEnabled(false);
+    qApp->processEvents();
+
+    QString err = TrbRunManager->sendBufferControlToTRB();
+
+    this->SetEnabled(true);
+    if (!err.isEmpty())
+        message(err, this);
+}
+
+void MainWindow::on_pbBufferUpdateScript_clicked()
+{
+
+}
+
+void MainWindow::onBufferDeleagateChanged(ABufferDelegate * del)
+{
+    int addr, samples, delay, down;
+    del->getValues(addr, samples, delay, down);
+
+    ABufferRecord * rec = Config->findBufferRecord(addr);
+    if (!rec)
+    {
+        qWarning() << "Error in find buffer record!";
+        return;
+    }
+
+    bool bChanged = rec->updateValues(samples, delay, down);
+
+    // TODO if common
+
+    if (!bChanged) return; //no change in values
+
+    // todo value canged -> update board? or just flag
 }

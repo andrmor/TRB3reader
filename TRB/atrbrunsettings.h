@@ -3,6 +3,8 @@
 
 #include <QString>
 
+#include <vector>
+
 class QJsonObject;
 
 class ATrbRunSettings
@@ -11,10 +13,10 @@ public:
     QString User;
     QString Host;
 
-    QString ScriptDirOnHost;
-    QString StartupScriptOnHost;
+    QString ScriptDirOnHost = "/home/rpcuser/trbsoft/userscripts/trb130";
+    QString StartupScriptOnHost = "startup_Andr";
     const QString getScriptDir() const;
-    QString StorageXML;
+    QString StorageXML = "EventBuilder_Andr.xml";
 
     QString HldDirOnHost;
     int     MaxHldSizeMb = 20;
