@@ -52,7 +52,8 @@ public:
     ~MasterConfig();
 
     //recognized datakinds
-    const QVector<ABufferRecord> & getBufferRecords() const {return DatakindSet;}
+    bool                isBufferRecordsEmpty() const {return DatakindSet.isEmpty();}
+    QVector<ABufferRecord> & getBufferRecords() {return DatakindSet;}
     ABufferRecord *     findBufferRecord(int datakind);
     const QVector<int>  GetListOfDatakinds() const;
     bool                IsGoodDatakind(int datakind) const {return ValidDatakinds.contains(datakind);}

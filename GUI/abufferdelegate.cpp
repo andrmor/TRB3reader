@@ -29,7 +29,7 @@ void ABufferDelegate::setValues(int address, int samples, int delay, int downsam
     ui->labAddress->setText( QString::number(address, 16) );
     ui->sbSamples->setValue(samples);
     ui->sbDelay->setValue(delay);
-    ui->sbDownsampling->setValue(downsampl);
+    ui->sbDownsampling->setValue(downsampl + 1);
 }
 
 void ABufferDelegate::getValues(int & address, int & samples, int & delay, int & downsampl)
@@ -37,7 +37,7 @@ void ABufferDelegate::getValues(int & address, int & samples, int & delay, int &
     Address = address = ui->labAddress->text().toInt(nullptr, 16);
     Samples = samples = ui->sbSamples->value();
     Delay = delay = ui->sbDelay->value();
-    Downsampling = downsampl = ui->sbDownsampling->value();
+    Downsampling = downsampl = ui->sbDownsampling->value() - 1;
 }
 
 QWidget * ABufferDelegate::getWidget()
@@ -67,7 +67,7 @@ void ABufferDelegate::onDelayMaybeChanged()
 
 void ABufferDelegate::onDownMaybeChanged()
 {
-    int newDownsampling = ui->sbDownsampling->value();
+    int newDownsampling = ui->sbDownsampling->value() - 1;
     if (newDownsampling != Downsampling)
     {
         Downsampling = newDownsampling;

@@ -27,7 +27,17 @@ public:
     bool    bLimitEvents = false;
     int     MaxEvents  = 100;
 
-    QString CtsControl;
+    bool    bMP_0 = false;
+    bool    bMP_1 = false;
+    bool    bMP_2 = false;
+    bool    bMP_3 = false;
+    bool    bMP_4 = false;
+    bool    bMP_5 = false;
+    bool    bMP_6 = false;
+    bool    bMP_7 = false;
+    bool    bRandPulser = false;
+    bool    bPeriodicPulser0 = false;
+    bool    bPeriodicPulser1 = false;
 
     const QJsonObject   WriteToJson() const;
     void                ReadFromJson(const QJsonObject &json);

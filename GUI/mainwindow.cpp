@@ -1771,7 +1771,16 @@ void MainWindow::on_cbBufferSameValues_clicked(bool checked)
 
 void MainWindow::on_cbBufferReadFromTRB_clicked()
 {
+    this->SetEnabled(false);
+    qApp->processEvents();
 
+    QString err = TrbRunManager->readBufferControlFromTRB();
+
+    this->SetEnabled(true);
+    if (!err.isEmpty())
+        message(err, this);
+
+    on_pbRefreshBufferIndication_clicked();
 }
 
 void MainWindow::on_pbBufferSendToTRB_clicked()
@@ -1788,7 +1797,14 @@ void MainWindow::on_pbBufferSendToTRB_clicked()
 
 void MainWindow::on_pbBufferUpdateScript_clicked()
 {
+    this->SetEnabled(false);
+    qApp->processEvents();
 
+    QString err = TrbRunManager->updateBufferSetupScript();
+
+    this->SetEnabled(true);
+    if (!err.isEmpty())
+        message(err, this);
 }
 
 void MainWindow::onBufferDeleagateChanged(ABufferDelegate * del)
@@ -1810,4 +1826,17 @@ void MainWindow::onBufferDeleagateChanged(ABufferDelegate * del)
     if (!bChanged) return; //no change in values
 
     // todo value canged -> update board? or just flag
+}
+
+void MainWindow::on_pbRestartTrb_clicked()
+{
+    if (!TrbRunManager->isBoardDisconnected())
+        if (!areYouSure("The board is connected. Restart TRB?", this)) return;
+
+    TrbRunManager->RestartBoard();
+}
+
+void MainWindow::on_pbUpdateTriggerGui_clicked()
+{
+
 }

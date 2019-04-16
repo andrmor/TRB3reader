@@ -28,7 +28,20 @@ const QJsonObject ATrbRunSettings::WriteToJson() const
     json["bLimitEvents"] = bLimitEvents;
     json["MaxEvents"] = MaxEvents;
 
-    json["CtsControl"] = CtsControl;
+    QJsonObject cj;
+        cj["MP_0"] = bMP_0;
+        cj["MP_1"] = bMP_1;
+        cj["MP_2"] = bMP_2;
+        cj["MP_3"] = bMP_3;
+        cj["MP_4"] = bMP_4;
+        cj["MP_5"] = bMP_5;
+        cj["MP_6"] = bMP_6;
+        cj["MP_7"] = bMP_7;
+
+        cj["RandPulser"] = bRandPulser;
+        cj["PeriodicPulser0"] = bPeriodicPulser0;
+        cj["PeriodicPulser0"] = bPeriodicPulser0;
+    json["CtsControl"] = cj;
 
     return json;
 }
@@ -51,5 +64,18 @@ void ATrbRunSettings::ReadFromJson(const QJsonObject &json)
     parseJson(json, "bLimitEvents", bLimitEvents);
     parseJson(json, "MaxEvents", MaxEvents);
 
-    parseJson(json, "CtsControl", CtsControl);
+    QJsonObject cj;
+    parseJson(json, "CtsControl", cj);
+        parseJson(cj, "MP_0", bMP_0);
+        parseJson(cj, "MP_1", bMP_1);
+        parseJson(cj, "MP_2", bMP_2);
+        parseJson(cj, "MP_3", bMP_3);
+        parseJson(cj, "MP_4", bMP_4);
+        parseJson(cj, "MP_5", bMP_5);
+        parseJson(cj, "MP_6", bMP_6);
+        parseJson(cj, "MP_7", bMP_7);
+        parseJson(cj, "RandPulser", bRandPulser);
+        parseJson(cj, "PeriodicPulser0", bPeriodicPulser0);
+        parseJson(cj, "PeriodicPulser0", bPeriodicPulser0);
+    json["CtsControl"] = cj;
 }

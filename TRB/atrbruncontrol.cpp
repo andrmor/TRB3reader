@@ -8,8 +8,8 @@
 
 ATrbRunControl::ATrbRunControl(MasterConfig & settings, const QString & exchangeDir) :
     QObject(), Settings(settings), RunSettings(settings.TrbRunSettings),
-    Host(settings.TrbRunSettings.Host), User(settings.TrbRunSettings.User),
-    sExchangeDir(exchangeDir) {}
+    sExchangeDir(exchangeDir),
+    Host(settings.TrbRunSettings.Host), User(settings.TrbRunSettings.User) {}
 
 const QString ATrbRunControl::StartBoard()
 {
@@ -41,6 +41,52 @@ void ATrbRunControl::StopBoard()
         prBoard->terminate();
         //prStartup->close();
     }
+}
+
+#include <QApplication>
+#include <QThread>
+void ATrbRunControl::RestartBoard()
+{
+    if (prAcquire)
+    {
+        prAcquire->close();
+        delete prAcquire; prAcquire = nullptr;
+    }
+    if (prBoard)
+    {
+        prBoard->close();
+        delete prBoard; prBoard = nullptr;
+    }
+    ConnectStatus = Disconnected;
+
+    emit boardLogReady("\n\nPowering OFF...");
+    QString err = sendCommandToHost("usbrelay HURTM_1=1");
+    if (!err.isEmpty())
+    {
+        emit boardLogReady(err);
+        return;
+    }
+
+    emit boardLogReady("Waiting 5 seconds...");
+    QElapsedTimer t;
+    t.start();
+    qint64 el = 0;
+    do
+    {
+        el = t.elapsed();
+        qApp->processEvents();
+        QThread::usleep(100);
+    }
+    while (el < 5000);
+
+    emit boardLogReady("Powering ON...");
+    err = sendCommandToHost("usbrelay HURTM_1=0");
+    if (!err.isEmpty())
+    {
+        emit boardLogReady(err);
+        return;
+    }
+    emit boardLogReady("Restart power cycle finished\n");
 }
 
 const QString ATrbRunControl::StartAcquire()
@@ -158,12 +204,24 @@ void ATrbRunControl::onReadyBoardLog()
         if (log == '\n') return;
         if (log == "Starting CTS\n")
             ConnectStatus = WaitingFirstReply;
-        boardLogReady(log);
+        emit boardLogReady(log);
         break;
     case WaitingFirstReply:
         if (log.contains("Label                                | Register"))
         {
             ConnectStatus = Connected;
+            if (!Settings.isBufferRecordsEmpty())
+            {
+                const QString err = sendBufferControlToTRB();
+                if (err.isEmpty()) emit boardLogReady("Updated buffer config");
+                else emit boardLogReady("Error during sending buffer config:\n" + err);
+            }
+            if (!RunSettings.CtsControl.isEmpty())
+            {
+                const QString err = sendCTStoTRB();
+                if (err.isEmpty()) emit boardLogReady("Updated trigger config");
+                else emit boardLogReady("Error during sending trigger config:\n" + err);
+            }
             emit sigBoardIsAlive();
         }
         break;
@@ -254,6 +312,28 @@ const QString ATrbRunControl::makeDirOnHost(const QString & hostDir)
     return "";
 }
 
+const QString ATrbRunControl::sendCommandToHost(const QString &command)
+{
+    QString com = "ssh";
+    QStringList args;
+    args << QString("%1@%2").arg(User).arg(Host);
+    args << command.split(' ', QString::SkipEmptyParts);
+    qDebug() << "Sending to host:" << com << args;
+
+    QProcess pr;
+    pr.setProcessChannelMode(QProcess::MergedChannels);
+    pr.start(com, args);
+
+    if (!pr.waitForStarted(500)) return "Could not start send";
+    if (!pr.waitForFinished(2000)) return "Timeout on read reply";
+
+    pr.closeWriteChannel();
+    QString reply1 = pr.readAll();
+    pr.close();
+    qDebug() << reply1;
+    return "";
+}
+
 #include <QXmlStreamReader>
 #include <QFileInfo>
 const QString ATrbRunControl::updateXML()
@@ -329,11 +409,32 @@ const QString ATrbRunControl::updateCTSsetupScript()
     bool bOK = SaveTextToFile(localCtsFileName, RunSettings.CtsControl);
     if (!bOK) return "Cannot save CTS settings to file " + localCtsFileName;
 
-    QFileInfo hostFileInfo(RunSettings.StorageXML);
-    QString hostDir = hostFileInfo.absolutePath();
-
+    QString hostDir = RunSettings.ScriptDirOnHost;
     qDebug() << "On host:" << hostDir << localCtsFileName;
+    QString err = sshCopyFileToHost(localCtsFileName, hostDir);
+    if (!err.isEmpty()) return err;
 
+    return "";
+}
+
+const QString ATrbRunControl::updateBufferSetupScript()
+{
+    if (Settings.getBufferRecords().isEmpty())
+        return "Error: ADCs are not configured!";
+
+    QString where = sExchangeDir;
+    if (!where.endsWith('/')) where += '/';
+    QString localCtsFileName = where + "BufferSetup_Andr.sh";
+
+    const QStringList sl = bufferRecordsToCommands();
+    QString commands = sl.join("");
+    qDebug() << commands;
+
+    bool bOK = SaveTextToFile(localCtsFileName, commands);
+    if (!bOK) return "Cannot save buffer settings to file " + localCtsFileName;
+
+    QString hostDir = RunSettings.ScriptDirOnHost;
+    qDebug() << "On host:" << hostDir << localCtsFileName;
     QString err = sshCopyFileToHost(localCtsFileName, hostDir);
     if (!err.isEmpty()) return err;
 
@@ -371,21 +472,23 @@ const QString ATrbRunControl::sendCTStoTRB()
     return "";
 }
 
-const QString ATrbRunControl::sendBufferControlToTRB()
+const QStringList ATrbRunControl::bufferRecordsToCommands()
 {
     QStringList txt;
-
     const QVector<ABufferRecord> & BufRec = Settings.getBufferRecords();
     for (const ABufferRecord & r : BufRec)
     {
         const QString addr = "0x" + QString::number(r.Datakind, 16);
-        txt << QString("trbcmd w %1 0xa010 0x%2\n").arg(addr).arg(QString::number(r.Samples, 16));
-        txt << QString("trbcmd w %1 0xa011 0x%2\n").arg(addr).arg(QString::number(r.Delay, 16));
-        txt << QString("trbcmd w %1 0xa015 0x%2\n").arg(addr).arg(QString::number(r.Downsampling - 1, 16));
+        txt << QString("trbcmd w %1 0xa010 0x%2   #Buffer depth\n").arg(addr).arg(QString::number(r.Samples, 16));
+        txt << QString("trbcmd w %1 0xa011 0x%2   #Samples after trigger\n").arg(addr).arg(QString::number(r.Delay, 16));
+        txt << QString("trbcmd w %1 0xa015 0x%2   #Downsampling (starts from 0)\n").arg(addr).arg(QString::number(r.Downsampling, 16));
     }
-
     qDebug() << txt;
+    return txt;
+}
 
+const QString ATrbRunControl::sendBufferControlToTRB()
+{
     QString command = "ssh";
     QStringList args;
     args << QString("%1@%2").arg(User).arg(Host);
@@ -398,6 +501,7 @@ const QString ATrbRunControl::sendBufferControlToTRB()
 
     if (!pr.waitForStarted(500)) return "Could not start send";
 
+    const QStringList txt = bufferRecordsToCommands();
     for (const QString & s : txt)
         pr.write(QByteArray(s.toLocal8Bit().data()));
 
@@ -409,6 +513,84 @@ const QString ATrbRunControl::sendBufferControlToTRB()
     pr.close();
 
     qDebug() << reply1;
+    return "";
+}
+
+const QString ATrbRunControl::readBufferControlFromTRB()
+{
+    QString command = "ssh";
+    QStringList args;
+    args << QString("%1@%2").arg(User).arg(Host);
+
+    qDebug() << "Sending command/args:" << command << args;
+
+    QProcess pr;
+    pr.setProcessChannelMode(QProcess::MergedChannels);
+    pr.start(command, args);
+
+    if (!pr.waitForStarted(500)) return "Could not start send";
+
+    QStringList txt;
+    const QVector<ABufferRecord> & BufRecConst = Settings.getBufferRecords();
+    for (const ABufferRecord & r : BufRecConst)
+    {
+        const QString addr = "0x" + QString::number(r.Datakind, 16);
+
+        txt << QString("trbcmd r %1 0xa010\n").arg(addr);
+        txt << QString("trbcmd r %1 0xa011\n").arg(addr);
+        txt << QString("trbcmd r %1 0xa015\n").arg(addr);
+    }
+    for (const QString & s : txt) pr.write(QByteArray(s.toLocal8Bit().data()));
+
+    pr.closeWriteChannel();
+    if (!pr.waitForFinished(2000)) return "Timeout on attempt to execute Buffer configuration";
+
+    QString reply = pr.readAll();
+    QStringList sl = reply.split('\n', QString::SkipEmptyParts);
+
+    //clean login messages
+    while (!sl.isEmpty() && !sl.first().startsWith("0x"))
+        sl.removeFirst();
+    qDebug() << sl;
+
+    if (sl.size() != BufRecConst.size() * 3) // absolute number = number of settings ber buf!
+        return "unexpected number of reply lines";
+
+    QVector<ABufferRecord> & BufRec = Settings.getBufferRecords();
+    int icounter = 0;
+    for (ABufferRecord & r : BufRec)
+    {
+        const QString addr = "0x" + QString::number(r.Datakind, 16);
+        ulong Samples, Delay, Downsampling;
+        bool bOK;
+
+        QStringList l = sl.at(icounter).split(' ', QString::SkipEmptyParts);
+        if (l.size() !=2 || l.first() != addr)
+            return "unexpected format of reply line";
+        Samples = l.last().toULong(&bOK, 16);
+        if (!bOK) return "unexpected format of reply line";
+        icounter++;
+
+        l = sl.at(icounter).split(' ', QString::SkipEmptyParts);
+        if (l.size() !=2 || l.first() != addr)
+            return "unexpected format of reply line";
+        Delay = l.last().toULong(&bOK, 16);
+        if (!bOK) return "unexpected format of reply line";
+        icounter++;
+
+        l = sl.at(icounter).split(' ', QString::SkipEmptyParts);
+        if (l.size() !=2 || l.first() != addr)
+            return "unexpected format of reply line";
+        Downsampling = l.last().toULong(&bOK, 16);
+        if (!bOK) return "unexpected format of reply line";
+        icounter++;
+
+        r.Samples = Samples;
+        r.Delay = Delay;
+        r.Downsampling = Downsampling;
+    }
+
+    pr.close();
     return "";
 }
 
