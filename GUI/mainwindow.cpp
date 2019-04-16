@@ -67,6 +67,8 @@ MainWindow::MainWindow(MasterConfig* Config,
     QList<QLineEdit*> list = this->findChildren<QLineEdit *>();
     foreach(QLineEdit *w, list) if (w->objectName().startsWith("led")) w->setValidator(dv);
 
+    ui->pbUpdateTriggerSettings->setVisible(false);
+
 #ifdef CERN_ROOT
     RootModule = new CernRootModule(Reader, Extractor, Config, DataHub);
     connect(RootModule, &CernRootModule::WOneHidden, [=](){ui->pbShowWaveform->setChecked(false);});
@@ -1713,7 +1715,7 @@ void MainWindow::on_pbReadTriggerSettingsFromTrb_clicked()
     {
         message("Triggering configuration received", this);
         ui->pteCTS->clear();
-        ui->pteCTS->appendPlainText(Config->TrbRunSettings.CtsControl);
+        //ui->pteCTS->appendPlainText(Config->TrbRunSettings.CtsControl);
     }
     else message(err, this);
 }
@@ -1838,5 +1840,61 @@ void MainWindow::on_pbRestartTrb_clicked()
 
 void MainWindow::on_pbUpdateTriggerGui_clicked()
 {
+    ui->cbMP0->setChecked(Config->TrbRunSettings.bMP_0);
+    ui->cbMP1->setChecked(Config->TrbRunSettings.bMP_1);
+    ui->cbMP2->setChecked(Config->TrbRunSettings.bMP_2);
+    ui->cbMP3->setChecked(Config->TrbRunSettings.bMP_3);
+    ui->cbMP4->setChecked(Config->TrbRunSettings.bMP_4);
+    ui->cbMP5->setChecked(Config->TrbRunSettings.bMP_5);
+    ui->cbMP6->setChecked(Config->TrbRunSettings.bMP_6);
+    ui->cbMP7->setChecked(Config->TrbRunSettings.bMP_7);
 
+    ui->cbRandomPulser->setChecked(Config->TrbRunSettings.bRandPulser);
+    ui->cbPeriodicalPulser0->setChecked(Config->TrbRunSettings.bPeriodicPulser0);
+    ui->cbPeriodicalPulser1->setChecked(Config->TrbRunSettings.bPeriodicPulser1);
+
+    ulong rFreq = Config->TrbRunSettings.RandomPulserFrequency.toULong(nullptr, 16);
+    double freq = (double)rFreq / 21.474836;
+    ui->leRandomFrequency->setText( QString::number(freq) );
+
+    ulong rPeriod = Config->TrbRunSettings.Period0.toULong(nullptr, 16);
+    double per = (double)rPeriod * 10.0;
+    ui->lePeriod0->setText( QString::number(per) );
+
+    rPeriod = Config->TrbRunSettings.Period1.toULong(nullptr, 16);
+    per = (double)rPeriod * 10.0;
+    ui->lePeriod1->setText( QString::number(per) );
+}
+
+void MainWindow::on_pbUpdateTriggerSettings_clicked()
+{
+    Config->TrbRunSettings.bMP_0 = ui->cbMP0->isChecked();
+    Config->TrbRunSettings.bMP_1 = ui->cbMP1->isChecked();
+    Config->TrbRunSettings.bMP_2 = ui->cbMP2->isChecked();
+    Config->TrbRunSettings.bMP_3 = ui->cbMP3->isChecked();
+    Config->TrbRunSettings.bMP_4 = ui->cbMP4->isChecked();
+    Config->TrbRunSettings.bMP_5 = ui->cbMP5->isChecked();
+    Config->TrbRunSettings.bMP_6 = ui->cbMP6->isChecked();
+    Config->TrbRunSettings.bMP_7 = ui->cbMP7->isChecked();
+
+    Config->TrbRunSettings.bRandPulser = ui->cbRandomPulser->isChecked();
+    Config->TrbRunSettings.bPeriodicPulser0 = ui->cbPeriodicalPulser0->isChecked();
+    Config->TrbRunSettings.bPeriodicPulser1 = ui->cbPeriodicalPulser1->isChecked();
+
+    double freq = ui->leRandomFrequency->text().toDouble() * 21.474836;
+    ulong rFreq = (ulong)freq;
+    if (rFreq > 0xffffffff) rFreq = 0xffffffff;
+    Config->TrbRunSettings.RandomPulserFrequency = "0x" + QString::number(rFreq, 16);
+
+    double per = 0.1 * ui->lePeriod0->text().toDouble();
+    ulong rPer = (ulong)per;
+    if (rPer > 0xffffffff) rPer = 0xffffffff;
+    Config->TrbRunSettings.Period0 = "0x" + QString::number(rPer, 16);
+
+    per = 0.1 * ui->lePeriod1->text().toDouble();
+    rPer = (ulong)per;
+    if (rPer > 0xffffffff) rPer = 0xffffffff;
+    Config->TrbRunSettings.Period1 = "0x" + QString::number(rPer, 16);
+
+    qDebug() <<Config->TrbRunSettings.RandomPulserFrequency<<Config->TrbRunSettings.Period0<<Config->TrbRunSettings.Period1;
 }

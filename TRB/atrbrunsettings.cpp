@@ -2,11 +2,33 @@
 
 #include "ajsontools.h"
 
+#include <QDebug>
+
 const QString ATrbRunSettings::getScriptDir() const
 {
     QString dir = ScriptDirOnHost;
     if (!dir.endsWith('/')) dir += '/';
     return dir;
+}
+
+ulong ATrbRunSettings::getTriggerInt() const
+{
+    ulong r = 1    * 0 +
+              2    * bPeriodicPulser0 + // 1
+              4    * bPeriodicPulser1 + // 2
+              8    * bRandPulser +      // 3
+              16   * bMP_0 +            // 4
+              32   * bMP_1 +            // 5
+              64   * bMP_2 +            // 6
+              128  * bMP_3 +            // 7
+              256  * bMP_4 +            // 8
+              512  * bMP_5 +            // 9
+              1024 * bMP_6 +            // 10
+              2048 * bMP_7 ;            // 11
+
+    r += (ulong)Mask * 0x10000;
+
+    return r;
 }
 
 const QJsonObject ATrbRunSettings::WriteToJson() const
@@ -41,6 +63,12 @@ const QJsonObject ATrbRunSettings::WriteToJson() const
         cj["RandPulser"] = bRandPulser;
         cj["PeriodicPulser0"] = bPeriodicPulser0;
         cj["PeriodicPulser0"] = bPeriodicPulser0;
+
+        cj["Mask"] = Mask;
+        cj["RandomPulserFrequency"] = RandomPulserFrequency;
+        cj["Period0"] = Period0;
+        cj["Period1"] = Period1;
+
     json["CtsControl"] = cj;
 
     return json;
@@ -74,8 +102,14 @@ void ATrbRunSettings::ReadFromJson(const QJsonObject &json)
         parseJson(cj, "MP_5", bMP_5);
         parseJson(cj, "MP_6", bMP_6);
         parseJson(cj, "MP_7", bMP_7);
+
         parseJson(cj, "RandPulser", bRandPulser);
         parseJson(cj, "PeriodicPulser0", bPeriodicPulser0);
         parseJson(cj, "PeriodicPulser0", bPeriodicPulser0);
+
+        parseJson(cj, "Mask", Mask);
+        parseJson(cj, "RandomPulserFrequency", RandomPulserFrequency);
+        parseJson(cj, "Period0", Period0);
+        parseJson(cj, "Period1", Period1);
     json["CtsControl"] = cj;
 }

@@ -275,6 +275,7 @@ private slots:
     void onBufferDeleagateChanged(ABufferDelegate *del);
     void on_pbRestartTrb_clicked();
     void on_pbUpdateTriggerGui_clicked();
+    void on_pbUpdateTriggerSettings_clicked();
 };
 
 #endif // MAINWINDOW_H

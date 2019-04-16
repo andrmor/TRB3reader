@@ -100,7 +100,7 @@ const QString ADispatcher::ReadTriggerSettingsFromBoard()
 
     if (reply.startsWith("# CTS Configuration dump") && reply.endsWith("# Enable all triggers\n"))
     {
-        Config->TrbRunSettings.CtsControl = reply;
+        QString txt = reply;
         return "";
     }
     return "Error: Board returned string with wrong format";

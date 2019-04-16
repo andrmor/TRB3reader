@@ -39,6 +39,13 @@ public:
     bool    bPeriodicPulser0 = false;
     bool    bPeriodicPulser1 = false;
 
+    int     Mask = 0xffff;
+    QString RandomPulserFrequency = "0"; //QJsonObject is not friendly for ulong...
+    QString Period0 = "0x30000000";
+    QString Period1 = "0x30000000";
+
+    ulong   getTriggerInt() const;
+
     const QJsonObject   WriteToJson() const;
     void                ReadFromJson(const QJsonObject &json);
 };

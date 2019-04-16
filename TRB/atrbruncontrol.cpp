@@ -60,7 +60,7 @@ void ATrbRunControl::RestartBoard()
     ConnectStatus = Disconnected;
 
     emit boardLogReady("\n\nPowering OFF...");
-    QString err = sendCommandToHost("usbrelay HURTM_1=1");
+    QString err = sendCommandToHost("usbrelay HURTM_2=1");
     if (!err.isEmpty())
     {
         emit boardLogReady(err);
@@ -80,7 +80,7 @@ void ATrbRunControl::RestartBoard()
     while (el < 5000);
 
     emit boardLogReady("Powering ON...");
-    err = sendCommandToHost("usbrelay HURTM_1=0");
+    err = sendCommandToHost("usbrelay HURTM_2=0");
     if (!err.isEmpty())
     {
         emit boardLogReady(err);
@@ -216,12 +216,9 @@ void ATrbRunControl::onReadyBoardLog()
                 if (err.isEmpty()) emit boardLogReady("Updated buffer config");
                 else emit boardLogReady("Error during sending buffer config:\n" + err);
             }
-            if (!RunSettings.CtsControl.isEmpty())
-            {
-                const QString err = sendCTStoTRB();
-                if (err.isEmpty()) emit boardLogReady("Updated trigger config");
-                else emit boardLogReady("Error during sending trigger config:\n" + err);
-            }
+            const QString err = sendCTStoTRB();
+            if (err.isEmpty()) emit boardLogReady("Updated trigger config");
+            else emit boardLogReady("Error during sending trigger config:\n" + err);
             emit sigBoardIsAlive();
         }
         break;
@@ -399,14 +396,12 @@ const QString ATrbRunControl::updateXML()
 #include "afiletools.h"
 const QString ATrbRunControl::updateCTSsetupScript()
 {
-    if (RunSettings.CtsControl.isEmpty())
-        return "Error: CTS settings are absent in configuration";
-
     QString where = sExchangeDir;
     if (!where.endsWith('/')) where += '/';
     QString localCtsFileName = where + "TriggerSetup_Andr.sh";
 
-    bool bOK = SaveTextToFile(localCtsFileName, RunSettings.CtsControl);
+    QString txt;
+    bool bOK = SaveTextToFile(localCtsFileName, txt);
     if (!bOK) return "Cannot save CTS settings to file " + localCtsFileName;
 
     QString hostDir = RunSettings.ScriptDirOnHost;
@@ -444,9 +439,24 @@ const QString ATrbRunControl::updateBufferSetupScript()
 const QString ATrbRunControl::sendCTStoTRB()
 {
     QStringList txt;
-    txt << "trbcmd setbit 0xc001 0xa00c 0x80000000\n";
-    txt << "trbcmd w 0xc001 0xa101 0xffff0040\n";
-    txt << "trbcmd clearbit 0xc001 0xa00c 0x80000000\n";
+    txt << "trbcmd setbit 0xc001 0xa00c 0x80000000\n";  // master swicth off
+
+    long bits = RunSettings.getTriggerInt();
+    QString sbits = QString::number(bits, 16);
+    txt << QString("trbcmd w 0xc001 0xa101 0x%1   #trg_channel and mask\n").arg(sbits);
+
+    //QString freq = QString::number(RunSettings.RandomPulserFrequency, 16);
+    txt << QString("trbcmd w 0xc001 0xa159 %1   #random pulser frequency\n").arg(RunSettings.RandomPulserFrequency);
+
+    //QString period = QString::number(RunSettings.Period0, 16);
+    txt << QString("trbcmd w 0xc001 0xa156 %1   #periodic pulser 0 - period\n").arg(RunSettings.Period0);
+
+    //period = QString::number(RunSettings.Period1, 16);
+    txt << QString("trbcmd w 0xc001 0xa157 %1   #periodic pulser 1 - period\n").arg(RunSettings.Period1);
+
+    txt << "trbcmd clearbit 0xc001 0xa00c 0x80000000\n"; // master switch on
+
+    qDebug() << txt;
 
     QString command = "ssh";
     QStringList args;

@@ -306,6 +306,8 @@ void MainWindow::UpdateGui()
     ui->leiMaxEvents->setText( QString::number(Config->TrbRunSettings.MaxEvents) );
 
     on_pbRefreshBufferIndication_clicked();
+
+    on_pbUpdateTriggerGui_clicked();
 }
 
 // --- update Config on GUI operated by user ---
