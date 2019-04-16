@@ -31,6 +31,28 @@ ulong ATrbRunSettings::getTriggerInt() const
     return r;
 }
 
+bool CheckBit(ulong val, int pos)
+{
+    return ((val) & (1<<(pos)));
+}
+void ATrbRunSettings::setTriggerInt(ulong val)
+{
+    Mask = val / 0x10000;
+    qDebug() << "mask-->" << QString::number(Mask, 16);
+
+    bPeriodicPulser0 = CheckBit(val, 1);
+    bPeriodicPulser1 = CheckBit(val, 2);
+    bRandPulser = CheckBit(val, 3);
+    bMP_0 = CheckBit(val, 4);
+    bMP_1 = CheckBit(val, 5);
+    bMP_2 = CheckBit(val, 6);
+    bMP_3 = CheckBit(val, 7);
+    bMP_4 = CheckBit(val, 8);
+    bMP_5 = CheckBit(val, 9);
+    bMP_6 = CheckBit(val, 10);
+    bMP_7 = CheckBit(val, 11);
+}
+
 const QJsonObject ATrbRunSettings::WriteToJson() const
 {
     QJsonObject json;

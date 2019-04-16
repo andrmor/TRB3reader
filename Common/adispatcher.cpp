@@ -88,20 +88,3 @@ void ADispatcher::ClearIgnoreChannels()
     emit RequestUpdateGui();
 }
 
-const QString ADispatcher::ReadTriggerSettingsFromBoard()
-{
-    //http://192.168.3.214:1234/cts/cts.pl?dump,shell
-
-    QString reply;
-    QString url = QString("http://%1:1234/cts/cts.pl?dump,shell").arg(Config->TrbRunSettings.Host);
-    bool bOK = Network->makeHttpRequest(url, reply, 2000);
-
-    if (!bOK) return reply;
-
-    if (reply.startsWith("# CTS Configuration dump") && reply.endsWith("# Enable all triggers\n"))
-    {
-        QString txt = reply;
-        return "";
-    }
-    return "Error: Board returned string with wrong format";
-}

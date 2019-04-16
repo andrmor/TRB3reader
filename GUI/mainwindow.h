@@ -243,7 +243,7 @@ private slots:
     void onBoardLogNewText(const QString text);
     void on_pbStartAcquire_clicked();
     void on_pbStopAcquire_clicked();
-    void onBoardIsAlive();
+    void onBoardIsAlive(double currentAccepetedRate);
     void onBoardDisconnected();
     void onAcquireIsAlive();
     void onWatchdogFailed();
@@ -276,6 +276,7 @@ private slots:
     void on_pbRestartTrb_clicked();
     void on_pbUpdateTriggerGui_clicked();
     void on_pbUpdateTriggerSettings_clicked();
+    void on_pbOpenBufferWebPage_clicked();
 };
 
 #endif // MAINWINDOW_H

@@ -46,7 +46,7 @@ MainWindow::MainWindow(MasterConfig* Config,
     bStopFlag = false;
     ui->setupUi(this);
 
-    TrbRunManager = new ATrbRunControl(*Config, Dispatcher->ConfigDir);
+    TrbRunManager = new ATrbRunControl(*Config, Network, Dispatcher->ConfigDir);
     QObject::connect(TrbRunManager, &ATrbRunControl::sigBoardIsAlive, this, &MainWindow::onBoardIsAlive);
     QObject::connect(TrbRunManager, &ATrbRunControl::sigBoardOff, this, &MainWindow::onBoardDisconnected);
     QObject::connect(TrbRunManager, &ATrbRunControl::boardLogReady, this, &MainWindow::onBoardLogNewText);
@@ -68,6 +68,8 @@ MainWindow::MainWindow(MasterConfig* Config,
     foreach(QLineEdit *w, list) if (w->objectName().startsWith("led")) w->setValidator(dv);
 
     ui->pbUpdateTriggerSettings->setVisible(false);
+    ui->pbRefreshBufferIndication->setVisible(false);
+    ui->pbUpdateTriggerGui->setVisible(false);
 
 #ifdef CERN_ROOT
     RootModule = new CernRootModule(Reader, Extractor, Config, DataHub);
@@ -1598,9 +1600,10 @@ void MainWindow::on_pbStopAcquire_clicked()
     TrbRunManager->StopAcquire();
 }
 
-void MainWindow::onBoardIsAlive()
+void MainWindow::onBoardIsAlive(double currentAccepetedRate)
 {
     ui->labConnectionStatus->setText("<font color='green'>Connected</font>");
+    if (currentAccepetedRate > 0) ui->leCurrentAceptedRate->setText(QString::number(currentAccepetedRate));
     watchdogTimer->start();
 }
 
@@ -1608,6 +1611,7 @@ void MainWindow::onBoardDisconnected()
 {
     ui->pteBoardLog->clear();
     ui->labConnectionStatus->setText("Not connected");
+    ui->leCurrentAceptedRate->setText("");
 
     ui->leHost->setEnabled(true);
     ui->leUser->setEnabled(true);
@@ -1705,19 +1709,12 @@ void MainWindow::on_leiMaxEvents_editingFinished()
     Config->TrbRunSettings.MaxEvents = ui->leiMaxEvents->text().toInt();
 }
 
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
 void MainWindow::on_pbReadTriggerSettingsFromTrb_clicked()
 {
+    QString err = TrbRunManager->ReadTriggerSettingsFromBoard();
+    if (!err.isEmpty()) message(err, this);
 
-    QString err = Dispatcher->ReadTriggerSettingsFromBoard();
-    if (err.isEmpty())
-    {
-        message("Triggering configuration received", this);
-        ui->pteCTS->clear();
-        //ui->pteCTS->appendPlainText(Config->TrbRunSettings.CtsControl);
-    }
-    else message(err, this);
+    on_pbUpdateTriggerGui_clicked();
 }
 
 void MainWindow::on_pbUpdateStartup_clicked()
@@ -1833,7 +1830,7 @@ void MainWindow::onBufferDeleagateChanged(ABufferDelegate * del)
 void MainWindow::on_pbRestartTrb_clicked()
 {
     if (!TrbRunManager->isBoardDisconnected())
-        if (!areYouSure("The board is connected. Restart TRB?", this)) return;
+        if (!areYouSure("The board is connected or connection procedure is in progress.\nRestart TRB?", this)) return;
 
     TrbRunManager->RestartBoard();
 }
@@ -1897,4 +1894,9 @@ void MainWindow::on_pbUpdateTriggerSettings_clicked()
     Config->TrbRunSettings.Period1 = "0x" + QString::number(rPer, 16);
 
     qDebug() <<Config->TrbRunSettings.RandomPulserFrequency<<Config->TrbRunSettings.Period0<<Config->TrbRunSettings.Period1;
+}
+
+void MainWindow::on_pbOpenBufferWebPage_clicked()
+{
+    on_pbOpenBufferControl_clicked();
 }

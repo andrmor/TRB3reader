@@ -6,16 +6,18 @@
 
 class MasterConfig;
 class ATrbRunSettings;
+class ANetworkModule;
 
 class ATrbRunControl : public QObject
 {
     Q_OBJECT
 public:
-    ATrbRunControl(MasterConfig & settings, const QString & exchangeDir);
+    ATrbRunControl(MasterConfig & settings, ANetworkModule & Network, const QString & exchangeDir);
 
     const QString StartBoard();
     void StopBoard();
 
+    bool isBoardProcessExists() const {return prBoard;}
     bool isBoardDisconnected() const {return (ConnectStatus == Disconnected);}
     void RestartBoard();
 
@@ -27,6 +29,7 @@ public:
     const QString updateCTSsetupScript();
     const QString updateBufferSetupScript();
     const QString sendCTStoTRB();
+    const QString ReadTriggerSettingsFromBoard();
     const QString sendBufferControlToTRB();
     const QString readBufferControlFromTRB();
 
@@ -41,7 +44,7 @@ signals:
     //void sigBoardOn();
     void sigBoardOff();
 
-    void sigBoardIsAlive();
+    void sigBoardIsAlive(double acceptedRate);
     void sigAcquireIsAlive();
 
     void boardLogReady(const QString txt);
@@ -49,7 +52,8 @@ signals:
 
 private:    
     MasterConfig & Settings;
-    const ATrbRunSettings & RunSettings;
+    ATrbRunSettings & RunSettings;
+    ANetworkModule & Network;
     const QString sExchangeDir;
     QProcess * prBoard = 0;
     QProcess * prAcquire = 0;

@@ -1,14 +1,15 @@
 #include "atrbruncontrol.h"
 #include "masterconfig.h"
 #include "atrbrunsettings.h"
+#include "anetworkmodule.h"
 
 #include <QDebug>
 #include <QObject>
 #include <QElapsedTimer>
 
-ATrbRunControl::ATrbRunControl(MasterConfig & settings, const QString & exchangeDir) :
+ATrbRunControl::ATrbRunControl(MasterConfig & settings, ANetworkModule &Network, const QString & exchangeDir) :
     QObject(), Settings(settings), RunSettings(settings.TrbRunSettings),
-    sExchangeDir(exchangeDir),
+    Network(Network), sExchangeDir(exchangeDir),
     Host(settings.TrbRunSettings.Host), User(settings.TrbRunSettings.User) {}
 
 const QString ATrbRunControl::StartBoard()
@@ -47,16 +48,9 @@ void ATrbRunControl::StopBoard()
 #include <QThread>
 void ATrbRunControl::RestartBoard()
 {
-    if (prAcquire)
-    {
-        prAcquire->close();
-        delete prAcquire; prAcquire = nullptr;
-    }
-    if (prBoard)
-    {
-        prBoard->close();
-        delete prBoard; prBoard = nullptr;
-    }
+    if (prAcquire) StopAcquire();
+    if (prBoard) StopBoard();
+
     ConnectStatus = Disconnected;
 
     emit boardLogReady("\n\nPowering OFF...");
@@ -216,14 +210,31 @@ void ATrbRunControl::onReadyBoardLog()
                 if (err.isEmpty()) emit boardLogReady("Updated buffer config");
                 else emit boardLogReady("Error during sending buffer config:\n" + err);
             }
-            const QString err = sendCTStoTRB();
-            if (err.isEmpty()) emit boardLogReady("Updated trigger config");
-            else emit boardLogReady("Error during sending trigger config:\n" + err);
-            emit sigBoardIsAlive();
+//            const QString err = sendCTStoTRB();
+//            if (err.isEmpty()) emit boardLogReady("Updated trigger config");
+//            else emit boardLogReady("Error during sending trigger config:\n" + err);
+
+            emit sigBoardIsAlive(0);
         }
         break;
     case Connected:
-        emit sigBoardIsAlive(); //"Expecting text every second - inicates the board is alive";
+        {
+            //Triggers accepted                   | cts_cnt_trg_accepted       | 0xa002  |       923.18 |        88326
+            int iStart = log.indexOf("cts_cnt_trg_accepted");
+            double rate = 0;
+            if (iStart > 0)
+            {
+                int iStop = log.indexOf('\n', iStart);
+                QString str = log.mid(iStart, iStop-iStart);
+                QStringList sl = str.split('|', QString::SkipEmptyParts);
+                if (sl.size()>2)
+                {
+                    QString srate = sl.at(2).simplified();
+                    rate = srate.toDouble();
+                }
+            }
+            emit sigBoardIsAlive(rate); //"Expecting text every second - inicates the board is alive";
+        }
         break;
     }
 }
@@ -693,3 +704,35 @@ const QString ATrbRunControl::sendCTStoTRB()
 //    return "";
 }
 */
+
+const QString ATrbRunControl::ReadTriggerSettingsFromBoard()
+{
+    //http://192.168.3.214:1234/cts/cts.pl?dump,shell
+
+    QString reply;
+    QString url = QString("http://%1:1234/cts/cts.pl?dump,shell").arg(RunSettings.Host);
+    bool bOK = Network.makeHttpRequest(url, reply, 2000);
+
+    if (!bOK) return reply;
+
+    if (reply.startsWith("# CTS Configuration dump") && reply.endsWith("# Enable all triggers\n"))
+    {
+        const QStringList sl = reply.split('\n', QString::SkipEmptyParts);
+        for (const QString & s : sl)
+        {
+            QStringList line = s.split(' ', QString::SkipEmptyParts);
+            if (line.size() < 5) continue;
+
+            if (line.at(3) == "0xa101")
+            {
+                QString trig = line.at(4);
+                RunSettings.setTriggerInt( trig.toULong(nullptr, 16) );
+            }
+            else if (line.at(3) == "0xa159") RunSettings.RandomPulserFrequency = line.at(4);
+            else if (line.at(3) == "0xa156") RunSettings.Period0 = line.at(4);
+            else if (line.at(3) == "0xa157") RunSettings.Period1 = line.at(4);
+        }
+        return "";
+    }
+    return "Error: Board returned string with wrong format";
+}

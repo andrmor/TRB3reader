@@ -45,6 +45,7 @@ public:
     QString Period1 = "0x30000000";
 
     ulong   getTriggerInt() const;
+    void    setTriggerInt(ulong val);
 
     const QJsonObject   WriteToJson() const;
     void                ReadFromJson(const QJsonObject &json);
