@@ -15,6 +15,9 @@
 #ifdef CERN_ROOT
 #include "cernrootmodule.h"
 #endif
+#ifdef SPEECH
+#include "ainterfacetospeech.h"
+#endif
 
 #include "trb3datareader.h"
 #include "trb3signalextractor.h"
@@ -60,7 +63,7 @@ MainWindow::MainWindow(MasterConfig* Config,
 
     aTimer = new QTimer();
     aTimer->setSingleShot(true);
-    QObject::connect(aTimer, &QTimer::timeout, this, &MainWindow::on_pbStopAcquire_clicked);
+    QObject::connect(aTimer, &QTimer::timeout, this, &MainWindow::onTimeLimitForAcquireReached);
 
     elTimer = new QElapsedTimer();
 
@@ -1564,6 +1567,9 @@ void MainWindow::on_pbBoardOn_clicked()
 
 void MainWindow::on_pbBoardOff_clicked()
 {
+    if (TrbRunManager->isAcquireProcessExists())
+        TrbRunManager->StopAcquire();
+
     watchdogTimer->stop();
     TrbRunManager->StopBoard();
     ui->pteBoardLog->appendPlainText("Disconnecting...");
@@ -1571,6 +1577,7 @@ void MainWindow::on_pbBoardOff_clicked()
 
 void MainWindow::on_pbStartAcquire_clicked()
 {
+    bAlreadyStopping = false;
     int time_ms = -1;
     if (ui->cbLimitedTime->isChecked())
     {
@@ -1645,8 +1652,16 @@ void MainWindow::onAcquireIsAlive()
     ui->leStatRate->setText( QString::number(TrbRunManager->StatRate, 'g', 4) );
     ui->labDataUnits->setText( TrbRunManager->StatDataUnits );
 
-    if (bLimitMaxEvents && TrbRunManager->StatEvents >= MaxEventsToRun)
-        on_pbStopAcquire_clicked();
+    if (bLimitMaxEvents && TrbRunManager->StatEvents >= MaxEventsToRun && !bAlreadyStopping)
+    {
+        bAlreadyStopping = true;
+        TrbRunManager->StopAcquire();
+    }
+}
+
+void MainWindow::onTimeLimitForAcquireReached()
+{
+    TrbRunManager->StopAcquire();
 }
 
 void MainWindow::onWatchdogFailed()

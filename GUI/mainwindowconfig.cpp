@@ -9,6 +9,7 @@
 #include "adispatcher.h"
 #include "adatahub.h"
 #include "amessage.h"
+#include "atrbruncontrol.h"
 
 #include <QJsonObject>
 #include <QJsonArray>
@@ -16,6 +17,7 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QTimer>
 
 #ifdef CERN_ROOT
 #include "cernrootmodule.h"
@@ -24,6 +26,15 @@
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     saveCompleteState();
+
+    if (TrbRunManager->isAcquireProcessExists())
+        TrbRunManager->StopAcquire();
+
+    watchdogTimer->stop();
+    aTimer->stop();
+    timerAutoFreeSpace->stop();
+
+    TrbRunManager->StopBoard();
 
 #ifdef CERN_ROOT
     delete RootModule; RootModule = 0;

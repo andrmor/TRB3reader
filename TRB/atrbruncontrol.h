@@ -18,8 +18,8 @@ public:
     const QString StartBoard();
     void StopBoard();
 
+    bool isAcquireProcessExists() const {return prAcquire;}
     bool isBoardProcessExists() const {return prBoard;}
-    bool isBoardDisconnected() const {return (ConnectStatus == Disconnected);}
     void RestartBoard();
 
     const QString StartAcquire(); //returns error string, empty if all is ok

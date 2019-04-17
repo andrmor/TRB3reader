@@ -686,7 +686,11 @@ void ATrbRunControl::onFreeSpaceCheckerFinished()
 {
     timerFreeSpaceChecker->stop();//paranoic
 
-    delete prFreeSpaceChecker;
+    prFreeSpaceChecker->closeWriteChannel();
+    prFreeSpaceChecker->closeReadChannel(QProcess::StandardOutput);
+    prFreeSpaceChecker->closeReadChannel(QProcess::StandardError);
+
+    prFreeSpaceChecker->deleteLater();
     prFreeSpaceChecker = nullptr;
 }
 

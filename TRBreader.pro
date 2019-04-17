@@ -1,7 +1,7 @@
 
 
 CONFIG += cern_root        #enable CERN ROOT for graph drawing
-#CONFIG += speech_support   #enables text_to_speech script unit - minimum Qt 5.8.0
+CONFIG += speech_support   #enables text_to_speech script unit - minimum Qt 5.8.0
 
 #---CERN ROOT---
 cern_root {

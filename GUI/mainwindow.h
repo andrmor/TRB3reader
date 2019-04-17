@@ -19,6 +19,7 @@ class ATrbRunControl;
 class QTimer;
 class QElapsedTimer;
 class ABufferDelegate;
+class AInterfaceToSpeech;
 
 namespace Ui {
 class MainWindow;
@@ -148,39 +149,23 @@ private slots:
     void on_cbSmoothWaveforms_toggled(bool checked);
     void on_cobSignalExtractionMethod_currentIndexChanged(int index);
     void on_cobExplorerSource_currentIndexChanged(int index);
-
     void on_pbClearDataHub_clicked();
-
     void on_pbLoadToDataHub_clicked();
-
     void on_cobLableType_activated(int index);
-
     void on_sbNumChannels_editingFinished();
-
     void on_sbNumSamples_editingFinished();
-
     void on_cbBulkExtract_clicked();
-
     void on_cbAutoExecuteScript_clicked();
-
     void on_cbSaveSignalsToFiles_clicked();
-
     void on_leAddToProcessed_editingFinished();
-
     void on_cbBulkCopyToDatahub_clicked();
-
     void on_cbBulkAlsoCopyWaveforms_clicked();
-
     void on_cobPedestalExtractionMethod_activated(int index);
-
     void on_ledPedestalPeakSigma_editingFinished();
-
     void on_ledPedestalPeakThreshold_editingFinished();
-
     void on_actionConfigure_WebSocket_server_triggered();
 
     void on_pbBoardOn_clicked();
-
     void on_pbBoardOff_clicked();
 
 protected:
@@ -216,6 +201,11 @@ private:
     bool bLimitMaxEvents = false;
     int MaxEventsToRun = 0;
     QTimer * timerAutoFreeSpace = 0;
+    bool bAlreadyStopping = false;
+
+#ifdef SPEECH
+    AInterfaceToSpeech* speech = 0;
+#endif
 
 private:
     const QString ProcessData(); //returns error message if any
@@ -282,6 +272,7 @@ private slots:
     void on_pbUpdateTriggerSettings_clicked();
     void on_pbOpenBufferWebPage_clicked();
     void on_cbAutocheckFreeSpace_toggled(bool checked);
+    void onTimeLimitForAcquireReached();
 };
 
 #endif // MAINWINDOW_H
