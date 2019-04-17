@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>TRB3_reader v2.2.0</string>
+   <string>TRBreader v3.0.1</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -40,7 +40,7 @@
         <item>
          <widget class="QTabWidget" name="tabWidget">
           <property name="currentIndex">
-           <number>5</number>
+           <number>3</number>
           </property>
           <widget class="QWidget" name="tab_11">
            <attribute name="title">
@@ -1776,17 +1776,10 @@
               <item>
                <layout class="QVBoxLayout" name="verticalLayout_37">
                 <item>
-                 <widget class="QCheckBox" name="cbBufferSameValues">
-                  <property name="text">
-                   <string>Same values for all</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
                  <widget class="QPushButton" name="pbBufferSendToTRB">
                   <property name="minimumSize">
                    <size>
-                    <width>0</width>
+                    <width>150</width>
                     <height>40</height>
                    </size>
                   </property>
@@ -1817,6 +1810,16 @@
                </layout>
               </item>
              </layout>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="cbBufferSameValues">
+              <property name="text">
+               <string>Synchronize changes for all ADCs</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
             </item>
             <item>
              <widget class="QPushButton" name="pbRefreshBufferIndication">
@@ -2862,6 +2865,50 @@
              </layout>
             </item>
            </layout>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="Line" name="line_15">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_66">
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="label_71">
+            <property name="text">
+             <string>Current accepted trigger rate:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="leCurAceptTrigrate_onAcquire">
+            <property name="maximumSize">
+             <size>
+              <width>100</width>
+              <height>16777215</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_36">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
         </item>

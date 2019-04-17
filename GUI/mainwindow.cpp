@@ -1611,7 +1611,9 @@ void MainWindow::onBoardIsAlive(double currentAccepetedRate)
     ui->labConnectionStatus->setText("<font color='green'>Connected</font>");
     if (currentAccepetedRate > 0 || ZeroRateCounter > 1)
     {
-        ui->leCurrentAceptedRate->setText(QString::number(currentAccepetedRate));
+        const QString tr = QString::number(currentAccepetedRate);
+        ui->leCurrentAceptedRate->setText(tr);
+        ui->leCurAceptTrigrate_onAcquire->setText(tr);
         if (currentAccepetedRate > 0) ZeroRateCounter = 0;
     }
     else ZeroRateCounter++;
@@ -1623,6 +1625,7 @@ void MainWindow::onBoardDisconnected()
     ui->pteBoardLog->clear();
     ui->labConnectionStatus->setText("Not connected");
     ui->leCurrentAceptedRate->setText("");
+    ui->leCurAceptTrigrate_onAcquire->setText("");
 
     ui->leHost->setEnabled(true);
     ui->leUser->setEnabled(true);
@@ -1774,11 +1777,6 @@ void MainWindow::on_pbRefreshBufferIndication_clicked()
     }
 }
 
-void MainWindow::on_cbBufferSameValues_clicked(bool checked)
-{
-
-}
-
 void MainWindow::on_cbBufferReadFromTRB_clicked()
 {
     this->SetEnabled(false);
@@ -1830,10 +1828,16 @@ void MainWindow::onBufferDeleagateChanged(ABufferDelegate * del)
     }
 
     bool bChanged = rec->updateValues(samples, delay, down);
-
-    // TODO if common
-
     if (!bChanged) return; //no change in values
+
+    if (ui->cbBufferSameValues->isChecked())
+    {
+        QVector<ABufferRecord> & br = Config->getBufferRecords();
+        for (ABufferRecord & r : br)
+            if (&r != rec)
+                r.updateValues(samples, delay, down);
+    }
+    on_pbRefreshBufferIndication_clicked();
 
     // todo value canged -> update board? or just flag
 }
