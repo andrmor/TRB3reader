@@ -6,6 +6,8 @@
 #include <QDebug>
 #include <QObject>
 #include <QElapsedTimer>
+#include <QApplication>
+#include <QThread>
 
 ATrbRunControl::ATrbRunControl(MasterConfig & settings, ANetworkModule &Network, const QString & exchangeDir) :
     QObject(), Settings(settings), RunSettings(settings.TrbRunSettings),
@@ -44,15 +46,14 @@ void ATrbRunControl::StopBoard()
     }
 }
 
-#include <QApplication>
-#include <QThread>
 void ATrbRunControl::RestartBoard()
 {
-    if (prAcquire) StopAcquire();
-    if (prBoard) StopBoard();
+    if (prAcquire) return;
+    if (prBoard) return;
 
     ConnectStatus = Disconnected;
 
+    emit requestClearLog();
     emit boardLogReady("\n\nPowering OFF...");
     QString err = sendCommandToHost("usbrelay HURTM_2=1");
     if (!err.isEmpty())
@@ -61,7 +62,7 @@ void ATrbRunControl::RestartBoard()
         return;
     }
 
-    emit boardLogReady("Waiting 5 seconds...");
+    emit boardLogReady("Waiting 10 seconds...");
     QElapsedTimer t;
     t.start();
     qint64 el = 0;
@@ -71,7 +72,7 @@ void ATrbRunControl::RestartBoard()
         qApp->processEvents();
         QThread::usleep(100);
     }
-    while (el < 5000);
+    while (el < 10000);
 
     emit boardLogReady("Powering ON...");
     err = sendCommandToHost("usbrelay HURTM_2=0");
@@ -128,8 +129,6 @@ const QString ATrbRunControl::StartAcquire()
     for (const QString & s : txt)
         prAcquire->write(QByteArray(s.toLocal8Bit().data()));
 
-
-
     return "";
 }
 
@@ -137,7 +136,6 @@ void ATrbRunControl::StopAcquire()
 {
     QString command = "ssh";
     QStringList args;
-    //args << QString("%1@%2").arg(User).arg(Host) << "'/usr/bin/pkill -ef dabc_exe'";
     args << QString("%1@%2").arg(User).arg(Host) << "/usr/bin/pkill" << "-ef" << "dabc_exe";
     qDebug() << "Kill command:"<<command << args;
     QProcess * pr = new QProcess();
@@ -183,6 +181,21 @@ void ATrbRunControl::onAcquireFinished(int exitCode, QProcess::ExitStatus exitSt
     //emit sigAcquireOff();
 }
 
+void ATrbRunControl::recallConfiguration()
+{
+    emit boardLogReady("Board is connected");
+
+    if (!Settings.isBufferRecordsEmpty())
+    {
+        const QString err = sendBufferControlToTRB();
+        if (err.isEmpty()) emit boardLogReady("-->Updated buffer config");
+        else emit boardLogReady("Error during sending buffer config:\n" + err);
+    }
+    const QString err = sendCTStoTRB();
+    if (err.isEmpty()) emit boardLogReady("-->Updated trigger config");
+       else emit boardLogReady("Error during sending trigger config:\n" + err);
+}
+
 void ATrbRunControl::onReadyBoardLog()
 {
     QString log(prBoard->readAll());
@@ -204,16 +217,7 @@ void ATrbRunControl::onReadyBoardLog()
         if (log.contains("Label                                | Register"))
         {
             ConnectStatus = Connected;
-            if (!Settings.isBufferRecordsEmpty())
-            {
-                const QString err = sendBufferControlToTRB();
-                if (err.isEmpty()) emit boardLogReady("Updated buffer config");
-                else emit boardLogReady("Error during sending buffer config:\n" + err);
-            }
-//            const QString err = sendCTStoTRB();
-//            if (err.isEmpty()) emit boardLogReady("Updated trigger config");
-//            else emit boardLogReady("Error during sending trigger config:\n" + err);
-
+            recallConfiguration(); // !
             emit sigBoardIsAlive(0);
         }
         break;
@@ -253,7 +257,20 @@ void ATrbRunControl::onReadyAcquireLog()
             QStringList ff = st.split(' ', QString::SkipEmptyParts);
             if (ff.size() > 7)
             {
-                StatEvents = ff.at(1).toInt();
+                //events can be in kEvents (assume mEvents too)
+                QString sEv = ff.at(1);
+                if (sEv.right(1) == "k")
+                {
+                    sEv.chop(1);
+                    StatEvents = sEv.toDouble() * 1000.0;
+                }
+                else if (sEv.right(1) == "m" || sEv.right(1) == "M")
+                {
+                    sEv.chop(1);
+                    StatEvents = sEv.toDouble() * 1000000.0;
+                }
+                else StatEvents = sEv.toInt();
+
                 StatRate = ff.at(3).toDouble();
                 StatData = ff.at(6).toDouble();
                 StatDataUnits = ff.at(7);
@@ -411,7 +428,11 @@ const QString ATrbRunControl::updateCTSsetupScript()
     if (!where.endsWith('/')) where += '/';
     QString localCtsFileName = where + "TriggerSetup_Andr.sh";
 
-    QString txt;
+    QStringList sl;
+    sl << CtsSettingsToCommands(true);
+    QString txt = sl.join("");
+    qDebug() << txt;
+
     bool bOK = SaveTextToFile(localCtsFileName, txt);
     if (!bOK) return "Cannot save CTS settings to file " + localCtsFileName;
 
@@ -450,23 +471,7 @@ const QString ATrbRunControl::updateBufferSetupScript()
 const QString ATrbRunControl::sendCTStoTRB()
 {
     QStringList txt;
-    txt << "trbcmd setbit 0xc001 0xa00c 0x80000000\n";  // master swicth off
-
-    long bits = RunSettings.getTriggerInt();
-    QString sbits = QString::number(bits, 16);
-    txt << QString("trbcmd w 0xc001 0xa101 0x%1   #trg_channel and mask\n").arg(sbits);
-
-    //QString freq = QString::number(RunSettings.RandomPulserFrequency, 16);
-    txt << QString("trbcmd w 0xc001 0xa159 %1   #random pulser frequency\n").arg(RunSettings.RandomPulserFrequency);
-
-    //QString period = QString::number(RunSettings.Period0, 16);
-    txt << QString("trbcmd w 0xc001 0xa156 %1   #periodic pulser 0 - period\n").arg(RunSettings.Period0);
-
-    //period = QString::number(RunSettings.Period1, 16);
-    txt << QString("trbcmd w 0xc001 0xa157 %1   #periodic pulser 1 - period\n").arg(RunSettings.Period1);
-
-    txt << "trbcmd clearbit 0xc001 0xa00c 0x80000000\n"; // master switch on
-
+    txt << CtsSettingsToCommands(false);
     qDebug() << txt;
 
     QString command = "ssh";
@@ -505,6 +510,31 @@ const QStringList ATrbRunControl::bufferRecordsToCommands()
         txt << QString("trbcmd w %1 0xa015 0x%2   #Downsampling (starts from 0)\n").arg(addr).arg(QString::number(r.Downsampling, 16));
     }
     qDebug() << txt;
+    return txt;
+}
+
+const QStringList ATrbRunControl::CtsSettingsToCommands(bool bIncludeHidden)
+{
+    QStringList txt;
+    txt << "trbcmd setbit 0xc001 0xa00c 0x80000000   # -->Disable all triggers\n";  // master swicth off
+
+    long bits = RunSettings.getTriggerInt();
+    QString sbits = QString::number(bits, 16);
+    txt << QString("trbcmd w 0xc001 0xa101 0x%1   # trg_channel and mask\n").arg(sbits);
+
+    txt << QString("trbcmd w 0xc001 0xa159 %1   # random pulser frequency\n").arg(RunSettings.RandomPulserFrequency);
+
+    txt << QString("trbcmd w 0xc001 0xa156 %1   # periodic pulser 0 - period\n").arg(RunSettings.Period0);
+
+    txt << QString("trbcmd w 0xc001 0xa157 %1   # periodic pulser 1 - period\n").arg(RunSettings.Period1);
+
+    if (bIncludeHidden)
+    {
+        txt << "#\n# The 'hidden' part:\n";
+        txt << RunSettings.TheRestCTScontrols;
+    }
+
+    txt << "trbcmd clearbit 0xc001 0xa00c 0x80000000   # <--Enable all triggers\n"; // master switch on
     return txt;
 }
 
@@ -615,96 +645,6 @@ const QString ATrbRunControl::readBufferControlFromTRB()
     return "";
 }
 
-/*
-const QString ATrbRunControl::sendCTStoTRB()
-{
-    //if (Settings.CtsControl.isEmpty()) return "Error: CTS settings are absent in configuration";
-
-    const QString tmpFileName = "tmp.sh";
-
-    QFileInfo hostFileInfo(Settings.StorageXMLOnHost);
-
-    QString hostDir = Settings.getScriptDir();
-
-    //QString txt = "#!/bin/bash\n";
-    //txt += Settings.CtsControl;
-    //bool bOK = SaveTextToFile(localCtsFileName, txt);
-    //if (!bOK) return "Cannot save CTS settings to file " + localCtsFileName;
-
-    qDebug() << "Dir on host:" << hostDir << "local file:"<<localCtsFileName;
-
-    QString err = sshCopyFileToHost(localCtsFileName, hostDir);
-    if (!err.isEmpty()) return err;
-
-    //executing the script
-
-    QStringList txt;
-    //txt << "export PATH=${HOME}/trbsoft/trbnettools/bin:${PATH}\n";
-       //txt << "export PATH=${PATH}:${HOME}/trbsoft/daqdata/bin\n";
-       //txt << "export LD_LIBRARY_PATH=$HOME/trbsoft/trbnettools/liblocal/\n";
-       //txt << "export PERL5LIB=~/trbsoft/daqtools/perllibs\n";
-    //txt << "export DAQOPSERVER=localhost:1\n";
-
-    txt << "trbcmd setbit 0xc001 0xa00c 0x80000000\n";
-    txt << "trbcmd w 0xc001 0xa101 0xffff0040\n";
-    txt << "trbcmd clearbit 0xc001 0xa00c 0x80000000\n";
-
-    QString command = "ssh";
-    QStringList args;
-    //args << QString("%1@%2").arg(User).arg(Host) << QString("'%1/%2'").arg(hostDir).arg(tmpFileName);
-    //args << QString("%1@%2").arg(User).arg(Host) << "bash" << "-c" << QString("'%1/%2'").arg(hostDir).arg(tmpFileName);
-    //args << QString("%1@%2").arg(User).arg(Host) << "bash" << "-s" << "<" << QString("'%1/%2'").arg(hostDir).arg(tmpFileName);
-    //args << QString("%1@%2").arg(User).arg(Host) << "bash" << "-s" << "<" << "/home/andr/.config/TRBreader/tmp.sh";
-
-    //args << "-t" << QString("%1@%2").arg(User).arg(Host);
-    args << QString("%1@%2").arg(User).arg(Host);
-
-    QProcess pr;
-    pr.setProcessChannelMode(QProcess::MergedChannels);
-    pr.start(command, args);
-
-    if (!pr.waitForStarted(500)) return "Could not start send";
-
-    for (const QString & s : txt)
-        pr.write(QByteArray(s.toLocal8Bit().data()));
-
-    pr.closeWriteChannel();
-
-    if (!pr.waitForFinished(2000)) return "Timeout on attempt to execute CTS configuration";
-
-    QString reply1 = pr.readAll();
-
-    pr.close();
-
-    qDebug() << reply1;
-    return "";
-
-//    QString command = "cat";
-//    //cat tmp.sh | ssh rpcuser@192.168.3.214 "/bin/bash"
-//    QStringList args;
-//    //args << localCtsFileName << "|" << "ssh" << QString("%1@%2").arg(User).arg(Host) << "\"/bin/bash\"";
-//    args << localCtsFileName << "|" << "ssh" << QString("%1@%2").arg(User).arg(Host) << "\"/bin/bash\"";
-
-
-//    qDebug() << "execute command:"<<command << args;
-
-//    QProcess pr;
-//    pr.setProcessChannelMode(QProcess::MergedChannels);
-//    pr.start(command, args);
-
-//    if (!pr.waitForStarted(500)) return "Could not start send";
-//    if (!pr.waitForFinished(2000)) return "Timeout on attempt to execute CTS configuration";
-
-//    pr.closeWriteChannel();
-//    QString reply = pr.readAll();
-//    qDebug() << reply;
-//    //if (reply.contains("No such file or directory")) return "Cannot find temporary file with CTS script on host";
-//    //if (reply.contains("Permission denied")) return "Cannot start temporary file with CTS script on host";
-
-//    return "";
-}
-*/
-
 const QString ATrbRunControl::ReadTriggerSettingsFromBoard()
 {
     //http://192.168.3.214:1234/cts/cts.pl?dump,shell
@@ -717,6 +657,7 @@ const QString ATrbRunControl::ReadTriggerSettingsFromBoard()
 
     if (reply.startsWith("# CTS Configuration dump") && reply.endsWith("# Enable all triggers\n"))
     {
+        RunSettings.TheRestCTScontrols.clear();
         const QStringList sl = reply.split('\n', QString::SkipEmptyParts);
         for (const QString & s : sl)
         {
@@ -731,6 +672,11 @@ const QString ATrbRunControl::ReadTriggerSettingsFromBoard()
             else if (line.at(3) == "0xa159") RunSettings.RandomPulserFrequency = line.at(4);
             else if (line.at(3) == "0xa156") RunSettings.Period0 = line.at(4);
             else if (line.at(3) == "0xa157") RunSettings.Period1 = line.at(4);
+            else
+            {
+                if (!s.contains("setbit") && !s.contains("clearbit"))
+                    RunSettings.TheRestCTScontrols << s + '\n';
+            }
         }
         return "";
     }

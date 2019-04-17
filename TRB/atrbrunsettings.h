@@ -2,6 +2,7 @@
 #define ATRBRUNSETTINGS_H
 
 #include <QString>
+#include <QStringList>
 
 #include <vector>
 
@@ -43,6 +44,7 @@ public:
     QString RandomPulserFrequency = "0"; //QJsonObject is not friendly for ulong...
     QString Period0 = "0x30000000";
     QString Period1 = "0x30000000";
+    QStringList TheRestCTScontrols;
 
     ulong   getTriggerInt() const;
     void    setTriggerInt(ulong val);

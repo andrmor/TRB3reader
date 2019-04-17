@@ -91,6 +91,10 @@ const QJsonObject ATrbRunSettings::WriteToJson() const
         cj["Period0"] = Period0;
         cj["Period1"] = Period1;
 
+        QJsonArray ar;
+        for (const QString & s : TheRestCTScontrols) ar << s;
+        cj["TheRestControls"] = ar;
+
     json["CtsControl"] = cj;
 
     return json;
@@ -133,5 +137,11 @@ void ATrbRunSettings::ReadFromJson(const QJsonObject &json)
         parseJson(cj, "RandomPulserFrequency", RandomPulserFrequency);
         parseJson(cj, "Period0", Period0);
         parseJson(cj, "Period1", Period1);
+
+        QJsonArray ar;
+        parseJson(cj, "TheRestControls", ar);
+        TheRestCTScontrols.clear();
+        for (int i=0; i<ar.size(); i++) TheRestCTScontrols << ar[i].toString();
+
     json["CtsControl"] = cj;
 }

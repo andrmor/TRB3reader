@@ -50,6 +50,7 @@ MainWindow::MainWindow(MasterConfig* Config,
     QObject::connect(TrbRunManager, &ATrbRunControl::sigBoardIsAlive, this, &MainWindow::onBoardIsAlive);
     QObject::connect(TrbRunManager, &ATrbRunControl::sigBoardOff, this, &MainWindow::onBoardDisconnected);
     QObject::connect(TrbRunManager, &ATrbRunControl::boardLogReady, this, &MainWindow::onBoardLogNewText);
+    QObject::connect(TrbRunManager, &ATrbRunControl::requestClearLog, this, &MainWindow::onRequestClearLog);
     QObject::connect(TrbRunManager, &ATrbRunControl::sigAcquireIsAlive, this, &MainWindow::onAcquireIsAlive);
 
     watchdogTimer = new QTimer();
@@ -1387,6 +1388,11 @@ void MainWindow::onBoardLogNewText(const QString text)
 
 }
 
+void MainWindow::onRequestClearLog()
+{
+    ui->pteBoardLog->clear();
+}
+
 void MainWindow::on_pbClearDataHub_clicked()
 {
     DataHub->Clear();
@@ -1603,7 +1609,12 @@ void MainWindow::on_pbStopAcquire_clicked()
 void MainWindow::onBoardIsAlive(double currentAccepetedRate)
 {
     ui->labConnectionStatus->setText("<font color='green'>Connected</font>");
-    if (currentAccepetedRate > 0) ui->leCurrentAceptedRate->setText(QString::number(currentAccepetedRate));
+    if (currentAccepetedRate > 0 || ZeroRateCounter > 1)
+    {
+        ui->leCurrentAceptedRate->setText(QString::number(currentAccepetedRate));
+        if (currentAccepetedRate > 0) ZeroRateCounter = 0;
+    }
+    else ZeroRateCounter++;
     watchdogTimer->start();
 }
 
@@ -1829,10 +1840,10 @@ void MainWindow::onBufferDeleagateChanged(ABufferDelegate * del)
 
 void MainWindow::on_pbRestartTrb_clicked()
 {
-    if (!TrbRunManager->isBoardDisconnected())
-        if (!areYouSure("The board is connected or connection procedure is in progress.\nRestart TRB?", this)) return;
-
-    TrbRunManager->RestartBoard();
+    if (TrbRunManager->isBoardProcessExists())
+        message("The board is connected, press 'Disconnect' first", this);
+    else
+        TrbRunManager->RestartBoard();
 }
 
 void MainWindow::on_pbUpdateTriggerGui_clicked()
@@ -1876,6 +1887,8 @@ void MainWindow::on_pbUpdateTriggerSettings_clicked()
 
     Config->TrbRunSettings.bRandPulser = ui->cbRandomPulser->isChecked();
     Config->TrbRunSettings.bPeriodicPulser0 = ui->cbPeriodicalPulser0->isChecked();
+    if (ui->cbPeriodicalPulser1->isChecked())
+        ui->cbPeriodicalPulser1->setChecked(false); //otherwise blocks - TRB bug?
     Config->TrbRunSettings.bPeriodicPulser1 = ui->cbPeriodicalPulser1->isChecked();
 
     double freq = ui->leRandomFrequency->text().toDouble() * 21.474836;

@@ -239,8 +239,11 @@ private:
 
 private:
     ATrbRunControl * TrbRunManager = 0;
+    int ZeroRateCounter = 0;
+
 private slots:
     void onBoardLogNewText(const QString text);
+    void onRequestClearLog();
     void on_pbStartAcquire_clicked();
     void on_pbStopAcquire_clicked();
     void onBoardIsAlive(double currentAccepetedRate);

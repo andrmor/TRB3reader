@@ -48,6 +48,7 @@ signals:
     void sigAcquireIsAlive();
 
     void boardLogReady(const QString txt);
+    void requestClearLog();
 
 
 private:    
@@ -71,6 +72,8 @@ public:
     QString StatDataUnits;
 
 private:
+    void  recallConfiguration(); //executed after board is connected !!!
+
     const QString sshCopyFileToHost(const QString & localFileName, const QString & hostDir);  // returns error message, empty if success
     const QString sshCopyFileFromHost(const QString & hostFileName, const QString & localDir);  // returns error message, empty if success
     const QString makeDirOnHost(const QString & hostDir);  // returns error message, empty if success
@@ -78,6 +81,7 @@ private:
     const QString sendCommandToHost(const QString & command);
 
     const QStringList bufferRecordsToCommands();
+    const QStringList CtsSettingsToCommands(bool bIncludeHidden);
 };
 
 #endif // ATRBRUNCONTROL_H
