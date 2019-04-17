@@ -8,11 +8,17 @@
 #include <QElapsedTimer>
 #include <QApplication>
 #include <QThread>
+#include <QTimer>
 
 ATrbRunControl::ATrbRunControl(MasterConfig & settings, ANetworkModule &Network, const QString & exchangeDir) :
     QObject(), Settings(settings), RunSettings(settings.TrbRunSettings),
     Network(Network), sExchangeDir(exchangeDir),
-    Host(settings.TrbRunSettings.Host), User(settings.TrbRunSettings.User) {}
+    Host(settings.TrbRunSettings.Host), User(settings.TrbRunSettings.User)
+{
+    timerFreeSpaceChecker = new QTimer(this);
+    timerFreeSpaceChecker->setSingleShot(true);
+    QObject::connect(timerFreeSpaceChecker, &QTimer::timeout, this, &ATrbRunControl::onFreeSpaceCheckerTimeout);
+}
 
 const QString ATrbRunControl::StartBoard()
 {
@@ -643,6 +649,84 @@ const QString ATrbRunControl::readBufferControlFromTRB()
 
     pr.close();
     return "";
+}
+
+void ATrbRunControl::checkFreeSpace()
+{
+    if (prFreeSpaceChecker)
+    {
+        //nothing to do - wait for finished
+    }
+    else
+    {
+        QString dir = RunSettings.HldDirOnHost;
+        if (dir.isEmpty()) return;
+
+        QString command = "ssh";
+        QStringList args;
+
+        //QStringList sl = dir.split('/',QString::SkipEmptyParts);
+        //if (sl.isEmpty()) dir = "/";
+        //else dir = '/' + sl.first();
+
+        args << QString("%1@%2").arg(User).arg(Host) << "df" << dir;
+
+        prFreeSpaceChecker = new QProcess();
+        connect(prFreeSpaceChecker, SIGNAL(finished(int, QProcess::ExitStatus )), this, SLOT(onFreeSpaceCheckerFinished()));
+        connect(prFreeSpaceChecker, SIGNAL(readyRead()), this, SLOT(onFreeSpaceCheckerReady()));
+        prFreeSpaceChecker->setProcessChannelMode(QProcess::MergedChannels);
+
+        lastFreeSpace = -1;
+        timerFreeSpaceChecker->start(2000);
+        prFreeSpaceChecker->start(command, args);
+    }
+}
+
+void ATrbRunControl::onFreeSpaceCheckerFinished()
+{
+    timerFreeSpaceChecker->stop();//paranoic
+
+    delete prFreeSpaceChecker;
+    prFreeSpaceChecker = nullptr;
+}
+
+void ATrbRunControl::onFreeSpaceCheckerReady()
+{
+    timerFreeSpaceChecker->stop();
+    lastFreeSpace = -1;
+
+    QString log(prFreeSpaceChecker->readAll());
+
+    if (log.startsWith("Filesystem"))
+    {
+        QStringList sl = log.split('\n');
+        if (sl.size() > 1)
+        {
+            QString line = sl.at(1);
+            QStringList f = line.split(' ', QString::SkipEmptyParts);
+            if (f.size() > 4 )
+            {
+                QString ssize = f.at(3);
+                bool bOK;
+                int isize = ssize.toInt(&bOK);
+                if (bOK)
+                    lastFreeSpace = isize;
+            }
+        }
+    }
+
+    prFreeSpaceChecker->closeWriteChannel();
+    emit freeSpaceCheckReady(lastFreeSpace);
+}
+
+void ATrbRunControl::onFreeSpaceCheckerTimeout()
+{
+    if (prFreeSpaceChecker)
+    {
+        delete prFreeSpaceChecker; prFreeSpaceChecker = nullptr;
+        lastFreeSpace = -1;
+        emit freeSpaceCheckReady(-1);
+    }
 }
 
 const QString ATrbRunControl::ReadTriggerSettingsFromBoard()

@@ -52,6 +52,7 @@ MainWindow::MainWindow(MasterConfig* Config,
     QObject::connect(TrbRunManager, &ATrbRunControl::boardLogReady, this, &MainWindow::onBoardLogNewText);
     QObject::connect(TrbRunManager, &ATrbRunControl::requestClearLog, this, &MainWindow::onRequestClearLog);
     QObject::connect(TrbRunManager, &ATrbRunControl::sigAcquireIsAlive, this, &MainWindow::onAcquireIsAlive);
+    QObject::connect(TrbRunManager, &ATrbRunControl::freeSpaceCheckReady, this, &MainWindow::onFreeSpaceReportReady);
 
     watchdogTimer = new QTimer();
     watchdogTimer->setInterval(2000);
@@ -62,6 +63,10 @@ MainWindow::MainWindow(MasterConfig* Config,
     QObject::connect(aTimer, &QTimer::timeout, this, &MainWindow::on_pbStopAcquire_clicked);
 
     elTimer = new QElapsedTimer();
+
+    timerAutoFreeSpace = new QTimer(this);
+    timerAutoFreeSpace->setSingleShot(false);
+    QObject::connect(timerAutoFreeSpace, &QTimer::timeout, TrbRunManager, &ATrbRunControl::checkFreeSpace);
 
     QDoubleValidator* dv = new QDoubleValidator(this);
     dv->setNotation(QDoubleValidator::ScientificNotation);
@@ -1688,6 +1693,7 @@ void MainWindow::on_leStorageXmlOnHost_editingFinished()
 void MainWindow::on_leFolderForHldFiles_editingFinished()
 {
     Config->TrbRunSettings.HldDirOnHost = ui->leFolderForHldFiles->text();
+    TrbRunManager->checkFreeSpace();
 }
 
 void MainWindow::on_leiHldFileSize_editingFinished()
@@ -1842,6 +1848,14 @@ void MainWindow::onBufferDeleagateChanged(ABufferDelegate * del)
     // todo value canged -> update board? or just flag
 }
 
+void MainWindow::onFreeSpaceReportReady(int KB)
+{
+    QString s = "n.a.";
+    if (KB != -1)
+        s = QString::number(KB);
+    ui->leFreeSpace->setText(s);
+}
+
 void MainWindow::on_pbRestartTrb_clicked()
 {
     if (TrbRunManager->isBoardProcessExists())
@@ -1916,4 +1930,18 @@ void MainWindow::on_pbUpdateTriggerSettings_clicked()
 void MainWindow::on_pbOpenBufferWebPage_clicked()
 {
     on_pbOpenBufferControl_clicked();
+}
+
+void MainWindow::on_cbAutocheckFreeSpace_toggled(bool checked)
+{
+    if (checked)
+    {
+        TrbRunManager->checkFreeSpace();
+        timerAutoFreeSpace->start(2000);
+    }
+    else
+    {
+        timerAutoFreeSpace->stop();
+        ui->leFreeSpace->setText("");
+    }
 }

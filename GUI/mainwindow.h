@@ -215,6 +215,7 @@ private:
     QElapsedTimer * elTimer = 0;
     bool bLimitMaxEvents = false;
     int MaxEventsToRun = 0;
+    QTimer * timerAutoFreeSpace = 0;
 
 private:
     const QString ProcessData(); //returns error message if any
@@ -275,10 +276,12 @@ private slots:
     void on_pbBufferUpdateScript_clicked();
 
     void onBufferDeleagateChanged(ABufferDelegate *del);
+    void onFreeSpaceReportReady(int KB);
     void on_pbRestartTrb_clicked();
     void on_pbUpdateTriggerGui_clicked();
     void on_pbUpdateTriggerSettings_clicked();
     void on_pbOpenBufferWebPage_clicked();
+    void on_cbAutocheckFreeSpace_toggled(bool checked);
 };
 
 #endif // MAINWINDOW_H
