@@ -262,12 +262,16 @@ void MainWindow::on_pbEditMap_clicked()
     QString old;
     for (int i : Config->GetMapping()) old += QString::number(i) + " ";
 
-    AEditChannelsDialog* D = new AEditChannelsDialog("Hardware channels sorted by logical number", old, "Example: 5 4 3 2 1 0 10 11 12");
+    AEditChannelsDialog* D = new AEditChannelsDialog("Hardware channels sorted by logical number", old, "Example: 5 4-0 6 12-25");
     int res = D->exec();
     if (res != 1) return;
     const QString str = D->GetText().simplified();
     delete D;
 
+    QVector<int> vec;
+    ExtractNumbersFromQString(str, &vec);
+
+    /*
     QRegExp rx("(\\ |\\,|\\:|\\t|\\n)");
     QStringList fields = str.split(rx, QString::SkipEmptyParts);
     QVector<int> vec;
@@ -282,6 +286,7 @@ void MainWindow::on_pbEditMap_clicked()
         }
         vec << i;
     }
+    */
 
     bool bOK = Config->SetMapping(vec);
     if (!bOK) message("Ignored: there are non-unique channel numbers in the list!", this);
@@ -983,7 +988,7 @@ bool MainWindow::ExtractNumbersFromQString(const QString input, QVector<int> *To
 {
   ToAdd->clear();
 
-  QRegExp rx("(\\,|\\-)"); //RegEx for ' ' and '-'
+  QRegExp rx("(\\,|\\-|\\ )");
 
   QStringList fields = input.split(rx, QString::SkipEmptyParts);
 
@@ -993,8 +998,9 @@ bool MainWindow::ExtractNumbersFromQString(const QString input, QVector<int> *To
       return false;
     }
 
-  fields = input.split(",", QString::SkipEmptyParts);
-  //  qDebug()<<"found "<<fields.size()<<" records";
+  //fields = input.split(",", QString::SkipEmptyParts);
+  fields = input.split(QRegExp("(\\,|\\ )"), QString::SkipEmptyParts);
+    //qDebug()<<"found "<<fields.size()<<" records"<<fields;
 
   for (int i=0; i<fields.size(); i++)
     {
@@ -1022,11 +1028,14 @@ bool MainWindow::ExtractNumbersFromQString(const QString input, QVector<int> *To
           pm2 = subFields[1].toInt(&ok2);
           if (ok1 && ok2)
             {
-               if (pm2<pm1) return false;//error = true;
+               if (pm2<pm1)
+               {
+                   for (int j=pm1; j>=pm2; j--) ToAdd->append(j);
+               }
                else
-                 {
+               {
                    for (int j=pm1; j<=pm2; j++) ToAdd->append(j);
-                 }
+               }
             }
           else return false;
         }
@@ -1067,6 +1076,55 @@ const QString MainWindow::PackChannelList(QVector<int> vec)
 
         //adding to output
         if (!out.isEmpty()) out += ", ";
+
+        if (prevVal == rangeStart)             //single val
+            out += QString::number(prevVal);
+        else                                //range ended
+            out += QString::number(rangeStart) + "-" + QString::number(prevVal);
+
+        prevVal = thisVal;
+        rangeStart = thisVal;
+    }
+
+    return out;
+}
+
+const QString MainWindow::PackMappingList(QVector<int> vec)
+{
+    if (vec.isEmpty()) return "";
+
+    QString out;
+    int prevVal = vec.first();
+    int rangeStart = prevVal;
+    for (int i=0; i<=vec.size(); ++i)        //includes the invalid index!
+    {
+        int thisVal;
+        int direction = 0; //-1 0 +1
+        if ( i == vec.size() )               //last in the vector
+            thisVal = prevVal;
+        else
+        {
+            thisVal = vec.at(i);
+            if ( i == 0 )                    // first but not the only
+            {
+                continue;
+            }
+            else if ( thisVal == prevVal+1 && (direction == 0 || direction == 1) )
+            {
+                prevVal++;
+                direction = 1;
+                continue;
+            }
+            else if ( thisVal == prevVal-1 && (direction == 0 || direction == -1) )
+            {
+                prevVal--;
+                direction = -1;
+                continue;
+            }
+        }
+
+        //adding to output
+        if (!out.isEmpty()) out += " ";
 
         if (prevVal == rangeStart)             //single val
             out += QString::number(prevVal);

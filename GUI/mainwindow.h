@@ -223,6 +223,7 @@ private:
     void CreateScriptWindow();
 
     const QString PackChannelList(QVector<int> vec);
+    const QString PackMappingList(QVector<int> vec);
     bool ExtractNumbersFromQString(const QString input, QVector<int>* ToAdd);
     //bool bulkProcessCore();
     void bulkProcessorEnvelope(const QStringList FileNames);

@@ -229,6 +229,7 @@ void MainWindow::UpdateGui()
     s.clear();
     for (int i: Config->GetMapping()) s += QString::number(i)+" ";
     ui->pteMapping->appendPlainText(s);
+    //ui->pteMapping->appendPlainText(PackMappingList(Config->GetMapping()));
 
     ui->pteIgnoreHardwareChannels->clear();
 //    s.clear();
