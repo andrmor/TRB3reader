@@ -706,19 +706,53 @@ void ATrbRunControl::onFreeSpaceCheckerReady()
         QStringList sl = log.split('\n');
         if (sl.size() > 1)
         {
-            QString line = sl.at(1);
+            QString line = sl.first();
             QStringList f = line.split(' ', QString::SkipEmptyParts);
-            if (f.size() > 4 )
+            if (f.size() > 2 )
             {
-                QString ssize = f.at(3);
+                int blockSize = 1024; //default
+                QString br = f.at(1);
+                f = br.split('-', QString::SkipEmptyParts);
+                QString record = f.first();
                 bool bOK;
-                int isize = ssize.toInt(&bOK);
-                if (bOK)
-                    lastFreeSpace = isize;
+                if (record.endsWith('k') || record.endsWith('K'))
+                {
+                    //qDebug() << "in K bytes";
+                    record.chop(1);
+                    int iTest = record.toInt(&bOK) ;
+                    if (bOK)
+                    {
+                        blockSize = 1024 * iTest;
+                        //qDebug() << "Block size is "<< blockSize << "bytes";
+                    }
+                    else qDebug() << "Size convertion to int failed, assuimg 1K blocks";
+                }
+                else
+                {
+                    int iTest = record.toInt(&bOK);
+                    if (bOK)
+                    {
+                        blockSize = iTest;
+                        //qDebug() << "Block size is "<< blockSize << "bytes";
+                    }
+                    else qDebug() << "Size convertion to int failed, assuimg 1K blocks";
+                }
+
+                //in blocks
+                line = sl.at(1);
+                f = line.split(' ', QString::SkipEmptyParts);
+                if (f.size() > 4 )
+                {
+                    QString ssize = f.at(3);
+                    bool bOK;
+                    long isize = ssize.toInt(&bOK);
+                    if (bOK)
+                        lastFreeSpace = isize * blockSize;
+                }
             }
         }
     }
-
+    //qDebug() << lastFreeSpace;
     prFreeSpaceChecker->closeWriteChannel();
     emit freeSpaceCheckReady(lastFreeSpace);
 }

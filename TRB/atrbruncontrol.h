@@ -57,7 +57,7 @@ signals:
     void boardLogReady(const QString txt);
     void requestClearLog();
 
-    void freeSpaceCheckReady(int kBytes); //can be -1 for n.a.
+    void freeSpaceCheckReady(long bytes); //can be -1 for n.a.
 
 private:    
     MasterConfig & Settings;
@@ -69,7 +69,7 @@ private:
 
     QProcess * prFreeSpaceChecker = 0;
     QTimer * timerFreeSpaceChecker = 0;
-    int lastFreeSpace = -1;
+    long lastFreeSpace = -1;
 
     enum eConnectStatus {Disconnected, Connecting, WaitingFirstReply, Connected};
     eConnectStatus ConnectStatus = Disconnected;

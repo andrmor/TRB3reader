@@ -266,7 +266,7 @@ private slots:
     void on_pbBufferUpdateScript_clicked();
 
     void onBufferDeleagateChanged(ABufferDelegate *del);
-    void onFreeSpaceReportReady(int KB);
+    void onFreeSpaceReportReady(long bytes);
     void on_pbRestartTrb_clicked();
     void on_pbUpdateTriggerGui_clicked();
     void on_pbUpdateTriggerSettings_clicked();

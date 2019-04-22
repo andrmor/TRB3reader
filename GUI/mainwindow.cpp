@@ -1863,11 +1863,14 @@ void MainWindow::onBufferDeleagateChanged(ABufferDelegate * del)
     // todo value canged -> update board? or just flag
 }
 
-void MainWindow::onFreeSpaceReportReady(int KB)
+void MainWindow::onFreeSpaceReportReady(long bytes)
 {
     QString s = "n.a.";
-    if (KB != -1)
-        s = QString::number(KB);
+    if (bytes != -1)
+    {
+        double d = (double)bytes*0.000001;
+        s = QString::number(d, 'f', 3);
+    }
     ui->leFreeSpace->setText(s);
 }
 
