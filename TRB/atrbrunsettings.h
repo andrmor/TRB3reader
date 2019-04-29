@@ -15,7 +15,7 @@ public:
     QString Host;
 
     QString ScriptDirOnHost = "/home/rpcuser/trbsoft/userscripts/trb130";
-    QString StartupScriptOnHost = "startup_Andr";
+    QString StartupScriptOnHost = "startup_Andr.sh";
     const QString getScriptDir() const;
     QString StorageXML = "EventBuilder_Andr.xml";
 
