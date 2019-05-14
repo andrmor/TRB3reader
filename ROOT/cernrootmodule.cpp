@@ -219,7 +219,8 @@ void CernRootModule::showGraphWindow(AGraphWindow** win, bool flag)
     if (flag)
     {
         if (!(*win)) (*win) = new AGraphWindow();
-        (*win)->show();
+        (*win)->showNormal();
+        (*win)->activateWindow();
     }
     else
     {

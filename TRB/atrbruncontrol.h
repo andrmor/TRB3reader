@@ -50,6 +50,7 @@ private slots:
 signals:
     //void sigBoardOn();
     void sigBoardOff();
+    void sigAcquireOff();
 
     void sigBoardIsAlive(double acceptedRate);
     void sigAcquireIsAlive();

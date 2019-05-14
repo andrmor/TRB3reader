@@ -55,6 +55,7 @@ MainWindow::MainWindow(MasterConfig* Config,
     QObject::connect(TrbRunManager, &ATrbRunControl::boardLogReady, this, &MainWindow::onBoardLogNewText);
     QObject::connect(TrbRunManager, &ATrbRunControl::requestClearLog, this, &MainWindow::onRequestClearLog);
     QObject::connect(TrbRunManager, &ATrbRunControl::sigAcquireIsAlive, this, &MainWindow::onAcquireIsAlive);
+    QObject::connect(TrbRunManager, &ATrbRunControl::sigAcquireOff, this, &MainWindow::onAcquireOff);
     QObject::connect(TrbRunManager, &ATrbRunControl::freeSpaceCheckReady, this, &MainWindow::onFreeSpaceReportReady);
 
     watchdogTimer = new QTimer();
@@ -1715,6 +1716,11 @@ void MainWindow::onAcquireIsAlive()
         bAlreadyStopping = true;
         TrbRunManager->StopAcquire();
     }
+}
+
+void MainWindow::onAcquireOff()
+{
+    ui->leStatRate->setText("");
 }
 
 void MainWindow::onTimeLimitForAcquireReached()

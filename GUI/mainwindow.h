@@ -241,6 +241,7 @@ private slots:
     void onBoardIsAlive(double currentAccepetedRate);
     void onBoardDisconnected();
     void onAcquireIsAlive();
+    void onAcquireOff();
     void onWatchdogFailed();
     void on_cbLimitedTime_clicked(bool checked);
     void on_cbLimitEvents_clicked(bool checked);

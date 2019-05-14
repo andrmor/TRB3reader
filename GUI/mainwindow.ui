@@ -30,7 +30,7 @@
     <item>
      <widget class="QTabWidget" name="twMain">
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab_8">
        <attribute name="title">
@@ -40,7 +40,7 @@
         <item>
          <widget class="QTabWidget" name="tabWidget">
           <property name="currentIndex">
-           <number>1</number>
+           <number>3</number>
           </property>
           <widget class="QWidget" name="tab_11">
            <attribute name="title">
@@ -4666,12 +4666,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>88</x>
-     <y>591</y>
+     <x>96</x>
+     <y>581</y>
     </hint>
     <hint type="destinationlabel">
-     <x>258</x>
-     <y>589</y>
+     <x>284</x>
+     <y>583</y>
     </hint>
    </hints>
   </connection>
@@ -4746,12 +4746,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>71</x>
-     <y>596</y>
+     <x>79</x>
+     <y>581</y>
     </hint>
     <hint type="destinationlabel">
-     <x>315</x>
-     <y>594</y>
+     <x>383</x>
+     <y>583</y>
     </hint>
    </hints>
   </connection>

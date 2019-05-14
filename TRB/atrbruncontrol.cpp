@@ -184,7 +184,7 @@ void ATrbRunControl::onAcquireFinished(int exitCode, QProcess::ExitStatus exitSt
     qDebug() << "Exit code:"<<exitCode;
     qDebug() << "Exit status"<< exitStatus;
     delete prAcquire; prAcquire = 0;
-    //emit sigAcquireOff();
+    emit sigAcquireOff();
 }
 
 void ATrbRunControl::recallConfiguration()
@@ -512,6 +512,7 @@ const QStringList ATrbRunControl::bufferRecordsToCommands()
     {
         const QString addr = "0x" + QString::number(r.Datakind, 16);
         txt << QString("trbcmd w %1 0xa010 0x%2   #Buffer depth\n").arg(addr).arg(QString::number(r.Samples, 16));
+        txt << QString("trbcmd w %1 0xa024 0x%2   #Buffer depth -> word count\n").arg(addr).arg(QString::number(r.Samples, 16));
         txt << QString("trbcmd w %1 0xa011 0x%2   #Samples after trigger\n").arg(addr).arg(QString::number(r.Delay, 16));
         txt << QString("trbcmd w %1 0xa015 0x%2   #Downsampling (starts from 0)\n").arg(addr).arg(QString::number(r.Downsampling, 16));
     }
