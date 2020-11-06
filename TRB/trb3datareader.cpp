@@ -492,6 +492,9 @@ void Trb3dataReader::smoothData()
                 else
                     doAdjacentAverage        (waveData[ievent][ichannel], Config->AdjacentAveraging_NumPoints);
             }
+
+            if (Config->bTrapezoidal)
+                applyTrapezoidal(waveData[ievent][ichannel], Config->TrapezoidalL, Config->TrapezoidalG);
         }
 }
 
@@ -532,6 +535,26 @@ void Trb3dataReader::doAdjacentWeightedAverage(QVector<float> &arr, int numPoint
         }
         arr[is] = sum/sumWeights;
     }
+}
+
+void Trb3dataReader::applyTrapezoidal(QVector<float> & arr, int L, int G) const
+{
+    QVector<float> arrOriginal = arr;
+    const int iSamMax = numSamples - 2*L - G;
+    for (int iSam = 0; iSam < iSamMax; iSam++)
+    {
+        float av1 = 0;
+        float av2 = 0;
+        for (int i = 0; i < L; i++)
+        {
+            av1 += arrOriginal[iSam + i];
+            av2 += arrOriginal[iSam + i + L + G];
+        }
+        arr[iSam] = (av2 - av1) / L;
+    }
+
+    for (int iSam = iSamMax; iSam < numSamples; iSam++)
+        arr[iSam] = arr[iSamMax-1];
 }
 
 void Trb3dataReader::ClearData()

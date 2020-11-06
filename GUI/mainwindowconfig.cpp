@@ -254,6 +254,10 @@ void MainWindow::UpdateGui()
             ui->sbAdjAvPoints->setValue(Config->AdjacentAveraging_NumPoints);
             ui->cbAdjAvWeighted->setChecked(Config->AdjacentAveraging_bWeighted);
 
+    ui->cbTrapezoidal->setChecked(Config->bTrapezoidal);
+        ui->sbTrapezoidalL->setValue(Config->TrapezoidalL);
+        ui->sbTrapezoidalG->setValue(Config->TrapezoidalG);
+
     int method = Config->SignalExtractionMethod;
     if (method <= 3) ui->cobSignalExtractionMethod->setCurrentIndex(method);
     else

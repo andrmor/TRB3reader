@@ -275,6 +275,9 @@ private slots:
     void on_pbOpenBufferWebPage_clicked();
     void on_cbAutocheckFreeSpace_toggled(bool checked);
     void onTimeLimitForAcquireReached();
+    void on_cbTrapezoidal_clicked(bool checked);
+    void on_sbTrapezoidalL_editingFinished();
+    void on_sbTrapezoidalG_editingFinished();
 };
 
 #endif // MAINWINDOW_H

@@ -83,6 +83,9 @@ public:
     bool                AdjacentAveraging_bOn = false;
     int                 AdjacentAveraging_NumPoints = 1;
     bool                AdjacentAveraging_bWeighted = false;
+    bool                bTrapezoidal = false;
+    int                 TrapezoidalL = 3;
+    int                 TrapezoidalG = 3;
 
     bool                bPedestalSubstraction = false;
     bool                bSmoothingBeforePedestals = false;

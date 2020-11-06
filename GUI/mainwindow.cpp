@@ -2027,3 +2027,21 @@ void MainWindow::on_cbAutocheckFreeSpace_toggled(bool checked)
         ui->leFreeSpace->setText("");
     }
 }
+
+void MainWindow::on_cbTrapezoidal_clicked(bool checked)
+{
+    Config->bTrapezoidal = checked;
+    ClearData();
+}
+
+void MainWindow::on_sbTrapezoidalL_editingFinished()
+{
+    Config->TrapezoidalL = ui->sbTrapezoidalL->value();
+    ClearData();
+}
+
+void MainWindow::on_sbTrapezoidalG_editingFinished()
+{
+    Config->TrapezoidalG = ui->sbTrapezoidalG->value();
+    ClearData();
+}

@@ -148,6 +148,12 @@ void MasterConfig::writeSmoothingToJson(QJsonObject &json)
         aa_js["Points"] =  AdjacentAveraging_NumPoints;
     js["AdjacentAveraging"] = aa_js;
 
+    QJsonObject tf_js;
+        tf_js["On"] = bTrapezoidal;
+        tf_js["TrapezoidalL"] = TrapezoidalL;
+        tf_js["TrapezoidalG"] = TrapezoidalG;
+    js["TrapezoidalFilter"] = tf_js;
+
     json["Smoothing"] = js;
 }
 
@@ -165,6 +171,17 @@ bool MasterConfig::readSmoothingFromJson(QJsonObject &json)
     AdjacentAveraging_bOn =  aa_js["On"].toBool();
     AdjacentAveraging_bWeighted  =  aa_js["Weighted"].toBool();
     AdjacentAveraging_NumPoints = aa_js["Points"].toInt();
+
+    bTrapezoidal = false;
+    QJsonObject tf_js;
+    bool ok = parseJson(js, "TrapezoidalFilter", tf_js);
+    if (ok)
+    {
+        parseJson(tf_js, "On", bTrapezoidal);
+        parseJson(tf_js, "TrapezoidalL", TrapezoidalL);
+        parseJson(tf_js, "TrapezoidalG", TrapezoidalG);
+    }
+
     return true;
 }
 
