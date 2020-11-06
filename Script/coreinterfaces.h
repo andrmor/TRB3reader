@@ -63,8 +63,8 @@ public slots:
   const QString  GetExamplesDir() const;
 
   //file finder
-  void          SetNewFileFinder(const QString dir, const QString fileNamePattern);
-  QVariant      GetNewFiles();
+  QVariant       SetNewFileFinder(const QString dir, const QString fileNamePattern);
+  QVariant       GetNewFiles();
 
   //externals
   const QString  StartExternalProcess(QString command, QVariant arguments, bool waitToFinish = false, int milliseconds = 1000);

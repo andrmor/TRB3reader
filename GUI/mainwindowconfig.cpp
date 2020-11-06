@@ -9,6 +9,7 @@
 #include "adispatcher.h"
 #include "adatahub.h"
 #include "amessage.h"
+#include "atrbruncontrol.h"
 
 #include <QJsonObject>
 #include <QJsonArray>
@@ -16,6 +17,7 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QTimer>
 
 #ifdef CERN_ROOT
 #include "cernrootmodule.h"
@@ -24,6 +26,15 @@
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     saveCompleteState();
+
+    if (TrbRunManager->isAcquireProcessExists())
+        TrbRunManager->StopAcquire();
+
+    watchdogTimer->stop();
+    aTimer->stop();
+    timerAutoFreeSpace->stop();
+
+    TrbRunManager->StopBoard();
 
 #ifdef CERN_ROOT
     delete RootModule; RootModule = 0;
@@ -201,7 +212,7 @@ void MainWindow::UpdateGui()
     if ( datakinds.size() > 1 ) std::sort(datakinds.begin(), datakinds.end());
     for (int i : datakinds)
     {
-        QString s = QString::number(i) + "   (hex: " + QString::number(i, 16) + ")";
+        QString s = QString("0x%1 (%2)").arg(QString::number(i, 16)).arg(QString::number(i));
         QListWidgetItem* item = new QListWidgetItem(s);
         item->setTextAlignment(Qt::AlignCenter);
         ui->lwDatakinds->addItem(item);
@@ -218,6 +229,7 @@ void MainWindow::UpdateGui()
     s.clear();
     for (int i: Config->GetMapping()) s += QString::number(i)+" ";
     ui->pteMapping->appendPlainText(s);
+    //ui->pteMapping->appendPlainText(PackMappingList(Config->GetMapping()));
 
     ui->pteIgnoreHardwareChannels->clear();
 //    s.clear();
@@ -285,6 +297,29 @@ void MainWindow::UpdateGui()
 
     updateNumEventsIndication();
     OnEventOrChannelChanged();
+
+    ui->leUser->setText(Config->TrbRunSettings.User);
+    ui->leHost->setText(Config->TrbRunSettings.Host);
+
+    ui->leDirOnHost->setText(Config->TrbRunSettings.ScriptDirOnHost);
+    ui->leStartupScriptOnHost->setText(Config->TrbRunSettings.StartupScriptOnHost);
+    ui->leStorageXmlOnHost->setText(Config->TrbRunSettings.StorageXML);
+
+    ui->leFolderForHldFiles->setText(Config->TrbRunSettings.HldDirOnHost);
+    ui->leiHldFileSize->setText( QString::number(Config->TrbRunSettings.MaxHldSizeMb) );
+
+    ui->ledTimeSpan->setText( QString::number(Config->TrbRunSettings.TimeLimit, 'g', 4 ) );
+    int index = 0;
+    if (Config->TrbRunSettings.TimeMultiplier == 60) index = 1;
+    else if (Config->TrbRunSettings.TimeMultiplier == 60*60) index = 2;
+    ui->cobTimeUnits->setCurrentIndex(index);
+    ui->cbLimitedTime->setChecked(Config->TrbRunSettings.bLimitTime);
+    ui->cbLimitEvents->setChecked(Config->TrbRunSettings.bLimitEvents);
+    ui->leiMaxEvents->setText( QString::number(Config->TrbRunSettings.MaxEvents) );
+
+    on_pbRefreshBufferIndication_clicked();
+
+    on_pbUpdateTriggerGui_clicked();
 }
 
 // --- update Config on GUI operated by user ---

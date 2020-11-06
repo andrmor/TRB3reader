@@ -336,7 +336,7 @@ int SaveIntVectorsToFile(QString FileName, const QVector<int> *x, const QVector<
   return 0;
 }
 
-bool LoadTextFromFile(QString FileName, QString &string)
+bool LoadTextFromFile(const QString &FileName, QString &string)
 {
     QFile file( FileName );
     if(!file.open(QIODevice::ReadOnly | QFile::Text))
@@ -344,6 +344,18 @@ bool LoadTextFromFile(QString FileName, QString &string)
 
     QTextStream in(&file);
     string = in.readAll();
+    file.close();
+    return true;
+}
+
+bool SaveTextToFile(const QString &FileName, const QString &text)
+{
+    QFile file( FileName );
+    if(!file.open(QIODevice::WriteOnly | QFile::Text))
+        return false;
+
+    QTextStream out(&file);
+    out << text;
     file.close();
     return true;
 }

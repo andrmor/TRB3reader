@@ -6,5 +6,6 @@
 class QWidget;
 
 void message(QString text, QWidget* parent = 0);
+bool areYouSure(const QString & text, QWidget * parent = 0);
 
 #endif // AMESSAGE_H

@@ -9,14 +9,20 @@
 #include "adispatcher.h"
 #include "aeditchannelsdialog.h"
 #include "adatahub.h"
+#include "aservermonitorwindow.h"
+#include "atrbruncontrol.h"
 
 #ifdef CERN_ROOT
 #include "cernrootmodule.h"
+#endif
+#ifdef SPEECH
+#include "ainterfacetospeech.h"
 #endif
 
 #include "trb3datareader.h"
 #include "trb3signalextractor.h"
 #include "ahldfileprocessor.h"
+#include "anetworkmodule.h"
 
 #include <QDebug>
 #include <QFileDialog>
@@ -24,6 +30,8 @@
 #include <QDirIterator>
 #include <QInputDialog>
 #include <QProgressBar>
+#include <QTimer>
+#include <QElapsedTimer>
 
 #include <cmath>
 
@@ -32,19 +40,46 @@ MainWindow::MainWindow(MasterConfig* Config,
                        ADataHub* DataHub,
                        Trb3dataReader* Reader,
                        Trb3signalExtractor* Extractor,
-                       AHldFileProcessor& HldFileProcessor,
+                       AHldFileProcessor& HldFileProcessor, ANetworkModule &Network,
                        QWidget *parent) :
     QMainWindow(parent),
-    Config(Config), Dispatcher(Dispatcher), DataHub(DataHub), Reader(Reader), Extractor(Extractor), HldFileProcessor(HldFileProcessor),
+    Config(Config), Dispatcher(Dispatcher), DataHub(DataHub), Reader(Reader), Extractor(Extractor), HldFileProcessor(HldFileProcessor), Network(Network),
     ui(new Ui::MainWindow)
 {
     bStopFlag = false;
     ui->setupUi(this);
 
+    TrbRunManager = new ATrbRunControl(*Config, Network, Dispatcher->ConfigDir);
+    QObject::connect(TrbRunManager, &ATrbRunControl::sigBoardIsAlive, this, &MainWindow::onBoardIsAlive);
+    QObject::connect(TrbRunManager, &ATrbRunControl::sigBoardOff, this, &MainWindow::onBoardDisconnected);
+    QObject::connect(TrbRunManager, &ATrbRunControl::boardLogReady, this, &MainWindow::onBoardLogNewText);
+    QObject::connect(TrbRunManager, &ATrbRunControl::requestClearLog, this, &MainWindow::onRequestClearLog);
+    QObject::connect(TrbRunManager, &ATrbRunControl::sigAcquireIsAlive, this, &MainWindow::onAcquireIsAlive);
+    QObject::connect(TrbRunManager, &ATrbRunControl::sigAcquireOff, this, &MainWindow::onAcquireOff);
+    QObject::connect(TrbRunManager, &ATrbRunControl::freeSpaceCheckReady, this, &MainWindow::onFreeSpaceReportReady);
+
+    watchdogTimer = new QTimer();
+    watchdogTimer->setInterval(2000);
+    QObject::connect(watchdogTimer, &QTimer::timeout, this, &MainWindow::onWatchdogFailed);
+
+    aTimer = new QTimer();
+    aTimer->setSingleShot(true);
+    QObject::connect(aTimer, &QTimer::timeout, this, &MainWindow::onTimeLimitForAcquireReached);
+
+    elTimer = new QElapsedTimer();
+
+    timerAutoFreeSpace = new QTimer(this);
+    timerAutoFreeSpace->setSingleShot(false);
+    QObject::connect(timerAutoFreeSpace, &QTimer::timeout, TrbRunManager, &ATrbRunControl::checkFreeSpace);
+
     QDoubleValidator* dv = new QDoubleValidator(this);
     dv->setNotation(QDoubleValidator::ScientificNotation);
     QList<QLineEdit*> list = this->findChildren<QLineEdit *>();
     foreach(QLineEdit *w, list) if (w->objectName().startsWith("led")) w->setValidator(dv);
+
+    ui->pbUpdateTriggerSettings->setVisible(false);
+    ui->pbRefreshBufferIndication->setVisible(false);
+    ui->pbUpdateTriggerGui->setVisible(false);
 
 #ifdef CERN_ROOT
     RootModule = new CernRootModule(Reader, Extractor, Config, DataHub);
@@ -81,6 +116,10 @@ MainWindow::MainWindow(MasterConfig* Config,
     ui->pbStop->setVisible(false);
     on_cobSignalExtractionMethod_currentIndexChanged(ui->cobSignalExtractionMethod->currentIndex());
     OnEventOrChannelChanged(); // to update channel mapping indication
+
+    ServerWindow = new AServerMonitorWindow(*this, Network, this);
+    QObject::connect(&Network, &ANetworkModule::StatusChanged, ServerWindow, &AServerMonitorWindow::onServerstatusChanged);
+    QObject::connect(&Network, &ANetworkModule::ReportTextToGUI, ServerWindow, &AServerMonitorWindow::appendText);
 }
 
 MainWindow::~MainWindow()
@@ -89,8 +128,21 @@ MainWindow::~MainWindow()
     delete RootModule;
 #endif
 
+    delete watchdogTimer;
+    delete aTimer;
+    delete elTimer;
+
+    delete TrbRunManager;
     delete ScriptWindow;
     delete ui;
+}
+
+void MainWindow::SetEnabled(bool flag)
+{
+    ui->twMain->setEnabled(flag);
+    menuBar()->setEnabled(flag);
+
+    ScriptWindow->setEnabled(flag);
 }
 
 void MainWindow::on_pbSelectFile_clicked()
@@ -211,12 +263,16 @@ void MainWindow::on_pbEditMap_clicked()
     QString old;
     for (int i : Config->GetMapping()) old += QString::number(i) + " ";
 
-    AEditChannelsDialog* D = new AEditChannelsDialog("Hardware channels sorted by logical number", old, "Example: 5 4 3 2 1 0 10 11 12");
+    AEditChannelsDialog* D = new AEditChannelsDialog("Hardware channels sorted by logical number", old, "Example: 5 4-0 6 12-25");
     int res = D->exec();
     if (res != 1) return;
     const QString str = D->GetText().simplified();
     delete D;
 
+    QVector<int> vec;
+    ExtractNumbersFromQString(str, &vec);
+
+    /*
     QRegExp rx("(\\ |\\,|\\:|\\t|\\n)");
     QStringList fields = str.split(rx, QString::SkipEmptyParts);
     QVector<int> vec;
@@ -231,6 +287,7 @@ void MainWindow::on_pbEditMap_clicked()
         }
         vec << i;
     }
+    */
 
     bool bOK = Config->SetMapping(vec);
     if (!bOK) message("Ignored: there are non-unique channel numbers in the list!", this);
@@ -932,7 +989,7 @@ bool MainWindow::ExtractNumbersFromQString(const QString input, QVector<int> *To
 {
   ToAdd->clear();
 
-  QRegExp rx("(\\,|\\-)"); //RegEx for ' ' and '-'
+  QRegExp rx("(\\,|\\-|\\ )");
 
   QStringList fields = input.split(rx, QString::SkipEmptyParts);
 
@@ -942,8 +999,9 @@ bool MainWindow::ExtractNumbersFromQString(const QString input, QVector<int> *To
       return false;
     }
 
-  fields = input.split(",", QString::SkipEmptyParts);
-  //  qDebug()<<"found "<<fields.size()<<" records";
+  //fields = input.split(",", QString::SkipEmptyParts);
+  fields = input.split(QRegExp("(\\,|\\ )"), QString::SkipEmptyParts);
+    //qDebug()<<"found "<<fields.size()<<" records"<<fields;
 
   for (int i=0; i<fields.size(); i++)
     {
@@ -971,11 +1029,14 @@ bool MainWindow::ExtractNumbersFromQString(const QString input, QVector<int> *To
           pm2 = subFields[1].toInt(&ok2);
           if (ok1 && ok2)
             {
-               if (pm2<pm1) return false;//error = true;
+               if (pm2<pm1)
+               {
+                   for (int j=pm1; j>=pm2; j--) ToAdd->append(j);
+               }
                else
-                 {
+               {
                    for (int j=pm1; j<=pm2; j++) ToAdd->append(j);
-                 }
+               }
             }
           else return false;
         }
@@ -1029,10 +1090,67 @@ const QString MainWindow::PackChannelList(QVector<int> vec)
     return out;
 }
 
+const QString MainWindow::PackMappingList(QVector<int> vec)
+{
+    if (vec.isEmpty()) return "";
+
+    QString out;
+    int prevVal = vec.first();
+    int rangeStart = prevVal;
+    for (int i=0; i<=vec.size(); ++i)        //includes the invalid index!
+    {
+        int thisVal;
+        int direction = 0; //-1 0 +1
+        if ( i == vec.size() )               //last in the vector
+            thisVal = prevVal;
+        else
+        {
+            thisVal = vec.at(i);
+            if ( i == 0 )                    // first but not the only
+            {
+                continue;
+            }
+            else if ( thisVal == prevVal+1 && (direction == 0 || direction == 1) )
+            {
+                prevVal++;
+                direction = 1;
+                continue;
+            }
+            else if ( thisVal == prevVal-1 && (direction == 0 || direction == -1) )
+            {
+                prevVal--;
+                direction = -1;
+                continue;
+            }
+        }
+
+        //adding to output
+        if (!out.isEmpty()) out += " ";
+
+        if (prevVal == rangeStart)             //single val
+            out += QString::number(prevVal);
+        else                                //range ended
+            out += QString::number(rangeStart) + "-" + QString::number(prevVal);
+
+        prevVal = thisVal;
+        rangeStart = thisVal;
+    }
+
+    return out;
+}
+
 void MainWindow::on_pbAddDatakind_clicked()
 {
     bool bOK;
-    int datakind = QInputDialog::getInt(this, "TRBreader", "Input new datakind to add", 0, 0, 0xFFFF, 1, &bOK);
+    //int datakind = QInputDialog::getInt(this, "TRBreader", "Input new datakind to add", 0, 0, 0xFFFF, 1, &bOK);
+    QString datakindStr = QInputDialog::getText(this, "TRBreader", "Input new address (start with 0x for hexadecimal)", QLineEdit::Normal,
+                                             QString(), &bOK);
+    int datakind = 0;
+    if (datakindStr.startsWith("0x"))
+        datakind = datakindStr.toInt(&bOK, 16);
+    else
+        datakind = datakindStr.toInt(&bOK, 10);
+
     if (bOK)
         Config->AddDatakind(datakind);
     UpdateGui();
@@ -1043,7 +1161,7 @@ void MainWindow::on_pbRemoveDatakind_clicked()
     int raw = ui->lwDatakinds->currentRow();
     if (raw < 0)
     {
-        message("Select datakind to remove by left-clicking on it in the list above", this);
+        message("Select datakind in th elist to remove by left-clicking on it", this);
         return;
     }
     QString sel = ui->lwDatakinds->currentItem()->text();
@@ -1051,7 +1169,7 @@ void MainWindow::on_pbRemoveDatakind_clicked()
     if (sl.size()>1)
     {
         QString dk = sl.first();
-        int datakind = dk.toInt();
+        int datakind = dk.toInt(0, 16);
         Config->RemoveDatakind(datakind);
     }
     UpdateGui();
@@ -1318,6 +1436,30 @@ void MainWindow::updateNumEventsIndication()
     ui->leNumEvents->setText( QString::number(numEvents) );
 }
 
+void MainWindow::onBoardLogNewText(const QString text)
+{
+    QString txt = text;
+    if (txt.endsWith('\n')) txt.chop(1);
+
+    const QString warning = "WARNING: Could not get all ADCs to work despite retrying...";
+    if (txt.contains(warning))
+    {
+        txt.remove(warning);
+        txt += "\n<font color='red'>" + warning + "</font>";
+        ui->pteBoardLog->appendHtml(txt);
+    }
+    else ui->pteBoardLog->appendPlainText(txt);
+
+    if (txt.contains("Your board should be working now..."))
+        ui->pteBoardLog->appendPlainText("Waiting for ready status...");
+
+}
+
+void MainWindow::onRequestClearLog()
+{
+    ui->pteBoardLog->clear();
+}
+
 void MainWindow::on_pbClearDataHub_clicked()
 {
     DataHub->Clear();
@@ -1431,4 +1573,457 @@ void MainWindow::on_cobLableType_activated(int)
 void MainWindow::onProgressUpdate(int progress)
 {
     ui->prbMainBar->setValue(progress);
+}
+
+void MainWindow::on_actionConfigure_WebSocket_server_triggered()
+{
+    ServerWindow->show();
+}
+
+//https://www.ssh.com/ssh/keygen/
+    /*
+
+    QStringList commands;
+    //commands << "-hold";
+    commands << "-iconic";
+    //commands << "-C";
+    commands << "-e";
+    //QString s = QString("ssh %1@%2 'mkdir /home/rpcuser/test_dir'").arg(user).arg(host);
+    QString s = QString("ssh %1@%2 '%3'").arg(user).arg(host).arg(start_script);
+    //commands << "ssh username@host 'cd /home/user/backups; mysqldump -u root -p mydb > mydb.sql; echo DONE!'";
+    commands << s;
+
+    QProcess *process = new QProcess(0);
+    process->setProcessChannelMode(QProcess::MergedChannels);
+    process->start("xterm", commands);
+
+    if(!process->waitForStarted()){
+        qDebug() << "Could not wait to start...";
+    }
+
+    if(!process->waitForFinished()) {
+        qDebug() << "Could not wait to finish...";
+    }
+
+    process->closeWriteChannel();
+    qDebug() << process->readAll();
+
+    */
+
+void MainWindow::on_pbBoardOn_clicked()
+{
+    ui->labConnectionStatus->setText("<font color='orange'>Connecting</font>");
+
+    QString err = TrbRunManager->StartBoard();
+    if (!err.isEmpty())
+        message(err, this);
+    else
+    {
+        ui->leHost->setEnabled(false);
+        ui->leUser->setEnabled(false);
+    }
+}
+
+void MainWindow::on_pbBoardOff_clicked()
+{
+    if (TrbRunManager->isAcquireProcessExists())
+        TrbRunManager->StopAcquire();
+
+    watchdogTimer->stop();
+    TrbRunManager->StopBoard();
+    ui->pteBoardLog->appendPlainText("Disconnecting...");
+}
+
+void MainWindow::on_pbStartAcquire_clicked()
+{
+    bAlreadyStopping = false;
+    int time_ms = -1;
+    if (ui->cbLimitedTime->isChecked())
+    {
+        double sec = ui->ledTimeSpan->text().toDouble();
+
+        int multiplier = 0;
+        switch (ui->cobTimeUnits->currentIndex())
+        {
+        case 0:
+            multiplier = 1;
+            break;
+        case 1:
+            multiplier = 60;
+            break;
+        case 2:
+            multiplier = 60*60;
+            break;
+        default:;
+        }
+        time_ms = sec * multiplier * 1000;
+    }
+
+    bLimitMaxEvents = ui->cbLimitEvents->isChecked();
+    MaxEventsToRun = ui->leiMaxEvents->text().toInt();
+
+    QString err = TrbRunManager->StartAcquire();
+    if (err.isEmpty())
+    {
+        elTimer->start();
+        if (ui->cbLimitedTime->isChecked()) aTimer->start(time_ms);
+    }
+    else message(err, this);
+
+}
+
+void MainWindow::on_pbStopAcquire_clicked()
+{
+    TrbRunManager->StopAcquire();
+}
+
+void MainWindow::onBoardIsAlive(double currentAccepetedRate)
+{
+    ui->labConnectionStatus->setText("<font color='green'>Connected</font>");
+    if (currentAccepetedRate > 0 || ZeroRateCounter > 1)
+    {
+        const QString tr = QString::number(currentAccepetedRate);
+        ui->leCurrentAceptedRate->setText(tr);
+        ui->leCurAceptTrigrate_onAcquire->setText(tr);
+        if (currentAccepetedRate > 0) ZeroRateCounter = 0;
+    }
+    else ZeroRateCounter++;
+    watchdogTimer->start();
+}
+
+void MainWindow::onBoardDisconnected()
+{
+    ui->pteBoardLog->clear();
+    ui->labConnectionStatus->setText("Not connected");
+    ui->leCurrentAceptedRate->setText("");
+    ui->leCurAceptTrigrate_onAcquire->setText("");
+
+    ui->leHost->setEnabled(true);
+    ui->leUser->setEnabled(true);
+}
+
+void MainWindow::onAcquireIsAlive()
+{
+    int iSec = elTimer->elapsed()*0.001;
+    ui->leStatTime->setText( QString::number(iSec) );
+    ui->leStatNumEv->setText( QString::number(TrbRunManager->StatEvents) );
+    ui->leStatData->setText( QString::number(TrbRunManager->StatData, 'g', 4) );
+    ui->leStatRate->setText( QString::number(TrbRunManager->StatRate, 'g', 4) );
+    ui->labDataUnits->setText( TrbRunManager->StatDataUnits );
+
+    if (bLimitMaxEvents && TrbRunManager->StatEvents >= MaxEventsToRun && !bAlreadyStopping)
+    {
+        bAlreadyStopping = true;
+        TrbRunManager->StopAcquire();
+    }
+}
+
+void MainWindow::onAcquireOff()
+{
+    ui->leStatRate->setText("");
+}
+
+void MainWindow::onTimeLimitForAcquireReached()
+{
+    TrbRunManager->StopAcquire();
+}
+
+void MainWindow::onWatchdogFailed()
+{
+    ui->labConnectionStatus->setText("<font color='red'>Not responding</font>");
+}
+
+#include <QDesktopServices>
+void MainWindow::on_pbOpenCTS_clicked()
+{
+    QDesktopServices::openUrl( QString("http://%1:1234/cts/cts.htm").arg(TrbRunManager->Host) );
+}
+
+void MainWindow::on_pbOpenBufferControl_clicked()
+{
+    QDesktopServices::openUrl( QString("http://%1:1234/addons/adc.pl?BufferConfig").arg(TrbRunManager->Host));
+}
+
+void MainWindow::on_leUser_editingFinished()
+{
+    Config->TrbRunSettings.User = ui->leUser->text();
+}
+
+void MainWindow::on_leHost_editingFinished()
+{
+    Config->TrbRunSettings.Host = ui->leHost->text();
+}
+
+void MainWindow::on_leDirOnHost_editingFinished()
+{
+    Config->TrbRunSettings.ScriptDirOnHost = ui->leDirOnHost->text();
+}
+
+void MainWindow::on_leStartupScriptOnHost_editingFinished()
+{
+    Config->TrbRunSettings.StartupScriptOnHost = ui->leStartupScriptOnHost->text();
+}
+
+void MainWindow::on_leStorageXmlOnHost_editingFinished()
+{
+    Config->TrbRunSettings.StorageXML = ui->leStorageXmlOnHost->text();
+}
+
+void MainWindow::on_leFolderForHldFiles_editingFinished()
+{
+    Config->TrbRunSettings.HldDirOnHost = ui->leFolderForHldFiles->text();
+    TrbRunManager->checkFreeSpace();
+}
+
+void MainWindow::on_leiHldFileSize_editingFinished()
+{
+    Config->TrbRunSettings.MaxHldSizeMb = ui->leiHldFileSize->text().toInt();
+}
+
+void MainWindow::on_ledTimeSpan_editingFinished()
+{
+    Config->TrbRunSettings.TimeLimit = ui->ledTimeSpan->text().toDouble();
+}
+
+void MainWindow::on_cobTimeUnits_activated(int index)
+{
+         if (index == 1)  Config->TrbRunSettings.TimeMultiplier = 60;
+    else if (index == 2)  Config->TrbRunSettings.TimeMultiplier = 60*60;
+    else                  Config->TrbRunSettings.TimeMultiplier = 1;
+}
+
+void MainWindow::on_cbLimitedTime_clicked(bool checked)
+{
+    Config->TrbRunSettings.bLimitTime = checked;
+    //if (checked) ui->cbLimitEvents->setChecked(false);
+}
+
+void MainWindow::on_cbLimitEvents_clicked(bool checked)
+{
+    Config->TrbRunSettings.bLimitEvents = checked;
+    //if (checked) ui->cbLimitedTime->setChecked(false);
+}
+void MainWindow::on_leiMaxEvents_editingFinished()
+{
+    Config->TrbRunSettings.MaxEvents = ui->leiMaxEvents->text().toInt();
+}
+
+void MainWindow::on_pbReadTriggerSettingsFromTrb_clicked()
+{
+    QString err = TrbRunManager->ReadTriggerSettingsFromBoard();
+    if (!err.isEmpty()) message(err, this);
+
+    on_pbUpdateTriggerGui_clicked();
+}
+
+void MainWindow::on_pbUpdateStartup_clicked()
+{
+    QString err = TrbRunManager->updateCTSsetupScript();
+    if (err.isEmpty())
+        message("Done!", this);
+    else
+        message(err, this);
+}
+
+void MainWindow::on_pbOpenCtsWebPage_clicked()
+{
+    QDesktopServices::openUrl( QString("http://%1:1234/cts/cts.htm").arg(TrbRunManager->Host) );
+}
+
+void MainWindow::on_pbSendCTStoTRB_clicked()
+{
+    this->SetEnabled(false);
+    qApp->processEvents();
+
+    QString err = TrbRunManager->sendCTStoTRB();
+
+    this->SetEnabled(true);
+    if (!err.isEmpty())
+        message(err, this);
+}
+
+#include "abufferdelegate.h"
+#include <QListWidgetItem>
+#include <QListWidget>
+void MainWindow::on_pbRefreshBufferIndication_clicked()
+{
+    ui->lwBufferControl->clear();
+
+    const QVector<ABufferRecord> & recs = Config->getBufferRecords();
+    for (const ABufferRecord & r : recs)
+    {
+        QListWidgetItem * item = new QListWidgetItem();
+        ui->lwBufferControl->addItem(item);
+        ABufferDelegate * wid = new ABufferDelegate();
+        QObject::connect(wid, &ABufferDelegate::contentChanged, this, &MainWindow::onBufferDeleagateChanged);
+        wid->setValues(r.Datakind, r.Samples, r.Delay, r.Downsampling);
+        ui->lwBufferControl->setItemWidget(item, wid);
+        item->setSizeHint( wid->sizeHint());
+    }
+}
+
+void MainWindow::on_cbBufferReadFromTRB_clicked()
+{
+    this->SetEnabled(false);
+    qApp->processEvents();
+
+    QString err = TrbRunManager->readBufferControlFromTRB();
+
+    this->SetEnabled(true);
+    if (!err.isEmpty())
+        message(err, this);
+
+    on_pbRefreshBufferIndication_clicked();
+}
+
+void MainWindow::on_pbBufferSendToTRB_clicked()
+{
+    this->SetEnabled(false);
+    qApp->processEvents();
+
+    QString err = TrbRunManager->sendBufferControlToTRB();
+
+    this->SetEnabled(true);
+    if (!err.isEmpty())
+        message(err, this);
+}
+
+void MainWindow::on_pbBufferUpdateScript_clicked()
+{
+    this->SetEnabled(false);
+    qApp->processEvents();
+
+    QString err = TrbRunManager->updateBufferSetupScript();
+
+    this->SetEnabled(true);
+    if (!err.isEmpty())
+        message(err, this);
+}
+
+void MainWindow::onBufferDeleagateChanged(ABufferDelegate * del)
+{
+    int addr, samples, delay, down;
+    del->getValues(addr, samples, delay, down);
+
+    ABufferRecord * rec = Config->findBufferRecord(addr);
+    if (!rec)
+    {
+        qWarning() << "Error in find buffer record!";
+        return;
+    }
+
+    bool bChanged = rec->updateValues(samples, delay, down);
+    if (!bChanged) return; //no change in values
+
+    if (ui->cbBufferSameValues->isChecked())
+    {
+        QVector<ABufferRecord> & br = Config->getBufferRecords();
+        for (ABufferRecord & r : br)
+            if (&r != rec)
+                r.updateValues(samples, delay, down);
+    }
+    on_pbRefreshBufferIndication_clicked();
+
+    // todo value canged -> update board? or just flag
+}
+
+void MainWindow::onFreeSpaceReportReady(long bytes)
+{
+    QString s = "n.a.";
+    if (bytes != -1)
+    {
+        double d = (double)bytes*0.000001;
+        s = QString::number(d, 'f', 3);
+    }
+    ui->leFreeSpace->setText(s);
+}
+
+void MainWindow::on_pbRestartTrb_clicked()
+{
+    if (TrbRunManager->isBoardProcessExists())
+        message("The board is connected, press 'Disconnect' first", this);
+    else
+        TrbRunManager->RestartBoard();
+}
+
+void MainWindow::on_pbUpdateTriggerGui_clicked()
+{
+    ui->cbMP0->setChecked(Config->TrbRunSettings.bMP_0);
+    ui->cbMP1->setChecked(Config->TrbRunSettings.bMP_1);
+    ui->cbMP2->setChecked(Config->TrbRunSettings.bMP_2);
+    ui->cbMP3->setChecked(Config->TrbRunSettings.bMP_3);
+    ui->cbMP4->setChecked(Config->TrbRunSettings.bMP_4);
+    ui->cbMP5->setChecked(Config->TrbRunSettings.bMP_5);
+    ui->cbMP6->setChecked(Config->TrbRunSettings.bMP_6);
+    ui->cbMP7->setChecked(Config->TrbRunSettings.bMP_7);
+
+    ui->cbRandomPulser->setChecked(Config->TrbRunSettings.bRandPulser);
+    ui->cbPeriodicalPulser0->setChecked(Config->TrbRunSettings.bPeriodicPulser0);
+    ui->cbPeriodicalPulser1->setChecked(Config->TrbRunSettings.bPeriodicPulser1);
+
+    ulong rFreq = Config->TrbRunSettings.RandomPulserFrequency.toULong(nullptr, 16);
+    double freq = (double)rFreq / 21.474836;
+    ui->leRandomFrequency->setText( QString::number(freq) );
+
+    ulong rPeriod = Config->TrbRunSettings.Period0.toULong(nullptr, 16);
+    double per = (double)rPeriod * 10.0;
+    ui->lePeriod0->setText( QString::number(per) );
+
+    rPeriod = Config->TrbRunSettings.Period1.toULong(nullptr, 16);
+    per = (double)rPeriod * 10.0;
+    ui->lePeriod1->setText( QString::number(per) );
+}
+
+void MainWindow::on_pbUpdateTriggerSettings_clicked()
+{
+    Config->TrbRunSettings.bMP_0 = ui->cbMP0->isChecked();
+    Config->TrbRunSettings.bMP_1 = ui->cbMP1->isChecked();
+    Config->TrbRunSettings.bMP_2 = ui->cbMP2->isChecked();
+    Config->TrbRunSettings.bMP_3 = ui->cbMP3->isChecked();
+    Config->TrbRunSettings.bMP_4 = ui->cbMP4->isChecked();
+    Config->TrbRunSettings.bMP_5 = ui->cbMP5->isChecked();
+    Config->TrbRunSettings.bMP_6 = ui->cbMP6->isChecked();
+    Config->TrbRunSettings.bMP_7 = ui->cbMP7->isChecked();
+
+    Config->TrbRunSettings.bRandPulser = ui->cbRandomPulser->isChecked();
+    Config->TrbRunSettings.bPeriodicPulser0 = ui->cbPeriodicalPulser0->isChecked();
+    if (ui->cbPeriodicalPulser1->isChecked())
+        ui->cbPeriodicalPulser1->setChecked(false); //otherwise blocks - TRB bug?
+    Config->TrbRunSettings.bPeriodicPulser1 = ui->cbPeriodicalPulser1->isChecked();
+
+    double freq = ui->leRandomFrequency->text().toDouble() * 21.474836;
+    ulong rFreq = (ulong)freq;
+    if (rFreq > 0xffffffff) rFreq = 0xffffffff;
+    Config->TrbRunSettings.RandomPulserFrequency = "0x" + QString::number(rFreq, 16);
+
+    double per = 0.1 * ui->lePeriod0->text().toDouble();
+    ulong rPer = (ulong)per;
+    if (rPer > 0xffffffff) rPer = 0xffffffff;
+    Config->TrbRunSettings.Period0 = "0x" + QString::number(rPer, 16);
+
+    per = 0.1 * ui->lePeriod1->text().toDouble();
+    rPer = (ulong)per;
+    if (rPer > 0xffffffff) rPer = 0xffffffff;
+    Config->TrbRunSettings.Period1 = "0x" + QString::number(rPer, 16);
+
+    qDebug() <<Config->TrbRunSettings.RandomPulserFrequency<<Config->TrbRunSettings.Period0<<Config->TrbRunSettings.Period1;
+}
+
+void MainWindow::on_pbOpenBufferWebPage_clicked()
+{
+    on_pbOpenBufferControl_clicked();
+}
+
+void MainWindow::on_cbAutocheckFreeSpace_toggled(bool checked)
+{
+    if (checked)
+    {
+        TrbRunManager->checkFreeSpace();
+        timerAutoFreeSpace->start(2000);
+    }
+    else
+    {
+        timerAutoFreeSpace->stop();
+        ui->leFreeSpace->setText("");
+    }
 }

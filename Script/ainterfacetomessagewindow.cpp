@@ -51,7 +51,7 @@ void AInterfaceToMessageWindow::init(bool fTransparent)
 AInterfaceToMessageWindow::~AInterfaceToMessageWindow()
 {
   //qDebug() << "Msg destructor";
-  deleteDialog();
+  //deleted by parent   //deleteDialog();
 }
 
 void AInterfaceToMessageWindow::setTransparent(bool flag)

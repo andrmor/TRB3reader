@@ -13,6 +13,13 @@ class AScriptWindow;
 class ADispatcher;
 class ADataHub;
 class AHldFileProcessor;
+class ANetworkModule;
+class AServerMonitorWindow;
+class ATrbRunControl;
+class QTimer;
+class QElapsedTimer;
+class ABufferDelegate;
+class AInterfaceToSpeech;
 
 namespace Ui {
 class MainWindow;
@@ -29,8 +36,11 @@ public:
                         Trb3dataReader* Reader,
                         Trb3signalExtractor* Extractor,
                         AHldFileProcessor& HldFileProcessor,
+                        ANetworkModule& Network,
                         QWidget *parent = 0);
     ~MainWindow();
+
+    void SetEnabled(bool flag);
 
 public slots:
     void UpdateGui();                               // slot since used by Dispatcher
@@ -139,34 +149,24 @@ private slots:
     void on_cbSmoothWaveforms_toggled(bool checked);
     void on_cobSignalExtractionMethod_currentIndexChanged(int index);
     void on_cobExplorerSource_currentIndexChanged(int index);
-
     void on_pbClearDataHub_clicked();
-
     void on_pbLoadToDataHub_clicked();
-
     void on_cobLableType_activated(int index);
-
     void on_sbNumChannels_editingFinished();
-
     void on_sbNumSamples_editingFinished();
-
     void on_cbBulkExtract_clicked();
-
     void on_cbAutoExecuteScript_clicked();
-
     void on_cbSaveSignalsToFiles_clicked();
-
     void on_leAddToProcessed_editingFinished();
-
     void on_cbBulkCopyToDatahub_clicked();
-
     void on_cbBulkAlsoCopyWaveforms_clicked();
-
     void on_cobPedestalExtractionMethod_activated(int index);
-
     void on_ledPedestalPeakSigma_editingFinished();
-
     void on_ledPedestalPeakThreshold_editingFinished();
+    void on_actionConfigure_WebSocket_server_triggered();
+
+    void on_pbBoardOn_clicked();
+    void on_pbBoardOff_clicked();
 
 protected:
     void closeEvent(QCloseEvent* event);
@@ -179,6 +179,7 @@ private:
     Trb3dataReader* Reader;
     Trb3signalExtractor* Extractor;
     AHldFileProcessor& HldFileProcessor;
+    ANetworkModule& Network;
 
     //owned objects
     Ui::MainWindow* ui;    
@@ -186,12 +187,25 @@ private:
 #ifdef CERN_ROOT
     CernRootModule* RootModule;
 #endif
+    AServerMonitorWindow* ServerWindow = 0;
 
     //gui misc
     bool bStopFlag;
     bool bNeverRemindAppendToHub = false;
     //int  numProcessedEvents;
     //int  numBadEvents;
+
+    QTimer * watchdogTimer = 0;
+    QTimer * aTimer = 0;
+    QElapsedTimer * elTimer = 0;
+    bool bLimitMaxEvents = false;
+    int MaxEventsToRun = 0;
+    QTimer * timerAutoFreeSpace = 0;
+    bool bAlreadyStopping = false;
+
+#ifdef SPEECH
+    AInterfaceToSpeech* speech = 0;
+#endif
 
 private:
     const QString ProcessData(); //returns error message if any
@@ -209,10 +223,58 @@ private:
     void CreateScriptWindow();
 
     const QString PackChannelList(QVector<int> vec);
+    const QString PackMappingList(QVector<int> vec);
     bool ExtractNumbersFromQString(const QString input, QVector<int>* ToAdd);
     //bool bulkProcessCore();
     void bulkProcessorEnvelope(const QStringList FileNames);
     void updateNumEventsIndication();
+
+private:
+    ATrbRunControl * TrbRunManager = 0;
+    int ZeroRateCounter = 0;
+
+private slots:
+    void onBoardLogNewText(const QString text);
+    void onRequestClearLog();
+    void on_pbStartAcquire_clicked();
+    void on_pbStopAcquire_clicked();
+    void onBoardIsAlive(double currentAccepetedRate);
+    void onBoardDisconnected();
+    void onAcquireIsAlive();
+    void onAcquireOff();
+    void onWatchdogFailed();
+    void on_cbLimitedTime_clicked(bool checked);
+    void on_cbLimitEvents_clicked(bool checked);
+    void on_pbOpenCTS_clicked();
+    void on_pbOpenBufferControl_clicked();
+
+    void on_leUser_editingFinished();
+    void on_leHost_editingFinished();
+    void on_leStartupScriptOnHost_editingFinished();
+    void on_leStorageXmlOnHost_editingFinished();
+    void on_leFolderForHldFiles_editingFinished();
+    void on_leiHldFileSize_editingFinished();
+    void on_ledTimeSpan_editingFinished();
+    void on_cobTimeUnits_activated(int index);
+    void on_leiMaxEvents_editingFinished();
+    void on_pbReadTriggerSettingsFromTrb_clicked();
+    void on_pbUpdateStartup_clicked();
+    void on_pbOpenCtsWebPage_clicked();
+    void on_pbSendCTStoTRB_clicked();
+    void on_leDirOnHost_editingFinished();
+    void on_pbRefreshBufferIndication_clicked();
+    void on_cbBufferReadFromTRB_clicked();
+    void on_pbBufferSendToTRB_clicked();
+    void on_pbBufferUpdateScript_clicked();
+
+    void onBufferDeleagateChanged(ABufferDelegate *del);
+    void onFreeSpaceReportReady(long bytes);
+    void on_pbRestartTrb_clicked();
+    void on_pbUpdateTriggerGui_clicked();
+    void on_pbUpdateTriggerSettings_clicked();
+    void on_pbOpenBufferWebPage_clicked();
+    void on_cbAutocheckFreeSpace_toggled(bool checked);
+    void onTimeLimitForAcquireReached();
 };
 
 #endif // MAINWINDOW_H

@@ -7,23 +7,22 @@ CONFIG += cern_root        #enable CERN ROOT for graph drawing
 cern_root {
     DEFINES += CERN_ROOT
 
-    INCLUDEPATH += $$system(/home/andr/root/bin/root-config --incdir)
-    LIBS += $$system(/home/andr/root/bin/root-config --libs) #-lGeom -lGeomPainter -lGeomBuilder -lMathMore -lMinuit2
-
-#    INCLUDEPATH += c:/root/include
-#    LIBS += -Lc:/root/lib/ -llibCore -llibCint -llibRIO -llibNet -llibHist -llibGraf -llibGraf3d -llibGpad -llibTree -llibRint -llibPostscript -llibMatrix -llibPhysics -llibRint -llibMathCore -llibGeom -llibGeomPainter -llibGeomBuilder -llibMathMore -llibMinuit2 -llibThread
+     INCLUDEPATH += $$system(root-config --incdir)
+     LIBS += $$system(root-config --libs) -lSpectrum #-lGeom -lGeomPainter -lGeomBuilder -lMinuit2
 
     SOURCES += ROOT/cernrootmodule.cpp \
                ROOT/GUI/arasterwindow.cpp \
                ROOT/GUI/agraphwindow.cpp \
                Script/histgraphinterfaces.cpp \
-               Common/tmpobjhubclass.cpp
+               Common/tmpobjhubclass.cpp \
+               ROOT/apeakfinder.cpp
 
     HEADERS += ROOT/cernrootmodule.h \
                ROOT/GUI/arasterwindow.h \
                ROOT/GUI/agraphwindow.h \
                Script/histgraphinterfaces.h \
-               Common/tmpobjhubclass.h
+               Common/tmpobjhubclass.h \
+               ROOT/apeakfinder.h
 
     FORMS   += ROOT/GUI/agraphwindow.ui
 
@@ -34,8 +33,8 @@ cern_root {
 
 #---DABC---
 DEFINES += DABC
-INCLUDEPATH += /home/andr/Soft/DABC/dabc_debug/include
-LIBS += -L/home/andr/Soft/DABC/dabc_debug/lib/ -lDabcBase -lDabcMbs -lDabcHadaq
+INCLUDEPATH += /home/andr/soft/trb3/dabc/include
+LIBS += -L/home/andr/soft/trb3/dabc/lib/ -lDabcBase -lDabcMbs -lDabcHadaq
 #-----------
 
 #---Speech---
@@ -53,7 +52,7 @@ QT += widgets
 QT += script
 QT += websockets
 
-TARGET = RootBase
+TARGET = TRBreader
 TEMPLATE = app
 
 
@@ -84,7 +83,15 @@ SOURCES += main.cpp \
     Script/ainterfacetowebsocket.cpp \
     Common/ahldfileprocessor.cpp \
     Script/ainterfacetohldfileprocessor.cpp \
-    Script/ainterfacetomultithread.cpp
+    Script/ainterfacetomultithread.cpp \
+    Net/awebsocketsession.cpp \
+    Net/awebsocketsessionserver.cpp \
+    Script/awebserverinterface.cpp \
+    Net/anetworkmodule.cpp \
+    aservermonitorwindow.cpp \
+    TRB/atrbruncontrol.cpp \
+    TRB/atrbrunsettings.cpp \
+    GUI/abufferdelegate.cpp
 
 HEADERS  += GUI/mainwindow.h \    
     TRB/trb3datareader.h \
@@ -112,13 +119,24 @@ HEADERS  += GUI/mainwindow.h \
     Common/ahldfileprocessor.h \
     Script/ainterfacetohldfileprocessor.h \
     Script/ainterfacetomultithread.h \
-    Script/ascriptinterfacefactory.h
+    Script/ascriptinterfacefactory.h \
+    Net/awebsocketsession.h \
+    Net/awebsocketsessionserver.h \
+    Script/awebserverinterface.h \
+    Net/anetworkmodule.h \
+    aservermonitorwindow.h \
+    TRB/atrbruncontrol.h \
+    TRB/atrbrunsettings.h \
+    GUI/abufferdelegate.h
 
 FORMS    += GUI/mainwindow.ui \
     GUI/ascriptwindow.ui \
-    GUI/aeditchannelsdialog.ui
+    GUI/aeditchannelsdialog.ui \
+    aservermonitorwindow.ui \
+    GUI/abufferdelegate.ui
 
 INCLUDEPATH += Common
 INCLUDEPATH += Script
 INCLUDEPATH += GUI
 INCLUDEPATH += TRB
+INCLUDEPATH += Net

@@ -88,6 +88,7 @@ void AInterfaceToMultiThread::waitForAll()
     while (countNotFinished() > 0)
       {
         qApp->processEvents();
+        QThread::usleep(100);
       }
 }
 
@@ -99,6 +100,7 @@ void AInterfaceToMultiThread::waitForOne(int IndexOfWorker)
   while (workers.at(IndexOfWorker)->isRunning())
     {
       qApp->processEvents();
+      QThread::usleep(100);
     }
 }
 
@@ -203,7 +205,7 @@ void AScriptThreadScr::Run()
     QScriptValue res = ScriptManager->EvaluationResult;
     if (res.isError())
     {
-        qDebug() << "EEEEEEEEEEEROR";
+        qDebug() << "Error in AScriptThreadScr::Run";
         Result = res.toString();
         emit errorFound(this);
     }

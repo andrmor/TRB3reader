@@ -1,237 +1,203 @@
 #include "ainterfacetowebsocket.h"
+#include "anetworkmodule.h"
+#include "awebsocketsession.h"
+#include "awebsocketsessionserver.h"
 
-#include <QWebSocketServer>
-#include <QWebSocket>
-
-#include <QApplication>
 #include <QDebug>
 #include <QJsonObject>
-#include <QJsonValue>
 #include <QJsonDocument>
-#include <QElapsedTimer>
+#include <QFile>
 
-AInterfaceToWebSocket::AInterfaceToWebSocket()
+const QJsonObject strToObject(const QString& s)
 {
-    Description = "Web socket unit give access to both server and client.\n"
-                  "Server listen for the configured port and interpret all incoming messages as script.\n"
-                  "The script is evaluated and result is sent back to the client.";
+    QJsonDocument doc = QJsonDocument::fromJson(s.toUtf8());
+    return doc.object();
+}
 
-    timeout = 3000;
-    ClientSocket = new QWebSocket();
-    connect(ClientSocket, &QWebSocket::connected, this, &AInterfaceToWebSocket::onClientConnected);
-    connect(ClientSocket, &QWebSocket::textMessageReceived, this, &AInterfaceToWebSocket::onTextMessageReceived);
-    State = Idle;
+AInterfaceToWebSocket::AInterfaceToWebSocket() : AScriptInterface() {}
 
-    Server = new QWebSocketServer(QStringLiteral("Echo Server"), QWebSocketServer::NonSecureMode, this);
-
-    //qDebug() << QMetaObject::normalizedSignature(SIGNAL(RequestEvaluate(const QString&, QVariant&)));
+AInterfaceToWebSocket::AInterfaceToWebSocket(const AInterfaceToWebSocket &) : AScriptInterface()
+{
+    socket = 0;
 }
 
 AInterfaceToWebSocket::~AInterfaceToWebSocket()
 {
-    ClientSocket->deleteLater();
-
-    Server->close();
-    qDeleteAll(ServerListOfClients.begin(), ServerListOfClients.end());
+    if (socket) socket->deleteLater();
 }
 
-QString AInterfaceToWebSocket::SendTextMessage(QString Url, QVariant message, bool WaitForAnswer)
+void AInterfaceToWebSocket::ForceStop()
 {
-   if (State != Idle)
-   {
-       qDebug() << "Not ready for this yet....";
-       exit(678);
-   }
-
-   qDebug() << "Client: Attempting to send to Url:\n" << Url
-            << "Message:\n->" << message << "<-";
-
-   State = Sending;
-   MessageToSend = variantToString(message);
-   MessageReceived = "";
-   fWaitForAnswer = WaitForAnswer;
-
-   QElapsedTimer timer;
-   timer.start();
-
-   ClientSocket->open(QUrl(Url));   
-   do
-   {
-       qApp->processEvents();
-       if (timer.elapsed() > timeout)
-       {
-           ClientSocket->abort();
-           State = Idle;
-           abort("Timeout!");
-           return "";
-       }
-   }
-   while (State != Idle);
-
-   ClientSocket->close();
-   lastExchangeDuration = timer.elapsed();
-   return MessageReceived;
+    if (socket) socket->ExternalAbort();
 }
 
-QString AInterfaceToWebSocket::Ping(QString Url)
+void AInterfaceToWebSocket::SetTimeout(int milliseconds)
 {
-  SendTextMessage(Url, "", true);
-  return QString("Ping time: ") + QString::number(lastExchangeDuration) + " ms";
+    TimeOut = milliseconds;
+
+    if (socket) socket->SetTimeout(milliseconds);
 }
 
-void AInterfaceToWebSocket::onClientConnected()
+const QString AInterfaceToWebSocket::Connect(const QString &Url, bool GetAnswerOnConnection)
 {
-    qDebug() << "Client: ClientSocket connected";
-    ClientSocket->sendTextMessage(MessageToSend);
-
-    if (!fWaitForAnswer) State = Idle;
-    else State = WaitingForAnswer;
-}
-
-void AInterfaceToWebSocket::onTextMessageReceived(QString message)
-{
-    qDebug() << "Client: Message received:" << message;
-    MessageReceived = message;
-    State = Idle;
-}
-
-//--------------------- SERVER ------------------
-
-bool AInterfaceToWebSocket::StartListen(quint16 port)
-{
-    if (Server->listen(QHostAddress::Any, port))
+    if (!socket)
     {
-            qDebug() << "Web socket server is now listening";
-            qDebug() << "--Address:"<< Server->serverAddress();
-            qDebug() << "--Port:"<< Server->serverPort();
-            qDebug() << "--URL:" << Server->serverUrl().toString();
-
-            connect(Server, &QWebSocketServer::newConnection, this, &AInterfaceToWebSocket::onNewConnection);
-
-            return true;
+        socket = new AWebSocketSession();
+        socket->SetTimeout(TimeOut);
     }
-    else    return false;
-}
 
-void AInterfaceToWebSocket::StopListen()
-{
-    qDebug() << "Web socket server is not listening anymore!";
-    Server->close();
-}
-
-void AInterfaceToWebSocket::onNewConnection()
-{
-    qDebug() << "Server: New connection established";
-    QWebSocket *pSocket = Server->nextPendingConnection();
-
-    connect(pSocket, &QWebSocket::textMessageReceived, this, &AInterfaceToWebSocket::processTextMessage);
-    //connect(pSocket, &QWebSocket::binaryMessageReceived, this, &AInterfaceToWebSocket::processBinaryMessage);
-    connect(pSocket, &QWebSocket::disconnected, this, &AInterfaceToWebSocket::socketDisconnected);
-
-    ServerListOfClients << pSocket;
-}
-
-void AInterfaceToWebSocket::processTextMessage(QString message)
-{
-    QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
-    qDebug() << "Server: Message received:" << message << " from client:"<<pClient;
-    ServerReplyClient = pClient;
-
-    if (message.isEmpty()) //we were pinged!
-      {
-        ReplyAndClose("ping!");
-        return;
-      }
-
-    QVariant res;
-    emit RequestEvaluate(message, res);
-
-    qDebug() << "Server: Evaluation finished, result:" << res;
-    QString strRes = variantToString(res);
-    qDebug() << "Server: Converted to string:"<<strRes;
-
-    ReplyAndClose(strRes);
-}
-
-void AInterfaceToWebSocket::ReplyAndClose(QString message)
-{
-    qDebug() << "Server: Reply and close request";
-    qDebug() << "Server: Message:"<<message<<"client:"<<ServerReplyClient;
-
-    if (ServerReplyClient)
+    bool bOK = socket->Connect(Url, GetAnswerOnConnection);
+    if (bOK)
     {
-        ServerReplyClient->sendTextMessage(message);
-        ServerReplyClient->close();
-        ServerReplyClient = 0;
+        return socket->GetTextReply();
+    }
+    else
+    {
+        abort(socket->GetError());
+        return "";
     }
 }
 
-
-/*
-void AInterfaceToWebSocket::processBinaryMessage(QByteArray message)
+void AInterfaceToWebSocket::Disconnect()
 {
-    QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
-    qDebug() << "Binary Message received:" << message;
-    //if (pClient) pClient->sendBinaryMessage(message);
+    if (socket) socket->Disconnect();
 }
-*/
 
-void AInterfaceToWebSocket::socketDisconnected()
+const QString AInterfaceToWebSocket::SendText(const QString &message)
 {
-    QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
-    //  qDebug() << "Server: socketDisconnected:" << pClient;
-
-    if (pClient)
+    if (!socket)
     {
-        ServerListOfClients.removeAll(pClient);
-        pClient->deleteLater();
+        abort("Web socket was not connected");
+        return "";
     }
 
-    ServerReplyClient = 0;
+    bool bOK = socket->SendText(message);
+    if (bOK)
+        return socket->GetTextReply();
+    else
+    {
+        abort(socket->GetError());
+        return "";
+    }
 }
 
-//-------------- utilities ------------
-const QString AInterfaceToWebSocket::variantToString(QVariant val) const
+const QString AInterfaceToWebSocket::SendObject(const QVariant &object)
 {
-    QString type = val.typeName();
+    if (object.type() != QVariant::Map)
+    {
+        abort("Argument type of SendObject() method should be object!");
+        return "";
+    }
+    QVariantMap vm = object.toMap();
+    QJsonObject js = QJsonObject::fromVariantMap(vm);
 
-    QJsonValue jv;
-    QString rep;
-    if (type == "int")
-      {
-        jv = QJsonValue(val.toInt());
-        rep = QString::number(val.toInt());
-      }
-    else if (type == "double")
-      {
-        jv = QJsonValue(val.toDouble());
-        rep = QString::number(val.toDouble());
-      }
-    else if (type == "bool")
-      {
-        jv = QJsonValue(val.toBool());
-        rep = val.toBool() ? "true" : "false";
-      }
-    else if (type == "QString")
-      {
-        jv = QJsonValue(val.toString());
-        rep = val.toString();
-      }
-//    else if (type == "QVariantList")
-//      {
-//        QVariantList vl = val.toList();
-//        QJsonArray ar = QJsonArray::fromVariantList(vl);
-//        jv = ar;
-//        rep = "-Array-";
-//      }
-    else if (type == "QVariantMap")
-        {
-          QVariantMap mp = val.toMap();
-          QJsonObject json = QJsonObject::fromVariantMap(mp);
-          QJsonDocument doc(json);
-          rep = QString(doc.toJson(QJsonDocument::Compact));
-        }
-
-    return rep;
+    return sendQJsonObject(js);
 }
 
+const QString AInterfaceToWebSocket::sendQJsonObject(const QJsonObject& json)
+{
+    if (!socket)
+    {
+        abort("Web socket was not connected");
+        return "";
+    }
+
+    bool bOK = socket->SendJson(json);
+    if (bOK)
+        return socket->GetTextReply();
+    else
+    {
+        abort(socket->GetError());
+        return "";
+    }
+}
+
+const QString AInterfaceToWebSocket::sendQByteArray(const QByteArray &ba)
+{
+    if (!socket)
+    {
+        abort("Web socket was not connected");
+        return "";
+    }
+
+    bool bOK = socket->SendQByteArray(ba);
+    if (bOK)
+        return socket->GetTextReply();
+    else
+    {
+        abort(socket->GetError());
+        return "";
+    }
+}
+
+const QString AInterfaceToWebSocket::SendFile(const QString &fileName)
+{
+    if (!socket)
+    {
+        abort("Web socket was not connected");
+        return "";
+    }
+
+    bool bOK = socket->SendFile(fileName);
+    if (bOK)
+        return socket->GetTextReply();
+    else
+    {
+        abort(socket->GetError());
+        return "";
+    }
+}
+
+const QString AInterfaceToWebSocket::ResumeWaitForAnswer()
+{
+    if (!socket)
+    {
+        abort("Web socket was not connected");
+        return "";
+    }
+
+    bool bOK = socket->ResumeWaitForAnswer();
+    if (bOK)
+        return socket->GetTextReply();
+    else
+    {
+        abort(socket->GetError());
+        return "";
+    }
+}
+
+const QVariant AInterfaceToWebSocket::GetBinaryReplyAsObject()
+{
+    if (!socket)
+    {
+        abort("Web socket was not connected");
+        return "";
+    }
+    const QByteArray& ba = socket->GetBinaryReply();
+    QJsonDocument doc = QJsonDocument::fromBinaryData(ba);
+    QJsonObject json = doc.object();
+
+    QVariantMap vm = json.toVariantMap();
+    return vm;
+}
+
+bool AInterfaceToWebSocket::SaveBinaryReplyToFile(const QString &fileName)
+{
+    if (!socket)
+    {
+        abort("Web socket was not connected");
+        return "";
+    }
+    const QByteArray& ba = socket->GetBinaryReply();
+    qDebug() << "ByteArray to save size:"<<ba.size();
+
+    QFile saveFile(fileName);
+    if ( !saveFile.open(QIODevice::WriteOnly) )
+    {
+        abort( QString("Server: Cannot save binary to file: ") + fileName );
+        return false;
+    }
+    saveFile.write(ba);
+    saveFile.close();
+    return true;
+}

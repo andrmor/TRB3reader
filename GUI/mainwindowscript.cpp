@@ -14,6 +14,8 @@
 #include "ainterfacetowebsocket.h"
 #include "ainterfacetohldfileprocessor.h"
 #include "ainterfacetomultithread.h"
+#include "awebserverinterface.h"
+#include "anetworkmodule.h"
 
 #ifdef CERN_ROOT
   #include "cernrootmodule.h"
@@ -28,7 +30,7 @@
 void MainWindow::CreateScriptWindow()
 {
     //  qDebug() << "Creating script window...";
-    ScriptWindow = new AScriptWindow(Config, this);
+    ScriptWindow = new AScriptWindow(Config, Network.getScriptManager(), this);
 
     //  qDebug() << "Registering script units...";
 
@@ -67,12 +69,17 @@ void MainWindow::CreateScriptWindow()
 
 #ifdef SPEECH
     //  qDebug() << "-> speech...";
-    AInterfaceToSpeech* speech = new AInterfaceToSpeech();
+    speech = new AInterfaceToSpeech();
     ScriptWindow->SetInterfaceObject(speech, "speech");
 #endif
 
-    AInterfaceToWebSocket* websoc = new AInterfaceToWebSocket();
-    ScriptWindow->SetInterfaceObject(websoc, "websoc");
+    AInterfaceToWebSocket* web = new AInterfaceToWebSocket();
+    ScriptWindow->SetInterfaceObject(web, "web");
+
+    AWebServerInterface* server = new AWebServerInterface(*Network.WebSocketServer);
+    ScriptWindow->SetInterfaceObject(server, "server");
+
+
 
     //  qDebug() << "-> msg...";
     AInterfaceToMessageWindow* txt = new AInterfaceToMessageWindow(ScriptWindow);

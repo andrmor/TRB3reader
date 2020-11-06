@@ -4,6 +4,7 @@
 #include "trb3datareader.h"
 #include "trb3signalextractor.h"
 #include "ajsontools.h"
+#include "anetworkmodule.h"
 
 #include "mainwindow.h"
 #include "ascriptwindow.h"
@@ -13,8 +14,8 @@
 #include <QDir>
 #include <QJsonObject>
 
-ADispatcher::ADispatcher(MasterConfig* Config, Trb3dataReader* Reader, Trb3signalExtractor* Extractor) :
-    Config(Config),Reader(Reader), Extractor(Extractor)
+ADispatcher::ADispatcher(MasterConfig* Config, Trb3dataReader* Reader, Trb3signalExtractor* Extractor, ANetworkModule* Network) :
+    Config(Config),Reader(Reader), Extractor(Extractor), Network(Network)
 {
     ConfigDir = QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation) + "/TRBreader";
     AutosaveFile = ConfigDir+"/autosave.json";
@@ -86,3 +87,4 @@ void ADispatcher::ClearIgnoreChannels()
 
     emit RequestUpdateGui();
 }
+

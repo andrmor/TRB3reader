@@ -1,6 +1,8 @@
 #ifndef MASTERCONFIG_H
 #define MASTERCONFIG_H
 
+#include "atrbrunsettings.h"
+
 #include <QVector>
 #include <QSet>
 #include <QList>
@@ -8,7 +10,6 @@
 
 class QJsonObject;
 class ChannelMapper;
-class AHldProcessSettings;
 
 class AHldProcessSettings
 {
@@ -26,6 +27,24 @@ public:
     void                ReadFromJson(const QJsonObject &json);
 };
 
+class ABufferRecord
+{
+public:
+    ABufferRecord(){}
+    ABufferRecord(int datakind) : Datakind(datakind) {}
+
+    int Datakind = 0;
+
+    int Samples = 80;
+    int Delay = 1023;
+    int Downsampling = 10;
+
+    bool updateValues(int samples, int delay, int downs); // return false if the new values are the same as old
+
+    const QJsonObject toJson() const;
+    void readFromJson(const QJsonObject & json);
+};
+
 class MasterConfig
 {
 public:
@@ -33,9 +52,11 @@ public:
     ~MasterConfig();
 
     //recognized datakinds
+    bool                isBufferRecordsEmpty() const {return DatakindSet.isEmpty();}
+    QVector<ABufferRecord> & getBufferRecords() {return DatakindSet;}
+    ABufferRecord *     findBufferRecord(int datakind);
     const QVector<int>  GetListOfDatakinds() const;
-    void                SetListOfDatakinds(const QVector<int> &list);
-    bool                IsGoodDatakind(int datakind) const {return Datakinds.contains(datakind);}
+    bool                IsGoodDatakind(int datakind) const {return ValidDatakinds.contains(datakind);}
     void                AddDatakind(int datakind);
     void                RemoveDatakind(int datakind);
 
@@ -105,12 +126,16 @@ public:
     // hld file processor settings
     AHldProcessSettings HldProcessSettings;
 
+    //trb acqusition-related settings
+    ATrbRunSettings     TrbRunSettings;
+
     // config <-> JSON handling
     void                WriteToJson(QJsonObject& json);
     bool                ReadFromJson(QJsonObject& json);
 
 private:
-    QSet<int>           Datakinds;
+    QVector<ABufferRecord> DatakindSet;
+    QSet<int>           ValidDatakinds; // must be synchronized with DatakindSet
 
     QVector<int>        ListNegativeChannels;
     QVector<bool>       NegPol; //Quick access

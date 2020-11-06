@@ -22,7 +22,10 @@ AScriptManager::AScriptManager()
 
 AScriptManager::~AScriptManager()
 {
-    for (int i=0; i<interfaces.size(); i++) delete interfaces[i];
+    for (int i=0; i<interfaces.size(); i++)
+    {
+        delete interfaces[i];
+    }
     interfaces.clear();
 
     if (engine)
@@ -40,7 +43,6 @@ QString AScriptManager::Evaluate(const QString& Script)
     LastError = "";
     fAborted = false;
     EvaluationResult = QScriptValue::UndefinedValue;
-
     emit onStart();
 
     //running InitOnRun method (if defined) for all defined interfaces
@@ -61,6 +63,7 @@ QString AScriptManager::Evaluate(const QString& Script)
     timer = new QElapsedTimer;
     timeOfStart = timer->restart();
 
+    //  qDebug() << "Starting evaluation...";
     fEngineIsRunning = true;
     EvaluationResult = engine->evaluate(Script);
     //  qDebug() << "Just finished!" << EvaluationResult.toString();
