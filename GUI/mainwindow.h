@@ -278,6 +278,12 @@ private slots:
     void on_cbTrapezoidal_clicked(bool checked);
     void on_sbTrapezoidalL_editingFinished();
     void on_sbTrapezoidalG_editingFinished();
+    void on_cbZeroSignalIfPeakOutside_P_clicked(bool checked);
+    void on_sbZeroSignalIfPeakBefore_P_editingFinished();
+    void on_sbZeroSignalIfPeakAfter_P_editingFinished();
+    void on_cbZeroSignalIfPeakOutside_N_clicked(bool checked);
+    void on_sbZeroSignalIfPeakBefore_N_editingFinished();
+    void on_sbZeroSignalIfPeakAfter_N_editingFinished();
 };
 
 #endif // MAINWINDOW_H

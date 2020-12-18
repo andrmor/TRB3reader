@@ -271,6 +271,13 @@ void MainWindow::UpdateGui()
     ui->cbZeroSignalIfReverseMax->setChecked(Config->bZeroSignalIfReverse);
         ui->ledReverseMaxLimit->setText(QString::number(Config->ReverseMaxThreshold));
 
+    ui->cbZeroSignalIfPeakOutside_P->setChecked(Config->bZeroSignalIfPeakOutside_Positive);
+    ui->cbZeroSignalIfPeakOutside_N->setChecked(Config->bZeroSignalIfPeakOutside_Negative);
+        ui->sbZeroSignalIfPeakBefore_P->setValue(Config->ZeroSignalIfPeakBefore_Positive);
+        ui->sbZeroSignalIfPeakBefore_N->setValue(Config->ZeroSignalIfPeakBefore_Negative);
+        ui->sbZeroSignalIfPeakAfter_P->setValue(Config->ZeroSignalIfPeakAfter_Positive);
+        ui->sbZeroSignalIfPeakAfter_N->setValue(Config->ZeroSignalIfPeakAfter_Negative);
+
     ui->cbPosThreshold->setChecked(Config->bPositiveThreshold);
     ui->ledPosThresholdMin->setText(QString::number(Config->PositiveThreshold));
 

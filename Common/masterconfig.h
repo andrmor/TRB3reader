@@ -103,6 +103,14 @@ public:
     bool                bZeroSignalIfReverse = false;
     double              ReverseMaxThreshold = 0.25;
 
+    bool                bZeroSignalIfPeakOutside_Positive = false;
+    int                 ZeroSignalIfPeakBefore_Positive = 10;
+    int                 ZeroSignalIfPeakAfter_Positive = 30;
+
+    bool                bZeroSignalIfPeakOutside_Negative = false;
+    int                 ZeroSignalIfPeakBefore_Negative = 10;
+    int                 ZeroSignalIfPeakAfter_Negative = 30;
+
     bool                bPositiveThreshold = false;
     double              PositiveThreshold = 0;
 

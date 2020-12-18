@@ -2045,3 +2045,39 @@ void MainWindow::on_sbTrapezoidalG_editingFinished()
     Config->TrapezoidalG = ui->sbTrapezoidalG->value();
     ClearData();
 }
+
+void MainWindow::on_cbZeroSignalIfPeakOutside_P_clicked(bool checked)
+{
+    Config->bZeroSignalIfPeakOutside_Positive = checked;
+    ClearData();
+}
+
+void MainWindow::on_sbZeroSignalIfPeakBefore_P_editingFinished()
+{
+    Config->ZeroSignalIfPeakBefore_Positive = ui->sbZeroSignalIfPeakBefore_P->value();
+    ClearData();
+}
+
+void MainWindow::on_sbZeroSignalIfPeakAfter_P_editingFinished()
+{
+    Config->ZeroSignalIfPeakAfter_Positive = ui->sbZeroSignalIfPeakAfter_P->value();
+    ClearData();
+}
+
+void MainWindow::on_cbZeroSignalIfPeakOutside_N_clicked(bool checked)
+{
+    Config->bZeroSignalIfPeakOutside_Negative = checked;
+    ClearData();
+}
+
+void MainWindow::on_sbZeroSignalIfPeakBefore_N_editingFinished()
+{
+    Config->ZeroSignalIfPeakBefore_Negative = ui->sbZeroSignalIfPeakBefore_N->value();
+    ClearData();
+}
+
+void MainWindow::on_sbZeroSignalIfPeakAfter_N_editingFinished()
+{
+    Config->ZeroSignalIfPeakAfter_Negative = ui->sbZeroSignalIfPeakAfter_N->value();
+    ClearData();
+}

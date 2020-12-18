@@ -289,6 +289,17 @@ void MasterConfig::writeSignalExtractionToJson(QJsonObject &json)
             rm_js["Threshold"] = ReverseMaxThreshold;
         js["ReverseMax"] = rm_js;
 
+        QJsonObject po_js;
+            po_js["PositiveOn"]     = bZeroSignalIfPeakOutside_Positive;
+            po_js["NegativeOn"]     = bZeroSignalIfPeakOutside_Negative;
+
+            po_js["PositiveBefore"] = ZeroSignalIfPeakBefore_Positive;
+            po_js["NegativeBefore"] = ZeroSignalIfPeakBefore_Negative;
+
+            po_js["PositiveAfter"]  = ZeroSignalIfPeakAfter_Positive;
+            po_js["NegativeAfter"]  = ZeroSignalIfPeakAfter_Negative;
+        js["PeakInRange"] = po_js;
+
         js["ApplyPositiveThreshold"] = bPositiveThreshold;
         js["PositiveThreshold"] = PositiveThreshold;
 
@@ -312,6 +323,22 @@ bool MasterConfig::readSignalExtractionFromJson(QJsonObject &json)
     QJsonObject rm_js = js["ReverseMax"].toObject();
         bZeroSignalIfReverse = rm_js["On"].toBool();
         ReverseMaxThreshold = rm_js["Threshold"].toDouble();
+
+    bZeroSignalIfPeakOutside_Positive = false;
+    bZeroSignalIfPeakOutside_Negative = false;
+    QJsonObject po_js;
+    bool ok = parseJson(js, "PeakInRange", po_js);
+    if (ok)
+    {
+        parseJson(po_js, "PositiveOn", bZeroSignalIfPeakOutside_Positive);
+        parseJson(po_js, "NegativeOn", bZeroSignalIfPeakOutside_Negative);
+
+        parseJson(po_js, "PositiveBefore", ZeroSignalIfPeakBefore_Positive);
+        parseJson(po_js, "PositiveAfter",  ZeroSignalIfPeakAfter_Positive);
+
+        parseJson(po_js, "NegativeBefore", ZeroSignalIfPeakBefore_Negative);
+        parseJson(po_js, "NegativeAfter",  ZeroSignalIfPeakAfter_Negative);
+    }
 
     parseJson(js, "ExtractionMethod", SignalExtractionMethod);
     parseJson(js, "CommonSample", CommonSampleNumber);

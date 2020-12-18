@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>753</width>
-    <height>761</height>
+    <height>775</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1275,6 +1275,140 @@
                  </item>
                  <item>
                   <spacer name="horizontalSpacer_8">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_68">
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QLabel" name="label_76">
+                   <property name="minimumSize">
+                    <size>
+                     <width>130</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>Positive channels:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="cbZeroSignalIfPeakOutside_P">
+                   <property name="text">
+                    <string>Peak value is reached before sample#</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QSpinBox" name="sbZeroSignalIfPeakBefore_P">
+                   <property name="maximum">
+                    <number>99999</number>
+                   </property>
+                   <property name="value">
+                    <number>20</number>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_75">
+                   <property name="text">
+                    <string>or after sample #</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QSpinBox" name="sbZeroSignalIfPeakAfter_P">
+                   <property name="maximum">
+                    <number>99999</number>
+                   </property>
+                   <property name="value">
+                    <number>30</number>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_49">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_69">
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QLabel" name="label_77">
+                   <property name="minimumSize">
+                    <size>
+                     <width>130</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>Negative channels:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="cbZeroSignalIfPeakOutside_N">
+                   <property name="text">
+                    <string>Peak value is reached before sample#</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QSpinBox" name="sbZeroSignalIfPeakBefore_N">
+                   <property name="maximum">
+                    <number>99999</number>
+                   </property>
+                   <property name="value">
+                    <number>20</number>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_78">
+                   <property name="text">
+                    <string>or after sample#</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QSpinBox" name="sbZeroSignalIfPeakAfter_N">
+                   <property name="maximum">
+                    <number>99999</number>
+                   </property>
+                   <property name="value">
+                    <number>30</number>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_50">
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
                    </property>
@@ -4727,12 +4861,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>96</x>
-     <y>581</y>
+     <x>101</x>
+     <y>112</y>
     </hint>
     <hint type="destinationlabel">
-     <x>274</x>
-     <y>590</y>
+     <x>112</x>
+     <y>112</y>
     </hint>
    </hints>
   </connection>
@@ -4743,12 +4877,12 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>111</x>
-     <y>536</y>
+     <x>112</x>
+     <y>114</y>
     </hint>
     <hint type="destinationlabel">
-     <x>304</x>
-     <y>593</y>
+     <x>87</x>
+     <y>116</y>
     </hint>
    </hints>
   </connection>
@@ -4759,12 +4893,12 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>111</x>
-     <y>536</y>
+     <x>112</x>
+     <y>114</y>
     </hint>
     <hint type="destinationlabel">
-     <x>420</x>
-     <y>627</y>
+     <x>87</x>
+     <y>116</y>
     </hint>
    </hints>
   </connection>
@@ -4775,12 +4909,12 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>111</x>
-     <y>536</y>
+     <x>112</x>
+     <y>114</y>
     </hint>
     <hint type="destinationlabel">
-     <x>420</x>
-     <y>593</y>
+     <x>87</x>
+     <y>116</y>
     </hint>
    </hints>
   </connection>
@@ -4791,12 +4925,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>462</x>
-     <y>536</y>
+     <x>112</x>
+     <y>114</y>
     </hint>
     <hint type="destinationlabel">
-     <x>716</x>
-     <y>539</y>
+     <x>112</x>
+     <y>114</y>
     </hint>
    </hints>
   </connection>
@@ -4807,12 +4941,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>79</x>
-     <y>581</y>
+     <x>84</x>
+     <y>112</y>
     </hint>
     <hint type="destinationlabel">
-     <x>367</x>
-     <y>590</y>
+     <x>112</x>
+     <y>112</y>
     </hint>
    </hints>
   </connection>
@@ -4823,12 +4957,12 @@
    <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>143</x>
-     <y>267</y>
+     <x>112</x>
+     <y>111</y>
     </hint>
     <hint type="destinationlabel">
-     <x>535</x>
-     <y>270</y>
+     <x>112</x>
+     <y>111</y>
     </hint>
    </hints>
   </connection>
@@ -4839,12 +4973,12 @@
    <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>154</x>
-     <y>299</y>
+     <x>112</x>
+     <y>113</y>
     </hint>
     <hint type="destinationlabel">
-     <x>738</x>
-     <y>299</y>
+     <x>112</x>
+     <y>113</y>
     </hint>
    </hints>
   </connection>
@@ -4855,12 +4989,12 @@
    <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>143</x>
-     <y>267</y>
+     <x>112</x>
+     <y>111</y>
     </hint>
     <hint type="destinationlabel">
-     <x>332</x>
-     <y>270</y>
+     <x>112</x>
+     <y>111</y>
     </hint>
    </hints>
   </connection>
@@ -4871,12 +5005,12 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>111</x>
-     <y>536</y>
+     <x>112</x>
+     <y>114</y>
     </hint>
     <hint type="destinationlabel">
-     <x>304</x>
-     <y>627</y>
+     <x>87</x>
+     <y>116</y>
     </hint>
    </hints>
   </connection>
@@ -4887,12 +5021,12 @@
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>101</x>
-     <y>167</y>
+     <x>108</x>
+     <y>137</y>
     </hint>
     <hint type="destinationlabel">
-     <x>244</x>
-     <y>428</y>
+     <x>106</x>
+     <y>112</y>
     </hint>
    </hints>
   </connection>
@@ -4903,12 +5037,12 @@
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>97</x>
-     <y>188</y>
+     <x>104</x>
+     <y>137</y>
     </hint>
     <hint type="destinationlabel">
-     <x>223</x>
-     <y>432</y>
+     <x>106</x>
+     <y>112</y>
     </hint>
    </hints>
   </connection>
@@ -4919,12 +5053,12 @@
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>120</x>
-     <y>214</y>
+     <x>122</x>
+     <y>137</y>
     </hint>
     <hint type="destinationlabel">
-     <x>194</x>
-     <y>432</y>
+     <x>106</x>
+     <y>112</y>
     </hint>
    </hints>
   </connection>
@@ -4935,12 +5069,12 @@
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>151</x>
-     <y>248</y>
+     <x>122</x>
+     <y>137</y>
     </hint>
     <hint type="destinationlabel">
-     <x>160</x>
-     <y>432</y>
+     <x>106</x>
+     <y>112</y>
     </hint>
    </hints>
   </connection>
@@ -4951,12 +5085,12 @@
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>129</x>
-     <y>266</y>
+     <x>122</x>
+     <y>137</y>
     </hint>
     <hint type="destinationlabel">
-     <x>127</x>
-     <y>429</y>
+     <x>106</x>
+     <y>112</y>
     </hint>
    </hints>
   </connection>
@@ -4967,12 +5101,12 @@
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>151</x>
-     <y>302</y>
+     <x>122</x>
+     <y>137</y>
     </hint>
     <hint type="destinationlabel">
-     <x>503</x>
-     <y>432</y>
+     <x>106</x>
+     <y>112</y>
     </hint>
    </hints>
   </connection>
@@ -4983,12 +5117,12 @@
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>151</x>
-     <y>329</y>
+     <x>122</x>
+     <y>137</y>
     </hint>
     <hint type="destinationlabel">
-     <x>353</x>
-     <y>431</y>
+     <x>106</x>
+     <y>112</y>
     </hint>
    </hints>
   </connection>
@@ -4999,12 +5133,12 @@
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>151</x>
-     <y>356</y>
+     <x>122</x>
+     <y>137</y>
     </hint>
     <hint type="destinationlabel">
-     <x>303</x>
-     <y>432</y>
+     <x>106</x>
+     <y>112</y>
     </hint>
    </hints>
   </connection>
@@ -5015,12 +5149,12 @@
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>245</x>
-     <y>223</y>
+     <x>122</x>
+     <y>137</y>
     </hint>
     <hint type="destinationlabel">
-     <x>326</x>
-     <y>432</y>
+     <x>106</x>
+     <y>112</y>
     </hint>
    </hints>
   </connection>
@@ -5031,12 +5165,12 @@
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>271</x>
-     <y>260</y>
+     <x>122</x>
+     <y>137</y>
     </hint>
     <hint type="destinationlabel">
-     <x>345</x>
-     <y>432</y>
+     <x>106</x>
+     <y>112</y>
     </hint>
    </hints>
   </connection>
@@ -5047,12 +5181,12 @@
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>271</x>
-     <y>290</y>
+     <x>122</x>
+     <y>137</y>
     </hint>
     <hint type="destinationlabel">
-     <x>378</x>
-     <y>432</y>
+     <x>106</x>
+     <y>112</y>
     </hint>
    </hints>
   </connection>
@@ -5063,12 +5197,12 @@
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>475</x>
-     <y>232</y>
+     <x>122</x>
+     <y>137</y>
     </hint>
     <hint type="destinationlabel">
-     <x>468</x>
-     <y>432</y>
+     <x>106</x>
+     <y>112</y>
     </hint>
    </hints>
   </connection>
@@ -5079,12 +5213,12 @@
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>452</x>
-     <y>260</y>
+     <x>122</x>
+     <y>137</y>
     </hint>
     <hint type="destinationlabel">
-     <x>518</x>
-     <y>432</y>
+     <x>106</x>
+     <y>112</y>
     </hint>
    </hints>
   </connection>
@@ -5095,12 +5229,12 @@
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>475</x>
-     <y>296</y>
+     <x>122</x>
+     <y>137</y>
     </hint>
     <hint type="destinationlabel">
-     <x>582</x>
-     <y>430</y>
+     <x>106</x>
+     <y>112</y>
     </hint>
    </hints>
   </connection>

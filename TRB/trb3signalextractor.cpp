@@ -237,6 +237,12 @@ float Trb3signalExtractor::extractSignalFromWaveform(int ievent, int ichannel, b
     {
         sig = -extractMin(Reader->GetWaveformPtrFast(ievent, ichannel));
 
+        if (Config->bZeroSignalIfPeakOutside_Negative)
+        {
+            if (iMin < Config->ZeroSignalIfPeakBefore_Negative) return 0;
+            if (iMin > Config->ZeroSignalIfPeakAfter_Negative)  return 0;
+        }
+
         if (Config->bNegativeThreshold)
             if (sig < Config->NegativeThreshold)
             {
@@ -267,6 +273,12 @@ float Trb3signalExtractor::extractSignalFromWaveform(int ievent, int ichannel, b
     else
     {
         sig = extractMax(Reader->GetWaveformPtrFast(ievent, ichannel));
+
+        if (Config->bZeroSignalIfPeakOutside_Positive)
+        {
+            if (iMax < Config->ZeroSignalIfPeakBefore_Positive) return 0;
+            if (iMax > Config->ZeroSignalIfPeakAfter_Positive)  return 0;
+        }
 
         if (Config->bPositiveThreshold)
             if (sig < Config->PositiveThreshold)
@@ -303,6 +315,7 @@ float Trb3signalExtractor::extractSignalFromWaveform(int ievent, int ichannel, b
 float Trb3signalExtractor::extractMax(const QVector<float> *arr)
 {
     int max = (*arr)[0];
+    iMax = 0;
     for (int i=1; i<arr->size(); i++)
         if ( (*arr)[i]>max)
         {
@@ -315,6 +328,7 @@ float Trb3signalExtractor::extractMax(const QVector<float> *arr)
 float Trb3signalExtractor::extractMin(const QVector<float> *arr)
 {
     int min = (*arr)[0];
+    iMin = 0;
     for (int i=1; i<arr->size(); i++)
         if ( (*arr)[i]<min)
         {
