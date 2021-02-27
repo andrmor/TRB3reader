@@ -55,6 +55,7 @@ void AInterfaceToData::addEvent(const QVariant signalArray)
     if ( !jsonArrToVector(ar, vec) )
     {
         abort("Failed to set signal values - array contains non-numerical data");
+        delete ev;
         return;
     }
     ev->SetSignals(&vec);

@@ -294,16 +294,14 @@ void Trb3dataReader::substractPedestals()
 
 void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels, int enforceNumSamples)
 {
-#ifdef DABC
     waveData.clear();
 
     numChannels = enforceNumChannels;
-    numSamples = enforceNumSamples;
+    numSamples  = enforceNumSamples;
 
     hadaq::ReadoutHandle ref = hadaq::ReadoutHandle::Connect(FileName.toLocal8Bit().data());
     hadaq::RawEvent* evnt = 0;
-    //evnt = ref.NextEvent(1.0);
-    //evnt = ref.NextEvent(1.0);
+
     bool bReportOnStart = true;
 
     numBadEvents = 0;
@@ -312,6 +310,7 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
     {
         bool bBadEvent = false;
         int foundChannels = 0;
+
         QVector < QVector <float> > thisEventData;  //format: [channel] [sample]
 
         // loop over sections
@@ -351,7 +350,7 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
                         if (bReportOnStart) qDebug() << "--> This is an ADC block. Channels: "<<channels<<"   Samples: "<< samples;
 
                         // reserve the necessary vectors for the waveforms and fill the data
-                        int oldSize = thisEventData.size();
+                        const int oldSize = thisEventData.size();
                         thisEventData.resize( oldSize + channels );
                         for (int ic=0; ic<channels; ic++)
                         {
@@ -405,14 +404,14 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
     ref.Disconnect();
 
     qDebug() << "--> Data read completed\n--> Events: "<< waveData.size() <<" Channels: "<<numChannels << "  Samples: "<<numSamples;
+    qDebug() << "!-> Num all events:" << numAllEvents << " bad events" << numBadEvents;
     if (numBadEvents > 0) qDebug() << "--> " << numBadEvents << " bad events were disreguarded!";
-#endif
 }
 
 const QString Trb3dataReader::GetFileInfo(const QString& FileName) const
 {
     QString output;
-#ifdef DABC
+
     bool bReportOnStart = true;
     int numEvents = 0;
 
@@ -475,7 +474,6 @@ const QString Trb3dataReader::GetFileInfo(const QString& FileName) const
         output += "Number of events: " + QString::number(numEvents);
 
     ref.Disconnect();
-#endif
 
     return output;
 }
