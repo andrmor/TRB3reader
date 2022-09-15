@@ -71,6 +71,8 @@ private:
     void    doAdjacentAverage(QVector<float> &arr, int numPoints);
     void    doAdjacentWeightedAverage(QVector<float> &arr, int numPoints);
 
+    void    applyTrapezoidal(QVector<float> & arr, int L, int G) const;
+
     void    substractPedestals();
 
 };

@@ -14,7 +14,7 @@ public:
     explicit ARasterWindow(QMainWindow *parent);
     virtual ~ARasterWindow();
 
-    TCanvas* fCanvas;
+    TCanvas* fCanvas = nullptr;
 
     void setBlockEvents(bool flag) {fBlockEvents = flag;}
     void setInvertedXYforDrag(bool flag) {fInvertedXYforDrag = flag;} //fix ROOT inversion in x-y for parallel view of geometry
