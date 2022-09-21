@@ -438,11 +438,13 @@ const QString Trb3dataReader::GetFileInfo(const QString& FileName) const
     while ( (evnt = ref.NextEvent(1.0)) )
     {
         // loop over sections
-        hadaq::RawSubevent* sub = 0;
+        qDebug() << "---Event---" << numEvents;
+        hadaq::RawSubevent * sub = 0;
         while ( (sub=evnt->NextSubevent(sub)) )
         {
+            qDebug() << "==>Id:" << QString::number(sub->GetId(), 16) << "==>Decoding:" << QString::number(sub->GetDecoding(), 16);
             unsigned trbSubEvSize = sub->GetSize() / 4 - 4;
-            //qDebug() << "--> Section found, size: "<< trbSubEvSize << "\n";
+            qDebug() << "==>Subevent size: "<< trbSubEvSize;// << "\n";
 
             unsigned ix = 0;
 
@@ -455,10 +457,11 @@ const QString Trb3dataReader::GetFileInfo(const QString& FileName) const
                 int datakind = hadata & 0xFFFF;
 
                 if (bReportOnStart) output += "Data block with datakind: 0x" + QString::number(datakind, 16) + "\n";
+                qDebug() << "====>" << QString::number(datakind, 16);
 
                 unsigned ixTmp = ix;
 
-                if (Config->IsGoodDatakind(datakind))
+                //if (Config->IsGoodDatakind(datakind))
                 {
                     // last word in the data block identifies max. ADC# and max. channel
                     // assuming they are written consecutively - seems to be the case so far
@@ -481,6 +484,10 @@ const QString Trb3dataReader::GetFileInfo(const QString& FileName) const
         }
         bReportOnStart = false;
         numEvents++;
+
+        // !!!
+        break;
+        // !!!
     }
 
     if (output.isEmpty())
