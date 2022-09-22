@@ -98,34 +98,40 @@ QString Trb3dataReader::GetFileInfo(const QString& FileName) const
 {
     QString output;
 
-    bool bReportOnStart = true;
     int numEvents = 0;
 
     hadaq::ReadoutHandle ref = hadaq::ReadoutHandle::Connect(FileName.toLocal8Bit().data());
     hadaq::RawEvent * evnt = nullptr;
 
+    bool bReportOnStart = true;
     while ( (evnt = ref.NextEvent(1.0)) )
     {
         // loop over sections
-        qDebug() << "---Event---" << numEvents << evnt->GetDate() << QString::number(evnt->GetDecoding(), 16);
+        //qDebug() << "---Event---" << numEvents << evnt->GetDate() << QString::number(evnt->GetDecoding(), 16);
+
         hadaq::RawSubevent * sub = nullptr;
         while ( (sub = evnt->NextSubevent(sub)) )
         {
             const int boardID = sub->GetId();
-            qDebug() << "==>BoardId:" << QString::number(boardID, 16) << "==>Decoding:" << QString::number(sub->GetDecoding(), 16);
-            unsigned trbSubEvSize = sub->GetSize() / 4 - 4;
-            qDebug() << "==>Subevent size: "<< trbSubEvSize;// << "\n";
+            QString msg = "BoardId: " + QString::number(boardID, 16);// + "Decoding:" + QString::number(sub->GetDecoding(), 16);
+            //qDebug() << "==>" << msg;
+            if (bReportOnStart) output += msg + '\n';
+
+            const unsigned trbSubEvSize = sub->GetSize() / 4 - 4;
+            //qDebug() << "==>Subevent size: "<< trbSubEvSize;// << "\n";
 
             if (!Config->IsGoodDatakind(boardID)) continue;
 
             // time processing is to add later
-            unsigned lastRec = sub->Data(trbSubEvSize-3);
-            qDebug() << "Last" << QString::number(lastRec, 16);
-            unsigned lastId   = (lastRec >> 16) & 0xFFFF;
-            unsigned lastChan = lastId & 0xF;
-            unsigned lastAdc  = (lastId >> 4) & 0xF;
-            unsigned numChan = (lastChan+1) * (lastAdc+1);
-            qDebug() << "===> Num channels" << numChan << "Num samples" << (trbSubEvSize-2) / numChan;
+            const unsigned lastRec = sub->Data(trbSubEvSize-3);
+            //qDebug() << "Last" << QString::number(lastRec, 16);
+            const unsigned lastId   = (lastRec >> 16) & 0xFFFF;
+            const unsigned lastChan = lastId & 0xF;
+            const unsigned lastAdc  = (lastId >> 4) & 0xF;
+            const unsigned numChan = (lastChan+1) * (lastAdc+1);
+            const unsigned numSamples =  (trbSubEvSize-2) / numChan;
+            msg = "Num channels: " + QString::number(numChan) + " Num samples: " + QString::number(numSamples);
+            //qDebug() << msg;
 
             unsigned ix = 0;
 
@@ -151,7 +157,7 @@ QString Trb3dataReader::GetFileInfo(const QString& FileName) const
         numEvents++;
 
         // !!!
-        break;
+//        break;
         // !!!
     }
 
