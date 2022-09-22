@@ -33,8 +33,10 @@ cern_root {
 
 #---DABC---
 DEFINES += DABC
-INCLUDEPATH += /home/andr/trb3/dabc/include
-LIBS += -L/home/andr/trb3/dabc/lib/ -lDabcBase -lDabcMbs -lDabcHadaq
+#DABCPATH = /home/andr/trb3/dabc
+DABCPATH = /home/andr/trb3
+INCLUDEPATH += $$DABCPATH/include
+LIBS += -L$$DABCPATH/lib/ -lDabcBase -lDabcMbs -lDabcHadaq
 #-----------
 
 #---Speech---

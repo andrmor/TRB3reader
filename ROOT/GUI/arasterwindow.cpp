@@ -1,12 +1,13 @@
+#include "TCanvas.h"
 #include "arasterwindow.h"
 
 #include <QDebug>
 #include <QMouseEvent>
 #include <QMainWindow>
 
-#include "TCanvas.h"
 #include "TView.h"
 #include "TView3D.h"
+#include "TVirtualX.h"
 
 ARasterWindow::ARasterWindow(QMainWindow *parent) : QWindow()
 {
