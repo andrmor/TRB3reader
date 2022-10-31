@@ -227,6 +227,8 @@ void Trb3signalExtractor::ExtractAllSignals()
     for (int ievent=0; ievent<signalData.size(); ievent++)
         if (RejectedEvents.at(ievent)) rejected++;
     qDebug() << "Rejected"<<rejected<<"events from total"<<signalData.size();
+
+    TimeData = Reader->timeData; // !!!***
 }
 
 float Trb3signalExtractor::extractSignalFromWaveform(int ievent, int ichannel, bool *WasSetToZero)

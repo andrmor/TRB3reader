@@ -57,10 +57,11 @@ public:
 
     void    ClearData();
 
+    std::vector<std::vector<std::pair<unsigned,double>>> timeData;  // format:  [event] [{channel,timeStamp}]
+
 private:
     MasterConfig* Config;
     QVector < QVector < QVector <float> > > waveData;  // format:  [event] [hardware chanel] [sample]
-    std::vector<std::vector<std::pair<unsigned,double>>> timeData;  // format:  [event] [{channel,timeStamp}]
 
     static constexpr unsigned NumTimeChannels = 11;
     static constexpr double FineSpan_ns = 5.0; //ns

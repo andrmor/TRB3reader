@@ -710,7 +710,18 @@ void MainWindow::OnEventOrChannelChanged()
     }
     ui->leSignal->setText(ss);
 
-    //if (ievent < )
+    // !!!***
+    QString timeStr;
+    if (!bFromDataHub && ievent < Extractor->TimeData.size())
+    {
+        const std::vector<std::pair<unsigned,double>> & vec = Extractor->TimeData[ievent];
+        for (const auto & rec : vec)
+        {
+            if (!timeStr.isEmpty()) timeStr += "; ";
+            timeStr += QString("Chan %0 -> %1ns").arg(rec.first).arg(rec.second);
+        }
+    }
+    ui->leTimes->setText(timeStr);
 }
 
 void MainWindow::on_pbShowWaveform_toggled(bool checked)

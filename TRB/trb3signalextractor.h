@@ -1,6 +1,8 @@
 #ifndef TRB3SIGNALEXTRACTOR_H
 #define TRB3SIGNALEXTRACTOR_H
 
+#include <vector>
+
 #include <QVector>
 
 class Trb3dataReader;
@@ -39,11 +41,14 @@ public:
 
     float   extractSignalFromWaveform(int ievent, int ichannel, bool *Rejected = 0);
 
+    std::vector<std::vector<std::pair<unsigned,double>>> TimeData;  // format:  [event] [{channel,timeStamp}]
+
 private:
     const   MasterConfig* Config;
     const   Trb3dataReader* Reader;
     QVector < QVector <float> > signalData;  // format:  [ievent] [ichanel]            this is (peak - pedestal)
     QVector<bool> RejectedEvents;
+
 
     int     numChannels;
 
