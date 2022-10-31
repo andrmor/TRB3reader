@@ -57,6 +57,9 @@ private:
     MasterConfig* Config;
     QVector < QVector < QVector <float> > > waveData;  // format:  [event] [hardware chanel] [sample]
 
+    static constexpr unsigned NumTimeChannels = 11;
+    static constexpr double FineSpan_ns = 5.0; //ns
+
     int     numSamples;
     int     numChannels;
 

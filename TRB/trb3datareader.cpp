@@ -107,51 +107,100 @@ QString Trb3dataReader::GetFileInfo(const QString& FileName) const
     while ( (evnt = ref.NextEvent(1.0)) )
     {
         // loop over sections
-        //qDebug() << "---Event---" << numEvents << evnt->GetDate() << QString::number(evnt->GetDecoding(), 16);
+        qDebug() << "---Event---" << numEvents << evnt->GetDate() << QString::number(evnt->GetDecoding(), 16);
 
         hadaq::RawSubevent * sub = nullptr;
         while ( (sub = evnt->NextSubevent(sub)) )
         {
             const int boardID = sub->GetId();
             QString msg = "BoardId: " + QString::number(boardID, 16);// + "Decoding:" + QString::number(sub->GetDecoding(), 16);
-            //qDebug() << "==>" << msg;
+            qDebug() << "==>" << msg;
             if (bReportOnStart) output += msg + '\n';
 
             const unsigned trbSubEvSize = sub->GetSize() / 4 - 4;
-            //qDebug() << "==>Subevent size: "<< trbSubEvSize;// << "\n";
+            qDebug() << "==>Subevent size: "<< trbSubEvSize;// << "\n";
 
-            if (!Config->IsGoodDatakind(boardID)) continue;
+            if (Config->isTimerBoard(boardID))
+            {
+                unsigned ix = 13;
 
-            // time processing is to add later
-            const unsigned lastRec = sub->Data(trbSubEvSize-3);
-            //qDebug() << "Last" << QString::number(lastRec, 16);
-            const unsigned lastId   = (lastRec >> 16) & 0xFFFF;
-            const unsigned lastChan = lastId & 0xF;
-            const unsigned lastAdc  = (lastId >> 4) & 0xF;
-            const unsigned numChan = (lastChan+1) * (lastAdc+1);
-            const unsigned numSamples =  (trbSubEvSize-2) / numChan;
-            msg = "-->ADC block; Num channels: " + QString::number(numChan) + " Num samples: " + QString::number(numSamples);
-            //qDebug() << msg;
-            if (bReportOnStart) output += msg + '\n';
+                unsigned epoch = 0;
+                std::array<bool,NumTimeChannels> seenChannels; seenChannels.fill(false);
 
-            unsigned ix = 0;
+                while (ix < trbSubEvSize)
+                { // loop over subsubevents
 
-            while (ix < trbSubEvSize)
-            { // loop over subsubevents
+                    unsigned hadata = sub->Data(ix++);
 
-                unsigned hadata = sub->Data(ix++);
+                    qDebug() << "--> " << QString::number(hadata, 16) << QString::number(hadata, 2);
 
-                unsigned id   = (hadata >> 16) & 0xFFFF;
-                unsigned data = hadata & 0xFFFF;
+                    if ( (hadata >> 28) == 6)  // starts from 0b011
+                    {
+                        //epoch
+                        epoch = hadata & 0x0fffffff;
+                        qDebug() << "  Epoch: " << QString::number(epoch, 16);
+                    }
+                    else if (hadata & 0x80000000) // starts from 0b1
+                    {
+                        //timedata
+                        const unsigned coarse  = hadata & 0x000007ff;    // 10-0
+                        const unsigned fine    = (hadata >> 12) & 0x3ff; // 21-12
+                        const unsigned channel = (hadata >> 22) & 0x7f;  // 28-22
+                        if (channel >= NumTimeChannels)
+                        {
+                            qCritical() << "Bad channel number" << channel;
+                            exit(222);
+                        }
+                        qDebug() << "  Data->" << "Channel:" << channel << "  Coarse:" << coarse << "  Fine:" << fine;
+                        if (!seenChannels[channel])
+                        {
+                            seenChannels[channel] = true;
 
-                if (data == 0x5555 && id == 1) break;
+                            const double timeFromFine  = FineSpan_ns * fine / 0x80;
+                            const double timeFromCorse = FineSpan_ns * coarse;
+                            const double timeFromEpoch = FineSpan_ns * 0x800 * epoch;
+                            const double time = timeFromEpoch + timeFromCorse + timeFromFine; // ns
+                            qDebug() << "Time contributions (ns) from fine, corse and epoc:" << timeFromFine << timeFromCorse << timeFromEpoch << " Global:" << time << "ns";
+                        }
+                        //else this channel appears more than once -> ignore
+                    }
+                    else if (hadata == 0x15555) break;
 
-                //if (bReportOnStart) output += "Data block with datakind: 0x" + QString::number(datakind, 16) + "\n";
-//                qDebug() << "====>  id:" << QString::number(id, 16) << "data:" <<  QString::number(data, 16);
+                }
+            }
+            else if (Config->isADCboard(boardID))
+            {
+                // time processing is to add later
+                const unsigned lastRec = sub->Data(trbSubEvSize-3);
+                //qDebug() << "Last" << QString::number(lastRec, 16);
+                const unsigned lastId   = (lastRec >> 16) & 0xFFFF;
+                const unsigned lastChan = lastId & 0xF;
+                const unsigned lastAdc  = (lastId >> 4) & 0xF;
+                const unsigned numChan = (lastChan+1) * (lastAdc+1);
+                const unsigned numSamples =  (trbSubEvSize-2) / numChan;
+                msg = "-->ADC block; Num channels: " + QString::number(numChan) + " Num samples: " + QString::number(numSamples);
+                //qDebug() << msg;
+                if (bReportOnStart) output += msg + '\n';
 
-                unsigned chan = id & 0xF;
-                unsigned adc  = (id >> 4) & 0xF;
-//                qDebug() << "====>      adc:" << adc << "channel:" << chan;
+                unsigned ix = 0;
+
+                while (ix < trbSubEvSize)
+                { // loop over subsubevents
+
+                    unsigned hadata = sub->Data(ix++);
+
+                    unsigned id   = (hadata >> 16) & 0xFFFF;
+                    unsigned data = hadata & 0xFFFF;
+
+                    if (data == 0x5555 && id == 1) break;
+
+                    //if (bReportOnStart) output += "Data block with datakind: 0x" + QString::number(datakind, 16) + "\n";
+                    //                qDebug() << "====>  id:" << QString::number(id, 16) << "data:" <<  QString::number(data, 16);
+
+                    unsigned chan = id & 0xF;
+                    unsigned adc  = (id >> 4) & 0xF;
+                    //                qDebug() << "====>      adc:" << adc << "channel:" << chan;
+                }
             }
         }
         bReportOnStart = false;
@@ -201,7 +250,7 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
             const int boardID = sub->GetId();
             qDebug() << "==>BoardId: " + QString::number(boardID, 16);// + "Decoding:" + QString::number(sub->GetDecoding(), 16);
 
-            if (!Config->IsGoodDatakind(boardID)) continue; // !!!*** add timing board processing!
+            if (!Config->isADCboard(boardID)) continue; // !!!*** add timing board processing!
 
             const unsigned trbSubEvSize = sub->GetSize() / 4 - 4;
 
