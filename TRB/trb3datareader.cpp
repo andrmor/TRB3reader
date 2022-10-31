@@ -176,7 +176,7 @@ QString Trb3dataReader::GetFileInfo(const QString& FileName)
     return output;
 }
 
-void Trb3dataReader::processTimingSubEvent(hadaq::RawSubevent * subEvent, unsigned subEventSize, QVector<double> * extractedData)
+void Trb3dataReader::processTimingSubEvent(hadaq::RawSubevent * subEvent, unsigned subEventSize, std::vector<std::pair<unsigned, double>> * extractedData)
 {
     unsigned ix = 13;  // Alberto sais this offset is fixed
 
@@ -215,7 +215,7 @@ void Trb3dataReader::processTimingSubEvent(hadaq::RawSubevent * subEvent, unsign
                 const double time = timeFromEpoch + timeFromCorse + timeFromFine; // ns
                 qDebug() << "Time contributions (ns) from fine, corse and epoc:" << timeFromFine << timeFromCorse << timeFromEpoch << " Global:" << time << "ns";
 
-                if (extractedData) extractedData->push_back(time);
+                if (extractedData) extractedData->push_back( {channel,time} );
             }
             //else this channel appears more than once -> ignore
         }
@@ -227,6 +227,7 @@ void Trb3dataReader::processTimingSubEvent(hadaq::RawSubevent * subEvent, unsign
 void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels, int enforceNumSamples)
 {
     waveData.clear();
+    timeData.clear();
 
     numChannels = enforceNumChannels;
     numSamples = enforceNumSamples;
@@ -245,14 +246,20 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
 
         // loop over boards
         hadaq::RawSubevent * sub = nullptr;
+        std::vector<std::pair<unsigned,double>> timing;
         while ( (sub=evnt->NextSubevent(sub)) )
         {
             const int boardID = sub->GetId();
             qDebug() << "==>BoardId: " + QString::number(boardID, 16);// + "Decoding:" + QString::number(sub->GetDecoding(), 16);
 
-            if (!Config->isADCboard(boardID)) continue; // !!!*** add timing board processing!
-
             const unsigned trbSubEvSize = sub->GetSize() / 4 - 4;
+
+            if (Config->isTimerBoard(boardID))
+            {
+                timing.clear();
+                processTimingSubEvent(sub, trbSubEvSize, &timing);
+            }
+            if (!Config->isADCboard(boardID)) continue;
 
             const unsigned lastRec = sub->Data(trbSubEvSize-3);
             qDebug() << "--->Last data record" << QString::number(lastRec, 16);
@@ -333,6 +340,7 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
         else
         {
             waveData << thisEventData;
+            timeData.push_back(timing);
             //qDebug() << "New data size: "<<data.size();
         }
         bReportOnStart = false;
@@ -507,6 +515,7 @@ QString Trb3dataReader::Read(const QString& FileName)
         if ( Config->HldProcessSettings.NumChannels != numChannels )
         {
             waveData.clear();
+            timeData.clear();
             numChannels = 0;
             numSamples = 0;
             return "--- Number of channels in file is different from requested";
@@ -854,6 +863,7 @@ void Trb3dataReader::applyTrapezoidal(QVector<float> & arr, int L, int G) const
 void Trb3dataReader::ClearData()
 {
     waveData.clear();
+    timeData.clear();
     numChannels = 0;
     numSamples = 0;
     numBadEvents = 0;

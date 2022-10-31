@@ -708,7 +708,9 @@ void MainWindow::OnEventOrChannelChanged()
             }
         }
     }
-    ui->leSignal->setText(ss);    
+    ui->leSignal->setText(ss);
+
+    //if (ievent < )
 }
 
 void MainWindow::on_pbShowWaveform_toggled(bool checked)
