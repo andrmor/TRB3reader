@@ -122,33 +122,29 @@ QString Trb3dataReader::GetFileInfo(const QString& FileName) const
 
             if (Config->isTimerBoard(boardID))
             {
-                unsigned ix = 13;
+                unsigned ix = 13;  // Alberto sais this offset is fixed
 
                 unsigned epoch = 0;
                 std::array<bool,NumTimeChannels> seenChannels; seenChannels.fill(false);
 
-                while (ix < trbSubEvSize)
-                { // loop over subsubevents
-
+                while (ix < trbSubEvSize) // loop over subsubevents
+                {
                     unsigned hadata = sub->Data(ix++);
+                    //qDebug() << "--> " << QString::number(hadata, 16) << QString::number(hadata, 2);
 
-                    qDebug() << "--> " << QString::number(hadata, 16) << QString::number(hadata, 2);
-
-                    if ( (hadata >> 28) == 6)  // starts from 0b011
+                    if ( (hadata >> 28) == 6)  // epoc records start from 0b011
                     {
-                        //epoch
                         epoch = hadata & 0x0fffffff;
-                        qDebug() << "  Epoch: " << QString::number(epoch, 16);
+                        qDebug() << "  Epoch updated:" << QString::number(epoch, 16);
                     }
-                    else if (hadata & 0x80000000) // starts from 0b1
+                    else if (hadata & 0x80000000) // timedata records start from 0b1
                     {
-                        //timedata
                         const unsigned coarse  = hadata & 0x000007ff;    // 10-0
                         const unsigned fine    = (hadata >> 12) & 0x3ff; // 21-12
                         const unsigned channel = (hadata >> 22) & 0x7f;  // 28-22
                         if (channel >= NumTimeChannels)
                         {
-                            qCritical() << "Bad channel number" << channel;
+                            qCritical() << "Bad channel number:" << channel;
                             exit(222);
                         }
                         qDebug() << "  Data->" << "Channel:" << channel << "  Coarse:" << coarse << "  Fine:" << fine;
@@ -156,7 +152,7 @@ QString Trb3dataReader::GetFileInfo(const QString& FileName) const
                         {
                             seenChannels[channel] = true;
 
-                            const double timeFromFine  = FineSpan_ns * fine / 0x80;
+                            const double timeFromFine  = FineSpan_ns * fine / 0x400;   // 5ps resolution?
                             const double timeFromCorse = FineSpan_ns * coarse;
                             const double timeFromEpoch = FineSpan_ns * 0x800 * epoch;
                             const double time = timeFromEpoch + timeFromCorse + timeFromFine; // ns
@@ -165,7 +161,6 @@ QString Trb3dataReader::GetFileInfo(const QString& FileName) const
                         //else this channel appears more than once -> ignore
                     }
                     else if (hadata == 0x15555) break;
-
                 }
             }
             else if (Config->isADCboard(boardID))
