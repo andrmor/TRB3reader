@@ -6,14 +6,16 @@
 
 class MasterConfig;
 
+namespace hadaq {struct RawSubevent;}
+
 class Trb3dataReader
 {
 public:
-    Trb3dataReader(MasterConfig *Config);
+    Trb3dataReader(MasterConfig * Config);
 
       // Reading waveform data from the file, optional - substract pedestals and apply smoothing
     QString Read(const QString &FileName);
-    QString GetFileInfo(const QString &FileName) const;
+    QString GetFileInfo(const QString &FileName);
 
     float   GetValue(int ievent, int ichannel, int isample) const;
     float   GetValueFast(int ievent, int ichannel, int isample) const; //no argument validity check!
@@ -56,6 +58,7 @@ public:
 private:
     MasterConfig* Config;
     QVector < QVector < QVector <float> > > waveData;  // format:  [event] [hardware chanel] [sample]
+    QVector < QVector <float> > timeData;  // format:  [event] [timeStamp]
 
     static constexpr unsigned NumTimeChannels = 11;
     static constexpr double FineSpan_ns = 5.0; //ns
@@ -77,6 +80,8 @@ private:
     void    applyTrapezoidal(QVector<float> & arr, int L, int G) const;
 
     void    substractPedestals();
+
+    void    processTimingSubEvent(hadaq::RawSubevent * subEvent, unsigned subEventSize, QVector<double> *extractedData);
 
 };
 

@@ -94,7 +94,7 @@ QString Trb3dataReader::GetFileInfo(const QString& FileName) const
 }
 */
 
-QString Trb3dataReader::GetFileInfo(const QString& FileName) const
+QString Trb3dataReader::GetFileInfo(const QString& FileName)
 {
     QString output;
 
@@ -120,49 +120,7 @@ QString Trb3dataReader::GetFileInfo(const QString& FileName) const
             const unsigned trbSubEvSize = sub->GetSize() / 4 - 4;
             qDebug() << "==>Subevent size: "<< trbSubEvSize;// << "\n";
 
-            if (Config->isTimerBoard(boardID))
-            {
-                unsigned ix = 13;  // Alberto sais this offset is fixed
-
-                unsigned epoch = 0;
-                std::array<bool,NumTimeChannels> seenChannels; seenChannels.fill(false);
-
-                while (ix < trbSubEvSize) // loop over subsubevents
-                {
-                    unsigned hadata = sub->Data(ix++);
-                    //qDebug() << "--> " << QString::number(hadata, 16) << QString::number(hadata, 2);
-
-                    if ( (hadata >> 28) == 6)  // epoc records start from 0b011
-                    {
-                        epoch = hadata & 0x0fffffff;
-                        qDebug() << "  Epoch updated:" << QString::number(epoch, 16);
-                    }
-                    else if (hadata & 0x80000000) // timedata records start from 0b1
-                    {
-                        const unsigned coarse  = hadata & 0x000007ff;    // 10-0
-                        const unsigned fine    = (hadata >> 12) & 0x3ff; // 21-12
-                        const unsigned channel = (hadata >> 22) & 0x7f;  // 28-22
-                        if (channel >= NumTimeChannels)
-                        {
-                            qCritical() << "Bad channel number:" << channel;
-                            exit(222);
-                        }
-                        qDebug() << "  Data->" << "Channel:" << channel << "  Coarse:" << coarse << "  Fine:" << fine;
-                        if (!seenChannels[channel])
-                        {
-                            seenChannels[channel] = true;
-
-                            const double timeFromFine  = FineSpan_ns * fine / 0x400;   // 5ps resolution?
-                            const double timeFromCorse = FineSpan_ns * coarse;
-                            const double timeFromEpoch = FineSpan_ns * 0x800 * epoch;
-                            const double time = timeFromEpoch + timeFromCorse + timeFromFine; // ns
-                            qDebug() << "Time contributions (ns) from fine, corse and epoc:" << timeFromFine << timeFromCorse << timeFromEpoch << " Global:" << time << "ns";
-                        }
-                        //else this channel appears more than once -> ignore
-                    }
-                    else if (hadata == 0x15555) break;
-                }
-            }
+            if (Config->isTimerBoard(boardID)) processTimingSubEvent(sub, trbSubEvSize, nullptr);
             else if (Config->isADCboard(boardID))
             {
                 // time processing is to add later
@@ -216,6 +174,53 @@ QString Trb3dataReader::GetFileInfo(const QString& FileName) const
     ref.Disconnect();
 
     return output;
+}
+
+void Trb3dataReader::processTimingSubEvent(hadaq::RawSubevent * subEvent, unsigned subEventSize, QVector<double> * extractedData)
+{
+    unsigned ix = 13;  // Alberto sais this offset is fixed
+
+    unsigned epoch = 0;
+    std::array<bool,NumTimeChannels> seenChannels; seenChannels.fill(false);
+
+    while (ix < subEventSize) // loop over subsubevents
+    {
+        unsigned hadata = subEvent->Data(ix++);
+        //qDebug() << "--> " << QString::number(hadata, 16) << QString::number(hadata, 2);
+
+        if ( (hadata >> 28) == 6)  // epoc records start from 0b011
+        {
+            epoch = hadata & 0x0fffffff;
+            qDebug() << "  Epoch updated:" << QString::number(epoch, 16);
+        }
+        else if (hadata & 0x80000000) // timedata records start from 0b1
+        {
+            //hadata = 0x8059bd26;
+            const unsigned coarse  = hadata & 0x000007ff;    // 10-0
+            const unsigned fine    = (hadata >> 12) & 0x3ff; // 21-12
+            const unsigned channel = (hadata >> 22) & 0x7f;  // 28-22
+            if (channel >= NumTimeChannels)
+            {
+                qCritical() << "Bad channel number:" << channel;
+                exit(222);
+            }
+            qDebug() << "  Data->" << "Channel:" << channel << "  Coarse:" << coarse << "  Fine:" << fine;
+            if (!seenChannels[channel])
+            {
+                seenChannels[channel] = true;
+
+                const double timeFromFine  = FineSpan_ns * fine / 0x400;   // 5ps resolution?
+                const double timeFromCorse = FineSpan_ns * coarse;
+                const double timeFromEpoch = FineSpan_ns * 0x800 * epoch;
+                const double time = timeFromEpoch + timeFromCorse + timeFromFine; // ns
+                qDebug() << "Time contributions (ns) from fine, corse and epoc:" << timeFromFine << timeFromCorse << timeFromEpoch << " Global:" << time << "ns";
+
+                if (extractedData) extractedData->push_back(time);
+            }
+            //else this channel appears more than once -> ignore
+        }
+        else if (hadata == 0x15555) break;
+    }
 }
 
 // num chan = 0 for a block?
