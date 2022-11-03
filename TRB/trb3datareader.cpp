@@ -223,6 +223,7 @@ void Trb3dataReader::processTimingSubEvent(hadaq::RawSubevent * subEvent, unsign
     }
 }
 
+
 // num chan = 0 for a block?
 void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels, int enforceNumSamples)
 {
@@ -294,9 +295,14 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
 
             unsigned ix = 0;
             // loop over data
-            for (int iChannel = 0; iChannel < numChan; iChannel++)
+            for (unsigned iChannel = 0; iChannel < numChan; iChannel++)
             {
-                thisEventData[oldSize + iChannel].resize(samples);
+                unsigned adcRead = iChannel / 4;
+                unsigned adcChan = 3 - iChannel % 4; // inverse order for 4 channels (0, 1, 2 and 3)
+                unsigned trueChannel = 4 * adcReadToTrue[adcRead] + adcChan;
+                //qDebug() << iChannel << trueChannel;
+                //thisEventData[oldSize + iChannel].resize(samples);
+                thisEventData[oldSize + trueChannel].resize(samples);
                 for (int iSample = 0; iSample < samples; iSample++)
                 {
 //                    unsigned hadata = sub->Data(ix++);
@@ -305,18 +311,19 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
 //                    if (data == 0x5555 && id == 1) break;
 //                    unsigned chan = id & 0xF;
 //                    unsigned adc  = (id >> 4) & 0xF;
-                    thisEventData[oldSize + iChannel][iSample] = (sub->Data(ix) & 0xFFFF);
+                    //thisEventData[oldSize + iChannel][iSample] = (sub->Data(ix) & 0xFFFF);
+                    thisEventData[oldSize + trueChannel][iSample] = (sub->Data(ix) & 0xFFFF);
                     ix++;
-                }
-                if (ix >= trbSubEvSize)
-                {
-                    qDebug() << "Something is wrong with data extrtaction;  Event:" << waveData.size() << "Board:"<<boardID;
-                    bBadEvent = true;
-                    break;
+
+                    if (ix >= trbSubEvSize)
+                    {
+                        qDebug() << "Something is wrong with data extrtaction;  Event:" << waveData.size() << "Board:"<<boardID;
+                        bBadEvent = true;
+                        break;
+                    }
                 }
             }
         }
-
 
         // Checking this event
         const int foundChannels = thisEventData.size();

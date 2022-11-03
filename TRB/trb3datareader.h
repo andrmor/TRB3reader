@@ -66,6 +66,9 @@ private:
     static constexpr unsigned NumTimeChannels = 11;
     static constexpr double FineSpan_ns = 5.0; //ns
 
+    //                                  0  1   2   3  4  5  6  7  8  9 10  11
+    const unsigned adcReadToTrue[12] = {5, 11, 4, 10, 9, 8, 2, 3, 1, 7, 6, 0}; // convertion from consequtive adc# to take into acount "hardware" channel map
+
     int     numSamples;
     int     numChannels;
 
