@@ -14,11 +14,11 @@ AHldFileProcessor::AHldFileProcessor(MasterConfig& Config,
                                      ADataHub& DataHub) :
     Config(Config), Reader(Reader), Extractor(Extractor), DataHub(DataHub) {}
 
-bool AHldFileProcessor::ProcessFile(const QString FileName, const QString SaveFileName)
+bool AHldFileProcessor::ProcessFile(const QString FileName, bool bSaveTimeData, const QString SaveFileName)
 {
     if (FileName.isEmpty())
     {
-        LogMessage("File name is empty!");
+        emit LogMessage("File name is empty!");
         LastError = "File name is not defined";
         return false;
     }
@@ -30,13 +30,13 @@ bool AHldFileProcessor::ProcessFile(const QString FileName, const QString SaveFi
     LastError = Reader.Read(FileName);
     if (!LastError.isEmpty())
     {
-        LogMessage(LastError);
+        emit LogMessage(LastError);
         return false;
     }
     const QString ValRes = Config.Map->ValidateForAvailableHardwareChannels(Reader.CountChannels());
     if (!ValRes.isEmpty())
     {
-        LogMessage(ValRes);
+        emit LogMessage(ValRes);
         return false;
     }
 
@@ -47,18 +47,18 @@ bool AHldFileProcessor::ProcessFile(const QString FileName, const QString SaveFi
     Extractor.ClearData();
     if (Config.HldProcessSettings.bDoSignalExtraction)
     {
-        LogAction("Extracting signals...");
+        emit LogAction("Extracting signals...");
         bool bOK = Extractor.ExtractSignals();
         if (!bOK)
         {
-            LogMessage("Signal extraction failed!");
+            emit LogMessage("Signal extraction failed!");
             LastError = "Signal extraction failed";
             return false;
         }
     }
     else
     {
-        LogAction("Generating default 0 signals");
+        emit LogAction("Generating default 0 signals");
         qDebug() << "Generating default data (all signals = 0) in extractor data";
         Extractor.GenerateDummyData();
     }
@@ -66,7 +66,7 @@ bool AHldFileProcessor::ProcessFile(const QString FileName, const QString SaveFi
     // Executing script
     if (Config.HldProcessSettings.bDoScript)
     {
-        LogAction("Executing script...");
+        emit LogAction("Executing script...");
         bool bOK;
         emit RequestExecuteScript(bOK);
         if (!bOK)
@@ -99,15 +99,15 @@ bool AHldFileProcessor::ProcessFile(const QString FileName, const QString SaveFi
         else nameSave = SaveFileName;
 
         qDebug() << "Saving to file:"<< nameSave;
-        LogAction("Saving to file...");
-        bool bOK = SaveSignalsToFile(nameSave, false);
+        emit LogAction("Saving to file...");
+        bool bOK = SaveSignalsToFile(nameSave, false, bSaveTimeData);
         if (!bOK) return false;
     }
 
     //Coping data to DataHub
     if (Config.HldProcessSettings.bDoCopyToDatahub)
     {
-        LogAction("Copying to datahub...");
+        emit LogAction("Copying to datahub...");
         qDebug() << "Copying to DataHub...";
         const QVector<int>& map = Config.Map->GetMapToHardware();
 
@@ -150,7 +150,7 @@ bool AHldFileProcessor::ProcessFile(const QString FileName, const QString SaveFi
     return true;
 }
 
-bool AHldFileProcessor::SaveSignalsToFile(const QString FileName, bool bUseHardware)
+bool AHldFileProcessor::SaveSignalsToFile(const QString FileName, bool bUseHardware, bool bSaveTimeData)
 {
     QFile outputFile(FileName);
     outputFile.open(QIODevice::WriteOnly);
@@ -163,14 +163,35 @@ bool AHldFileProcessor::SaveSignalsToFile(const QString FileName, bool bUseHardw
         }
 
     QTextStream outStream(&outputFile);
-    sendSignalData(outStream, bUseHardware);
-    if (bUseHardware) LogAction("Signals saved using HARDWARE channels!");
-    else LogAction("Signals saved");
+
+    if (bSaveTimeData) outStream.setRealNumberPrecision(9);
+
+    sendSignalData(outStream, bUseHardware, bSaveTimeData);
+    if (bUseHardware) emit LogAction("Signals saved using HARDWARE channels!");
+    else emit LogAction("Signals saved");
     outputFile.close();
     return true;
 }
 
-bool AHldFileProcessor::sendSignalData(QTextStream &outStream, bool bUseHardware)
+void AHldFileProcessor::saveTimeData(int iEvent, QTextStream & outStream)
+{
+    if (iEvent < Extractor.TimeData.size())
+    {
+        const auto & vec = Extractor.TimeData[iEvent];
+
+        QVector<double> Channels(11, 0);
+        for (const auto & pair : vec)
+        {
+            const int index = pair.first - 1; // ignore "0" channel, shift all 1 down
+            if (index < 0 || index >= vec.size()) continue;
+            Channels[index] = pair.second;
+        }
+
+        for (double time : Channels) outStream << time << " ";
+    }
+}
+
+bool AHldFileProcessor::sendSignalData(QTextStream &outStream, bool bUseHardware, bool bSaveTimeData)
 {
     int numEvents = Extractor.CountEvents();
     int numChannels = Extractor.CountChannels();
@@ -180,8 +201,10 @@ bool AHldFileProcessor::sendSignalData(QTextStream &outStream, bool bUseHardware
         for (int ie=0; ie<numEvents; ie++)
             if (!Extractor.IsRejectedEventFast(ie))
             {
-                for (int ic=0; ic<numChannels; ic++)
-                    outStream << Extractor.GetSignalFast(ie, ic) << " ";
+                for (int ic=0; ic<numChannels; ic++) outStream << Extractor.GetSignalFast(ie, ic) << " ";
+
+                if (bSaveTimeData) saveTimeData(ie, outStream);
+
                 outStream << "\r\n";
             }
     }
@@ -191,8 +214,10 @@ bool AHldFileProcessor::sendSignalData(QTextStream &outStream, bool bUseHardware
         for (int ie=0; ie<numEvents; ie++)
             if (!Extractor.IsRejectedEventFast(ie))
             {
-                for (int ic=0; ic<numChannels; ic++)
-                    outStream << Extractor.GetSignalFast(ie, Config.Map->LogicalToHardwareFast(ic)) << " ";
+                for (int ic=0; ic<numChannels; ic++) outStream << Extractor.GetSignalFast(ie, Config.Map->LogicalToHardwareFast(ic)) << " ";
+
+                if (bSaveTimeData) saveTimeData(ie, outStream);
+
                 outStream << "\r\n";
             }
     }

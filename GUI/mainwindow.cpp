@@ -565,6 +565,12 @@ void MainWindow::on_pbStop_toggled(bool checked)
     else ui->pbStop->setText("Stop");
 }
 
+void MainWindow::on_sbEvent_editingFinished()
+{
+    int arg1 = ui->sbEvent->value();
+    on_sbEvent_valueChanged(arg1);
+}
+
 void MainWindow::on_sbEvent_valueChanged(int arg1)
 {
     if (!Reader || arg1 >= Reader->CountEvents())
@@ -1262,7 +1268,7 @@ void MainWindow::bulkProcessorEnvelope(const QStringList FileNames)
     int numBadEvents = 0;
     for (QString name : FileNames)
     {
-        bool bOK = HldFileProcessor.ProcessFile(name);
+        bool bOK = HldFileProcessor.ProcessFile(name, ui->cbSaveTime->isChecked());
         if (!bOK) numErrors++;
 
         updateNumEventsIndication();

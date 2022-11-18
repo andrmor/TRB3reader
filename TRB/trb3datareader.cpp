@@ -204,7 +204,7 @@ void Trb3dataReader::processTimingSubEvent(hadaq::RawSubevent * subEvent, unsign
                 qCritical() << "Bad channel number:" << channel;
                 exit(222);
             }
-            qDebug() << "  Data->" << "Channel:" << channel << "  Coarse:" << coarse << "  Fine:" << fine;
+            //qDebug() << "  Data->" << "Channel:" << channel << "  Coarse:" << coarse << "  Fine:" << fine;
             if (!seenChannels[channel])
             {
                 seenChannels[channel] = true;
@@ -213,7 +213,7 @@ void Trb3dataReader::processTimingSubEvent(hadaq::RawSubevent * subEvent, unsign
                 const double timeFromCorse = FineSpan_ns * coarse;
                 const double timeFromEpoch = FineSpan_ns * 0x800 * epoch;
                 const double time = timeFromEpoch + timeFromCorse + timeFromFine; // ns
-                qDebug() << "Time contributions (ns) from fine, corse and epoc:" << timeFromFine << timeFromCorse << timeFromEpoch << " Global:" << time << "ns";
+                //qDebug() << "Time contributions (ns) from fine, corse and epoc:" << timeFromFine << timeFromCorse << timeFromEpoch << " Global:" << time << "ns";
 
                 if (extractedData) extractedData->push_back( {channel,time} );
             }
@@ -226,7 +226,7 @@ void Trb3dataReader::processTimingSubEvent(hadaq::RawSubevent * subEvent, unsign
 
 // num chan = 0 for a block?
 void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels, int enforceNumSamples)
-{
+{   
     waveData.clear();
     timeData.clear();
 
@@ -293,12 +293,15 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
             int oldSize = thisEventData.size();
             thisEventData.resize( oldSize + numChan );
 
+
+            //                            0  1   2   3  4  5  6  7  8  9 10  11
+            unsigned adcReadToTrue[12] = {5, 11, 4, 10, 9, 8, 2, 3, 1, 7, 6, 0};
             unsigned ix = 0;
             // loop over data
-            for (unsigned iChannel = 0; iChannel < numChan; iChannel++)
+            for (int iChannel = 0; iChannel < numChan; iChannel++)
             {
                 unsigned adcRead = iChannel / 4;
-                unsigned adcChan = 3 - iChannel % 4; // inverse order for 4 channels (0, 1, 2 and 3)
+                unsigned adcChan = 3 - iChannel % 4;
                 unsigned trueChannel = 4 * adcReadToTrue[adcRead] + adcChan;
                 //qDebug() << iChannel << trueChannel;
                 //thisEventData[oldSize + iChannel].resize(samples);
@@ -314,16 +317,16 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
                     //thisEventData[oldSize + iChannel][iSample] = (sub->Data(ix) & 0xFFFF);
                     thisEventData[oldSize + trueChannel][iSample] = (sub->Data(ix) & 0xFFFF);
                     ix++;
-
-                    if (ix >= trbSubEvSize)
-                    {
-                        qDebug() << "Something is wrong with data extrtaction;  Event:" << waveData.size() << "Board:"<<boardID;
-                        bBadEvent = true;
-                        break;
-                    }
+                }
+                if (ix >= trbSubEvSize)
+                {
+                    qDebug() << "Something is wrong with data extrtaction;  Event:" << waveData.size() << "Board:"<<boardID;
+                    bBadEvent = true;
+                    break;
                 }
             }
         }
+
 
         // Checking this event
         const int foundChannels = thisEventData.size();

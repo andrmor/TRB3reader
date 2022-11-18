@@ -61,7 +61,7 @@ void ATrbRunControl::RestartBoard()
 
     emit requestClearLog();
     emit boardLogReady("\n\nPowering OFF...");
-    QString err = sendCommandToHost("usbrelay HURTM_2=1");
+    QString err = sendCommandToHost("usbrelay HW554_5=1");
     if (!err.isEmpty())
     {
         emit boardLogReady(err);
@@ -81,7 +81,7 @@ void ATrbRunControl::RestartBoard()
     while (el < 10000);
 
     emit boardLogReady("Powering ON...");
-    err = sendCommandToHost("usbrelay HURTM_2=0");
+    err = sendCommandToHost("usbrelay HW554_5=0");
     if (!err.isEmpty())
     {
         emit boardLogReady(err);

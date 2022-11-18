@@ -284,6 +284,7 @@ private slots:
     void on_cbZeroSignalIfPeakOutside_N_clicked(bool checked);
     void on_sbZeroSignalIfPeakBefore_N_editingFinished();
     void on_sbZeroSignalIfPeakAfter_N_editingFinished();
+    void on_sbEvent_editingFinished();
 };
 
 #endif // MAINWINDOW_H

@@ -8,9 +8,9 @@ AInterfaceToHldFileProcessor::AInterfaceToHldFileProcessor(AHldFileProcessor &hl
                   "To modify settings use the global configuration.";
 }
 
-const QString AInterfaceToHldFileProcessor::ProcessFile(const QString FileName, const QString SaveFileName)
+const QString AInterfaceToHldFileProcessor::ProcessFile(const QString FileName, bool bSaveTimeData, const QString SaveFileName)
 {
-    bool bOK = hldProcessor.ProcessFile(FileName, SaveFileName);
+    bool bOK = hldProcessor.ProcessFile(FileName, bSaveTimeData, SaveFileName);
     if (bOK) return "";
     else
     {

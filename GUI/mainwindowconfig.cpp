@@ -87,6 +87,8 @@ void MainWindow::WriteGUItoJson(QJsonObject &json)
     jsgui["SaveSkipRejected"] = ui->cbSaveOnlyGood->isChecked();
     jsgui["LoadAlsoPositions"] = ui->cbLoadIncludeReconstructed->isChecked();
 
+    jsgui["SaveTime"] = ui->cbSaveTime->isChecked();
+
     jsgui["ExplorerSource"] = ui->cobExplorerSource->currentIndex();
 
     QJsonObject ja;
@@ -128,6 +130,8 @@ void MainWindow::ReadGUIfromJson(const QJsonObject& json)
     JsonToCheckbox(jsgui, "SaveAddPositions", ui->cbAddReconstructedPositions);
     JsonToCheckbox(jsgui, "SaveSkipRejected", ui->cbSaveOnlyGood);
     JsonToCheckbox(jsgui, "LoadAlsoPositions", ui->cbLoadIncludeReconstructed);
+
+    JsonToCheckbox(jsgui, "SaveTime", ui->cbSaveTime);
 
     JsonToComboBox(jsgui, "ExplorerSource", ui->cobExplorerSource);
 
