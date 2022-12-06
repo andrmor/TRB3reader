@@ -59,12 +59,13 @@ public:
 
     std::vector<std::vector<std::pair<unsigned,double>>> timeData;  // format:  [event] [{channel,timeStamp}]
 
+public:
+    static constexpr unsigned NumTimeChannels = 12;
+    static constexpr double FineSpan_ns = 5.0; //ns
+
 private:
     MasterConfig* Config;
     QVector < QVector < QVector <float> > > waveData;  // format:  [event] [hardware chanel] [sample]
-
-    static constexpr unsigned NumTimeChannels = 12;
-    static constexpr double FineSpan_ns = 5.0; //ns
 
     int     numSamples;
     int     numChannels;

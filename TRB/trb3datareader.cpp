@@ -191,7 +191,7 @@ void Trb3dataReader::processTimingSubEvent(hadaq::RawSubevent * subEvent, unsign
         if ( (hadata >> 28) == 6)  // epoc records start from 0b011
         {
             epoch = hadata & 0x0fffffff;
-            qDebug() << "  Epoch updated:" << QString::number(epoch, 16);
+            //qDebug() << "  Epoch updated:" << QString::number(epoch, 16);
         }
         else if (hadata & 0x80000000) // timedata records start from 0b1
         {
@@ -221,6 +221,10 @@ void Trb3dataReader::processTimingSubEvent(hadaq::RawSubevent * subEvent, unsign
         }
         else if (hadata == 0x15555) break;
     }
+
+    //
+    //if (extractedData) qDebug() << *extractedData;
+    //
 }
 
 
@@ -251,7 +255,7 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
         while ( (sub=evnt->NextSubevent(sub)) )
         {
             const int boardID = sub->GetId();
-            qDebug() << "==>BoardId: " + QString::number(boardID, 16);// + "Decoding:" + QString::number(sub->GetDecoding(), 16);
+            //qDebug() << "==>BoardId: " + QString::number(boardID, 16);// + "Decoding:" + QString::number(sub->GetDecoding(), 16);
 
             const unsigned trbSubEvSize = sub->GetSize() / 4 - 4;
 
@@ -263,7 +267,7 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
             if (!Config->isADCboard(boardID)) continue;
 
             const unsigned lastRec = sub->Data(trbSubEvSize-3);
-            qDebug() << "--->Last data record" << QString::number(lastRec, 16);
+            //qDebug() << "--->Last data record" << QString::number(lastRec, 16);
             const unsigned lastId   = (lastRec >> 16) & 0xFFFF;
             const unsigned lastChan = lastId & 0xF;
             const unsigned lastAdc  = (lastId >> 4) & 0xF;
