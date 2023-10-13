@@ -30,7 +30,7 @@
     <item>
      <widget class="QTabWidget" name="twMain">
       <property name="currentIndex">
-       <number>3</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_8">
        <attribute name="title">
@@ -40,7 +40,7 @@
         <item>
          <widget class="QTabWidget" name="tabWidget">
           <property name="currentIndex">
-           <number>0</number>
+           <number>5</number>
           </property>
           <widget class="QWidget" name="tab_11">
            <attribute name="title">
@@ -2341,6 +2341,30 @@
               <item>
                <layout class="QVBoxLayout" name="verticalLayout_40">
                 <item>
+                 <widget class="QLabel" name="label_67">
+                  <property name="text">
+                   <string>Periphery FPGA</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="Line" name="line_16">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="cbPeripheryFPGA0">
+                  <property name="text">
+                   <string>Input 0</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
                  <spacer name="verticalSpacer_31">
                   <property name="orientation">
                    <enum>Qt::Vertical</enum>
@@ -2387,14 +2411,7 @@
                     <item>
                      <widget class="QCheckBox" name="cbPeriodicalPulser0">
                       <property name="text">
-                       <string>Periodical 0</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QCheckBox" name="cbPeriodicalPulser1">
-                      <property name="text">
-                       <string>Periodical 1</string>
+                       <string>Periodical</string>
                       </property>
                      </widget>
                     </item>
@@ -2419,13 +2436,6 @@
                       </property>
                      </widget>
                     </item>
-                    <item>
-                     <widget class="QLabel" name="label_67">
-                      <property name="text">
-                       <string>Period, ns</string>
-                      </property>
-                     </widget>
-                    </item>
                    </layout>
                   </item>
                   <item>
@@ -2445,16 +2455,6 @@
                     </item>
                     <item>
                      <widget class="QLineEdit" name="lePeriod0">
-                      <property name="maximumSize">
-                       <size>
-                        <width>100</width>
-                        <height>16777215</height>
-                       </size>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QLineEdit" name="lePeriod1">
                       <property name="maximumSize">
                        <size>
                         <width>100</width>
@@ -5183,22 +5183,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>cbPeriodicalPulser1</sender>
-   <signal>clicked()</signal>
-   <receiver>pbUpdateTriggerSettings</receiver>
-   <slot>click()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>122</x>
-     <y>137</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>106</x>
-     <y>112</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>leRandomFrequency</sender>
    <signal>editingFinished()</signal>
    <receiver>pbUpdateTriggerSettings</receiver>
@@ -5216,22 +5200,6 @@
   </connection>
   <connection>
    <sender>lePeriod0</sender>
-   <signal>editingFinished()</signal>
-   <receiver>pbUpdateTriggerSettings</receiver>
-   <slot>click()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>122</x>
-     <y>137</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>106</x>
-     <y>112</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>lePeriod1</sender>
    <signal>editingFinished()</signal>
    <receiver>pbUpdateTriggerSettings</receiver>
    <slot>click()</slot>

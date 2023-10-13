@@ -37,13 +37,12 @@ public:
     bool    bMP_6 = false;
     bool    bMP_7 = false;
     bool    bRandPulser = false;
-    bool    bPeriodicPulser0 = false;
-    bool    bPeriodicPulser1 = false;
+    bool    bPeriodicPulser = false;
+    bool    bPeripheryFPGA0 = false;
 
     int     Mask = 0xffff;
     QString RandomPulserFrequency = "0"; //QJsonObject is not friendly for ulong...
-    QString Period0 = "0x30000000";
-    QString Period1 = "0x30000000";
+    QString Period = "0x30000000";
     QStringList TheRestCTScontrols;
 
     ulong   getTriggerInt() const;

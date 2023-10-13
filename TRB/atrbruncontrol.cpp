@@ -206,7 +206,7 @@ void ATrbRunControl::onReadyBoardLog()
 {
     QString log(prBoard->readAll());
     //qDebug() << "=========================";
-    //qDebug() << log;
+    qDebug() << log;
     //qDebug() << "=========================";
 
     switch (ConnectStatus)
@@ -215,16 +215,25 @@ void ATrbRunControl::onReadyBoardLog()
         break;
     case Connecting:
         if (log == '\n') return;
-        if (log == "Starting CTS\n")
+        //if (log == "Starting CTS\n")
+        if (log.contains("- trbnetd pid:"))
+        {
             ConnectStatus = WaitingFirstReply;
+            emit boardLogReady("Starting CTS");
+        }
         emit boardLogReady(log);
         break;
     case WaitingFirstReply:
-        if (log.contains("Label                                | Register"))
+        if (log.contains("Register"))
+        //if (log.contains("Label                               | Register"))
         {
             ConnectStatus = Connected;
             recallConfiguration(); // !
             emit sigBoardIsAlive(0);
+        }
+        else
+        {
+            emit boardLogReady(log);
         }
         break;
     case Connected:
@@ -529,11 +538,11 @@ const QStringList ATrbRunControl::CtsSettingsToCommands(bool bIncludeHidden)
     QString sbits = QString::number(bits, 16);
     txt << QString("trbcmd w 0xc001 0xa101 0x%1   # trg_channel and mask\n").arg(sbits);
 
-    txt << QString("trbcmd w 0xc001 0xa159 %1   # random pulser frequency\n").arg(RunSettings.RandomPulserFrequency);
+    //txt << QString("trbcmd w 0xc001 0xa159 %1   # random pulser frequency\n").arg(RunSettings.RandomPulserFrequency);
+    txt << QString("trbcmd w 0xc001 0xa15a %1   # random pulser frequency\n").arg(RunSettings.RandomPulserFrequency);
 
-    txt << QString("trbcmd w 0xc001 0xa156 %1   # periodic pulser 0 - period\n").arg(RunSettings.Period0);
-
-    txt << QString("trbcmd w 0xc001 0xa157 %1   # periodic pulser 1 - period\n").arg(RunSettings.Period1);
+    //txt << QString("trbcmd w 0xc001 0xa156 %1   # periodic pulser - period\n").arg(RunSettings.Period);
+    txt << QString("trbcmd w 0xc001 0xa158 %1   # periodic pulser - period\n").arg(RunSettings.Period);
 
     if (bIncludeHidden)
     {
@@ -792,9 +801,10 @@ const QString ATrbRunControl::ReadTriggerSettingsFromBoard()
                 QString trig = line.at(4);
                 RunSettings.setTriggerInt( trig.toULong(nullptr, 16) );
             }
-            else if (line.at(3) == "0xa159") RunSettings.RandomPulserFrequency = line.at(4);
-            else if (line.at(3) == "0xa156") RunSettings.Period0 = line.at(4);
-            else if (line.at(3) == "0xa157") RunSettings.Period1 = line.at(4);
+            //else if (line.at(3) == "0xa159") RunSettings.RandomPulserFrequency = line.at(4);
+            else if (line.at(3) == "0xa15a") RunSettings.RandomPulserFrequency = line.at(4);
+            //else if (line.at(3) == "0xa156") RunSettings.Period = line.at(4);
+            else if (line.at(3) == "0xa158") RunSettings.Period = line.at(4);
             else
             {
                 if (!s.contains("setbit") && !s.contains("clearbit"))

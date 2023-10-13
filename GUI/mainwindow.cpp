@@ -1977,20 +1977,17 @@ void MainWindow::on_pbUpdateTriggerGui_clicked()
     ui->cbMP7->setChecked(Config->TrbRunSettings.bMP_7);
 
     ui->cbRandomPulser->setChecked(Config->TrbRunSettings.bRandPulser);
-    ui->cbPeriodicalPulser0->setChecked(Config->TrbRunSettings.bPeriodicPulser0);
-    ui->cbPeriodicalPulser1->setChecked(Config->TrbRunSettings.bPeriodicPulser1);
+    ui->cbPeriodicalPulser0->setChecked(Config->TrbRunSettings.bPeriodicPulser);
+
+    ui->cbPeripheryFPGA0->setChecked(Config->TrbRunSettings.bPeripheryFPGA0);
 
     ulong rFreq = Config->TrbRunSettings.RandomPulserFrequency.toULong(nullptr, 16);
     double freq = (double)rFreq / 21.474836;
     ui->leRandomFrequency->setText( QString::number(freq) );
 
-    ulong rPeriod = Config->TrbRunSettings.Period0.toULong(nullptr, 16);
+    ulong rPeriod = Config->TrbRunSettings.Period.toULong(nullptr, 16);
     double per = (double)rPeriod * 10.0;
     ui->lePeriod0->setText( QString::number(per) );
-
-    rPeriod = Config->TrbRunSettings.Period1.toULong(nullptr, 16);
-    per = (double)rPeriod * 10.0;
-    ui->lePeriod1->setText( QString::number(per) );
 }
 
 void MainWindow::on_pbUpdateTriggerSettings_clicked()
@@ -2005,10 +2002,9 @@ void MainWindow::on_pbUpdateTriggerSettings_clicked()
     Config->TrbRunSettings.bMP_7 = ui->cbMP7->isChecked();
 
     Config->TrbRunSettings.bRandPulser = ui->cbRandomPulser->isChecked();
-    Config->TrbRunSettings.bPeriodicPulser0 = ui->cbPeriodicalPulser0->isChecked();
-    if (ui->cbPeriodicalPulser1->isChecked())
-        ui->cbPeriodicalPulser1->setChecked(false); //otherwise blocks - TRB bug?
-    Config->TrbRunSettings.bPeriodicPulser1 = ui->cbPeriodicalPulser1->isChecked();
+    Config->TrbRunSettings.bPeriodicPulser = ui->cbPeriodicalPulser0->isChecked();
+
+    Config->TrbRunSettings.bPeripheryFPGA0 = ui->cbPeripheryFPGA0->isChecked();
 
     double freq = ui->leRandomFrequency->text().toDouble() * 21.474836;
     ulong rFreq = (ulong)freq;
@@ -2018,14 +2014,9 @@ void MainWindow::on_pbUpdateTriggerSettings_clicked()
     double per = 0.1 * ui->lePeriod0->text().toDouble();
     ulong rPer = (ulong)per;
     if (rPer > 0xffffffff) rPer = 0xffffffff;
-    Config->TrbRunSettings.Period0 = "0x" + QString::number(rPer, 16);
+    Config->TrbRunSettings.Period = "0x" + QString::number(rPer, 16);
 
-    per = 0.1 * ui->lePeriod1->text().toDouble();
-    rPer = (ulong)per;
-    if (rPer > 0xffffffff) rPer = 0xffffffff;
-    Config->TrbRunSettings.Period1 = "0x" + QString::number(rPer, 16);
-
-    qDebug() <<Config->TrbRunSettings.RandomPulserFrequency<<Config->TrbRunSettings.Period0<<Config->TrbRunSettings.Period1;
+    qDebug() <<Config->TrbRunSettings.RandomPulserFrequency<<Config->TrbRunSettings.Period;
 }
 
 void MainWindow::on_pbOpenBufferWebPage_clicked()

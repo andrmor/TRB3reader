@@ -57,7 +57,7 @@ public:
     ABufferRecord *     findBufferRecord(int datakind);
     const QVector<int>  GetListOfDatakinds() const;
     bool                isADCboard(int datakind) const {return ValidDatakinds.contains(datakind);}
-    bool                isTimerBoard(int datakind) const {return (datakind == 0xc001);}
+    bool                isTimerBoard(int datakind) const {return (datakind == 0xa003);}//{return (datakind == 0xc001);}
     void                AddDatakind(int datakind);
     void                RemoveDatakind(int datakind);
 

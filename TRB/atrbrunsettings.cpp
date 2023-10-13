@@ -13,18 +13,18 @@ const QString ATrbRunSettings::getScriptDir() const
 
 ulong ATrbRunSettings::getTriggerInt() const
 {
-    ulong r = 1    * 0 +
-              2    * bPeriodicPulser0 + // 1
-              4    * bPeriodicPulser1 + // 2
-              8    * bRandPulser +      // 3
-              16   * bMP_0 +            // 4
-              32   * bMP_1 +            // 5
-              64   * bMP_2 +            // 6
-              128  * bMP_3 +            // 7
-              256  * bMP_4 +            // 8
-              512  * bMP_5 +            // 9
-              1024 * bMP_6 +            // 10
-              2048 * bMP_7 ;            // 11
+    ulong r = 1    * bPeriodicPulser +  // 0
+              2    * bRandPulser +      // 1
+              4    * bMP_0 +            // 2
+              8    * bMP_1 +            // 3
+              16   * bMP_2 +            // 4
+              32   * bMP_3 +            // 5
+              64   * bMP_4 +            // 6
+              128  * bMP_5 +            // 7
+              256  * bMP_6 +            // 8
+              512  * bMP_7 +            // 9
+              1024 * bPeripheryFPGA0 ;  // 10
+              //2048 * bMP_7 ;            // 11
 
     r += (ulong)Mask * 0x10000;
 
@@ -40,17 +40,17 @@ void ATrbRunSettings::setTriggerInt(ulong val)
     Mask = val / 0x10000;
     qDebug() << "mask-->" << QString::number(Mask, 16);
 
-    bPeriodicPulser0 = CheckBit(val, 1);
-    bPeriodicPulser1 = CheckBit(val, 2);
-    bRandPulser = CheckBit(val, 3);
-    bMP_0 = CheckBit(val, 4);
-    bMP_1 = CheckBit(val, 5);
-    bMP_2 = CheckBit(val, 6);
-    bMP_3 = CheckBit(val, 7);
-    bMP_4 = CheckBit(val, 8);
-    bMP_5 = CheckBit(val, 9);
-    bMP_6 = CheckBit(val, 10);
-    bMP_7 = CheckBit(val, 11);
+    bPeriodicPulser = CheckBit(val, 0);
+    bRandPulser     = CheckBit(val, 1);
+    bMP_0           = CheckBit(val, 2);
+    bMP_1           = CheckBit(val, 3);
+    bMP_2           = CheckBit(val, 4);
+    bMP_3           = CheckBit(val, 5);
+    bMP_4           = CheckBit(val, 6);
+    bMP_5           = CheckBit(val, 7);
+    bMP_6           = CheckBit(val, 8);
+    bMP_7           = CheckBit(val, 9);
+    bPeripheryFPGA0 = CheckBit(val, 10);
 }
 
 const QJsonObject ATrbRunSettings::WriteToJson() const
@@ -83,13 +83,13 @@ const QJsonObject ATrbRunSettings::WriteToJson() const
         cj["MP_7"] = bMP_7;
 
         cj["RandPulser"] = bRandPulser;
-        cj["PeriodicPulser0"] = bPeriodicPulser0;
-        cj["PeriodicPulser0"] = bPeriodicPulser0;
+        cj["PeriodicPulser"] = bPeriodicPulser;
+
+        cj["bPeripheryFPGA0"] = bPeripheryFPGA0;
 
         cj["Mask"] = Mask;
         cj["RandomPulserFrequency"] = RandomPulserFrequency;
-        cj["Period0"] = Period0;
-        cj["Period1"] = Period1;
+        cj["Period"] = Period;
 
         QJsonArray ar;
         for (const QString & s : TheRestCTScontrols) ar << s;
@@ -130,13 +130,13 @@ void ATrbRunSettings::ReadFromJson(const QJsonObject &json)
         parseJson(cj, "MP_7", bMP_7);
 
         parseJson(cj, "RandPulser", bRandPulser);
-        parseJson(cj, "PeriodicPulser0", bPeriodicPulser0);
-        parseJson(cj, "PeriodicPulser0", bPeriodicPulser0);
+        parseJson(cj, "PeriodicPulser", bPeriodicPulser);
+
+        parseJson(cj, "bPeripheryFPGA0", bPeripheryFPGA0);
 
         parseJson(cj, "Mask", Mask);
         parseJson(cj, "RandomPulserFrequency", RandomPulserFrequency);
-        parseJson(cj, "Period0", Period0);
-        parseJson(cj, "Period1", Period1);
+        parseJson(cj, "Period0", Period);
 
         QJsonArray ar;
         parseJson(cj, "TheRestControls", ar);

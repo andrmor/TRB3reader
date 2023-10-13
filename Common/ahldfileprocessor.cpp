@@ -178,17 +178,14 @@ void AHldFileProcessor::saveTimeData(int iEvent, QTextStream & outStream)
     if (iEvent < Extractor.TimeData.size())
     {
         const auto & vec = Extractor.TimeData[iEvent];
-        //qDebug() << vec << vec.size();
 
-        //QVector<double> Channels(12, 0);
-        QVector<double> Channels(Trb3dataReader::NumTimeChannels, 0);
+        QVector<double> Channels(11, 0);
         for (const auto & pair : vec)
         {
             const int index = pair.first - 1; // ignore "0" channel, shift all 1 down
-            if (index < 0 || index >= Trb3dataReader::NumTimeChannels) continue;
+            if (index < 0 || index >= vec.size()) continue;
             Channels[index] = pair.second;
         }
-        //qDebug() << Channels; exit(222);
 
         for (double time : Channels) outStream << time << " ";
     }
