@@ -83,7 +83,11 @@ private:
 
     void    substractPedestals();
 
+#ifdef MULTIBOARD
     void    processTimingSubEvent(hadaq::RawSubevent * subEvent, unsigned subEventSize, std::vector<std::pair<unsigned,double>> * extractedData);
+#else
+    void    processTimingSubEvent(hadaq::RawSubevent * subEvent, unsigned ix, unsigned subEventSize, std::vector<std::pair<unsigned,double>> * extractedData);
+#endif
 
 };
 
