@@ -1,10 +1,8 @@
 #include "trb3datareader.h"
 #include "masterconfig.h"
 
-#ifdef DABC
 #include "hadaq/defines.h"
 #include "hadaq/api.h"
-#endif
 
 #include <stdexcept>
 
@@ -15,86 +13,9 @@ const float NaN = std::numeric_limits<float>::quiet_NaN();
 Trb3dataReader::Trb3dataReader(MasterConfig *Config) :
     Config(Config), numSamples(0), numChannels(0) {}
 
-/*
-QString Trb3dataReader::GetFileInfo(const QString& FileName) const
-{
-    QString output;
 
-    bool bReportOnStart = true;
-    int numEvents = 0;
-
-    hadaq::ReadoutHandle ref = hadaq::ReadoutHandle::Connect(FileName.toLocal8Bit().data());
-    hadaq::RawEvent* evnt = 0;
-
-    while ( (evnt = ref.NextEvent(1.0)) )
-    {
-        // loop over sections
-        qDebug() << "---Event---" << numEvents;
-        hadaq::RawSubevent * sub = 0;
-        while ( (sub=evnt->NextSubevent(sub)) )
-        {
-            qDebug() << "==>Id:" << QString::number(sub->GetId(), 16) << "==>Decoding:" << QString::number(sub->GetDecoding(), 16);
-            unsigned trbSubEvSize = sub->GetSize() / 4 - 4;
-            qDebug() << "==>Subevent size: "<< trbSubEvSize;// << "\n";
-
-            unsigned ix = 0;
-
-            while (ix < trbSubEvSize)
-            { // loop over subsubevents
-
-                unsigned hadata = sub->Data(ix++);
-
-                unsigned datalen = (hadata >> 16) & 0xFFFF;
-                int datakind = hadata & 0xFFFF;
-
-                if (bReportOnStart) output += "Data block with datakind: 0x" + QString::number(datakind, 16) + "\n";
-                qDebug() << "====>" << QString::number(datakind, 16);
-
-                unsigned ixTmp = ix;
-
-                //if (Config->IsGoodDatakind(datakind))
-                {
-                    // last word in the data block identifies max. ADC# and max. channel
-                    // assuming they are written consecutively - seems to be the case so far
-                    unsigned lastword = sub->Data( ix + datalen - 1 );
-                    int ch_per_adc = ((lastword >> 16) & 0xF) + 1;
-                    int n_adcs = ((lastword >> 20) & 0xF) + 1;
-
-                    int channels = ch_per_adc * n_adcs;
-
-                    if (channels > 0)
-                    {
-                        int samples = datalen/channels;
-                        if (bReportOnStart) output += "--> This is an ADC block. Channels: " +QString::number(channels) +"   Samples: " +QString::number(samples) +"\n";
-                    }
-                    else
-                        if (bReportOnStart) output += "==> This is an ADC block. Error: number of channels is 0!\n";
-                }
-                ix = ixTmp + datalen;
-            }
-        }
-        bReportOnStart = false;
-        numEvents++;
-
-        // !!!
-        break;
-        // !!!
-    }
-
-    if (output.isEmpty())
-    {
-        output = "Read failed or bad file format";
-    }
-    else
-        output += "Number of events: " + QString::number(numEvents);
-
-    ref.Disconnect();
-
-    return output;
-}
-*/
-
-QString Trb3dataReader::GetFileInfo(const QString& FileName)
+QString Trb3dataReader::GetFileInfo(const QString & FileName)
+#ifdef MULTIBOARD
 {
     QString output;
 
@@ -175,6 +96,83 @@ QString Trb3dataReader::GetFileInfo(const QString& FileName)
 
     return output;
 }
+#else
+{
+    QString output;
+
+    bool bReportOnStart = true;
+    int numEvents = 0;
+
+    hadaq::ReadoutHandle ref = hadaq::ReadoutHandle::Connect(FileName.toLocal8Bit().data());
+    hadaq::RawEvent* evnt = 0;
+
+    while ( (evnt = ref.NextEvent(1.0)) )
+    {
+        // loop over sections
+        qDebug() << "---Event---" << numEvents;
+        hadaq::RawSubevent * sub = 0;
+        while ( (sub=evnt->NextSubevent(sub)) )
+        {
+            qDebug() << "==>Id:" << QString::number(sub->GetId(), 16) << "==>Decoding:" << QString::number(sub->GetDecoding(), 16);
+            unsigned trbSubEvSize = sub->GetSize() / 4 - 4;
+            qDebug() << "==>Subevent size: "<< trbSubEvSize;// << "\n";
+
+            unsigned ix = 0;
+
+            while (ix < trbSubEvSize)
+            { // loop over subsubevents
+
+                unsigned hadata = sub->Data(ix++);
+
+                unsigned datalen = (hadata >> 16) & 0xFFFF;
+                int datakind = hadata & 0xFFFF;
+
+                if (bReportOnStart) output += "Data block with datakind: 0x" + QString::number(datakind, 16) + "\n";
+                qDebug() << "====>" << QString::number(datakind, 16);
+
+                unsigned ixTmp = ix;
+
+                if (Config->isADCboard(datakind))
+                {
+                    // last word in the data block identifies max. ADC# and max. channel
+                    // assuming they are written consecutively - seems to be the case so far
+                    unsigned lastword = sub->Data( ix + datalen - 1 );
+                    int ch_per_adc = ((lastword >> 16) & 0xF) + 1;
+                    int n_adcs = ((lastword >> 20) & 0xF) + 1;
+
+                    int channels = ch_per_adc * n_adcs;
+
+                    if (channels > 0)
+                    {
+                        int samples = datalen/channels;
+                        if (bReportOnStart) output += "--> This is an ADC block. Channels: " +QString::number(channels) +"   Samples: " +QString::number(samples) +"\n";
+                    }
+                    else
+                        if (bReportOnStart) output += "==> This is an ADC block. Error: number of channels is 0!\n";
+                }
+                ix = ixTmp + datalen;
+            }
+        }
+        bReportOnStart = false;
+        numEvents++;
+
+        // !!!
+        break;
+        // !!!
+    }
+
+    if (output.isEmpty())
+    {
+        output = "Read failed or bad file format";
+    }
+    else
+        output += "Number of events: " + QString::number(numEvents);
+
+    ref.Disconnect();
+
+    return output;
+}
+#endif
 
 void Trb3dataReader::processTimingSubEvent(hadaq::RawSubevent * subEvent, unsigned subEventSize, std::vector<std::pair<unsigned, double>> * extractedData)
 {
@@ -223,10 +221,10 @@ void Trb3dataReader::processTimingSubEvent(hadaq::RawSubevent * subEvent, unsign
     }
 }
 
-
-// num chan = 0 for a block?
 void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels, int enforceNumSamples)
+#ifdef MULTIBOARD
 {   
+    // num chan = 0 for a block?
     waveData.clear();
     timeData.clear();
 
@@ -365,23 +363,7 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
     qDebug() <<"   Channels: "<<numChannels << "  Samples: "<<numSamples;
     if (numBadEvents > 0) qDebug() << "--> " << numBadEvents << " bad events were disreguarded!";
 }
-
-
-/*
-                        if (numSamples != 0)
-                        {
-                            if (samples != numSamples)
-                            {
-                                bBadEvent = true;
-                                //if (numBadEvents<50) qDebug() << "----- Event #" << waveData.size()-1 << " has wrong number of samples ("<< samples <<")\n";
-                            }
-                        }
-                        else numSamples = samples;
-*/
-
-
-/*
-void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels, int enforceNumSamples)
+#else
 {
     waveData.clear();
 
@@ -420,7 +402,8 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
 
                 unsigned ixTmp = ix;  // --->  position before read
 
-                if (Config->IsGoodDatakind(datakind))
+                //qDebug() << datakind << Config->isADCboard(datakind);
+                if (Config->isADCboard(datakind))
                 {
 
                     // last word in the data block identifies max. ADC# and max. channel
@@ -513,7 +496,7 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
     qDebug() <<"   Channels: "<<numChannels << "  Samples: "<<numSamples;
     if (numBadEvents > 0) qDebug() << "--> " << numBadEvents << " bad events were disreguarded!";
 }
-*/
+#endif
 
 QString Trb3dataReader::Read(const QString& FileName)
 {

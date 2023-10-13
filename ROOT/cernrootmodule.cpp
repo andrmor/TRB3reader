@@ -384,7 +384,7 @@ bool CernRootModule::DrawOverlay(bool bFromDataHub, int ievent, bool bNeg, bool 
         multiGraph->Add(g, "AL");
     }
 
-    if (multiGraph->GetListOfGraphs()->GetEntries() == 0) return false;
+    if (!multiGraph->GetListOfGraphs() || multiGraph->GetListOfGraphs()->GetEntries() == 0) return false;
 
     AGraphWindow* win = bNeg ? WOverNeg : WOverPos;
     win->SetAsActiveRootWindow();

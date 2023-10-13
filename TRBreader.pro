@@ -1,53 +1,43 @@
 
-
-CONFIG += cern_root        #enable CERN ROOT for graph drawing
-#CONFIG += speech_support   #enables text_to_speech script unit - minimum Qt 5.8.0
+#---Operation mode---
+#DEFINES += MULTIBOARD  #setup used in Bern
+#comment the line above to define setup with a single (large) TRB3 board
+#
 
 #---CERN ROOT---
-cern_root {
-    DEFINES += CERN_ROOT
+DEFINES += CERN_ROOT
 
-     INCLUDEPATH += $$system(root-config --incdir)
-     LIBS += $$system(root-config --libs) -lSpectrum #-lGeom -lGeomPainter -lGeomBuilder -lMinuit2
+INCLUDEPATH += $$system(root-config --incdir)
+LIBS += $$system(root-config --libs) -lSpectrum #-lGeom -lGeomPainter -lGeomBuilder -lMinuit2
 
-    SOURCES += ROOT/cernrootmodule.cpp \
-               ROOT/GUI/arasterwindow.cpp \
-               ROOT/GUI/agraphwindow.cpp \
-               Script/histgraphinterfaces.cpp \
-               Common/tmpobjhubclass.cpp \
-               ROOT/apeakfinder.cpp
+SOURCES += ROOT/cernrootmodule.cpp \
+           ROOT/GUI/arasterwindow.cpp \
+           ROOT/GUI/agraphwindow.cpp \
+           Script/histgraphinterfaces.cpp \
+           Common/tmpobjhubclass.cpp \
+           ROOT/apeakfinder.cpp
 
-    HEADERS += ROOT/cernrootmodule.h \
-               ROOT/GUI/arasterwindow.h \
-               ROOT/GUI/agraphwindow.h \
-               Script/histgraphinterfaces.h \
-               Common/tmpobjhubclass.h \
-               ROOT/apeakfinder.h
+HEADERS += ROOT/cernrootmodule.h \
+           ROOT/GUI/arasterwindow.h \
+           ROOT/GUI/agraphwindow.h \
+           Script/histgraphinterfaces.h \
+           Common/tmpobjhubclass.h \
+           ROOT/apeakfinder.h
 
-    FORMS   += ROOT/GUI/agraphwindow.ui
+FORMS   += ROOT/GUI/agraphwindow.ui
 
-    INCLUDEPATH += ROOT
-    INCLUDEPATH += ROOT/GUI
-}
+INCLUDEPATH += ROOT
+INCLUDEPATH += ROOT/GUI
 #-----------
 
 #---DABC---
 DEFINES += DABC
-DABCPATH = /home/exnote/dabc
-#DABCPATH = /home/andr/trb3
+#DABCPATH = /home/exnote/dabc
+DABCPATH = /home/andr/dabc
 INCLUDEPATH += $$DABCPATH/include
+INCLUDEPATH += $$DABCPATH/include/hadaq
 LIBS += -L$$DABCPATH/lib/ -lDabcBase -lDabcMbs -lDabcHadaq
 #-----------
-
-#---Speech---
-speech_support{
-    DEFINES += SPEECH
-    QT += texttospeech
-
-    HEADERS += Script/ainterfacetospeech.h
-    SOURCES += Script/ainterfacetospeech.cpp
-}
-#------------
 
 QT += core gui
 QT += widgets
@@ -59,7 +49,7 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp \
-        GUI/mainwindow.cpp \
+    GUI/mainwindow.cpp \
     TRB/trb3datareader.cpp \
     TRB/trb3signalextractor.cpp \
     Common/channelmapper.cpp \

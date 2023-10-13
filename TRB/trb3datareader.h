@@ -15,9 +15,8 @@ class Trb3dataReader
 public:
     Trb3dataReader(MasterConfig * Config);
 
-      // Reading waveform data from the file, optional - substract pedestals and apply smoothing
-    QString Read(const QString &FileName);
     QString GetFileInfo(const QString &FileName);
+    QString Read(const QString &FileName); // Reading waveform data from the file, optional - substract pedestals and apply smoothing
 
     float   GetValue(int ievent, int ichannel, int isample) const;
     float   GetValueFast(int ievent, int ichannel, int isample) const; //no argument validity check!

@@ -11,13 +11,7 @@
 #include "adatahub.h"
 #include "aservermonitorwindow.h"
 #include "atrbruncontrol.h"
-
-#ifdef CERN_ROOT
 #include "cernrootmodule.h"
-#endif
-#ifdef SPEECH
-#include "ainterfacetospeech.h"
-#endif
 
 #include "trb3datareader.h"
 #include "trb3signalextractor.h"
@@ -800,7 +794,6 @@ void MainWindow::on_pbShowOverlayPos_toggled(bool checked)
 
 void MainWindow::showOverlay(bool checked, bool bNeg)
 {
-#ifdef CERN_ROOT
     bNeg ? RootModule->ShowOverNegWaveWindow(checked) : RootModule->ShowOverPosWaveWindow(checked);
     LogMessage("");
     if (!checked) return;
@@ -833,10 +826,6 @@ void MainWindow::showOverlay(bool checked, bool bNeg)
         if (bNeg) RootModule->ClearOverNegWaveWindow();
         else      RootModule->ClearOverPosWaveWindow();
     }
-
-#else
-    QMessageBox::information(this, "", "Cern ROOT module was not configured!", QMessageBox::Ok, QMessageBox::Ok);
-#endif
 }
 
 void MainWindow::on_pbShowAllNeg_toggled(bool checked)
@@ -851,7 +840,6 @@ void MainWindow::on_pbShowAllPos_toggled(bool checked)
 
 void MainWindow::showAllWave(bool checked, bool bNeg)
 {
-#ifdef CERN_ROOT
     if (!RootModule) return;
     bNeg ? RootModule->ShowAllNegWaveWindow(checked) : RootModule->ShowAllPosWaveWindow(checked);
     LogMessage("");
@@ -893,10 +881,6 @@ void MainWindow::showAllWave(bool checked, bool bNeg)
         if (bNeg) RootModule->ClearAllNegWaveWindow();
         else      RootModule->ClearAllPosWaveWindow();
     }
-
-#else
-    QMessageBox::information(this, "", "Cern ROOT module was not configured!", QMessageBox::Ok, QMessageBox::Ok);
-#endif
 }
 
 
@@ -993,9 +977,7 @@ void MainWindow::on_actionReset_positions_of_all_windows_triggered()
     //ScriptWindow->setGeometry(670,10,600,800);
     ScriptWindow->move(670, 10); ScriptWindow->resize(600, 800);
 
-#ifdef CERN_ROOT
     RootModule->ResetPositionOfWindows();
-#endif
 }
 
 void MainWindow::on_cobSignalExtractionMethod_currentIndexChanged(int index)
