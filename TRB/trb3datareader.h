@@ -15,7 +15,7 @@ class Trb3dataReader
 public:
     Trb3dataReader(MasterConfig * Config);
 
-    QString GetFileInfo(const QString &FileName);
+    QString GetFileInfo(const QString &FileName); // used only in the gui when clicking "...print file data structure"
     QString Read(const QString &FileName); // Reading waveform data from the file, optional - substract pedestals and apply smoothing
 
     float   GetValue(int ievent, int ichannel, int isample) const;

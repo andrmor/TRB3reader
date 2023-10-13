@@ -175,6 +175,7 @@ QString Trb3dataReader::GetFileInfo(const QString & FileName)
 #endif
 
 void Trb3dataReader::processTimingSubEvent(hadaq::RawSubevent * subEvent, unsigned subEventSize, std::vector<std::pair<unsigned, double>> * extractedData)
+#ifdef MULTIBOARD
 {
     unsigned ix = 13;  // Alberto said this offset is fixed
 
@@ -189,7 +190,7 @@ void Trb3dataReader::processTimingSubEvent(hadaq::RawSubevent * subEvent, unsign
         if ( (hadata >> 28) == 6)  // epoc records start from 0b011
         {
             epoch = hadata & 0x0fffffff;
-            qDebug() << "  Epoch updated:" << QString::number(epoch, 16);
+            //qDebug() << "  Epoch updated:" << QString::number(epoch, 16);
         }
         else if (hadata & 0x80000000) // timedata records start from 0b1
         {
@@ -197,6 +198,7 @@ void Trb3dataReader::processTimingSubEvent(hadaq::RawSubevent * subEvent, unsign
             const unsigned coarse  = hadata & 0x000007ff;    // 10-0
             const unsigned fine    = (hadata >> 12) & 0x3ff; // 21-12
             const unsigned channel = (hadata >> 22) & 0x7f;  // 28-22
+            //qDebug() << "--timedata: coarse"<< coarse << "fine" << fine << "channel" << channel;
             if (channel >= NumTimeChannels)
             {
                 qCritical() << "Bad channel number:" << channel;
@@ -220,11 +222,62 @@ void Trb3dataReader::processTimingSubEvent(hadaq::RawSubevent * subEvent, unsign
         else if (hadata == 0x15555) break;
     }
 }
+#else
+{
+    //unsigned ix = 13;  // Alberto said this offset is fixed
+    unsigned ix = 0;
+
+    unsigned epoch = 0;
+    std::array<bool,NumTimeChannels> seenChannels; seenChannels.fill(false);
+
+    while (ix < subEventSize) // loop over subsubevents
+    {
+        unsigned hadata = subEvent->Data(ix++);
+        qDebug() << "--> " << QString::number(hadata, 16) << QString::number(hadata, 2);
+
+        if ( (hadata >> 28) == 6)  // epoc records start from 0b011
+        {
+            epoch = hadata & 0x0fffffff;
+            qDebug() << "  Epoch updated:" << QString::number(epoch, 16);
+        }
+        else if (hadata & 0x80000000) // timedata records start from 0b1
+        {
+            //hadata = 0x8059bd26;
+            const unsigned coarse  = hadata & 0x000007ff;    // 10-0
+            const unsigned fine    = (hadata >> 12) & 0x3ff; // 21-12
+            const unsigned channel = (hadata >> 22) & 0x7f;  // 28-22
+            qDebug() << "--timedata: coarse"<< coarse << "fine" << fine << "channel" << channel;
+            if (channel >= NumTimeChannels)
+            {
+                qCritical() << "Bad channel number:" << channel;
+                exit(222);
+            }
+            if (!seenChannels[channel])
+            {
+                seenChannels[channel] = true;
+
+                const double timeFromFine  = FineSpan_ns * fine / 0x400;   // 5ps resolution?
+                const double timeFromCorse = FineSpan_ns * coarse;
+                const double timeFromEpoch = FineSpan_ns * 0x800 * epoch;
+                const double time = timeFromEpoch + timeFromCorse + timeFromFine; // ns
+                qDebug() << "Time contributions (ns) from fine, corse and epoc:" << timeFromFine << timeFromCorse << timeFromEpoch << " Global:" << time << "ns";
+
+                if (extractedData) extractedData->push_back( {channel,time} );
+            }
+            //else this channel appears more than once -> ignore
+        }
+        else if (hadata == 0x15555)
+        {
+            qDebug() << "End of timing info block";
+            break;
+        }
+    }
+}
+#endif
 
 void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels, int enforceNumSamples)
 #ifdef MULTIBOARD
 {   
-    // num chan = 0 for a block?
     waveData.clear();
     timeData.clear();
 
@@ -366,6 +419,9 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
 #else
 {
     waveData.clear();
+    timeData.clear();
+
+    std::vector<std::pair<unsigned,double>> timing;
 
     numChannels = enforceNumChannels;
     numSamples = enforceNumSamples;
@@ -402,7 +458,12 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
 
                 unsigned ixTmp = ix;  // --->  position before read
 
-                //qDebug() << datakind << Config->isADCboard(datakind);
+                qDebug() << QString::number(datakind, 16) << Config->isADCboard(datakind);
+                if (Config->isTimerBoard(datakind)) //boardID
+                {
+                    timing.clear();
+                    processTimingSubEvent(sub, trbSubEvSize, &timing);
+                }
                 if (Config->isADCboard(datakind))
                 {
 
@@ -482,6 +543,7 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
         else
         {
             waveData << thisEventData;
+            timeData.push_back(timing);
             //qDebug() << "New data size: "<<data.size();
         }
         bReportOnStart = false;
