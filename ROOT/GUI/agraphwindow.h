@@ -31,7 +31,7 @@ public:
     void restoreGeomStatus();
 
 protected:
-    void resizeEvent(QResizeEvent *event);
+    //void resizeEvent(QResizeEvent *event);
     void hideEvent(QHideEvent* event);
     bool event(QEvent *event);
 
@@ -39,7 +39,6 @@ private:
     Ui::AGraphWindow * ui = nullptr;
 
     ARasterWindow * RasterWindow = nullptr;
-    QWidget       * QWinContainer = nullptr;
 
     QString IdStr;
     bool ColdStart = true;

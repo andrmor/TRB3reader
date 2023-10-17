@@ -1,20 +1,20 @@
 #ifndef ARASTERWINDOW_H
 #define ARASTERWINDOW_H
 
-#include <QWindow>
+#include <QWidget>
 #include <TMathBase.h>
 
 class TCanvas;
 class QMainWindow;
 
-class ARasterWindow : public QWindow
+class ARasterWindow : public QWidget
 {
     Q_OBJECT
 public:
-    explicit ARasterWindow(QMainWindow *parent);
+    explicit ARasterWindow(QMainWindow * parent);
     virtual ~ARasterWindow();
 
-    TCanvas* fCanvas = nullptr;
+    TCanvas * fCanvas = nullptr;
 
     void setBlockEvents(bool flag) {fBlockEvents = flag;}
     void setInvertedXYforDrag(bool flag) {fInvertedXYforDrag = flag;} //fix ROOT inversion in x-y for parallel view of geometry
@@ -36,11 +36,15 @@ signals:
     void UserChangedWindow(Double_t centerX, Double_t centerY, Double_t hWidth, Double_t hHeight, Double_t phi, Double_t theta);
 
 protected:
-    void exposeEvent(QExposeEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
+
+    void paintEvent(QPaintEvent * event ) override;
+    void resizeEvent(QResizeEvent * event ) override;
+
+    QPaintEngine * paintEngine() const override {return nullptr;}  // added due to setAttribute(Qt::WA_PaintOnScreen, true);
 
 protected:
     QMainWindow *MasterWindow;
@@ -48,9 +52,9 @@ protected:
     bool PressEventRegistered; //to avoid Qt bug - "leaking" of events to another window
     int lastX, lastY;
     double lastCenterX, lastCenterY;
-    bool fBlockEvents;
+    bool fBlockEvents = false;
 
-    bool fInvertedXYforDrag;
+    bool fInvertedXYforDrag = false;
 
 };
 
