@@ -15,6 +15,7 @@ class ADataHub;
 class TGraph;
 class TmpObjHubClass;
 class TObject;
+class QMainWindow;
 
 class CernRootModule : public QObject
 {
@@ -44,13 +45,15 @@ public:
                  bool bShowlabels, int Channels0_Signals1);
 
     void StartGraphWindows();
-    const QJsonObject SaveGraphWindows() const;
-    void SetWindowGeometries(const QJsonObject &js);
+    //const QJsonObject SaveGraphWindows() const;
+    //void SetWindowGeometries(const QJsonObject &js);
     void ResetPositionOfWindows();
 
     void DrawSignature(bool bNeg);
 
     TmpObjHubClass* GetTmpHub() {return TmpHub;}
+
+    void setMainWindow(QMainWindow * main) {MainWin = main;}
 
 public slots:
     void onDrawRequested(TObject* obj, QString opt, bool bDoUpdate);
@@ -61,6 +64,8 @@ private:
     MasterConfig* Config;
     ADataHub* DataHub;
 
+    QMainWindow * MainWin = nullptr;
+
     TApplication* RootApp;
 
     TmpObjHubClass* TmpHub;
@@ -69,13 +74,17 @@ private:
     TGraph* gSingle;
     QVector<TGraph*> graphsNeg, graphsPos;
 
-    AGraphWindow *WOne, *WOverNeg, *WOverPos, *WAllNeg, *WAllPos;
+    AGraphWindow * WOne     = nullptr;
+    AGraphWindow * WOverNeg = nullptr;
+    AGraphWindow * WOverPos = nullptr;
+    AGraphWindow * WAllNeg  = nullptr;
+    AGraphWindow * WAllPos  = nullptr;
 
     int NormalColor;
     int RejectedColor;
     int LineWidth;
 
-    void showGraphWindow(AGraphWindow **win, bool flag);
+    void showGraphWindow(AGraphWindow * win, bool flag);
     void clearNegGraphVectors();
     void clearPosGraphVectors();
 

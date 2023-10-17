@@ -19,7 +19,6 @@ class ATrbRunControl;
 class QTimer;
 class QElapsedTimer;
 class ABufferDelegate;
-class AInterfaceToSpeech;
 
 namespace Ui {
 class MainWindow;
@@ -37,7 +36,7 @@ public:
                         Trb3signalExtractor* Extractor,
                         AHldFileProcessor& HldFileProcessor,
                         ANetworkModule& Network,
-                        QWidget *parent = 0);
+                        QWidget *parent = nullptr);
     ~MainWindow();
 
     void SetEnabled(bool flag);
@@ -118,7 +117,7 @@ private slots:
     void on_sbChannel_valueChanged(int arg1);
 
     //Show Waveforms
-    void on_pbShowWaveform_toggled(bool checked);
+    void on_pbShowWaveform_clicked(bool checked);
     void on_pbShowOverlayNeg_toggled(bool checked);
     void on_pbShowOverlayPos_toggled(bool checked);
     void on_pbShowAllNeg_toggled(bool checked);
@@ -172,7 +171,7 @@ protected:
     void closeEvent(QCloseEvent* event);
 
 private:
-    //aliases    
+    //aliases
     MasterConfig* Config;
     ADispatcher* Dispatcher;
     ADataHub* DataHub;
@@ -182,12 +181,10 @@ private:
     ANetworkModule& Network;
 
     //owned objects
-    Ui::MainWindow* ui;    
-    AScriptWindow* ScriptWindow;
-#ifdef CERN_ROOT
-    CernRootModule* RootModule;
-#endif
-    AServerMonitorWindow* ServerWindow = 0;
+    Ui::MainWindow* ui;
+    AScriptWindow * ScriptWindow = nullptr;
+    CernRootModule * RootModule = nullptr;
+    AServerMonitorWindow * ServerWindow = nullptr;
 
     //gui misc
     bool bStopFlag;
@@ -195,17 +192,13 @@ private:
     //int  numProcessedEvents;
     //int  numBadEvents;
 
-    QTimer * watchdogTimer = 0;
-    QTimer * aTimer = 0;
-    QElapsedTimer * elTimer = 0;
+    QTimer * watchdogTimer = nullptr;
+    QTimer * aTimer = nullptr;
+    QElapsedTimer * elTimer = nullptr;
     bool bLimitMaxEvents = false;
     int MaxEventsToRun = 0;
-    QTimer * timerAutoFreeSpace = 0;
+    QTimer * timerAutoFreeSpace = nullptr;
     bool bAlreadyStopping = false;
-
-#ifdef SPEECH
-    AInterfaceToSpeech* speech = 0;
-#endif
 
 private:
     const QString ProcessData(); //returns error message if any
@@ -230,7 +223,7 @@ private:
     void updateNumEventsIndication();
 
 private:
-    ATrbRunControl * TrbRunManager = 0;
+    ATrbRunControl * TrbRunManager = nullptr;
     int ZeroRateCounter = 0;
 
 private slots:

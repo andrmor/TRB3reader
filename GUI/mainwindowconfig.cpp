@@ -163,9 +163,7 @@ void MainWindow::SaveWindowSettings()
     json["Main"] = SaveWindowToJson(x(), y(), width(), height(), true);
     json["ScriptWindow"] = SaveWindowToJson(ScriptWindow->x(), ScriptWindow->y(), ScriptWindow->width(), ScriptWindow->height(), ScriptWindow->isVisible());
 
-#ifdef CERN_ROOT
-    json["GraphWindows"] = RootModule->SaveGraphWindows();
-#endif
+    //json["GraphWindows"] = RootModule->SaveGraphWindows();
 
     SaveJsonToFile(json, Dispatcher->WinSetFile);
 }
@@ -198,11 +196,9 @@ void MainWindow::LoadWindowSettings()
         ScriptWindow->setVisible(bVis);
     }
 
-#ifdef CERN_ROOT
-    QJsonObject jsW;
-    parseJson(js, "GraphWindows", jsW);
-    RootModule->SetWindowGeometries(jsW);
-#endif
+    //QJsonObject jsW;
+    //parseJson(js, "GraphWindows", jsW);
+    //RootModule->SetWindowGeometries(jsW);
 }
 
 // --- Update GUI controls on Config change ---

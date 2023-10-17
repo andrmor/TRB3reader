@@ -75,16 +75,13 @@ MainWindow::MainWindow(MasterConfig* Config,
     ui->pbRefreshBufferIndication->setVisible(false);
     ui->pbUpdateTriggerGui->setVisible(false);
 
-#ifdef CERN_ROOT
     RootModule = new CernRootModule(Reader, Extractor, Config, DataHub);
+    RootModule->setMainWindow(this);
     connect(RootModule, &CernRootModule::WOneHidden, [=](){ui->pbShowWaveform->setChecked(false);});
     connect(RootModule, &CernRootModule::WOverNegHidden, [=](){ui->pbShowOverlayNeg->setChecked(false);});
     connect(RootModule, &CernRootModule::WOverPosHidden, [=](){ui->pbShowOverlayPos->setChecked(false);});
     connect(RootModule, &CernRootModule::WAllNegHidden, [=](){ui->pbShowAllNeg->setChecked(false);});
     connect(RootModule, &CernRootModule::WAllPosHidden, [=](){ui->pbShowAllPos->setChecked(false);});
-#else
-    qDebug() << "-> Graph module (based on CERN ROOT) was NOT compiled";
-#endif
 
     connect(DataHub, &ADataHub::requestGuiUpdate, this, &MainWindow::UpdateGui);
     connect(DataHub, &ADataHub::reportProgress, this, &MainWindow::onProgressUpdate);
@@ -575,18 +572,20 @@ void MainWindow::on_sbEvent_valueChanged(int arg1)
 
     OnEventOrChannelChanged();
 
-    on_pbShowWaveform_toggled(ui->pbShowWaveform->isChecked());
-    on_pbShowOverlayNeg_toggled(ui->pbShowOverlayNeg->isChecked());
-    on_pbShowOverlayPos_toggled(ui->pbShowOverlayPos->isChecked());
-    on_pbShowAllNeg_toggled(ui->pbShowAllNeg->isChecked());
-    on_pbShowAllPos_toggled(ui->pbShowAllPos->isChecked());
+    if (ui->pbShowAllNeg->isChecked()) on_pbShowAllNeg_toggled(true);
+    if (ui->pbShowAllPos->isChecked()) on_pbShowAllPos_toggled(true);
+
+    if (ui->pbShowOverlayNeg->isChecked()) on_pbShowOverlayNeg_toggled(true);
+    if (ui->pbShowOverlayPos->isChecked()) on_pbShowOverlayPos_toggled(true);
+
+    if (ui->pbShowWaveform->isChecked()) on_pbShowWaveform_clicked(true);
 }
 
 void MainWindow::on_sbChannel_valueChanged(int)
 {
     OnEventOrChannelChanged();
 
-    on_pbShowWaveform_toggled(ui->pbShowWaveform->isChecked());
+    if (ui->pbShowWaveform->isChecked()) on_pbShowWaveform_clicked(true);
 }
 
 int MainWindow::getCurrentlySelectedHardwareChannel()
@@ -724,9 +723,8 @@ void MainWindow::OnEventOrChannelChanged()
     ui->leTimes->setText(timeStr);
 }
 
-void MainWindow::on_pbShowWaveform_toggled(bool checked)
+void MainWindow::on_pbShowWaveform_clicked(bool checked)
 {
-#ifdef CERN_ROOT
     RootModule->ShowSingleWaveWindow(checked);
     LogMessage("");
     if (!checked) return;
@@ -776,10 +774,6 @@ void MainWindow::on_pbShowWaveform_toggled(bool checked)
 
     bool bOK = RootModule->DrawSingle(bFromDataHub, ievent, ichannel, ui->cbAutoscaleY->isChecked(), Min, Max);
     if (!bOK) RootModule->ClearSingleWaveWindow();
-
-#else
-    QMessageBox::information(this, "", "Cern ROOT module was not configured!", QMessageBox::Ok, QMessageBox::Ok);
-#endif
 }
 
 void MainWindow::on_pbShowOverlayNeg_toggled(bool checked)

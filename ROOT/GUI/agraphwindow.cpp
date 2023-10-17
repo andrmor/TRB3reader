@@ -7,14 +7,11 @@
 
 #include "TCanvas.h"
 
-AGraphWindow::AGraphWindow(QWidget *parent) :
+AGraphWindow::AGraphWindow(const QString & idStr, QWidget * parent) :
     QMainWindow(parent),
-    ui(new Ui::AGraphWindow)
+    ui(new Ui::AGraphWindow),
+    IdStr(idStr)
 {
-    RasterWindow = 0;
-    QWinContainer = 0;
-    ColdStart = true;
-
     ui->setupUi(this);
 
     RasterWindow = new ARasterWindow(this);
@@ -25,11 +22,11 @@ AGraphWindow::AGraphWindow(QWidget *parent) :
     QWinContainer->setGeometry(0, 0, this->width(), this->height());
     RasterWindow->resize(this->width(), this->height());
     RasterWindow->ForceResize();
-
 }
 
 AGraphWindow::~AGraphWindow()
 {
+    qDebug() << "Destructor called for AGraphWindow";
     delete ui;
 }
 
@@ -72,12 +69,12 @@ void AGraphWindow::UpdateRootCanvas()
     RasterWindow->fCanvas->Update();
 }
 
-void AGraphWindow::SaveAs(const QString filename)
+void AGraphWindow::SaveAs(const QString & filename)
 {
     RasterWindow->SaveAs(filename);
 }
 
-void AGraphWindow::SetTitle(QString title)
+void AGraphWindow::SetTitle(const QString & title)
 {
     setWindowTitle(title);
 }
@@ -94,4 +91,73 @@ void AGraphWindow::resizeEvent(QResizeEvent * /*event*/)
 void AGraphWindow::hideEvent(QHideEvent *)
 {
     emit WasHidden();
+}
+
+#include <QTimer>
+bool AGraphWindow::event(QEvent *event)
+{
+    if (event->type() == QEvent::WindowActivate)
+    {
+        RasterWindow->UpdateRootCanvas();
+    }
+
+    if (event->type() == QEvent::Show)
+    {
+        if (ColdStart)
+        {
+            //first time this window is shown
+            ColdStart = false;
+            this->resize(width()+1, height());
+            this->resize(width()-1, height());
+        }
+        else
+        {
+            //qDebug() << "Graph win show event";
+            //RasterWindow->UpdateRootCanvas();
+            QTimer::singleShot(10, RasterWindow, [this](){RasterWindow->UpdateRootCanvas();}); // without delay canvas is not shown in Qt 5.9.5
+        }
+    }
+
+    return QMainWindow::event(event);
+}
+
+#include <QSettings>
+void AGraphWindow::storeGeomStatus()
+{
+    QSettings settings;
+    settings.beginGroup(IdStr);
+    settings.setValue("geometry", saveGeometry());
+    settings.setValue("visible", isVisible());
+    settings.setValue("maximized", isMaximized());
+    settings.endGroup();
+}
+
+void AGraphWindow::restoreGeomStatus()
+{
+    QSettings settings;
+    settings.beginGroup(IdStr);
+    restoreGeometry(settings.value("geometry").toByteArray());
+    bool bVisible = settings.value("visible", false).toBool();
+    bool bmax = settings.value("maximized", false).toBool();
+    if (bVisible)
+    {
+        if (bmax) showMaximized();
+        else      showNormal();
+    }
+    settings.endGroup();
+}
+
+void AGraphWindow::onMainWinButtonClicked(bool show)
+{
+    if (show)
+    {
+        restoreGeomStatus();
+        showNormal();
+        activateWindow();
+    }
+    else
+    {
+        storeGeomStatus();
+        hide();
+    }
 }

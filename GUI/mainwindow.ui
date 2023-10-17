@@ -30,7 +30,7 @@
     <item>
      <widget class="QTabWidget" name="twMain">
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab_8">
        <attribute name="title">
@@ -40,7 +40,7 @@
         <item>
          <widget class="QTabWidget" name="tabWidget">
           <property name="currentIndex">
-           <number>0</number>
+           <number>4</number>
           </property>
           <widget class="QWidget" name="tab_11">
            <attribute name="title">
@@ -2143,6 +2143,9 @@
               </item>
               <item>
                <widget class="QPushButton" name="pbBufferUpdateScript">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="minimumSize">
                  <size>
                   <width>400</width>
@@ -2627,6 +2630,9 @@
               </item>
               <item>
                <widget class="QPushButton" name="pbUpdateStartup">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="minimumSize">
                  <size>
                   <width>400</width>
@@ -4869,12 +4875,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>101</x>
-     <y>112</y>
+     <x>109</x>
+     <y>673</y>
     </hint>
     <hint type="destinationlabel">
-     <x>112</x>
-     <y>112</y>
+     <x>229</x>
+     <y>674</y>
     </hint>
    </hints>
   </connection>
@@ -4886,11 +4892,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>112</x>
-     <y>114</y>
+     <y>630</y>
     </hint>
     <hint type="destinationlabel">
-     <x>87</x>
-     <y>116</y>
+     <x>304</x>
+     <y>664</y>
     </hint>
    </hints>
   </connection>
@@ -4902,11 +4908,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>112</x>
-     <y>114</y>
+     <y>630</y>
     </hint>
     <hint type="destinationlabel">
-     <x>87</x>
-     <y>116</y>
+     <x>420</x>
+     <y>695</y>
     </hint>
    </hints>
   </connection>
@@ -4918,11 +4924,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>112</x>
-     <y>114</y>
+     <y>630</y>
     </hint>
     <hint type="destinationlabel">
-     <x>87</x>
-     <y>116</y>
+     <x>420</x>
+     <y>664</y>
     </hint>
    </hints>
   </connection>
@@ -4933,12 +4939,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>112</x>
-     <y>114</y>
+     <x>466</x>
+     <y>630</y>
     </hint>
     <hint type="destinationlabel">
-     <x>112</x>
-     <y>114</y>
+     <x>576</x>
+     <y>631</y>
     </hint>
    </hints>
   </connection>
@@ -4949,12 +4955,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>84</x>
-     <y>112</y>
+     <x>92</x>
+     <y>673</y>
     </hint>
     <hint type="destinationlabel">
-     <x>112</x>
-     <y>112</y>
+     <x>372</x>
+     <y>674</y>
     </hint>
    </hints>
   </connection>
@@ -4965,12 +4971,12 @@
    <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>112</x>
-     <y>111</y>
+     <x>118</x>
+     <y>281</y>
     </hint>
     <hint type="destinationlabel">
-     <x>112</x>
-     <y>111</y>
+     <x>436</x>
+     <y>282</y>
     </hint>
    </hints>
   </connection>
@@ -4981,12 +4987,12 @@
    <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>112</x>
-     <y>113</y>
+     <x>118</x>
+     <y>311</y>
     </hint>
     <hint type="destinationlabel">
-     <x>112</x>
-     <y>113</y>
+     <x>488</x>
+     <y>311</y>
     </hint>
    </hints>
   </connection>
@@ -4997,12 +5003,12 @@
    <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>112</x>
-     <y>111</y>
+     <x>118</x>
+     <y>281</y>
     </hint>
     <hint type="destinationlabel">
-     <x>112</x>
-     <y>111</y>
+     <x>269</x>
+     <y>282</y>
     </hint>
    </hints>
   </connection>
@@ -5014,11 +5020,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>112</x>
-     <y>114</y>
+     <y>630</y>
     </hint>
     <hint type="destinationlabel">
-     <x>87</x>
-     <y>116</y>
+     <x>304</x>
+     <y>695</y>
     </hint>
    </hints>
   </connection>
@@ -5033,8 +5039,8 @@
      <y>137</y>
     </hint>
     <hint type="destinationlabel">
-     <x>106</x>
-     <y>112</y>
+     <x>113</x>
+     <y>414</y>
     </hint>
    </hints>
   </connection>
@@ -5045,12 +5051,12 @@
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>104</x>
-     <y>137</y>
+     <x>113</x>
+     <y>183</y>
     </hint>
     <hint type="destinationlabel">
-     <x>106</x>
-     <y>112</y>
+     <x>113</x>
+     <y>414</y>
     </hint>
    </hints>
   </connection>
@@ -5061,12 +5067,12 @@
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>122</x>
-     <y>137</y>
+     <x>131</x>
+     <y>210</y>
     </hint>
     <hint type="destinationlabel">
-     <x>106</x>
-     <y>112</y>
+     <x>113</x>
+     <y>414</y>
     </hint>
    </hints>
   </connection>
@@ -5077,12 +5083,12 @@
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>122</x>
-     <y>137</y>
+     <x>131</x>
+     <y>237</y>
     </hint>
     <hint type="destinationlabel">
-     <x>106</x>
-     <y>112</y>
+     <x>113</x>
+     <y>414</y>
     </hint>
    </hints>
   </connection>
@@ -5093,12 +5099,12 @@
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>122</x>
-     <y>137</y>
+     <x>131</x>
+     <y>264</y>
     </hint>
     <hint type="destinationlabel">
-     <x>106</x>
-     <y>112</y>
+     <x>113</x>
+     <y>414</y>
     </hint>
    </hints>
   </connection>
@@ -5109,12 +5115,12 @@
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>122</x>
-     <y>137</y>
+     <x>131</x>
+     <y>291</y>
     </hint>
     <hint type="destinationlabel">
-     <x>106</x>
-     <y>112</y>
+     <x>113</x>
+     <y>414</y>
     </hint>
    </hints>
   </connection>
@@ -5125,12 +5131,12 @@
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>122</x>
-     <y>137</y>
+     <x>131</x>
+     <y>318</y>
     </hint>
     <hint type="destinationlabel">
-     <x>106</x>
-     <y>112</y>
+     <x>113</x>
+     <y>414</y>
     </hint>
    </hints>
   </connection>
@@ -5141,12 +5147,12 @@
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>122</x>
-     <y>137</y>
+     <x>131</x>
+     <y>345</y>
     </hint>
     <hint type="destinationlabel">
-     <x>106</x>
-     <y>112</y>
+     <x>113</x>
+     <y>414</y>
     </hint>
    </hints>
   </connection>
@@ -5157,12 +5163,12 @@
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>122</x>
-     <y>137</y>
+     <x>254</x>
+     <y>264</y>
     </hint>
     <hint type="destinationlabel">
-     <x>106</x>
-     <y>112</y>
+     <x>113</x>
+     <y>414</y>
     </hint>
    </hints>
   </connection>
@@ -5173,12 +5179,12 @@
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>122</x>
-     <y>137</y>
+     <x>254</x>
+     <y>292</y>
     </hint>
     <hint type="destinationlabel">
-     <x>106</x>
-     <y>112</y>
+     <x>113</x>
+     <y>414</y>
     </hint>
    </hints>
   </connection>
@@ -5189,12 +5195,12 @@
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>122</x>
-     <y>137</y>
+     <x>458</x>
+     <y>265</y>
     </hint>
     <hint type="destinationlabel">
-     <x>106</x>
-     <y>112</y>
+     <x>113</x>
+     <y>414</y>
     </hint>
    </hints>
   </connection>
@@ -5205,12 +5211,28 @@
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>122</x>
-     <y>137</y>
+     <x>458</x>
+     <y>294</y>
     </hint>
     <hint type="destinationlabel">
-     <x>106</x>
-     <y>112</y>
+     <x>113</x>
+     <y>414</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cbPeripheryFPGA0</sender>
+   <signal>clicked()</signal>
+   <receiver>pbUpdateTriggerSettings</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>221</x>
+     <y>149</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>190</x>
+     <y>399</y>
     </hint>
    </hints>
   </connection>

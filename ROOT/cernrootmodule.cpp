@@ -39,7 +39,6 @@ CernRootModule::CernRootModule(Trb3dataReader *Reader, Trb3signalExtractor *Extr
 
     qDebug() << "Running CERN ROOT version"<<gROOT->GetVersion();
 
-    WOne = WOverNeg = WOverPos = WAllNeg = WAllPos = 0;
     StartGraphWindows();
 
     gSingle = 0;
@@ -52,6 +51,7 @@ CernRootModule::CernRootModule(Trb3dataReader *Reader, Trb3signalExtractor *Extr
     TmpHub = new TmpObjHubClass();
 }
 
+/*
 const QJsonObject saveWindowProperties(AGraphWindow* w)
 {
     return SaveWindowToJson(w->x(), w->y(), w->width(), w->height(), w->isVisible());
@@ -94,6 +94,7 @@ void CernRootModule::SetWindowGeometries(const QJsonObject &js)
     setWinGeometry(WAllNeg, "AllNeg", js);
     setWinGeometry(WAllPos, "AllPos", js);
 }
+*/
 
 void CernRootModule::ResetPositionOfWindows()
 {
@@ -179,13 +180,12 @@ void CernRootModule::onDrawRequested(TObject *obj, QString opt, bool bDoUpdate)
 
 void CernRootModule::StartGraphWindows()
 {
-    QList<AGraphWindow**> ws;
-    ws << &WOne << &WOverNeg << &WOverPos << &WAllNeg << &WAllPos;
-    for (AGraphWindow** w : ws)
-    {
-        (*w) = new AGraphWindow();
-        (*w)->resize(1001, 601);
-    }
+    WOne     = new AGraphWindow("One",     MainWin); WOne->resize(1001, 601);
+    WOverNeg = new AGraphWindow("OverNeg", MainWin); WOverNeg->resize(1001, 601);
+    WOverPos = new AGraphWindow("OverPos", MainWin); WOverPos->resize(1001, 601);
+    WAllNeg  = new AGraphWindow("AllNeg",  MainWin); WAllNeg->resize(1001, 601);
+    WAllPos  = new AGraphWindow("AllPos",  MainWin); WAllPos->resize(1001, 601);
+
     connect(WOne, SIGNAL(WasHidden()), this, SIGNAL(WOneHidden()));
     connect(WOverNeg, SIGNAL(WasHidden()), this, SIGNAL(WOverNegHidden()));
     connect(WOverPos, SIGNAL(WasHidden()), this, SIGNAL(WOverPosHidden()));
@@ -214,18 +214,11 @@ void CernRootModule::timerTimeout()
     gSystem->ProcessEvents();
 }
 
-void CernRootModule::showGraphWindow(AGraphWindow** win, bool flag)
+void CernRootModule::showGraphWindow(AGraphWindow * win, bool flag)
 {
-    if (flag)
-    {
-        if (!(*win)) (*win) = new AGraphWindow();
-        (*win)->showNormal();
-        (*win)->activateWindow();
-    }
-    else
-    {
-        if (*win) (*win)->hide();
-    }
+    win->onMainWinButtonClicked(flag);
+//        (*win)->showNormal();
+//        (*win)->activateWindow();
 }
 
 void CernRootModule::clearNegGraphVectors()
@@ -240,27 +233,27 @@ void CernRootModule::clearPosGraphVectors()
 
 void CernRootModule::ShowSingleWaveWindow(bool flag)
 {
-    showGraphWindow(&WOne, flag);
+    showGraphWindow(WOne, flag);
 }
 
 void CernRootModule::ShowOverNegWaveWindow(bool flag)
 {
-    showGraphWindow(&WOverNeg, flag);
+    showGraphWindow(WOverNeg, flag);
 }
 
 void CernRootModule::ShowOverPosWaveWindow(bool flag)
 {
-    showGraphWindow(&WOverPos, flag);
+    showGraphWindow(WOverPos, flag);
 }
 
 void CernRootModule::ShowAllNegWaveWindow(bool flag)
 {
-    showGraphWindow(&WAllNeg, flag);
+    showGraphWindow(WAllNeg, flag);
 }
 
 void CernRootModule::ShowAllPosWaveWindow(bool flag)
 {
-    showGraphWindow(&WAllPos, flag);
+    showGraphWindow(WAllPos, flag);
 }
 
 void CernRootModule::ClearSingleWaveWindow()

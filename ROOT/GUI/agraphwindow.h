@@ -14,7 +14,7 @@ class AGraphWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit AGraphWindow(QWidget *parent = 0);
+    explicit AGraphWindow(const QString & idStr, QWidget * parent = nullptr);
     ~AGraphWindow();
 
     void ShowAndFocus();
@@ -22,20 +22,27 @@ public:
     void ClearRootCanvas();
     void UpdateRootCanvas();
 
-    void SaveAs(const QString filename);
+    void onMainWinButtonClicked(bool show);
 
-    void SetTitle(QString title);
+    void SaveAs(const QString & filename);
+    void SetTitle(const QString & title);
+
+    void storeGeomStatus();
+    void restoreGeomStatus();
 
 protected:
     void resizeEvent(QResizeEvent *event);
     void hideEvent(QHideEvent* event);
+    bool event(QEvent *event);
 
 private:
-    Ui::AGraphWindow *ui;
-    ARasterWindow *RasterWindow;
-    QWidget *QWinContainer;
+    Ui::AGraphWindow * ui = nullptr;
 
-    bool ColdStart;
+    ARasterWindow * RasterWindow = nullptr;
+    QWidget       * QWinContainer = nullptr;
+
+    QString IdStr;
+    bool ColdStart = true;
 
 signals:
     void WasHidden();
