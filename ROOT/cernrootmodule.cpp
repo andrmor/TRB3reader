@@ -39,7 +39,7 @@ CernRootModule::CernRootModule(Trb3dataReader *Reader, Trb3signalExtractor *Extr
 
     qDebug() << "Running CERN ROOT version"<<gROOT->GetVersion();
 
-    StartGraphWindows();
+    CreateGraphWindows();
 
     gSingle = 0;
     multiGraph = 0;
@@ -178,7 +178,7 @@ void CernRootModule::onDrawRequested(TObject *obj, QString opt, bool bDoUpdate)
     if (bDoUpdate) WOne->UpdateRootCanvas();
 }
 
-void CernRootModule::StartGraphWindows()
+void CernRootModule::CreateGraphWindows()
 {
     WOne     = new AGraphWindow("One",     MainWin); WOne->resize(1001, 601);
     WOverNeg = new AGraphWindow("OverNeg", MainWin); WOverNeg->resize(1001, 601);
@@ -186,11 +186,20 @@ void CernRootModule::StartGraphWindows()
     WAllNeg  = new AGraphWindow("AllNeg",  MainWin); WAllNeg->resize(1001, 601);
     WAllPos  = new AGraphWindow("AllPos",  MainWin); WAllPos->resize(1001, 601);
 
-    connect(WOne, SIGNAL(WasHidden()), this, SIGNAL(WOneHidden()));
-    connect(WOverNeg, SIGNAL(WasHidden()), this, SIGNAL(WOverNegHidden()));
-    connect(WOverPos, SIGNAL(WasHidden()), this, SIGNAL(WOverPosHidden()));
-    connect(WAllNeg, SIGNAL(WasHidden()), this, SIGNAL(WAllNegHidden()));
-    connect(WAllPos, SIGNAL(WasHidden()), this, SIGNAL(WAllPosHidden()));
+    connect(WOne,     &AGraphWindow::wasHidden, this, &CernRootModule::onGraphWindowRequestHide);
+    connect(WOverNeg, &AGraphWindow::wasHidden, this, &CernRootModule::onGraphWindowRequestHide);
+    connect(WOverPos, &AGraphWindow::wasHidden, this, &CernRootModule::onGraphWindowRequestHide);
+    connect(WAllNeg,  &AGraphWindow::wasHidden, this, &CernRootModule::onGraphWindowRequestHide);
+    connect(WAllPos,  &AGraphWindow::wasHidden, this, &CernRootModule::onGraphWindowRequestHide);
+}
+
+void CernRootModule::onGraphWindowRequestHide(QString idStr)
+{
+    if (idStr == "One")     emit WOneHidden();
+    if (idStr == "OverNeg") emit WOverNegHidden();
+    if (idStr == "OverPos") emit WOverPosHidden();
+    if (idStr == "AllNeg")  emit WAllNegHidden();
+    if (idStr == "AllPos")  emit WAllPosHidden();
 }
 
 CernRootModule::~CernRootModule()

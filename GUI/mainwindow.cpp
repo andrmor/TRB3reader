@@ -578,14 +578,14 @@ void MainWindow::on_sbEvent_valueChanged(int arg1)
     if (ui->pbShowOverlayNeg->isChecked()) on_pbShowOverlayNeg_toggled(true);
     if (ui->pbShowOverlayPos->isChecked()) on_pbShowOverlayPos_toggled(true);
 
-    if (ui->pbShowWaveform->isChecked()) on_pbShowWaveform_clicked(true);
+    if (ui->pbShowWaveform->isChecked()) on_pbShowWaveform_toggled(true);
 }
 
 void MainWindow::on_sbChannel_valueChanged(int)
 {
     OnEventOrChannelChanged();
 
-    if (ui->pbShowWaveform->isChecked()) on_pbShowWaveform_clicked(true);
+    if (ui->pbShowWaveform->isChecked()) on_pbShowWaveform_toggled(true);
 }
 
 int MainWindow::getCurrentlySelectedHardwareChannel()
@@ -723,7 +723,7 @@ void MainWindow::OnEventOrChannelChanged()
     ui->leTimes->setText(timeStr);
 }
 
-void MainWindow::on_pbShowWaveform_clicked(bool checked)
+void MainWindow::on_pbShowWaveform_toggled(bool checked)
 {
     RootModule->ShowSingleWaveWindow(checked);
     LogMessage("");

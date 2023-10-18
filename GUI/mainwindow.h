@@ -116,8 +116,8 @@ private slots:
     void on_sbEvent_valueChanged(int arg1);
     void on_sbChannel_valueChanged(int arg1);
 
-    //Show Waveforms
-    void on_pbShowWaveform_clicked(bool checked);
+    //Show/Hide Waveforms - triggered also by "close window" on the window itself!
+    void on_pbShowWaveform_toggled(bool checked);
     void on_pbShowOverlayNeg_toggled(bool checked);
     void on_pbShowOverlayPos_toggled(bool checked);
     void on_pbShowAllNeg_toggled(bool checked);

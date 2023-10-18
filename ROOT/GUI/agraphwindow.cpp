@@ -88,21 +88,19 @@ void AGraphWindow::resizeEvent(QResizeEvent * )
 }
 */
 
-void AGraphWindow::hideEvent(QHideEvent * e)
-{
-    storeGeomStatus();
-    emit WasHidden();
-
-    QMainWindow::hideEvent(e);
-}
-
 #include <QTimer>
-bool AGraphWindow::event(QEvent *event)
+bool AGraphWindow::event(QEvent * event)
 {
+    if (event->type() == QEvent::Close)
+    {
+        event->ignore();
+        emit wasHidden(IdStr);
+        return false;
+    }
+
     /*
     if (event->type() == QEvent::WindowActivate)
     {
-        qDebug() << "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
         RasterWindow->UpdateRootCanvas();
     }
     */

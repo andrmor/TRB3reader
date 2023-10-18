@@ -44,7 +44,7 @@ public:
                  bool bAutoscale, float Min, float Max, int SortBy_0Logic1Hardw,
                  bool bShowlabels, int Channels0_Signals1);
 
-    void StartGraphWindows();
+    void CreateGraphWindows();
     //const QJsonObject SaveGraphWindows() const;
     //void SetWindowGeometries(const QJsonObject &js);
     void ResetPositionOfWindows();
@@ -92,6 +92,7 @@ private:
 
 private slots:
     void timerTimeout();
+    void onGraphWindowRequestHide(QString idStr);
 
 signals:
     void WOneHidden();
