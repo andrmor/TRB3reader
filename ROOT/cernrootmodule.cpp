@@ -41,13 +41,6 @@ CernRootModule::CernRootModule(Trb3dataReader *Reader, Trb3signalExtractor *Extr
 
     CreateGraphWindows();
 
-    gSingle = 0;
-    multiGraph = 0;
-
-    NormalColor = 4;
-    RejectedColor = 2;
-    LineWidth = 2;
-
     TmpHub = new TmpObjHubClass();
 }
 
@@ -185,30 +178,38 @@ void CernRootModule::CreateGraphWindows()
     WOverPos = new AGraphWindow("OverPos", MainWin); WOverPos->resize(1001, 601);
     WAllNeg  = new AGraphWindow("AllNeg",  MainWin); WAllNeg->resize(1001, 601);
     WAllPos  = new AGraphWindow("AllPos",  MainWin); WAllPos->resize(1001, 601);
+    WSigNeg  = new AGraphWindow("SigNeg",  MainWin); WSigNeg->resize(1001, 601);
+    WSigPos  = new AGraphWindow("SigPos",  MainWin); WSigPos->resize(1001, 601);
 
     connect(WOne,     &AGraphWindow::wasHidden, this, &CernRootModule::onGraphWindowRequestHide);
     connect(WOverNeg, &AGraphWindow::wasHidden, this, &CernRootModule::onGraphWindowRequestHide);
     connect(WOverPos, &AGraphWindow::wasHidden, this, &CernRootModule::onGraphWindowRequestHide);
     connect(WAllNeg,  &AGraphWindow::wasHidden, this, &CernRootModule::onGraphWindowRequestHide);
     connect(WAllPos,  &AGraphWindow::wasHidden, this, &CernRootModule::onGraphWindowRequestHide);
+    connect(WSigNeg,  &AGraphWindow::wasHidden, this, &CernRootModule::onGraphWindowRequestHide);
+    connect(WSigPos,  &AGraphWindow::wasHidden, this, &CernRootModule::onGraphWindowRequestHide);
 }
 
 void CernRootModule::onGraphWindowRequestHide(QString idStr)
 {
-    if (idStr == "One")     emit WOneHidden();
-    if (idStr == "OverNeg") emit WOverNegHidden();
-    if (idStr == "OverPos") emit WOverPosHidden();
-    if (idStr == "AllNeg")  emit WAllNegHidden();
-    if (idStr == "AllPos")  emit WAllPosHidden();
+    if      (idStr == "One")     emit WOneHidden();
+    else if (idStr == "OverNeg") emit WOverNegHidden();
+    else if (idStr == "OverPos") emit WOverPosHidden();
+    else if (idStr == "AllNeg")  emit WAllNegHidden();
+    else if (idStr == "AllPos")  emit WAllPosHidden();
+    else if (idStr == "SigNeg")  emit WSigNegHidden();
+    else if (idStr == "SigPos")  emit WSigPosHidden();
 }
 
 CernRootModule::~CernRootModule()
 {
-    delete WOne; delete WOverNeg; delete WOverPos; delete WAllNeg; delete WAllPos;
-    WOne = WOverNeg = WOverPos = WAllNeg = WAllPos = 0;
+    delete WOne; delete WOverNeg; delete WOverPos; delete WAllNeg; delete WAllPos; delete WSigNeg; delete WSigPos;
+    WOne = WOverNeg = WOverPos = WAllNeg = WAllPos = WSigNeg = WSigPos = nullptr;
 
-    delete gSingle; gSingle = 0;
-    delete multiGraph; multiGraph = 0;
+    delete gSingle; gSingle = nullptr;
+    delete gNegSig; gNegSig = nullptr;
+    delete gPosSig; gPosSig = nullptr;
+    delete multiGraph; multiGraph = nullptr;
 
     clearNegGraphVectors();
     clearPosGraphVectors();
@@ -263,6 +264,16 @@ void CernRootModule::ShowAllNegWaveWindow(bool flag)
 void CernRootModule::ShowAllPosWaveWindow(bool flag)
 {
     showGraphWindow(WAllPos, flag);
+}
+
+void CernRootModule::ShowNegativeSignalWindow(bool flag)
+{
+    showGraphWindow(WSigNeg, flag);
+}
+
+void CernRootModule::ShowPositiveSignalWindow(bool flag)
+{
+    showGraphWindow(WSigPos, flag);
 }
 
 void CernRootModule::ClearSingleWaveWindow()
@@ -327,8 +338,7 @@ bool CernRootModule::DrawSingle(bool bFromDataHub, int ievent, int ichannel, boo
     const QVector<float>* wave = bFromDataHub ? DataHub->GetWaveform(ievent, ichannel) : Reader->GetWaveformPtr(ievent, ichannel);
     if (!wave) return false;
 
-    if (gSingle) delete gSingle;
-    gSingle = new TGraph();
+    delete gSingle; gSingle = new TGraph();
 
     int isam = 0;
     for (const float& val : *wave)
@@ -538,4 +548,64 @@ bool CernRootModule::DrawAll(bool bFromDataHub, int ievent, bool bNeg, int padsX
     win->SetTitle(title);
 
     return NonZeroWaves>0;
+}
+
+void CernRootModule::DrawSignals(bool bFromDataHub, int ievent, bool bNeg)
+{
+    TGraph*       & graph = (bNeg ? gNegSig : gPosSig);
+    AGraphWindow* & grwin = (bNeg ? WSigNeg : WSigPos);
+
+    const QVector<float> * sigAr = bFromDataHub ? DataHub->GetSignals(ievent) : Extractor->GetSignals(ievent);
+    if (!sigAr)
+    {
+        grwin->ClearRootCanvas();
+        grwin->UpdateRootCanvas();
+        return;
+    }
+
+    delete graph; graph = new TGraph();
+
+    const int numChan = (bFromDataHub ? Config->CountLogicalChannels() : Reader->CountChannels());
+
+    int from = -1;
+    int to   = -1;
+    for (int iCh = 0; iCh < numChan; iCh++)
+    {
+        int iChannel;
+        if (bFromDataHub) iChannel = iCh;
+        else
+        {
+            iChannel = Config->Map->LogicalToHardware(iCh);
+            if ( iChannel < 0 ) continue;
+        }
+
+        bool bPolarity = bFromDataHub ? Config->IsNegativeLogicalChannel(iChannel) : Config->IsNegativeHardwareChannel(iChannel);
+        if (bNeg != bPolarity) continue;
+
+        graph->AddPoint(iCh, sigAr->at(iCh));
+
+        if (from == -1) from = iCh;
+        to = iCh;
+    }
+
+    if (graph->GetN() == 0)
+    {
+        grwin->ClearRootCanvas();
+        grwin->UpdateRootCanvas();
+        return;
+    }
+
+    graph->GetXaxis()->SetTitle("Channel number");
+    graph->GetYaxis()->SetTitle("Signal, adc channels");
+    graph->SetMarkerStyle(20); graph->SetMarkerSize(0.5);
+    graph->GetXaxis()->SetRangeUser(from, to);
+    graph->SetMarkerColor(bNeg ? 4 : 2);
+    graph->SetLineColor(bNeg ? 4 : 2);
+
+    grwin->SetAsActiveRootWindow();
+    graph->Draw("APL");
+    grwin->UpdateRootCanvas();
+
+    QString title = QString(bNeg ? "Negative" : "Positive") + " polarity signals";
+    grwin->SetTitle(title);
 }

@@ -31,6 +31,8 @@ public:
     void ShowOverPosWaveWindow(bool flag);
     void ShowAllNegWaveWindow(bool flag);
     void ShowAllPosWaveWindow(bool flag);
+    void ShowNegativeSignalWindow(bool flag);
+    void ShowPositiveSignalWindow(bool flag);
 
     void ClearSingleWaveWindow();
     void ClearOverNegWaveWindow();
@@ -43,6 +45,7 @@ public:
     bool DrawAll(bool bFromDataHub, int ievent, bool bNeg, int padsX, int padsY,
                  bool bAutoscale, float Min, float Max, int SortBy_0Logic1Hardw,
                  bool bShowlabels, int Channels0_Signals1);
+    void DrawSignals(bool bFromDataHub, int ievent, bool bNeg);
 
     void CreateGraphWindows();
     //const QJsonObject SaveGraphWindows() const;
@@ -70,19 +73,23 @@ private:
 
     TmpObjHubClass* TmpHub;
 
-    TMultiGraph *multiGraph;
-    TGraph* gSingle;
+    TMultiGraph * multiGraph = nullptr;
+    TGraph * gSingle = nullptr;
     QVector<TGraph*> graphsNeg, graphsPos;
+    TGraph * gNegSig = nullptr;
+    TGraph * gPosSig = nullptr;
 
     AGraphWindow * WOne     = nullptr;
     AGraphWindow * WOverNeg = nullptr;
     AGraphWindow * WOverPos = nullptr;
     AGraphWindow * WAllNeg  = nullptr;
     AGraphWindow * WAllPos  = nullptr;
+    AGraphWindow * WSigPos  = nullptr;
+    AGraphWindow * WSigNeg  = nullptr;
 
-    int NormalColor;
-    int RejectedColor;
-    int LineWidth;
+    int NormalColor = 4;
+    int RejectedColor = 2;
+    int LineWidth = 2;
 
     void showGraphWindow(AGraphWindow * win, bool flag);
     void clearNegGraphVectors();
@@ -100,6 +107,8 @@ signals:
     void WOverPosHidden();
     void WAllNegHidden();
     void WAllPosHidden();
+    void WSigNegHidden();
+    void WSigPosHidden();
 
 };
 

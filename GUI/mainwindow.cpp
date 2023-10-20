@@ -82,6 +82,8 @@ MainWindow::MainWindow(MasterConfig* Config,
     connect(RootModule, &CernRootModule::WOverPosHidden, [=](){ui->pbShowOverlayPos->setChecked(false);});
     connect(RootModule, &CernRootModule::WAllNegHidden, [=](){ui->pbShowAllNeg->setChecked(false);});
     connect(RootModule, &CernRootModule::WAllPosHidden, [=](){ui->pbShowAllPos->setChecked(false);});
+    connect(RootModule, &CernRootModule::WSigNegHidden, [=](){ui->pbShowSignalsNegative->setChecked(false);});
+    connect(RootModule, &CernRootModule::WSigPosHidden, [=](){ui->pbShowSignalsPositive->setChecked(false);});
 
     connect(DataHub, &ADataHub::requestGuiUpdate, this, &MainWindow::UpdateGui);
     connect(DataHub, &ADataHub::reportProgress, this, &MainWindow::onProgressUpdate);
@@ -820,6 +822,42 @@ void MainWindow::showOverlay(bool checked, bool bNeg)
         if (bNeg) RootModule->ClearOverNegWaveWindow();
         else      RootModule->ClearOverPosWaveWindow();
     }
+}
+
+void MainWindow::on_pbShowSignalsNegative_toggled(bool checked)
+{
+    showSignals(checked, true);
+}
+
+void MainWindow::on_pbShowSignalsPositive_toggled(bool checked)
+{
+    showSignals(checked, false);
+}
+
+void MainWindow::showSignals(bool checked, bool bNeg)
+{
+    bNeg ? RootModule->ShowNegativeSignalWindow(checked) : RootModule->ShowPositiveSignalWindow(checked);
+    LogMessage("");
+    if (!checked) return;
+
+    const bool bFromDataHub = (ui->cobExplorerSource->currentIndex() == 1);
+    int numEvents = bFromDataHub ? DataHub->CountEvents() : Reader->CountEvents();
+    int ievent = ui->sbEvent->value();
+    if (ievent >= numEvents)
+    {
+        ui->sbEvent->setValue(0);
+        RootModule->ClearSingleWaveWindow(); // !!!*** why this one?
+        return;
+    }
+
+    RootModule->DrawSignals(bFromDataHub, ievent, bNeg);
+    /*
+    if (!bOK)
+    {
+        if (bNeg) RootModule->ClearOverNegWaveWindow();
+        else      RootModule->ClearOverPosWaveWindow();
+    }
+    */
 }
 
 void MainWindow::on_pbShowAllNeg_toggled(bool checked)

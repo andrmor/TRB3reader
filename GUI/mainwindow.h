@@ -122,6 +122,8 @@ private slots:
     void on_pbShowOverlayPos_toggled(bool checked);
     void on_pbShowAllNeg_toggled(bool checked);
     void on_pbShowAllPos_toggled(bool checked);
+    void on_pbShowSignalsNegative_toggled(bool checked);
+    void on_pbShowSignalsPositive_toggled(bool checked);
 
     //auto-redraws
     void on_pbGotoNextEvent_clicked();
@@ -208,6 +210,7 @@ private:
 
     void OnEventOrChannelChanged();
     void showOverlay(bool checked, bool bNeg);
+    void showSignals(bool checked, bool bNeg);
     int  getCurrentlySelectedHardwareChannel();
     void showAllWave(bool checked, bool bNeg);
     void updateSmoothAfterPedeEnableStatus();
@@ -278,6 +281,7 @@ private slots:
     void on_sbZeroSignalIfPeakBefore_N_editingFinished();
     void on_sbZeroSignalIfPeakAfter_N_editingFinished();
     void on_sbEvent_editingFinished();
+
 };
 
 #endif // MAINWINDOW_H

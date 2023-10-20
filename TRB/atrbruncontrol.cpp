@@ -206,7 +206,7 @@ void ATrbRunControl::onReadyBoardLog()
 {
     QString log(prBoard->readAll());
     //qDebug() << "=========================";
-    qDebug() << log;
+    //qDebug() << log;
     //qDebug() << "=========================";
 
     switch (ConnectStatus)
