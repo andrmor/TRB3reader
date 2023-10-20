@@ -565,27 +565,23 @@ void CernRootModule::DrawSignals(bool bFromDataHub, int ievent, bool bNeg)
 
     delete graph; graph = new TGraph();
 
-    const int numChan = (bFromDataHub ? Config->CountLogicalChannels() : Reader->CountChannels());
+    const int numLogicalChan = Config->CountLogicalChannels();
 
     int from = -1;
     int to   = -1;
-    for (int iCh = 0; iCh < numChan; iCh++)
+    for (int iLogicalCh = 0; iLogicalCh < numLogicalChan; iLogicalCh++)
     {
-        int iChannel;
-        if (bFromDataHub) iChannel = iCh;
-        else
-        {
-            iChannel = Config->Map->LogicalToHardware(iCh);
-            if ( iChannel < 0 ) continue;
-        }
+        if (Config->IsIgnoredLogicalChannel(iLogicalCh)) continue;
 
-        bool bPolarity = bFromDataHub ? Config->IsNegativeLogicalChannel(iChannel) : Config->IsNegativeHardwareChannel(iChannel);
+        bool bPolarity = Config->IsNegativeLogicalChannel(iLogicalCh);
         if (bNeg != bPolarity) continue;
 
-        graph->AddPoint(iCh, sigAr->at(iCh));
+        float sig = (bFromDataHub ? sigAr->at(iLogicalCh) : sigAr->at(Config->Map->LogicalToHardware(iLogicalCh)));
 
-        if (from == -1) from = iCh;
-        to = iCh;
+        graph->SetPoint(graph->GetN(), iLogicalCh, sig);
+
+        if (from == -1) from = iLogicalCh;
+        to = iLogicalCh;
     }
 
     if (graph->GetN() == 0)
