@@ -2108,3 +2108,22 @@ void MainWindow::on_sbZeroSignalIfPeakAfter_N_editingFinished()
     Config->ZeroSignalIfPeakAfter_Negative = ui->sbZeroSignalIfPeakAfter_N->value();
     ClearData();
 }
+
+void MainWindow::on_pbShowAllNegatives_clicked()
+{
+    const bool bFromDataHub = (ui->cobExplorerSource->currentIndex() == 1);
+    double Min = ui->ledMinNeg->text().toDouble();
+    double Max = ui->ledMaxNeg->text().toDouble();
+    RootModule->ShowSingleWaveWindow(true);
+    RootModule->DrawAllKindOnOne(true, bFromDataHub, ui->cbAutoscaleY->isChecked(), Min, Max);
+}
+
+void MainWindow::on_pbShowAllPositives_clicked()
+{
+    const bool bFromDataHub = (ui->cobExplorerSource->currentIndex() == 1);
+    double Min = ui->ledMinPos->text().toDouble();
+    double Max = ui->ledMaxPos->text().toDouble();
+    RootModule->ShowSingleWaveWindow(true);
+    RootModule->DrawAllKindOnOne(false, bFromDataHub, ui->cbAutoscaleY->isChecked(), Min, Max);
+}
+

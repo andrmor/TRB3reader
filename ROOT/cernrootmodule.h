@@ -15,6 +15,7 @@ class ADataHub;
 class TGraph;
 class TmpObjHubClass;
 class TObject;
+class TH2D;
 class QMainWindow;
 
 class CernRootModule : public QObject
@@ -46,6 +47,7 @@ public:
                  bool bAutoscale, float Min, float Max, int SortBy_0Logic1Hardw,
                  bool bShowlabels, int Channels0_Signals1);
     void DrawSignals(bool bFromDataHub, int ievent, bool bNeg);
+    void DrawAllKindOnOne(bool bNegatives, bool bFromDataHub, bool bAutoscale, double Min, double Max);
 
     void CreateGraphWindows();
     //const QJsonObject SaveGraphWindows() const;
@@ -78,6 +80,7 @@ private:
     QVector<TGraph*> graphsNeg, graphsPos;
     TGraph * gNegSig = nullptr;
     TGraph * gPosSig = nullptr;
+    TH2D * hAll = nullptr;
 
     AGraphWindow * WOne     = nullptr;
     AGraphWindow * WOverNeg = nullptr;

@@ -24,6 +24,7 @@ public:
     bool    SetValue(int ievent, int ichannel, int isample, float value);
     void    SetValueFast(int ievent, int ichannel, int isample, float value); //no argument validity check!
 
+    const QVector<float>* GetWaveformsPtr(int ievent, int ichannel) const;
     const QVector<float>* GetWaveformPtr(int ievent, int ichannel) const;
     const QVector<float>* GetWaveformPtrFast(int ievent, int ichannel) const; //no argument validity check!
 

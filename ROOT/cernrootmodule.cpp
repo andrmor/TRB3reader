@@ -605,3 +605,61 @@ void CernRootModule::DrawSignals(bool bFromDataHub, int ievent, bool bNeg)
     QString title = QString(bNeg ? "Negative" : "Positive") + " polarity signals";
     grwin->SetTitle(title);
 }
+
+void CernRootModule::DrawAllKindOnOne(bool bNegatives, bool bFromDataHub, bool bAutoscale, double Min, double Max)
+{
+    const int numChannels = (bFromDataHub ? DataHub->CountChannels() : Reader->CountChannels());
+    const int numEvents = (bFromDataHub ? DataHub->CountEvents() : Reader->CountEvents());
+
+    double minY = Min;
+    double maxY = Max;
+    //if (bAutoscale) {minY = maxY = 0;}
+
+    QVector<int> channels;
+    for (int iCh = 0; iCh < numChannels; iCh++)
+    {
+        if (Config->IsIgnoredLogicalChannel(iCh)) continue;
+        bool isNegativeChannel = Config->IsNegativeLogicalChannel(iCh);
+        if (isNegativeChannel == bNegatives) channels << iCh;
+    }
+    //qDebug() << channels;
+
+    if (channels.isEmpty())
+    {
+        ClearSingleWaveWindow();
+        return;
+    }
+
+    if (bAutoscale)
+    {
+        // bad feature of ROOT - cannot have in Y direction autorange and still have fixed range for X :-(
+        minY = +1e20;
+        maxY = -1e20;
+
+        for (int iEv = 0; iEv < numEvents; iEv++)
+            for (int iCh : channels)
+            {
+                const double sig = (bFromDataHub ? DataHub->GetSignalFast(iEv, iCh) : Extractor->GetSignalFast(iEv, iCh));
+                if (sig < minY) minY = sig;
+                if (sig > maxY) maxY = sig;
+            }
+    }
+
+    delete hAll;
+    hAll = new TH2D("", "", 1+channels.last() - channels.front(), channels.front(), channels.last()+1,    50, minY, maxY);
+    //qDebug() << 1+channels.last() - channels.front() << channels.front() << channels.last()+1;
+
+    for (int iEv = 0; iEv < numEvents; iEv++)
+        for (int iCh : channels)
+        {
+            double sig = (bFromDataHub ? DataHub->GetSignalFast(iEv, iCh) : Extractor->GetSignalFast(iEv, iCh));
+            //qDebug() << iCh << sig;
+            hAll->Fill(iCh+0.001, sig, 1);
+        }
+
+    WOne->SetAsActiveRootWindow();
+    hAll->Draw("colz");
+    WOne->UpdateRootCanvas();
+
+    WOne->SetTitle(QString("All %1").arg(bNegatives ? "negatives" : "positives"));
+}

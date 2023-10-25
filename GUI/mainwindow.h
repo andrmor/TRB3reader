@@ -282,6 +282,8 @@ private slots:
     void on_sbZeroSignalIfPeakAfter_N_editingFinished();
     void on_sbEvent_editingFinished();
 
+    void on_pbShowAllNegatives_clicked();
+    void on_pbShowAllPositives_clicked();
 };
 
 #endif // MAINWINDOW_H
