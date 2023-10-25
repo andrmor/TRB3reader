@@ -581,6 +581,9 @@ void MainWindow::on_sbEvent_valueChanged(int arg1)
     if (ui->pbShowOverlayPos->isChecked()) on_pbShowOverlayPos_toggled(true);
 
     if (ui->pbShowWaveform->isChecked()) on_pbShowWaveform_toggled(true);
+
+    if (ui->pbShowSignalsNegative->isChecked()) on_pbShowSignalsNegative_toggled(true);
+    if (ui->pbShowSignalsPositive->isChecked()) on_pbShowSignalsPositive_toggled(true);
 }
 
 void MainWindow::on_sbChannel_valueChanged(int)
