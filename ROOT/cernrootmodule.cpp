@@ -639,7 +639,7 @@ void CernRootModule::DrawAllKindOnOne(bool bNegatives, bool bFromDataHub, bool b
         for (int iEv = 0; iEv < numEvents; iEv++)
             for (int iCh : channels)
             {
-                const double sig = (bFromDataHub ? DataHub->GetSignalFast(iEv, iCh) : Extractor->GetSignalFast(iEv, iCh));
+                const double sig = (bFromDataHub ? DataHub->GetSignalFast(iEv, iCh) : Extractor->GetSignalFast(iEv, Config->Map->LogicalToHardware(iCh) ));
                 if (sig < minY) minY = sig;
                 if (sig > maxY) maxY = sig;
             }
@@ -652,7 +652,7 @@ void CernRootModule::DrawAllKindOnOne(bool bNegatives, bool bFromDataHub, bool b
     for (int iEv = 0; iEv < numEvents; iEv++)
         for (int iCh : channels)
         {
-            double sig = (bFromDataHub ? DataHub->GetSignalFast(iEv, iCh) : Extractor->GetSignalFast(iEv, iCh));
+            double sig = (bFromDataHub ? DataHub->GetSignalFast(iEv, iCh) : Extractor->GetSignalFast(iEv, Config->Map->LogicalToHardware(iCh) ));
             //qDebug() << iCh << sig;
             hAll->Fill(iCh+0.001, sig, 1);
         }
