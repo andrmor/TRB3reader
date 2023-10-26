@@ -4364,12 +4364,18 @@
             <property name="text">
              <string>Show all negatives</string>
             </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
           <item>
            <widget class="QPushButton" name="pbShowAllPositives">
             <property name="text">
              <string>Show all positives</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
             </property>
            </widget>
           </item>

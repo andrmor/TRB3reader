@@ -17,14 +17,19 @@ AGraphWindow::AGraphWindow(const QString & idStr, QWidget * parent) :
 
     RasterWindow = new ARasterWindow(this);
 
-    RasterWindow->resize(width(), height());
+    //RasterWindow->resize(width(), height());
+    RasterWindow->resize(800, 500);
     RasterWindow->ForceResize();
 
     setCentralWidget(RasterWindow);
+
+    restoreGeomStatus();
+    hide();
 }
 
 AGraphWindow::~AGraphWindow()
 {
+    storeGeomStatus();
     qDebug() << "Destructor called for AGraphWindow";
     delete ui;
 }

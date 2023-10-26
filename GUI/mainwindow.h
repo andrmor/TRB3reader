@@ -124,6 +124,8 @@ private slots:
     void on_pbShowAllPos_toggled(bool checked);
     void on_pbShowSignalsNegative_toggled(bool checked);
     void on_pbShowSignalsPositive_toggled(bool checked);
+    void on_pbShowAllNegatives_toggled(bool checked);
+    void on_pbShowAllPositives_toggled(bool checked);
 
     //auto-redraws
     void on_pbGotoNextEvent_clicked();
@@ -282,8 +284,6 @@ private slots:
     void on_sbZeroSignalIfPeakAfter_N_editingFinished();
     void on_sbEvent_editingFinished();
 
-    void on_pbShowAllNegatives_clicked();
-    void on_pbShowAllPositives_clicked();
 };
 
 #endif // MAINWINDOW_H

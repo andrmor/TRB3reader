@@ -84,6 +84,8 @@ MainWindow::MainWindow(MasterConfig* Config,
     connect(RootModule, &CernRootModule::WAllPosHidden, [=](){ui->pbShowAllPos->setChecked(false);});
     connect(RootModule, &CernRootModule::WSigNegHidden, [=](){ui->pbShowSignalsNegative->setChecked(false);});
     connect(RootModule, &CernRootModule::WSigPosHidden, [=](){ui->pbShowSignalsPositive->setChecked(false);});
+    connect(RootModule, &CernRootModule::W2DNegHidden, [=](){ui->pbShowAllNegatives->setChecked(false);});
+    connect(RootModule, &CernRootModule::W2DNegHidden, [=](){ui->pbShowAllPositives->setChecked(false);});
 
     connect(DataHub, &ADataHub::requestGuiUpdate, this, &MainWindow::UpdateGui);
     connect(DataHub, &ADataHub::reportProgress, this, &MainWindow::onProgressUpdate);
@@ -168,6 +170,9 @@ void MainWindow::on_pbProcessData_clicked()
     OnEventOrChannelChanged();
     on_sbEvent_valueChanged(ui->sbEvent->value());
     updateNumEventsIndication();
+
+    on_pbShowAllNegatives_toggled(ui->pbShowAllNegatives->isChecked());
+    on_pbShowAllPositives_toggled(ui->pbShowAllNegatives->isChecked());
 }
 
 const QString MainWindow::ProcessData()
@@ -918,6 +923,25 @@ void MainWindow::showAllWave(bool checked, bool bNeg)
     }
 }
 
+void MainWindow::on_pbShowAllNegatives_toggled(bool checked)
+{
+    const bool bFromDataHub = (ui->cobExplorerSource->currentIndex() == 1);
+    double Min = ui->ledMinNeg->text().toDouble();
+    double Max = ui->ledMaxNeg->text().toDouble();
+    RootModule->Show2DNegWindow(checked);
+    if (checked)
+        RootModule->Draw2D(true, bFromDataHub, ui->cbAutoscaleY->isChecked(), Min, Max);
+}
+
+void MainWindow::on_pbShowAllPositives_toggled(bool checked)
+{
+    const bool bFromDataHub = (ui->cobExplorerSource->currentIndex() == 1);
+    double Min = ui->ledMinPos->text().toDouble();
+    double Max = ui->ledMaxPos->text().toDouble();
+    RootModule->Show2DPosWindow(checked);
+    if (checked)
+        RootModule->Draw2D(false, bFromDataHub, ui->cbAutoscaleY->isChecked(), Min, Max);
+}
 
 void MainWindow::on_cbLabels_clicked()
 {
@@ -1239,6 +1263,9 @@ void MainWindow::on_pbProcessAllFromDir_clicked()
     while (it.hasNext()) names << it.next();
 
     bulkProcessorEnvelope(names);
+
+    on_pbShowAllNegatives_toggled(ui->pbShowAllNegatives->isChecked());
+    on_pbShowAllPositives_toggled(ui->pbShowAllNegatives->isChecked());
 }
 
 void MainWindow::on_pbProcessSelectedFiles_clicked()
@@ -1248,6 +1275,9 @@ void MainWindow::on_pbProcessSelectedFiles_clicked()
     Config->WorkingDir = QFileInfo(names.first()).absolutePath();
 
     bulkProcessorEnvelope(names);
+
+    on_pbShowAllNegatives_toggled(ui->pbShowAllNegatives->isChecked());
+    on_pbShowAllPositives_toggled(ui->pbShowAllNegatives->isChecked());
 }
 
 void MainWindow::bulkProcessorEnvelope(const QStringList FileNames)
@@ -2108,22 +2138,3 @@ void MainWindow::on_sbZeroSignalIfPeakAfter_N_editingFinished()
     Config->ZeroSignalIfPeakAfter_Negative = ui->sbZeroSignalIfPeakAfter_N->value();
     ClearData();
 }
-
-void MainWindow::on_pbShowAllNegatives_clicked()
-{
-    const bool bFromDataHub = (ui->cobExplorerSource->currentIndex() == 1);
-    double Min = ui->ledMinNeg->text().toDouble();
-    double Max = ui->ledMaxNeg->text().toDouble();
-    RootModule->ShowSingleWaveWindow(true);
-    RootModule->DrawAllKindOnOne(true, bFromDataHub, ui->cbAutoscaleY->isChecked(), Min, Max);
-}
-
-void MainWindow::on_pbShowAllPositives_clicked()
-{
-    const bool bFromDataHub = (ui->cobExplorerSource->currentIndex() == 1);
-    double Min = ui->ledMinPos->text().toDouble();
-    double Max = ui->ledMaxPos->text().toDouble();
-    RootModule->ShowSingleWaveWindow(true);
-    RootModule->DrawAllKindOnOne(false, bFromDataHub, ui->cbAutoscaleY->isChecked(), Min, Max);
-}
-
