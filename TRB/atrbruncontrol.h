@@ -32,10 +32,9 @@ public:
     QString sendCTStoTRB();
     QString ReadTriggerSettingsFromBoard();
     QString sendTriggerLogicToTRB();
+    QString readTriggerLogicFromTRB();
     QString sendBufferControlToTRB();
     QString readBufferControlFromTRB();
-    QString readTriggerLogicFromTRB();
-
 
     void  checkFreeSpace();
 

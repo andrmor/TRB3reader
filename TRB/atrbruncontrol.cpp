@@ -517,9 +517,9 @@ QString ATrbRunControl::sendTriggerLogicToTRB()
 {
     QStringList txt;
     txt << QString("trbcmd w 0xa003 0xdf00 0x%1 # OR logic, slice 0\n").arg( QString::number(Settings.TrbRunSettings.OR_0_FPGA3, 16) );
-    txt << QString("trbcmd w 0xa003 0xdf01 0x%1 # OR logic, slice 1\n").arg( QString::number(Settings.TrbRunSettings.OR_1_FPGA3, 16) );
+    txt << QString("trbcmd w 0xa003 0xdf04 0x%1 # OR logic, slice 1\n").arg( QString::number(Settings.TrbRunSettings.OR_1_FPGA3, 16) );
     txt << QString("trbcmd w 0xa004 0xdf00 0x%1 # OR logic, slice 0\n").arg( QString::number(Settings.TrbRunSettings.OR_0_FPGA4, 16) );
-    txt << QString("trbcmd w 0xa004 0xdf01 0x%1 # OR logic, slice 1\n").arg( QString::number(Settings.TrbRunSettings.OR_1_FPGA4, 16) );
+    txt << QString("trbcmd w 0xa004 0xdf04 0x%1 # OR logic, slice 1\n").arg( QString::number(Settings.TrbRunSettings.OR_1_FPGA4, 16) );
     qDebug() << txt;
 
     QString command = "ssh";
@@ -713,7 +713,7 @@ QString ATrbRunControl::readTriggerLogicFromTRB()
     for (const QString & bstr : TimeBoards)
     {
         txt << QString("trbcmd r %1 0xdf00\n").arg(bstr);
-        txt << QString("trbcmd r %1 0xdf01\n").arg(bstr);
+        txt << QString("trbcmd r %1 0xdf04\n").arg(bstr);
     }
     for (const QString & s : txt) pr.write(QByteArray(s.toLocal8Bit().data()));
 
@@ -721,7 +721,7 @@ QString ATrbRunControl::readTriggerLogicFromTRB()
     if (!pr.waitForFinished(2000)) return "Timeout on attempt to execute Buffer configuration";
 
     QString reply = pr.readAll();
-    QStringList sl = reply.split('\n', QString::SkipEmptyParts);
+    QStringList sl = reply.split('\n', Qt::SkipEmptyParts);
 
     //clean login messages
     while (!sl.isEmpty() && !sl.first().startsWith("0x"))
@@ -731,41 +731,27 @@ QString ATrbRunControl::readTriggerLogicFromTRB()
     if (sl.size() != TimeBoards.size() * 2) // absolute number = number of settings ber buf!
         return "unexpected number of reply lines";
 
-    /*
-    QVector<ABufferRecord> & BufRec = Settings.getBufferRecords();
-    int icounter = 0;
-    for (ABufferRecord & r : BufRec)
-    {
-        const QString addr = "0x" + QString::number(r.Datakind, 16);
-        ulong Samples, Delay, Downsampling;
-        bool bOK;
+    bool bOK;
 
-        QStringList l = sl.at(icounter).split(' ', QString::SkipEmptyParts);
-        if (l.size() !=2 || l.first() != addr)
-            return "unexpected format of reply line";
-        Samples = l.last().toULong(&bOK, 16);
-        if (!bOK) return "unexpected format of reply line";
-        icounter++;
+    QStringList l = sl[0].split(' ', Qt::SkipEmptyParts);
+    if (l.size() !=2 || l.first() != TimeBoards[0]) return "unexpected format of reply line";
+    Settings.TrbRunSettings.OR_0_FPGA3 = l.last().toULong(&bOK, 16);
+    if (!bOK) return "unexpected format of reply line";
 
-        l = sl.at(icounter).split(' ', QString::SkipEmptyParts);
-        if (l.size() !=2 || l.first() != addr)
-            return "unexpected format of reply line";
-        Delay = l.last().toULong(&bOK, 16);
-        if (!bOK) return "unexpected format of reply line";
-        icounter++;
+    l = sl[1].split(' ', Qt::SkipEmptyParts);
+    if (l.size() !=2 || l.first() != TimeBoards[0]) return "unexpected format of reply line";
+    Settings.TrbRunSettings.OR_1_FPGA3 = l.last().toULong(&bOK, 16);
+    if (!bOK) return "unexpected format of reply line";
 
-        l = sl.at(icounter).split(' ', QString::SkipEmptyParts);
-        if (l.size() !=2 || l.first() != addr)
-            return "unexpected format of reply line";
-        Downsampling = l.last().toULong(&bOK, 16);
-        if (!bOK) return "unexpected format of reply line";
-        icounter++;
+    l = sl[3].split(' ', Qt::SkipEmptyParts);
+    if (l.size() !=2 || l.first() != TimeBoards[1]) return "unexpected format of reply line";
+    Settings.TrbRunSettings.OR_0_FPGA4 = l.last().toULong(&bOK, 16);
+    if (!bOK) return "unexpected format of reply line";
 
-        r.Samples = Samples;
-        r.Delay = Delay;
-        r.Downsampling = Downsampling;
-    }
-    */
+    l = sl[4].split(' ', Qt::SkipEmptyParts);
+    if (l.size() !=2 || l.first() != TimeBoards[1]) return "unexpected format of reply line";
+    Settings.TrbRunSettings.OR_1_FPGA4 = l.last().toULong(&bOK, 16);
+    if (!bOK) return "unexpected format of reply line";
 
     pr.close();
     return "";
