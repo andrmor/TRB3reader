@@ -2012,6 +2012,7 @@ void MainWindow::on_pbRestartTrb_clicked()
         TrbRunManager->RestartBoard();
 }
 
+#include <bitset>
 void MainWindow::on_pbUpdateTriggerGui_clicked()
 {
     ui->cbMP0->setChecked(Config->TrbRunSettings.bMP_0);
@@ -2027,6 +2028,7 @@ void MainWindow::on_pbUpdateTriggerGui_clicked()
     ui->cbPeriodicalPulser0->setChecked(Config->TrbRunSettings.bPeriodicPulser);
 
     ui->cbPeripheryFPGA0->setChecked(Config->TrbRunSettings.bPeripheryFPGA0);
+    ui->cbPeripheryFPGA1->setChecked(Config->TrbRunSettings.bPeripheryFPGA1);
 
     ulong rFreq = Config->TrbRunSettings.RandomPulserFrequency.toULong(nullptr, 16);
     double freq = (double)rFreq / 21.474836;
@@ -2035,6 +2037,36 @@ void MainWindow::on_pbUpdateTriggerGui_clicked()
     ulong rPeriod = Config->TrbRunSettings.Period.toULong(nullptr, 16);
     double per = (double)rPeriod * 10.0;
     ui->lePeriod0->setText( QString::number(per) );
+
+    // line 0
+    {
+        int val = Config->TrbRunSettings.PeripheryTriggerInputs0.toInt(nullptr, 16);
+        std::bitset<32> bits(val);
+        ui->cbT330->setChecked(bits.test(14));
+        ui->cbT320->setChecked(bits.test(13));
+        ui->cbT310->setChecked(bits.test(12));
+        ui->cbT300->setChecked(bits.test(11));
+
+        ui->cbT430->setChecked(bits.test(19));
+        ui->cbT420->setChecked(bits.test(18));
+        ui->cbT410->setChecked(bits.test(17));
+        ui->cbT400->setChecked(bits.test(16));
+    }
+
+    // line 1
+    {
+        int val = Config->TrbRunSettings.PeripheryTriggerInputs1.toInt(nullptr, 16);
+        std::bitset<32> bits(val);
+        ui->cbT331->setChecked(bits.test(14));
+        ui->cbT321->setChecked(bits.test(13));
+        ui->cbT311->setChecked(bits.test(12));
+        ui->cbT301->setChecked(bits.test(11));
+
+        ui->cbT431->setChecked(bits.test(19));
+        ui->cbT421->setChecked(bits.test(18));
+        ui->cbT411->setChecked(bits.test(17));
+        ui->cbT401->setChecked(bits.test(16));
+    }
 }
 
 void MainWindow::on_pbUpdateTriggerSettings_clicked()
@@ -2052,6 +2084,7 @@ void MainWindow::on_pbUpdateTriggerSettings_clicked()
     Config->TrbRunSettings.bPeriodicPulser = ui->cbPeriodicalPulser0->isChecked();
 
     Config->TrbRunSettings.bPeripheryFPGA0 = ui->cbPeripheryFPGA0->isChecked();
+    Config->TrbRunSettings.bPeripheryFPGA1 = ui->cbPeripheryFPGA1->isChecked();
 
     double freq = ui->leRandomFrequency->text().toDouble() * 21.474836;
     ulong rFreq = (ulong)freq;
@@ -2063,7 +2096,37 @@ void MainWindow::on_pbUpdateTriggerSettings_clicked()
     if (rPer > 0xffffffff) rPer = 0xffffffff;
     Config->TrbRunSettings.Period = "0x" + QString::number(rPer, 16);
 
-    qDebug() <<Config->TrbRunSettings.RandomPulserFrequency<<Config->TrbRunSettings.Period;
+    //qDebug() <<Config->TrbRunSettings.RandomPulserFrequency<<Config->TrbRunSettings.Period;
+
+    // line 0
+    {
+        int val = Config->TrbRunSettings.PeripheryTriggerInputs0.toInt(nullptr, 16);
+        std::bitset<32> bits(val);
+        bits.set(14, ui->cbT330->isChecked());
+        bits.set(13, ui->cbT320->isChecked());
+        bits.set(12, ui->cbT310->isChecked());
+        bits.set(11, ui->cbT300->isChecked());
+        bits.set(19, ui->cbT430->isChecked());
+        bits.set(18, ui->cbT420->isChecked());
+        bits.set(17, ui->cbT410->isChecked());
+        bits.set(16, ui->cbT400->isChecked());
+        Config->TrbRunSettings.PeripheryTriggerInputs0 = "0x" + QString::number(bits.to_ulong(), 16);
+    }
+    // line 1
+    {
+        int val = Config->TrbRunSettings.PeripheryTriggerInputs1.toInt(nullptr, 16);
+        std::bitset<32> bits(val);
+        bits.set(14, ui->cbT331->isChecked());
+        bits.set(13, ui->cbT321->isChecked());
+        bits.set(12, ui->cbT311->isChecked());
+        bits.set(11, ui->cbT301->isChecked());
+        bits.set(19, ui->cbT431->isChecked());
+        bits.set(18, ui->cbT421->isChecked());
+        bits.set(17, ui->cbT411->isChecked());
+        bits.set(16, ui->cbT401->isChecked());
+        Config->TrbRunSettings.PeripheryTriggerInputs1 = "0x" + QString::number(bits.to_ulong(), 16);
+    }
+
 }
 
 void MainWindow::on_pbOpenBufferWebPage_clicked()

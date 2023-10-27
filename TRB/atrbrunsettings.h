@@ -39,6 +39,10 @@ public:
     bool    bRandPulser = false;
     bool    bPeriodicPulser = false;
     bool    bPeripheryFPGA0 = false;
+    bool    bPeripheryFPGA1 = false;
+
+    QString PeripheryTriggerInputs0 = "0x00000000";
+    QString PeripheryTriggerInputs1 = "0x00000000";
 
     int     Mask = 0xffff;
     QString RandomPulserFrequency = "0"; //QJsonObject is not friendly for ulong...

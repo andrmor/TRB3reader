@@ -538,11 +538,11 @@ const QStringList ATrbRunControl::CtsSettingsToCommands(bool bIncludeHidden)
     QString sbits = QString::number(bits, 16);
     txt << QString("trbcmd w 0xc001 0xa101 0x%1   # trg_channel and mask\n").arg(sbits);
 
-    //txt << QString("trbcmd w 0xc001 0xa159 %1   # random pulser frequency\n").arg(RunSettings.RandomPulserFrequency);
     txt << QString("trbcmd w 0xc001 0xa15a %1   # random pulser frequency\n").arg(RunSettings.RandomPulserFrequency);
-
-    //txt << QString("trbcmd w 0xc001 0xa156 %1   # periodic pulser - period\n").arg(RunSettings.Period);
     txt << QString("trbcmd w 0xc001 0xa158 %1   # periodic pulser - period\n").arg(RunSettings.Period);
+
+    txt << QString("trbcmd w 0xc001 0xa153 %1   # periphery trigger inpits 0\n").arg(RunSettings.PeripheryTriggerInputs0);
+    txt << QString("trbcmd w 0xc001 0xa154 %1   # periphery trigger inputs 1\n").arg(RunSettings.PeripheryTriggerInputs1);
 
     if (bIncludeHidden)
     {
@@ -801,10 +801,10 @@ const QString ATrbRunControl::ReadTriggerSettingsFromBoard()
                 QString trig = line.at(4);
                 RunSettings.setTriggerInt( trig.toULong(nullptr, 16) );
             }
-            //else if (line.at(3) == "0xa159") RunSettings.RandomPulserFrequency = line.at(4);
             else if (line.at(3) == "0xa15a") RunSettings.RandomPulserFrequency = line.at(4);
-            //else if (line.at(3) == "0xa156") RunSettings.Period = line.at(4);
             else if (line.at(3) == "0xa158") RunSettings.Period = line.at(4);
+            else if (line.at(3) == "0xa153") RunSettings.PeripheryTriggerInputs0 = line.at(4);
+            else if (line.at(3) == "0xa154") RunSettings.PeripheryTriggerInputs1 = line.at(4);
             else
             {
                 if (!s.contains("setbit") && !s.contains("clearbit"))
