@@ -32,8 +32,8 @@ INCLUDEPATH += ROOT/GUI
 
 #---DABC---
 DEFINES += DABC
-DABCPATH = /home/exnote/dabc
-#DABCPATH = /home/andr/dabc
+#DABCPATH = /home/exnote/dabc
+DABCPATH = /home/andr/dabc
 INCLUDEPATH += $$DABCPATH/include
 INCLUDEPATH += $$DABCPATH/include/hadaq
 LIBS += -L$$DABCPATH/lib/ -lDabcBase -lDabcMbs -lDabcHadaq

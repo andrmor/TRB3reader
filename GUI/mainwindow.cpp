@@ -1878,6 +1878,11 @@ void MainWindow::on_pbReadTriggerSettingsFromTrb_clicked()
 {
     QString err = TrbRunManager->ReadTriggerSettingsFromBoard();
     if (!err.isEmpty()) message(err, this);
+    else
+    {
+        err = TrbRunManager->readTriggerLogicFromTRB();
+        if (!err.isEmpty()) message(err, this);
+    }
 
     on_pbUpdateTriggerGui_clicked();
 }
@@ -1898,14 +1903,18 @@ void MainWindow::on_pbOpenCtsWebPage_clicked()
 
 void MainWindow::on_pbSendCTStoTRB_clicked()
 {
-    this->SetEnabled(false);
+    SetEnabled(false);
     qApp->processEvents();
 
     QString err = TrbRunManager->sendCTStoTRB();
 
-    this->SetEnabled(true);
-    if (!err.isEmpty())
-        message(err, this);
+    if (!err.isEmpty()) message(err, this);
+    else
+    {
+        err = TrbRunManager->sendTriggerLogicToTRB();
+        if (!err.isEmpty()) message(err, this);
+    }
+    SetEnabled(true);
 }
 
 #include "abufferdelegate.h"
@@ -2029,6 +2038,11 @@ void MainWindow::on_pbUpdateTriggerGui_clicked()
 
     ui->cbPeripheryFPGA0->setChecked(Config->TrbRunSettings.bPeripheryFPGA0);
     ui->cbPeripheryFPGA1->setChecked(Config->TrbRunSettings.bPeripheryFPGA1);
+
+    ui->leFPGA3_0->setText(intToBitString(Config->TrbRunSettings.OR_0_FPGA3));
+    ui->leFPGA3_1->setText(intToBitString(Config->TrbRunSettings.OR_1_FPGA3));
+    ui->leFPGA4_0->setText(intToBitString(Config->TrbRunSettings.OR_0_FPGA4));
+    ui->leFPGA4_1->setText(intToBitString(Config->TrbRunSettings.OR_1_FPGA4));
 
     ulong rFreq = Config->TrbRunSettings.RandomPulserFrequency.toULong(nullptr, 16);
     double freq = (double)rFreq / 21.474836;
@@ -2201,3 +2215,69 @@ void MainWindow::on_sbZeroSignalIfPeakAfter_N_editingFinished()
     Config->ZeroSignalIfPeakAfter_Negative = ui->sbZeroSignalIfPeakAfter_N->value();
     ClearData();
 }
+
+int vectorToBitInt(const QVector<int> & vec)
+{
+    int res = 0;
+    for (int i : vec)
+    {
+        if (i > 30) continue;
+        res += (1 << i);
+    }
+    return res;
+}
+
+#include <bitset>
+QString MainWindow::intToBitString(int val)
+{
+    QVector<int> vec;
+    std::bitset<32> bs(val);
+    for (int i = 0; i < 31; i++)
+        if (bs.test(i)) vec << i;
+    return PackChannelList(vec);
+}
+
+void MainWindow::on_leFPGA3_0_editingFinished()
+{
+    QVector<int> vec;
+    bool ok = ExtractNumbersFromQString(ui->leFPGA3_0->text(), &vec);
+    if (!ok)
+        message("Bad format: use, e.g., 0,1,3-5,7,10-20", this);
+    else
+        Config->TrbRunSettings.OR_0_FPGA3 = vectorToBitInt(vec);
+    ui->leFPGA3_0->setText(intToBitString(Config->TrbRunSettings.OR_0_FPGA3));
+}
+
+void MainWindow::on_leFPGA3_1_editingFinished()
+{
+    QVector<int> vec;
+    bool ok = ExtractNumbersFromQString(ui->leFPGA3_1->text(), &vec);
+    if (!ok)
+        message("Bad format: use, e.g., 0,1,3-5,7,10-20", this);
+    else
+        Config->TrbRunSettings.OR_1_FPGA3 = vectorToBitInt(vec);
+    ui->leFPGA3_1->setText(intToBitString(Config->TrbRunSettings.OR_1_FPGA3));
+}
+
+void MainWindow::on_leFPGA4_0_editingFinished()
+{
+    QVector<int> vec;
+    bool ok = ExtractNumbersFromQString(ui->leFPGA4_0->text(), &vec);
+    if (!ok)
+        message("Bad format: use, e.g., 0,1,3-5,7,10-20", this);
+    else
+        Config->TrbRunSettings.OR_0_FPGA4 = vectorToBitInt(vec);
+    ui->leFPGA4_0->setText(intToBitString(Config->TrbRunSettings.OR_0_FPGA4));
+}
+
+void MainWindow::on_leFPGA4_1_editingFinished()
+{
+    QVector<int> vec;
+    bool ok = ExtractNumbersFromQString(ui->leFPGA4_1->text(), &vec);
+    if (!ok)
+        message("Bad format: use, e.g., 0,1,3-5,7,10-20", this);
+    else
+        Config->TrbRunSettings.OR_1_FPGA4 = vectorToBitInt(vec);
+    ui->leFPGA4_1->setText(intToBitString(Config->TrbRunSettings.OR_1_FPGA4));
+}
+

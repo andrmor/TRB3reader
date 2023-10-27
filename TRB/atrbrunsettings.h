@@ -44,6 +44,11 @@ public:
     QString PeripheryTriggerInputs0 = "0x00000000";
     QString PeripheryTriggerInputs1 = "0x00000000";
 
+    int     OR_0_FPGA3 = 0;
+    int     OR_1_FPGA3 = 0;
+    int     OR_0_FPGA4 = 0;
+    int     OR_1_FPGA4 = 0;
+
     int     Mask = 0xffff;
     QString RandomPulserFrequency = "0"; //QJsonObject is not friendly for ulong...
     QString Period = "0x30000000";

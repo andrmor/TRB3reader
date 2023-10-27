@@ -437,7 +437,7 @@ const QString ATrbRunControl::updateXML()
 }
 
 #include "afiletools.h"
-const QString ATrbRunControl::updateCTSsetupScript()
+QString ATrbRunControl::updateCTSsetupScript()
 {
     QString where = sExchangeDir;
     if (!where.endsWith('/')) where += '/';
@@ -459,7 +459,7 @@ const QString ATrbRunControl::updateCTSsetupScript()
     return "";
 }
 
-const QString ATrbRunControl::updateBufferSetupScript()
+QString ATrbRunControl::updateBufferSetupScript()
 {
     if (Settings.getBufferRecords().isEmpty())
         return "Error: ADCs are not configured!";
@@ -483,10 +483,43 @@ const QString ATrbRunControl::updateBufferSetupScript()
     return "";
 }
 
-const QString ATrbRunControl::sendCTStoTRB()
+QString ATrbRunControl::sendCTStoTRB()
 {
     QStringList txt;
     txt << CtsSettingsToCommands(false);
+    qDebug() << txt;
+
+    QString command = "ssh";
+    QStringList args;
+    args << QString("%1@%2").arg(User).arg(Host);
+
+    QProcess pr;
+    pr.setProcessChannelMode(QProcess::MergedChannels);
+    pr.start(command, args);
+
+    if (!pr.waitForStarted(500)) return "Could not start send";
+
+    for (const QString & s : txt)
+        pr.write(QByteArray(s.toLocal8Bit().data()));
+
+    pr.closeWriteChannel();
+    if (!pr.waitForFinished(2000)) return "Timeout on attempt to execute CTS configuration";
+
+    QString reply1 = pr.readAll();
+
+    pr.close();
+
+    qDebug() << reply1;
+    return "";
+}
+
+QString ATrbRunControl::sendTriggerLogicToTRB()
+{
+    QStringList txt;
+    txt << QString("trbcmd w 0xa003 0xdf00 0x%1 # OR logic, slice 0\n").arg( QString::number(Settings.TrbRunSettings.OR_0_FPGA3, 16) );
+    txt << QString("trbcmd w 0xa003 0xdf01 0x%1 # OR logic, slice 1\n").arg( QString::number(Settings.TrbRunSettings.OR_1_FPGA3, 16) );
+    txt << QString("trbcmd w 0xa004 0xdf00 0x%1 # OR logic, slice 0\n").arg( QString::number(Settings.TrbRunSettings.OR_0_FPGA4, 16) );
+    txt << QString("trbcmd w 0xa004 0xdf01 0x%1 # OR logic, slice 1\n").arg( QString::number(Settings.TrbRunSettings.OR_1_FPGA4, 16) );
     qDebug() << txt;
 
     QString command = "ssh";
@@ -554,7 +587,7 @@ const QStringList ATrbRunControl::CtsSettingsToCommands(bool bIncludeHidden)
     return txt;
 }
 
-const QString ATrbRunControl::sendBufferControlToTRB()
+QString ATrbRunControl::sendBufferControlToTRB()
 {
     QString command = "ssh";
     QStringList args;
@@ -583,7 +616,7 @@ const QString ATrbRunControl::sendBufferControlToTRB()
     return "";
 }
 
-const QString ATrbRunControl::readBufferControlFromTRB()
+QString ATrbRunControl::readBufferControlFromTRB()
 {
     QString command = "ssh";
     QStringList args;
@@ -656,6 +689,83 @@ const QString ATrbRunControl::readBufferControlFromTRB()
         r.Delay = Delay;
         r.Downsampling = Downsampling;
     }
+
+    pr.close();
+    return "";
+}
+
+QString ATrbRunControl::readTriggerLogicFromTRB()
+{
+    QString command = "ssh";
+    QStringList args;
+    args << QString("%1@%2").arg(User).arg(Host);
+
+    qDebug() << "Sending command/args:" << command << args;
+
+    QProcess pr;
+    pr.setProcessChannelMode(QProcess::MergedChannels);
+    pr.start(command, args);
+
+    if (!pr.waitForStarted(500)) return "Could not start send";
+
+    QStringList txt;
+    const QVector<QString> TimeBoards = {"0xa003", "0xa004"};
+    for (const QString & bstr : TimeBoards)
+    {
+        txt << QString("trbcmd r %1 0xdf00\n").arg(bstr);
+        txt << QString("trbcmd r %1 0xdf01\n").arg(bstr);
+    }
+    for (const QString & s : txt) pr.write(QByteArray(s.toLocal8Bit().data()));
+
+    pr.closeWriteChannel();
+    if (!pr.waitForFinished(2000)) return "Timeout on attempt to execute Buffer configuration";
+
+    QString reply = pr.readAll();
+    QStringList sl = reply.split('\n', QString::SkipEmptyParts);
+
+    //clean login messages
+    while (!sl.isEmpty() && !sl.first().startsWith("0x"))
+        sl.removeFirst();
+    qDebug() << sl;
+
+    if (sl.size() != TimeBoards.size() * 2) // absolute number = number of settings ber buf!
+        return "unexpected number of reply lines";
+
+    /*
+    QVector<ABufferRecord> & BufRec = Settings.getBufferRecords();
+    int icounter = 0;
+    for (ABufferRecord & r : BufRec)
+    {
+        const QString addr = "0x" + QString::number(r.Datakind, 16);
+        ulong Samples, Delay, Downsampling;
+        bool bOK;
+
+        QStringList l = sl.at(icounter).split(' ', QString::SkipEmptyParts);
+        if (l.size() !=2 || l.first() != addr)
+            return "unexpected format of reply line";
+        Samples = l.last().toULong(&bOK, 16);
+        if (!bOK) return "unexpected format of reply line";
+        icounter++;
+
+        l = sl.at(icounter).split(' ', QString::SkipEmptyParts);
+        if (l.size() !=2 || l.first() != addr)
+            return "unexpected format of reply line";
+        Delay = l.last().toULong(&bOK, 16);
+        if (!bOK) return "unexpected format of reply line";
+        icounter++;
+
+        l = sl.at(icounter).split(' ', QString::SkipEmptyParts);
+        if (l.size() !=2 || l.first() != addr)
+            return "unexpected format of reply line";
+        Downsampling = l.last().toULong(&bOK, 16);
+        if (!bOK) return "unexpected format of reply line";
+        icounter++;
+
+        r.Samples = Samples;
+        r.Delay = Delay;
+        r.Downsampling = Downsampling;
+    }
+    */
 
     pr.close();
     return "";
@@ -777,7 +887,7 @@ void ATrbRunControl::onFreeSpaceCheckerTimeout()
     }
 }
 
-const QString ATrbRunControl::ReadTriggerSettingsFromBoard()
+QString ATrbRunControl::ReadTriggerSettingsFromBoard()
 {
     //http://192.168.3.214:1234/cts/cts.pl?dump,shell
 

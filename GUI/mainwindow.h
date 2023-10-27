@@ -231,6 +231,7 @@ private:
     ATrbRunControl * TrbRunManager = nullptr;
     int ZeroRateCounter = 0;
 
+    QString intToBitString(int val);
 private slots:
     void onBoardLogNewText(const QString text);
     void onRequestClearLog();
@@ -284,6 +285,10 @@ private slots:
     void on_sbZeroSignalIfPeakAfter_N_editingFinished();
     void on_sbEvent_editingFinished();
 
+    void on_leFPGA3_0_editingFinished();
+    void on_leFPGA3_1_editingFinished();
+    void on_leFPGA4_0_editingFinished();
+    void on_leFPGA4_1_editingFinished();
 };
 
 #endif // MAINWINDOW_H
