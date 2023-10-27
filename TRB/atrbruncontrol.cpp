@@ -694,6 +694,114 @@ QString ATrbRunControl::readBufferControlFromTRB()
     return "";
 }
 
+QString ATrbRunControl::sendTimeSettingsToTRB()
+{
+    QStringList txt;
+    txt << QString("trbcmd w 0xa003 0xc802 0x%1 # activated time channels\n").arg( QString::number(Settings.TrbRunSettings.TimeChannels_FPGA3, 16) );
+    unsigned val = 0x80000000 + Settings.TrbRunSettings.TimeWinBefore_FPGA3/5*0x10000 + Settings.TrbRunSettings.TimeWinAfter_FPGA3/5;
+    qDebug() << "0x"+QString::number(val, 16);
+    txt << QString("trbcmd w 0xa003 0xc801 0x%1 # before/after windows\n").arg( QString::number(val, 16) );
+    txt << QString("trbcmd w 0xa003 0xc804 0x0000007b # set max data limit\n");
+
+    txt << QString("trbcmd w 0xa004 0xc802 0x%1 # activated time channels\n").arg( QString::number(Settings.TrbRunSettings.TimeChannels_FPGA4, 16) );
+    val = 0x80000000 + Settings.TrbRunSettings.TimeWinBefore_FPGA4/5*0x10000 + Settings.TrbRunSettings.TimeWinAfter_FPGA4/5;
+    qDebug() << "0x"+QString::number(val, 16);
+    txt << QString("trbcmd w 0xa004 0xc801 0x%1 # before/after windows\n").arg( QString::number(val, 16) );
+    txt << QString("trbcmd w 0xa004 0xc804 0x0000007b # set max data limit\n");
+
+    qDebug() << txt;
+
+    QString command = "ssh";
+    QStringList args;
+    args << QString("%1@%2").arg(User).arg(Host);
+
+    QProcess pr;
+    pr.setProcessChannelMode(QProcess::MergedChannels);
+    pr.start(command, args);
+
+    if (!pr.waitForStarted(500)) return "Could not start send";
+
+    for (const QString & s : txt)
+        pr.write(QByteArray(s.toLocal8Bit().data()));
+
+    pr.closeWriteChannel();
+    if (!pr.waitForFinished(2000)) return "Timeout on attempt to execute CTS configuration";
+
+    QString reply1 = pr.readAll();
+
+    pr.close();
+
+    qDebug() << reply1;
+    return "";
+}
+
+QString ATrbRunControl::readTimeSettingsFromTRB()
+{
+    QString command = "ssh";
+    QStringList args;
+    args << QString("%1@%2").arg(User).arg(Host);
+
+    qDebug() << "Sending command/args:" << command << args;
+
+    QProcess pr;
+    pr.setProcessChannelMode(QProcess::MergedChannels);
+    pr.start(command, args);
+
+    if (!pr.waitForStarted(500)) return "Could not start send";
+
+    QStringList txt;
+    const QVector<QString> TimeBoards = {"0xa003", "0xa004"};
+    for (const QString & bstr : TimeBoards)
+    {
+        txt << QString("trbcmd r %1 0xc802\n").arg(bstr);
+        txt << QString("trbcmd r %1 0xc801\n").arg(bstr);
+    }
+    for (const QString & s : txt) pr.write(QByteArray(s.toLocal8Bit().data()));
+
+    pr.closeWriteChannel();
+    if (!pr.waitForFinished(2000)) return "Timeout on attempt to execute Buffer configuration";
+
+    QString reply = pr.readAll();
+    QStringList sl = reply.split('\n', Qt::SkipEmptyParts);
+
+    //clean login messages
+    while (!sl.isEmpty() && !sl.first().startsWith("0x"))
+        sl.removeFirst();
+    qDebug() << sl;
+
+    if (sl.size() != TimeBoards.size() * 2) // absolute number = number of settings ber buf!
+        return "unexpected number of reply lines";
+
+    bool bOK;
+
+    QStringList l = sl[0].split(' ', Qt::SkipEmptyParts);
+    if (l.size() !=2 || l.first() != TimeBoards[0]) return "unexpected format of reply line";
+    Settings.TrbRunSettings.TimeChannels_FPGA3 = l.last().toULong(&bOK, 16);
+    if (!bOK) return "unexpected format of reply line";
+
+    l = sl[1].split(' ', Qt::SkipEmptyParts);
+    if (l.size() !=2 || l.first() != TimeBoards[0]) return "unexpected format of reply line";
+    unsigned compoundVal = l.last().toULong(&bOK, 16);
+    if (!bOK) return "unexpected format of reply line";
+    Settings.TrbRunSettings.TimeWinBefore_FPGA3 = (compoundVal/0x10000) & 0x7fff;
+    Settings.TrbRunSettings.TimeWinAfter_FPGA3 = (compoundVal & 0x7fff);
+
+    l = sl[3].split(' ', Qt::SkipEmptyParts);
+    if (l.size() !=2 || l.first() != TimeBoards[1]) return "unexpected format of reply line";
+    Settings.TrbRunSettings.TimeChannels_FPGA4 = l.last().toULong(&bOK, 16);
+    if (!bOK) return "unexpected format of reply line";
+
+    l = sl[1].split(' ', Qt::SkipEmptyParts);
+    if (l.size() !=2 || l.first() != TimeBoards[0]) return "unexpected format of reply line";
+    compoundVal = l.last().toULong(&bOK, 16);
+    if (!bOK) return "unexpected format of reply line";
+    Settings.TrbRunSettings.TimeWinBefore_FPGA4 = (compoundVal/0x10000) & 0x7fff;
+    Settings.TrbRunSettings.TimeWinAfter_FPGA4 = (compoundVal & 0x7fff);
+
+    pr.close();
+    return "";
+}
+
 QString ATrbRunControl::readTriggerLogicFromTRB()
 {
     QString command = "ssh";

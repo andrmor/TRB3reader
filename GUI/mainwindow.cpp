@@ -2044,6 +2044,13 @@ void MainWindow::on_pbUpdateTriggerGui_clicked()
     ui->leFPGA4_0->setText(intToBitString(Config->TrbRunSettings.OR_0_FPGA4));
     ui->leFPGA4_1->setText(intToBitString(Config->TrbRunSettings.OR_1_FPGA4));
 
+    ui->leTimeChannelsFPGA3->setText(intToBitString(Config->TrbRunSettings.TimeChannels_FPGA3));
+    ui->leTimeChannelsFPGA4->setText(intToBitString(Config->TrbRunSettings.TimeChannels_FPGA4));
+    ui->ledTimeWinBefore_FPGA3->setText(QString::number(Config->TrbRunSettings.TimeWinBefore_FPGA3));
+    ui->ledTimeWinAfter_FPGA3->setText(QString::number(Config->TrbRunSettings.TimeWinAfter_FPGA3));
+    ui->ledTimeWinBefore_FPGA4->setText(QString::number(Config->TrbRunSettings.TimeWinBefore_FPGA4));
+    ui->ledTimeWinAfter_FPGA4->setText(QString::number(Config->TrbRunSettings.TimeWinAfter_FPGA4));
+
     ulong rFreq = Config->TrbRunSettings.RandomPulserFrequency.toULong(nullptr, 16);
     double freq = (double)rFreq / 21.474836;
     ui->leRandomFrequency->setText( QString::number(freq) );
@@ -2281,3 +2288,83 @@ void MainWindow::on_leFPGA4_1_editingFinished()
     ui->leFPGA4_1->setText(intToBitString(Config->TrbRunSettings.OR_1_FPGA4));
 }
 
+void MainWindow::on_leTimeChannelsFPGA3_editingFinished()
+{
+    QVector<int> vec;
+    bool ok = ExtractNumbersFromQString(ui->leTimeChannelsFPGA3->text(), &vec);
+    if (!ok)
+        message("Bad format: use, e.g., 0,1,3-5,7,10-20", this);
+    else
+        Config->TrbRunSettings.TimeChannels_FPGA3 = vectorToBitInt(vec);
+    ui->leTimeChannelsFPGA3->setText(intToBitString(Config->TrbRunSettings.TimeChannels_FPGA3));
+}
+
+void MainWindow::on_leTimeChannelsFPGA4_editingFinished()
+{
+    QVector<int> vec;
+    bool ok = ExtractNumbersFromQString(ui->leTimeChannelsFPGA4->text(), &vec);
+    if (!ok)
+        message("Bad format: use, e.g., 0,1,3-5,7,10-20", this);
+    else
+        Config->TrbRunSettings.TimeChannels_FPGA4 = vectorToBitInt(vec);
+    ui->leTimeChannelsFPGA4->setText(intToBitString(Config->TrbRunSettings.TimeChannels_FPGA4));
+}
+
+void MainWindow::on_ledTimeWinBefore_FPGA3_editingFinished()
+{
+    double  val = ui->ledTimeWinBefore_FPGA3->text().toDouble();
+    if (val < 0) val = -val;
+    int base = val / 5;
+    if (base > 300) base = 300;
+    Config->TrbRunSettings.TimeWinBefore_FPGA3 = base * 5;
+    ui->ledTimeWinBefore_FPGA3->setText(QString::number(Config->TrbRunSettings.TimeWinBefore_FPGA3));
+}
+
+void MainWindow::on_ledTimeWinAfter_FPGA3_editingFinished()
+{
+    double  val = ui->ledTimeWinAfter_FPGA3->text().toDouble();
+    if (val < 0) val = -val;
+    int base = val / 5;
+    if (base > 300) base = 300;
+    Config->TrbRunSettings.TimeWinAfter_FPGA3 = base * 5;
+    ui->ledTimeWinAfter_FPGA3->setText(QString::number(Config->TrbRunSettings.TimeWinAfter_FPGA3));
+}
+
+void MainWindow::on_ledTimeWinBefore_FPGA4_editingFinished()
+{
+    double  val = ui->ledTimeWinBefore_FPGA4->text().toDouble();
+    if (val < 0) val = -val;
+    int base = val / 5;
+    if (base > 300) base = 300;
+    Config->TrbRunSettings.TimeWinBefore_FPGA4 = base * 5;
+    ui->ledTimeWinBefore_FPGA4->setText(QString::number(Config->TrbRunSettings.TimeWinBefore_FPGA4));
+}
+
+void MainWindow::on_ledTimeWinAfter_FPGA4_editingFinished()
+{
+    double  val = ui->ledTimeWinAfter_FPGA4->text().toDouble();
+    if (val < 0) val = -val;
+    int base = val / 5;
+    if (base > 300) base = 300;
+    Config->TrbRunSettings.TimeWinAfter_FPGA4 = base * 5;
+    ui->ledTimeWinAfter_FPGA4->setText(QString::number(Config->TrbRunSettings.TimeWinAfter_FPGA4));
+}
+
+void MainWindow::on_pbWriteTimeSettingsToTrb_clicked()
+{
+    SetEnabled(false);
+    qApp->processEvents();
+
+    QString err = TrbRunManager->sendTimeSettingsToTRB();
+
+    if (!err.isEmpty()) message(err, this);
+    SetEnabled(true);
+}
+
+void MainWindow::on_pbReadTimeSettingsFromTrb_clicked()
+{
+    QString err = TrbRunManager->readTimeSettingsFromTRB();
+    if (!err.isEmpty()) message(err, this);
+
+    on_pbUpdateTriggerGui_clicked();
+}

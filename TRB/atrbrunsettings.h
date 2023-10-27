@@ -49,6 +49,14 @@ public:
     int     OR_0_FPGA4 = 0;
     int     OR_1_FPGA4 = 0;
 
+    int     TimeChannels_FPGA3 = 0;
+    int     TimeChannels_FPGA4 = 0;
+
+    int     TimeWinBefore_FPGA3 = 1500;
+    int     TimeWinAfter_FPGA3  = 1500;
+    int     TimeWinBefore_FPGA4 = 1500;
+    int     TimeWinAfter_FPGA4  = 1500;
+
     int     Mask = 0xffff;
     QString RandomPulserFrequency = "0"; //QJsonObject is not friendly for ulong...
     QString Period = "0x30000000";

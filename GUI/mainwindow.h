@@ -289,6 +289,14 @@ private slots:
     void on_leFPGA3_1_editingFinished();
     void on_leFPGA4_0_editingFinished();
     void on_leFPGA4_1_editingFinished();
+    void on_leTimeChannelsFPGA3_editingFinished();
+    void on_leTimeChannelsFPGA4_editingFinished();
+    void on_ledTimeWinBefore_FPGA3_editingFinished();
+    void on_ledTimeWinAfter_FPGA3_editingFinished();
+    void on_ledTimeWinBefore_FPGA4_editingFinished();
+    void on_ledTimeWinAfter_FPGA4_editingFinished();
+    void on_pbWriteTimeSettingsToTrb_clicked();
+    void on_pbReadTimeSettingsFromTrb_clicked();
 };
 
 #endif // MAINWINDOW_H

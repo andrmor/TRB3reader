@@ -36,6 +36,9 @@ public:
     QString sendBufferControlToTRB();
     QString readBufferControlFromTRB();
 
+    QString sendTimeSettingsToTRB();
+    QString readTimeSettingsFromTRB();
+
     void  checkFreeSpace();
 
 private slots:
