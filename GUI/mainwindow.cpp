@@ -2044,8 +2044,8 @@ void MainWindow::on_pbUpdateTriggerGui_clicked()
     ui->leFPGA4_0->setText(intToBitString(Config->TrbRunSettings.OR_0_FPGA4));
     ui->leFPGA4_1->setText(intToBitString(Config->TrbRunSettings.OR_1_FPGA4));
 
-    ui->leTimeChannelsFPGA3->setText(intToBitString(Config->TrbRunSettings.TimeChannels_FPGA3));
-    ui->leTimeChannelsFPGA4->setText(intToBitString(Config->TrbRunSettings.TimeChannels_FPGA4));
+    ui->leTimeChannelsFPGA3->setText(intToBitStringShift1(Config->TrbRunSettings.TimeChannels_FPGA3));
+    ui->leTimeChannelsFPGA4->setText(intToBitStringShift1(Config->TrbRunSettings.TimeChannels_FPGA4));
     ui->ledTimeWinBefore_FPGA3->setText(QString::number(Config->TrbRunSettings.TimeWinBefore_FPGA3));
     ui->ledTimeWinAfter_FPGA3->setText(QString::number(Config->TrbRunSettings.TimeWinAfter_FPGA3));
     ui->ledTimeWinBefore_FPGA4->setText(QString::number(Config->TrbRunSettings.TimeWinBefore_FPGA4));
@@ -2228,6 +2228,17 @@ int vectorToBitInt(const QVector<int> & vec)
     int res = 0;
     for (int i : vec)
     {
+        if (i > 30) continue;
+        res += (1 << i);
+    }
+    return res;
+}
+
+int vectorToBitIntShift1(const QVector<int> & vec)
+{
+    int res = 0;
+    for (int i : vec)
+    {
         if (i > 31) continue; // was 30 originally -> use signed int in the config, befare of overflow,
         res += (1 << (i-1));  // i-1 to account for TRB time channel shift: "0" encodes c001
     }
@@ -2236,6 +2247,15 @@ int vectorToBitInt(const QVector<int> & vec)
 
 #include <bitset>
 QString MainWindow::intToBitString(int val)
+{
+    QVector<int> vec;
+    std::bitset<32> bs(val);
+    for (int i = 0; i < 31; i++)
+        if (bs.test(i)) vec << i;
+    return PackChannelList(vec);
+}
+
+QString MainWindow::intToBitStringShift1(int val)
 {
     QVector<int> vec;
     std::bitset<32> bs(val);
@@ -2297,7 +2317,7 @@ void MainWindow::on_leTimeChannelsFPGA3_editingFinished()
     else if (vec.contains(0))
         message("Channel 0 is reserved!", 0);
     else
-        Config->TrbRunSettings.TimeChannels_FPGA3 = vectorToBitInt(vec);
+        Config->TrbRunSettings.TimeChannels_FPGA3 = vectorToBitIntShift1(vec);
     ui->leTimeChannelsFPGA3->setText(intToBitString(Config->TrbRunSettings.TimeChannels_FPGA3));
 }
 
@@ -2310,7 +2330,7 @@ void MainWindow::on_leTimeChannelsFPGA4_editingFinished()
     else if (vec.contains(0))
         message("Channel 0 is reserved!", 0);
     else
-        Config->TrbRunSettings.TimeChannels_FPGA4 = vectorToBitInt(vec);
+        Config->TrbRunSettings.TimeChannels_FPGA4 = vectorToBitIntShift1(vec);
     ui->leTimeChannelsFPGA4->setText(intToBitString(Config->TrbRunSettings.TimeChannels_FPGA4));
 }
 
@@ -2318,6 +2338,7 @@ void MainWindow::on_ledTimeWinBefore_FPGA3_editingFinished()
 {
     double  val = ui->ledTimeWinBefore_FPGA3->text().toDouble();
     if (val < 0) val = -val;
+    if (val > 9040) val = 9040;
     int base = val / 5;
     if (base > 300) base = 300;
     Config->TrbRunSettings.TimeWinBefore_FPGA3 = base * 5;
@@ -2328,6 +2349,7 @@ void MainWindow::on_ledTimeWinAfter_FPGA3_editingFinished()
 {
     double  val = ui->ledTimeWinAfter_FPGA3->text().toDouble();
     if (val < 0) val = -val;
+    if (val > 9760) val = 9760;
     int base = val / 5;
     if (base > 300) base = 300;
     Config->TrbRunSettings.TimeWinAfter_FPGA3 = base * 5;
@@ -2338,6 +2360,7 @@ void MainWindow::on_ledTimeWinBefore_FPGA4_editingFinished()
 {
     double  val = ui->ledTimeWinBefore_FPGA4->text().toDouble();
     if (val < 0) val = -val;
+    if (val > 9040) val = 9040;
     int base = val / 5;
     if (base > 300) base = 300;
     Config->TrbRunSettings.TimeWinBefore_FPGA4 = base * 5;
@@ -2348,6 +2371,7 @@ void MainWindow::on_ledTimeWinAfter_FPGA4_editingFinished()
 {
     double  val = ui->ledTimeWinAfter_FPGA4->text().toDouble();
     if (val < 0) val = -val;
+    if (val > 9760) val = 9760;
     int base = val / 5;
     if (base > 300) base = 300;
     Config->TrbRunSettings.TimeWinAfter_FPGA4 = base * 5;

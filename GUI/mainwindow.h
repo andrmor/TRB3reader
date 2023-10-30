@@ -232,6 +232,8 @@ private:
     int ZeroRateCounter = 0;
 
     QString intToBitString(int val);
+    QString intToBitStringShift1(int val);
+
 private slots:
     void onBoardLogNewText(const QString text);
     void onRequestClearLog();
