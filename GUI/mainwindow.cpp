@@ -1053,11 +1053,13 @@ bool MainWindow::ExtractNumbersFromQString(const QString input, QVector<int> *To
 
   QStringList fields = input.split(rx, QString::SkipEmptyParts);
 
+  /*
   if (fields.size() == 0 )
     {
       //message("Nothing to add!");
       return false;
     }
+  */
 
   //fields = input.split(",", QString::SkipEmptyParts);
   fields = input.split(QRegExp("(\\,|\\ )"), QString::SkipEmptyParts);
@@ -2268,70 +2270,70 @@ void MainWindow::on_leFPGA3_0_editingFinished()
 {
     QVector<int> vec;
     bool ok = ExtractNumbersFromQString(ui->leFPGA3_0->text(), &vec);
-    if (!ok)
-        message("Bad format: use, e.g., 0,1,3-5,7,10-20", this);
-    else
-        Config->TrbRunSettings.OR_0_FPGA3 = vectorToBitInt(vec);
+    if (ok) Config->TrbRunSettings.OR_0_FPGA3 = vectorToBitInt(vec);
     ui->leFPGA3_0->setText(intToBitString(Config->TrbRunSettings.OR_0_FPGA3));
+    if (!ok) message("Bad format: use, e.g., 0,1,3-5,7,10-20", this);
 }
 
 void MainWindow::on_leFPGA3_1_editingFinished()
 {
     QVector<int> vec;
     bool ok = ExtractNumbersFromQString(ui->leFPGA3_1->text(), &vec);
-    if (!ok)
-        message("Bad format: use, e.g., 0,1,3-5,7,10-20", this);
-    else
-        Config->TrbRunSettings.OR_1_FPGA3 = vectorToBitInt(vec);
+    if (ok) Config->TrbRunSettings.OR_1_FPGA3 = vectorToBitInt(vec);
     ui->leFPGA3_1->setText(intToBitString(Config->TrbRunSettings.OR_1_FPGA3));
+    if (!ok) message("Bad format: use, e.g., 0,1,3-5,7,10-20", this);
 }
 
 void MainWindow::on_leFPGA4_0_editingFinished()
 {
     QVector<int> vec;
     bool ok = ExtractNumbersFromQString(ui->leFPGA4_0->text(), &vec);
-    if (!ok)
-        message("Bad format: use, e.g., 0,1,3-5,7,10-20", this);
-    else
-        Config->TrbRunSettings.OR_0_FPGA4 = vectorToBitInt(vec);
+    if (ok) Config->TrbRunSettings.OR_0_FPGA4 = vectorToBitInt(vec);
     ui->leFPGA4_0->setText(intToBitString(Config->TrbRunSettings.OR_0_FPGA4));
+    if (!ok) message("Bad format: use, e.g., 0,1,3-5,7,10-20", this);
 }
 
 void MainWindow::on_leFPGA4_1_editingFinished()
 {
     QVector<int> vec;
     bool ok = ExtractNumbersFromQString(ui->leFPGA4_1->text(), &vec);
-    if (!ok)
-        message("Bad format: use, e.g., 0,1,3-5,7,10-20", this);
-    else
-        Config->TrbRunSettings.OR_1_FPGA4 = vectorToBitInt(vec);
+    if (ok) Config->TrbRunSettings.OR_1_FPGA4 = vectorToBitInt(vec);
     ui->leFPGA4_1->setText(intToBitString(Config->TrbRunSettings.OR_1_FPGA4));
+    if (!ok) message("Bad format: use, e.g., 0,1,3-5,7,10-20", this);
 }
 
 void MainWindow::on_leTimeChannelsFPGA3_editingFinished()
 {
+    ui->leTimeChannelsFPGA3->blockSignals(true); // -->
+
     QVector<int> vec;
     bool ok = ExtractNumbersFromQString(ui->leTimeChannelsFPGA3->text(), &vec);
     if (!ok)
         message("Bad format: use, e.g., 1,3-5,7,10-20    Note that 0 is not possible", this);
     else if (vec.contains(0))
-        message("Channel 0 is reserved!", 0);
+        message("Channel 0 is reserved!", this);
     else
         Config->TrbRunSettings.TimeChannels_FPGA3 = vectorToBitIntShift1(vec);
-    ui->leTimeChannelsFPGA3->setText(intToBitString(Config->TrbRunSettings.TimeChannels_FPGA3));
+    ui->leTimeChannelsFPGA3->setText(intToBitStringShift1(Config->TrbRunSettings.TimeChannels_FPGA3));
+
+    ui->leTimeChannelsFPGA3->blockSignals(false); // <--
 }
 
 void MainWindow::on_leTimeChannelsFPGA4_editingFinished()
 {
+    ui->leTimeChannelsFPGA4->blockSignals(true); // -->
+
     QVector<int> vec;
     bool ok = ExtractNumbersFromQString(ui->leTimeChannelsFPGA4->text(), &vec);
     if (!ok)
         message("Bad format: use, e.g., 1,3-5,7,10-20    Note that 0 is not possible", this);
     else if (vec.contains(0))
-        message("Channel 0 is reserved!", 0);
+        message("Channel 0 is reserved!", this);
     else
         Config->TrbRunSettings.TimeChannels_FPGA4 = vectorToBitIntShift1(vec);
-    ui->leTimeChannelsFPGA4->setText(intToBitString(Config->TrbRunSettings.TimeChannels_FPGA4));
+    ui->leTimeChannelsFPGA4->setText(intToBitStringShift1(Config->TrbRunSettings.TimeChannels_FPGA4));
+
+    ui->leTimeChannelsFPGA4->blockSignals(false); // <--
 }
 
 void MainWindow::on_ledTimeWinBefore_FPGA3_editingFinished()
@@ -2340,7 +2342,6 @@ void MainWindow::on_ledTimeWinBefore_FPGA3_editingFinished()
     if (val < 0) val = -val;
     if (val > 9040) val = 9040;
     int base = val / 5;
-    if (base > 300) base = 300;
     Config->TrbRunSettings.TimeWinBefore_FPGA3 = base * 5;
     ui->ledTimeWinBefore_FPGA3->setText(QString::number(Config->TrbRunSettings.TimeWinBefore_FPGA3));
 }
@@ -2351,7 +2352,6 @@ void MainWindow::on_ledTimeWinAfter_FPGA3_editingFinished()
     if (val < 0) val = -val;
     if (val > 9760) val = 9760;
     int base = val / 5;
-    if (base > 300) base = 300;
     Config->TrbRunSettings.TimeWinAfter_FPGA3 = base * 5;
     ui->ledTimeWinAfter_FPGA3->setText(QString::number(Config->TrbRunSettings.TimeWinAfter_FPGA3));
 }
@@ -2362,7 +2362,6 @@ void MainWindow::on_ledTimeWinBefore_FPGA4_editingFinished()
     if (val < 0) val = -val;
     if (val > 9040) val = 9040;
     int base = val / 5;
-    if (base > 300) base = 300;
     Config->TrbRunSettings.TimeWinBefore_FPGA4 = base * 5;
     ui->ledTimeWinBefore_FPGA4->setText(QString::number(Config->TrbRunSettings.TimeWinBefore_FPGA4));
 }
@@ -2373,7 +2372,6 @@ void MainWindow::on_ledTimeWinAfter_FPGA4_editingFinished()
     if (val < 0) val = -val;
     if (val > 9760) val = 9760;
     int base = val / 5;
-    if (base > 300) base = 300;
     Config->TrbRunSettings.TimeWinAfter_FPGA4 = base * 5;
     ui->ledTimeWinAfter_FPGA4->setText(QString::number(Config->TrbRunSettings.TimeWinAfter_FPGA4));
 }
