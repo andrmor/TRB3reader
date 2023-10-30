@@ -3201,7 +3201,7 @@
             <item>
              <widget class="QLabel" name="label_110">
               <property name="text">
-               <string>Record time information for the following channels  (e.g. 0,1,2,10-20):</string>
+               <string>Record time information for the following channels  (e.g. 1,2,3,10-20):</string>
               </property>
              </widget>
             </item>

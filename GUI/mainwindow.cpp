@@ -2293,7 +2293,9 @@ void MainWindow::on_leTimeChannelsFPGA3_editingFinished()
     QVector<int> vec;
     bool ok = ExtractNumbersFromQString(ui->leTimeChannelsFPGA3->text(), &vec);
     if (!ok)
-        message("Bad format: use, e.g., 0,1,3-5,7,10-20", this);
+        message("Bad format: use, e.g., 1,3-5,7,10-20    Note that 0 is not possible", this);
+    else if (vec.contains(0))
+        message("Channel 0 is reserved!", 0);
     else
         Config->TrbRunSettings.TimeChannels_FPGA3 = vectorToBitInt(vec);
     ui->leTimeChannelsFPGA3->setText(intToBitString(Config->TrbRunSettings.TimeChannels_FPGA3));
@@ -2304,7 +2306,9 @@ void MainWindow::on_leTimeChannelsFPGA4_editingFinished()
     QVector<int> vec;
     bool ok = ExtractNumbersFromQString(ui->leTimeChannelsFPGA4->text(), &vec);
     if (!ok)
-        message("Bad format: use, e.g., 0,1,3-5,7,10-20", this);
+        message("Bad format: use, e.g., 1,3-5,7,10-20    Note that 0 is not possible", this);
+    else if (vec.contains(0))
+        message("Channel 0 is reserved!", 0);
     else
         Config->TrbRunSettings.TimeChannels_FPGA4 = vectorToBitInt(vec);
     ui->leTimeChannelsFPGA4->setText(intToBitString(Config->TrbRunSettings.TimeChannels_FPGA4));
