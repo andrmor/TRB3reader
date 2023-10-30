@@ -2228,8 +2228,8 @@ int vectorToBitInt(const QVector<int> & vec)
     int res = 0;
     for (int i : vec)
     {
-        if (i > 30) continue;
-        res += (1 << i);
+        if (i > 31) continue; // was 30 originally -> use signed int in the config, befare of overflow,
+        res += (1 << (i-1));  // i-1 to account for TRB time channel shift: "0" encodes c001
     }
     return res;
 }
@@ -2239,8 +2239,8 @@ QString MainWindow::intToBitString(int val)
 {
     QVector<int> vec;
     std::bitset<32> bs(val);
-    for (int i = 0; i < 31; i++)
-        if (bs.test(i)) vec << i;
+    for (int i = 1; i < 32; i++)     // from 1, and 31->32 as the limit,
+        if (bs.test(i-1)) vec << i;  // i-1 to account for TRB time channel shift: "0" encodes c001
     return PackChannelList(vec);
 }
 
