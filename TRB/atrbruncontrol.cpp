@@ -783,20 +783,20 @@ QString ATrbRunControl::readTimeSettingsFromTRB()
     if (l.size() !=2 || l.first() != TimeBoards[0]) return "unexpected format of reply line";
     unsigned compoundVal = l.last().toULong(&bOK, 16);
     if (!bOK) return "unexpected format of reply line";
-    Settings.TrbRunSettings.TimeWinBefore_FPGA3 = (compoundVal/0x10000) & 0x7fff;
-    Settings.TrbRunSettings.TimeWinAfter_FPGA3 = (compoundVal & 0x7fff);
+    Settings.TrbRunSettings.TimeWinBefore_FPGA3 = ((compoundVal/0x10000) & 0x7fff) * 5;
+    Settings.TrbRunSettings.TimeWinAfter_FPGA3 = (compoundVal & 0x7fff) * 5;
 
-    l = sl[3].split(' ', Qt::SkipEmptyParts);
+    l = sl[2].split(' ', Qt::SkipEmptyParts);
     if (l.size() !=2 || l.first() != TimeBoards[1]) return "unexpected format of reply line";
     Settings.TrbRunSettings.TimeChannels_FPGA4 = l.last().toULong(&bOK, 16);
     if (!bOK) return "unexpected format of reply line";
 
-    l = sl[1].split(' ', Qt::SkipEmptyParts);
-    if (l.size() !=2 || l.first() != TimeBoards[0]) return "unexpected format of reply line";
+    l = sl[3].split(' ', Qt::SkipEmptyParts);
+    if (l.size() !=2 || l.first() != TimeBoards[1]) return "unexpected format of reply line";
     compoundVal = l.last().toULong(&bOK, 16);
     if (!bOK) return "unexpected format of reply line";
-    Settings.TrbRunSettings.TimeWinBefore_FPGA4 = (compoundVal/0x10000) & 0x7fff;
-    Settings.TrbRunSettings.TimeWinAfter_FPGA4 = (compoundVal & 0x7fff);
+    Settings.TrbRunSettings.TimeWinBefore_FPGA4 = ((compoundVal/0x10000) & 0x7fff) * 5;
+    Settings.TrbRunSettings.TimeWinAfter_FPGA4 = (compoundVal & 0x7fff) * 5;
 
     pr.close();
     return "";
@@ -851,12 +851,12 @@ QString ATrbRunControl::readTriggerLogicFromTRB()
     Settings.TrbRunSettings.OR_1_FPGA3 = l.last().toULong(&bOK, 16);
     if (!bOK) return "unexpected format of reply line";
 
-    l = sl[3].split(' ', Qt::SkipEmptyParts);
+    l = sl[2].split(' ', Qt::SkipEmptyParts);
     if (l.size() !=2 || l.first() != TimeBoards[1]) return "unexpected format of reply line";
     Settings.TrbRunSettings.OR_0_FPGA4 = l.last().toULong(&bOK, 16);
     if (!bOK) return "unexpected format of reply line";
 
-    l = sl[4].split(' ', Qt::SkipEmptyParts);
+    l = sl[3].split(' ', Qt::SkipEmptyParts);
     if (l.size() !=2 || l.first() != TimeBoards[1]) return "unexpected format of reply line";
     Settings.TrbRunSettings.OR_1_FPGA4 = l.last().toULong(&bOK, 16);
     if (!bOK) return "unexpected format of reply line";
