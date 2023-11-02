@@ -49,9 +49,10 @@ public:
     int     OR_0_FPGA4 = 0;
     int     OR_1_FPGA4 = 0;
 
+    bool    TimeEnable_FPGA3 = false;
+    bool    TimeEnable_FPGA4 = false;
     int     TimeChannels_FPGA3 = 0;
     int     TimeChannels_FPGA4 = 0;
-
     int     TimeWinBefore_FPGA3 = 1500;
     int     TimeWinAfter_FPGA3  = 1500;
     int     TimeWinBefore_FPGA4 = 1500;

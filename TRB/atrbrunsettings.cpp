@@ -94,9 +94,10 @@ const QJsonObject ATrbRunSettings::WriteToJson() const
         cj["OR_0_FPGA4"] = OR_0_FPGA4;
         cj["OR_1_FPGA4"] = OR_1_FPGA4;
 
+        cj["TimeEnable_FPGA3"] = TimeEnable_FPGA3;
+        cj["TimeEnable_FPGA4"] = TimeEnable_FPGA4;
         cj["TimeChannels_FPGA3"] = TimeChannels_FPGA3;
         cj["TimeChannels_FPGA4"] = TimeChannels_FPGA4;
-
         cj["TimeWinBefore_FPGA3"] = TimeWinBefore_FPGA3;
         cj["TimeWinAfter_FPGA3"]  = TimeWinAfter_FPGA3;
         cj["TimeWinBefore_FPGA4"] = TimeWinBefore_FPGA4;
@@ -158,9 +159,10 @@ void ATrbRunSettings::ReadFromJson(const QJsonObject &json)
         parseJson(cj, "OR_0_FPGA4", OR_0_FPGA4);
         parseJson(cj, "OR_1_FPGA4", OR_1_FPGA4);
 
+        parseJson(cj, "TimeEnable_FPGA3", TimeEnable_FPGA3);
+        parseJson(cj, "TimeEnable_FPGA4", TimeEnable_FPGA4);
         parseJson(cj, "TimeChannels_FPGA3", TimeChannels_FPGA3);
         parseJson(cj, "TimeChannels_FPGA4", TimeChannels_FPGA4);
-
         parseJson(cj, "TimeWinBefore_FPGA3", TimeWinBefore_FPGA3);
         parseJson(cj, "TimeWinAfter_FPGA3",  TimeWinAfter_FPGA3);
         parseJson(cj, "TimeWinBefore_FPGA4", TimeWinBefore_FPGA4);

@@ -707,13 +707,15 @@ QString ATrbRunControl::sendTimeSettingsToTRB()
 {
     QStringList txt;
     txt << QString("trbcmd w 0xa003 0xc802 0x%1 # activated time channels\n").arg( QString::number(Settings.TrbRunSettings.TimeChannels_FPGA3, 16) );
-    unsigned val = 0x80000000 + Settings.TrbRunSettings.TimeWinAfter_FPGA3/5*0x10000 + Settings.TrbRunSettings.TimeWinBefore_FPGA3/5;
+    unsigned val = (Settings.TrbRunSettings.TimeEnable_FPGA3 ? 0x80000000 : 0);
+    val += Settings.TrbRunSettings.TimeWinAfter_FPGA3/5*0x10000 + Settings.TrbRunSettings.TimeWinBefore_FPGA3/5;
     qDebug() << "0x"+QString::number(val, 16);
     txt << QString("trbcmd w 0xa003 0xc801 0x%1 # before/after windows\n").arg( QString::number(val, 16) );
     txt << QString("trbcmd w 0xa003 0xc804 0x0000007b # set max data limit\n");
 
     txt << QString("trbcmd w 0xa004 0xc802 0x%1 # activated time channels\n").arg( QString::number(Settings.TrbRunSettings.TimeChannels_FPGA4, 16) );
-    val = 0x80000000 + Settings.TrbRunSettings.TimeWinAfter_FPGA4/5*0x10000 + Settings.TrbRunSettings.TimeWinBefore_FPGA4/5;
+    val = (Settings.TrbRunSettings.TimeEnable_FPGA4 ? 0x80000000 : 0);
+    val += Settings.TrbRunSettings.TimeWinAfter_FPGA4/5*0x10000 + Settings.TrbRunSettings.TimeWinBefore_FPGA4/5;
     qDebug() << "0x"+QString::number(val, 16);
     txt << QString("trbcmd w 0xa004 0xc801 0x%1 # before/after windows\n").arg( QString::number(val, 16) );
     txt << QString("trbcmd w 0xa004 0xc804 0x0000007b # set max data limit\n");
@@ -792,6 +794,7 @@ QString ATrbRunControl::readTimeSettingsFromTRB()
     if (l.size() !=2 || l.first() != TimeBoards[0]) return "unexpected format of reply line";
     unsigned compoundVal = l.last().toULong(&bOK, 16);
     if (!bOK) return "unexpected format of reply line";
+    Settings.TrbRunSettings.TimeEnable_FPGA3 = (compoundVal & 0x80000000);
     Settings.TrbRunSettings.TimeWinAfter_FPGA3 = ((compoundVal/0x10000) & 0x7fff) * 5;
     Settings.TrbRunSettings.TimeWinBefore_FPGA3 = (compoundVal & 0x7fff) * 5;
 
@@ -804,6 +807,7 @@ QString ATrbRunControl::readTimeSettingsFromTRB()
     if (l.size() !=2 || l.first() != TimeBoards[1]) return "unexpected format of reply line";
     compoundVal = l.last().toULong(&bOK, 16);
     if (!bOK) return "unexpected format of reply line";
+    Settings.TrbRunSettings.TimeEnable_FPGA4 = (compoundVal & 0x80000000);
     Settings.TrbRunSettings.TimeWinAfter_FPGA4 = ((compoundVal/0x10000) & 0x7fff) * 5;
     Settings.TrbRunSettings.TimeWinBefore_FPGA4 = (compoundVal & 0x7fff) * 5;
 

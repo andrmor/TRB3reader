@@ -30,7 +30,7 @@ AGraphWindow::AGraphWindow(const QString & idStr, QWidget * parent) :
 AGraphWindow::~AGraphWindow()
 {
     storeGeomStatus();
-    qDebug() << "Destructor called for AGraphWindow";
+    //qDebug() << "Destructor called for AGraphWindow";
     delete ui;
 }
 

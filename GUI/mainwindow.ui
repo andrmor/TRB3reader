@@ -30,7 +30,7 @@
     <item>
      <widget class="QTabWidget" name="twMain">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_8">
        <attribute name="title">
@@ -40,7 +40,7 @@
         <item>
          <widget class="QTabWidget" name="tabWidget">
           <property name="currentIndex">
-           <number>4</number>
+           <number>6</number>
           </property>
           <widget class="QWidget" name="tab_11">
            <attribute name="title">
@@ -3224,6 +3224,13 @@
                  </widget>
                 </item>
                 <item>
+                 <widget class="QCheckBox" name="cbTimeEnable_FPGA3">
+                  <property name="text">
+                   <string>Enable</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
                  <widget class="QLineEdit" name="leTimeChannelsFPGA3"/>
                 </item>
                 <item>
@@ -3286,6 +3293,13 @@
                  <widget class="QLabel" name="label_111">
                   <property name="text">
                    <string>FPGA 4</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="cbTimeEnable_FPGA4">
+                  <property name="text">
+                   <string>Enable</string>
                   </property>
                  </widget>
                 </item>

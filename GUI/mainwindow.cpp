@@ -2046,6 +2046,8 @@ void MainWindow::on_pbUpdateTriggerGui_clicked()
     ui->leFPGA4_0->setText(intToBitString(Config->TrbRunSettings.OR_0_FPGA4));
     ui->leFPGA4_1->setText(intToBitString(Config->TrbRunSettings.OR_1_FPGA4));
 
+    ui->cbTimeEnable_FPGA3->setChecked(Config->TrbRunSettings.TimeEnable_FPGA3);
+    ui->cbTimeEnable_FPGA4->setChecked(Config->TrbRunSettings.TimeEnable_FPGA4);
     ui->leTimeChannelsFPGA3->setText(intToBitStringShift1(Config->TrbRunSettings.TimeChannels_FPGA3));
     ui->leTimeChannelsFPGA4->setText(intToBitStringShift1(Config->TrbRunSettings.TimeChannels_FPGA4));
     ui->ledTimeWinBefore_FPGA3->setText(QString::number(Config->TrbRunSettings.TimeWinBefore_FPGA3));
@@ -2394,3 +2396,14 @@ void MainWindow::on_pbReadTimeSettingsFromTrb_clicked()
 
     on_pbUpdateTriggerGui_clicked();
 }
+
+void MainWindow::on_cbTimeEnable_FPGA3_clicked(bool checked)
+{
+    Config->TrbRunSettings.TimeEnable_FPGA3 = checked;
+}
+
+void MainWindow::on_cbTimeEnable_FPGA4_clicked(bool checked)
+{
+    Config->TrbRunSettings.TimeEnable_FPGA4 = checked;
+}
+

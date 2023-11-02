@@ -299,6 +299,8 @@ private slots:
     void on_ledTimeWinAfter_FPGA4_editingFinished();
     void on_pbWriteTimeSettingsToTrb_clicked();
     void on_pbReadTimeSettingsFromTrb_clicked();
+    void on_cbTimeEnable_FPGA3_clicked(bool checked);
+    void on_cbTimeEnable_FPGA4_clicked(bool checked);
 };
 
 #endif // MAINWINDOW_H
