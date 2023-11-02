@@ -30,7 +30,7 @@
     <item>
      <widget class="QTabWidget" name="twMain">
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab_8">
        <attribute name="title">
@@ -40,7 +40,7 @@
         <item>
          <widget class="QTabWidget" name="tabWidget">
           <property name="currentIndex">
-           <number>6</number>
+           <number>4</number>
           </property>
           <widget class="QWidget" name="tab_11">
            <attribute name="title">
@@ -3208,7 +3208,7 @@
             <item>
              <widget class="QLabel" name="label_117">
               <property name="text">
-               <string>Note that &quot;c001&quot; is shortened to &quot;1&quot;</string>
+               <string>Note that the first channel &quot;c001&quot; is shortened to &quot;1&quot; (not zero! --&gt; beware of the mismatch with the triggers!)</string>
               </property>
              </widget>
             </item>
@@ -4101,6 +4101,23 @@
                </property>
                <property name="text">
                 <string>Select file</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="Line" name="line_11">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="pbLoadLastAndProcess">
+               <property name="toolTip">
+                <string>Load the most recent file in the data directory defined in &quot;Acquire&quot; tab and process the data</string>
+               </property>
+               <property name="text">
+                <string>Load last and process</string>
                </property>
               </widget>
              </item>

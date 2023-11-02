@@ -301,6 +301,7 @@ private slots:
     void on_pbReadTimeSettingsFromTrb_clicked();
     void on_cbTimeEnable_FPGA3_clicked(bool checked);
     void on_cbTimeEnable_FPGA4_clicked(bool checked);
+    void on_pbLoadLastAndProcess_clicked();
 };
 
 #endif // MAINWINDOW_H

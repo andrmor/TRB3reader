@@ -2407,3 +2407,34 @@ void MainWindow::on_cbTimeEnable_FPGA4_clicked(bool checked)
     Config->TrbRunSettings.TimeEnable_FPGA4 = checked;
 }
 
+void MainWindow::on_pbLoadLastAndProcess_clicked()
+{
+    QString dirTxt = ui->leFolderForHldFiles->text();
+    if (dirTxt.isEmpty())
+    {
+        message("Directory is not set in 'Acquire' tab!", this);
+        return;
+    }
+    QDir dir(dirTxt);
+    if (!dir.exists())
+    {
+        message("Directory set in 'Acquire' tab does not exist!", this);
+        return;
+    }
+
+    QStringList files = dir.entryList( QStringList("*.hld"), QDir::Files, QDir::Time);
+    qDebug() << files;
+
+    if (files.isEmpty())
+    {
+        message("No hld files are found in the directory defined in the 'Acquire' tab", this);
+        return;
+    }
+
+    QString fn = dirTxt;
+    if (fn.endsWith('/')) fn.chop(1);
+    fn += "/" + files.front();
+    ui->leFileName->setText(fn);
+    on_pbProcessData_clicked();
+}
+
