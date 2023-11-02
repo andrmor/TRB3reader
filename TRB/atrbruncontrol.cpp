@@ -193,13 +193,22 @@ void ATrbRunControl::recallConfiguration()
 
     if (!Settings.isBufferRecordsEmpty())
     {
-        const QString err = sendBufferControlToTRB();
+        QString err = sendBufferControlToTRB();
         if (err.isEmpty()) emit boardLogReady("-->Updated buffer config");
         else emit boardLogReady("Error during sending buffer config:\n" + err);
     }
-    const QString err = sendCTStoTRB();
+
+    QString err = sendCTStoTRB();
     if (err.isEmpty()) emit boardLogReady("-->Updated trigger config");
        else emit boardLogReady("Error during sending trigger config:\n" + err);
+
+    err = sendTriggerLogicToTRB();
+    if (err.isEmpty()) emit boardLogReady("-->Updated trigger logic");
+    else emit boardLogReady("Error during sending trigger logic:\n" + err);
+
+    err = sendTimeSettingsToTRB();
+    if (err.isEmpty()) emit boardLogReady("-->Updated time info saving");
+    else emit boardLogReady("Error during sending timing settings:\n" + err);
 }
 
 void ATrbRunControl::onReadyBoardLog()

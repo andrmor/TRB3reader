@@ -85,7 +85,7 @@ MainWindow::MainWindow(MasterConfig* Config,
     connect(RootModule, &CernRootModule::WSigNegHidden, [=](){ui->pbShowSignalsNegative->setChecked(false);});
     connect(RootModule, &CernRootModule::WSigPosHidden, [=](){ui->pbShowSignalsPositive->setChecked(false);});
     connect(RootModule, &CernRootModule::W2DNegHidden, [=](){ui->pbShowAllNegatives->setChecked(false);});
-    connect(RootModule, &CernRootModule::W2DNegHidden, [=](){ui->pbShowAllPositives->setChecked(false);});
+    connect(RootModule, &CernRootModule::W2DPosHidden, [=](){ui->pbShowAllPositives->setChecked(false);});
 
     connect(DataHub, &ADataHub::requestGuiUpdate, this, &MainWindow::UpdateGui);
     connect(DataHub, &ADataHub::reportProgress, this, &MainWindow::onProgressUpdate);
