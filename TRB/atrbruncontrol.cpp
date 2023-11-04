@@ -90,7 +90,7 @@ void ATrbRunControl::RestartBoard()
     emit boardLogReady("Restart power cycle finished\n");
 }
 
-const QString ATrbRunControl::StartAcquire()
+QString ATrbRunControl::StartAcquire()
 {
     if (!prBoard) return "Board not ready!";
     if (prAcquire) return "Acquisition is already running";
@@ -812,6 +812,28 @@ QString ATrbRunControl::readTimeSettingsFromTRB()
     Settings.TrbRunSettings.TimeWinBefore_FPGA4 = (compoundVal & 0x7fff) * 5;
 
     pr.close();
+    return "";
+}
+
+QString ATrbRunControl::sendTriggerGainsToBoard(const QString & dbFilename, const QString & hostDir)
+{
+    QString err = sshCopyFileToHost(dbFilename, hostDir);
+    if (!err.isEmpty()) return err;
+
+    qDebug() << "Running script...";
+    QString command = "ssh";
+    QStringList args;
+    args << QString("%1@%2").arg(User).arg(Host);
+    args << "ls -a"; // !!!***
+
+    qDebug() << "Requesting to run script by sending command:" << command << args;
+    QProcess pr;
+    pr.setProcessChannelMode(QProcess::MergedChannels);
+    pr.start(command, args);
+
+    if (!pr.waitForStarted(500)) return "Could not start send";
+    if (!pr.waitForFinished(2000)) return "Timeout on reply from run script!";
+
     return "";
 }
 

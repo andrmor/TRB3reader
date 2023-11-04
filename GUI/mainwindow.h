@@ -2,7 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+
 #include <string>
+#include <vector>
 
 class MasterConfig;
 class Trb3dataReader;
@@ -19,6 +21,7 @@ class ATrbRunControl;
 class QTimer;
 class QElapsedTimer;
 class ABufferDelegate;
+class QSpinBox;
 
 namespace Ui {
 class MainWindow;
@@ -231,6 +234,8 @@ private:
     ATrbRunControl * TrbRunManager = nullptr;
     int ZeroRateCounter = 0;
 
+    std::vector<QSpinBox*> TriggerGainSpinBoxes;
+
     QString intToBitString(int val);
     QString intToBitStringShift1(int val);
 
@@ -302,6 +307,9 @@ private slots:
     void on_cbTimeEnable_FPGA3_clicked(bool checked);
     void on_cbTimeEnable_FPGA4_clicked(bool checked);
     void on_pbLoadLastAndProcess_clicked();
+    void on_sbNumberTriggerBoardChannels_editingFinished();
+    void on_pbSendTriggerBoardGains_clicked();
+    void on_pbSetAllTriggerGainsTo_clicked();
 };
 
 #endif // MAINWINDOW_H

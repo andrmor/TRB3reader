@@ -2442,3 +2442,69 @@ void MainWindow::on_pbLoadLastAndProcess_clicked()
     on_pbProcessData_clicked();
 }
 
+// ---- Gains for trigger board ----
+
+void MainWindow::on_sbNumberTriggerBoardChannels_editingFinished()
+{
+    const int num = ui->sbNumberTriggerBoardChannels->value();
+    if (num == TriggerGainSpinBoxes.size()) return;
+
+    QLayoutItem * item = nullptr;
+    while ( (item = ui->vlTriggerBoard->takeAt(0)) )
+    {
+        delete item->widget();
+        delete item;
+    }
+    TriggerGainSpinBoxes.clear();
+
+    for (int iCh = 0; iCh < num; iCh++)
+    {
+        QFrame * fr = new QFrame();
+            QHBoxLayout * hl = new QHBoxLayout(fr);
+            hl->setContentsMargins(2,2,2,2);
+                hl->addWidget(new QLabel( QString("Channel %0 threshold:").arg(iCh)));
+                QSpinBox * sb = new QSpinBox();
+                    sb->setMinimum(5);
+                    sb->setMaximum(40);
+                hl->addWidget(sb);
+                hl->addWidget(new QLabel("mV"));
+                hl->addStretch();
+        ui->vlTriggerBoard->addWidget(fr);
+
+        TriggerGainSpinBoxes.push_back(sb);
+    }
+
+    on_pbSetAllTriggerGainsTo_clicked();
+}
+
+void MainWindow::on_pbSetAllTriggerGainsTo_clicked()
+{
+    const int newVal = ui->sbAllGainsTo->value();
+    for (QSpinBox * sb : TriggerGainSpinBoxes)
+        sb->setValue(newVal);
+}
+
+void MainWindow::on_pbSendTriggerBoardGains_clicked()
+{
+    QString txt;
+
+    txt = "#Fixed part\n";
+
+    for (QSpinBox * sb : TriggerGainSpinBoxes)
+    {
+        int thr = sb->value();
+        txt += QString("aaaaaaa bbbbbb %0 cccccc\n").arg(thr);
+    }
+
+    QString localFN = "TriggerGains_Andr.txt";
+    bool ok = SaveTextToFile(localFN, txt);
+    if (!ok)
+    {
+        message("cannor update local file with trigger gain settings!", this);
+        return;
+    }
+
+    QString hostDir = Config->TrbRunSettings.ScriptDirOnHost;
+    QString err = TrbRunManager->sendTriggerGainsToBoard(localFN, hostDir);
+    if (!err.isEmpty()) message(err, this);
+}

@@ -22,7 +22,7 @@ public:
     bool isBoardProcessExists() const {return prBoard;}
     void RestartBoard();
 
-    const QString StartAcquire(); //returns error string, empty if all is ok
+    QString StartAcquire(); //returns error string, empty if all is ok
     void StopAcquire();
 
     const QString updateXML();
@@ -38,6 +38,8 @@ public:
 
     QString sendTimeSettingsToTRB();
     QString readTimeSettingsFromTRB();
+
+    QString sendTriggerGainsToBoard(const QString & dbFilename, const QString & hostDir);
 
     void  checkFreeSpace();
 
