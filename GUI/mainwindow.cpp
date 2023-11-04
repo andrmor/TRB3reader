@@ -82,6 +82,10 @@ MainWindow::MainWindow(MasterConfig* Config,
     connect(RootModule, &CernRootModule::WOverPosHidden, [=](){ui->pbShowOverlayPos->setChecked(false);});
     connect(RootModule, &CernRootModule::WAllNegHidden, [=](){ui->pbShowAllNeg->setChecked(false);});
     connect(RootModule, &CernRootModule::WAllPosHidden, [=](){ui->pbShowAllPos->setChecked(false);});
+    connect(RootModule, &CernRootModule::WSigNegHidden, [=](){ui->pbShowSignalsNegative->setChecked(false);});
+    connect(RootModule, &CernRootModule::WSigPosHidden, [=](){ui->pbShowSignalsPositive->setChecked(false);});
+    connect(RootModule, &CernRootModule::W2DNegHidden, [=](){ui->pbShowAllNegatives->setChecked(false);});
+    connect(RootModule, &CernRootModule::W2DPosHidden, [=](){ui->pbShowAllPositives->setChecked(false);});
 
     connect(DataHub, &ADataHub::requestGuiUpdate, this, &MainWindow::UpdateGui);
     connect(DataHub, &ADataHub::reportProgress, this, &MainWindow::onProgressUpdate);
@@ -166,6 +170,9 @@ void MainWindow::on_pbProcessData_clicked()
     OnEventOrChannelChanged();
     on_sbEvent_valueChanged(ui->sbEvent->value());
     updateNumEventsIndication();
+
+    on_pbShowAllNegatives_toggled(ui->pbShowAllNegatives->isChecked());
+    on_pbShowAllPositives_toggled(ui->pbShowAllNegatives->isChecked());
 }
 
 const QString MainWindow::ProcessData()
@@ -578,14 +585,17 @@ void MainWindow::on_sbEvent_valueChanged(int arg1)
     if (ui->pbShowOverlayNeg->isChecked()) on_pbShowOverlayNeg_toggled(true);
     if (ui->pbShowOverlayPos->isChecked()) on_pbShowOverlayPos_toggled(true);
 
-    if (ui->pbShowWaveform->isChecked()) on_pbShowWaveform_clicked(true);
+    if (ui->pbShowWaveform->isChecked()) on_pbShowWaveform_toggled(true);
+
+    if (ui->pbShowSignalsNegative->isChecked()) on_pbShowSignalsNegative_toggled(true);
+    if (ui->pbShowSignalsPositive->isChecked()) on_pbShowSignalsPositive_toggled(true);
 }
 
 void MainWindow::on_sbChannel_valueChanged(int)
 {
     OnEventOrChannelChanged();
 
-    if (ui->pbShowWaveform->isChecked()) on_pbShowWaveform_clicked(true);
+    if (ui->pbShowWaveform->isChecked()) on_pbShowWaveform_toggled(true);
 }
 
 int MainWindow::getCurrentlySelectedHardwareChannel()
@@ -723,7 +733,7 @@ void MainWindow::OnEventOrChannelChanged()
     ui->leTimes->setText(timeStr);
 }
 
-void MainWindow::on_pbShowWaveform_clicked(bool checked)
+void MainWindow::on_pbShowWaveform_toggled(bool checked)
 {
     RootModule->ShowSingleWaveWindow(checked);
     LogMessage("");
@@ -822,6 +832,42 @@ void MainWindow::showOverlay(bool checked, bool bNeg)
     }
 }
 
+void MainWindow::on_pbShowSignalsNegative_toggled(bool checked)
+{
+    showSignals(checked, true);
+}
+
+void MainWindow::on_pbShowSignalsPositive_toggled(bool checked)
+{
+    showSignals(checked, false);
+}
+
+void MainWindow::showSignals(bool checked, bool bNeg)
+{
+    bNeg ? RootModule->ShowNegativeSignalWindow(checked) : RootModule->ShowPositiveSignalWindow(checked);
+    LogMessage("");
+    if (!checked) return;
+
+    const bool bFromDataHub = (ui->cobExplorerSource->currentIndex() == 1);
+    int numEvents = bFromDataHub ? DataHub->CountEvents() : Reader->CountEvents();
+    int ievent = ui->sbEvent->value();
+    if (ievent >= numEvents)
+    {
+        ui->sbEvent->setValue(0);
+        RootModule->ClearSingleWaveWindow(); // !!!*** why this one?
+        return;
+    }
+
+    RootModule->DrawSignals(bFromDataHub, ievent, bNeg);
+    /*
+    if (!bOK)
+    {
+        if (bNeg) RootModule->ClearOverNegWaveWindow();
+        else      RootModule->ClearOverPosWaveWindow();
+    }
+    */
+}
+
 void MainWindow::on_pbShowAllNeg_toggled(bool checked)
 {
     showAllWave(checked, true);
@@ -877,6 +923,25 @@ void MainWindow::showAllWave(bool checked, bool bNeg)
     }
 }
 
+void MainWindow::on_pbShowAllNegatives_toggled(bool checked)
+{
+    const bool bFromDataHub = (ui->cobExplorerSource->currentIndex() == 1);
+    double Min = ui->ledMinNeg->text().toDouble();
+    double Max = ui->ledMaxNeg->text().toDouble();
+    RootModule->Show2DNegWindow(checked);
+    if (checked)
+        RootModule->Draw2D(true, bFromDataHub, ui->cbAutoscaleY->isChecked(), Min, Max);
+}
+
+void MainWindow::on_pbShowAllPositives_toggled(bool checked)
+{
+    const bool bFromDataHub = (ui->cobExplorerSource->currentIndex() == 1);
+    double Min = ui->ledMinPos->text().toDouble();
+    double Max = ui->ledMaxPos->text().toDouble();
+    RootModule->Show2DPosWindow(checked);
+    if (checked)
+        RootModule->Draw2D(false, bFromDataHub, ui->cbAutoscaleY->isChecked(), Min, Max);
+}
 
 void MainWindow::on_cbLabels_clicked()
 {
@@ -988,11 +1053,13 @@ bool MainWindow::ExtractNumbersFromQString(const QString input, QVector<int> *To
 
   QStringList fields = input.split(rx, QString::SkipEmptyParts);
 
+  /*
   if (fields.size() == 0 )
     {
       //message("Nothing to add!");
       return false;
     }
+  */
 
   //fields = input.split(",", QString::SkipEmptyParts);
   fields = input.split(QRegExp("(\\,|\\ )"), QString::SkipEmptyParts);
@@ -1198,6 +1265,9 @@ void MainWindow::on_pbProcessAllFromDir_clicked()
     while (it.hasNext()) names << it.next();
 
     bulkProcessorEnvelope(names);
+
+    on_pbShowAllNegatives_toggled(ui->pbShowAllNegatives->isChecked());
+    on_pbShowAllPositives_toggled(ui->pbShowAllNegatives->isChecked());
 }
 
 void MainWindow::on_pbProcessSelectedFiles_clicked()
@@ -1207,6 +1277,9 @@ void MainWindow::on_pbProcessSelectedFiles_clicked()
     Config->WorkingDir = QFileInfo(names.first()).absolutePath();
 
     bulkProcessorEnvelope(names);
+
+    on_pbShowAllNegatives_toggled(ui->pbShowAllNegatives->isChecked());
+    on_pbShowAllPositives_toggled(ui->pbShowAllNegatives->isChecked());
 }
 
 void MainWindow::bulkProcessorEnvelope(const QStringList FileNames)
@@ -1807,6 +1880,11 @@ void MainWindow::on_pbReadTriggerSettingsFromTrb_clicked()
 {
     QString err = TrbRunManager->ReadTriggerSettingsFromBoard();
     if (!err.isEmpty()) message(err, this);
+    else
+    {
+        err = TrbRunManager->readTriggerLogicFromTRB();
+        if (!err.isEmpty()) message(err, this);
+    }
 
     on_pbUpdateTriggerGui_clicked();
 }
@@ -1827,14 +1905,18 @@ void MainWindow::on_pbOpenCtsWebPage_clicked()
 
 void MainWindow::on_pbSendCTStoTRB_clicked()
 {
-    this->SetEnabled(false);
+    SetEnabled(false);
     qApp->processEvents();
 
     QString err = TrbRunManager->sendCTStoTRB();
 
-    this->SetEnabled(true);
-    if (!err.isEmpty())
-        message(err, this);
+    if (!err.isEmpty()) message(err, this);
+    else
+    {
+        err = TrbRunManager->sendTriggerLogicToTRB();
+        if (!err.isEmpty()) message(err, this);
+    }
+    SetEnabled(true);
 }
 
 #include "abufferdelegate.h"
@@ -1941,6 +2023,7 @@ void MainWindow::on_pbRestartTrb_clicked()
         TrbRunManager->RestartBoard();
 }
 
+#include <bitset>
 void MainWindow::on_pbUpdateTriggerGui_clicked()
 {
     ui->cbMP0->setChecked(Config->TrbRunSettings.bMP_0);
@@ -1956,6 +2039,21 @@ void MainWindow::on_pbUpdateTriggerGui_clicked()
     ui->cbPeriodicalPulser0->setChecked(Config->TrbRunSettings.bPeriodicPulser);
 
     ui->cbPeripheryFPGA0->setChecked(Config->TrbRunSettings.bPeripheryFPGA0);
+    ui->cbPeripheryFPGA1->setChecked(Config->TrbRunSettings.bPeripheryFPGA1);
+
+    ui->leFPGA3_0->setText(intToBitString(Config->TrbRunSettings.OR_0_FPGA3));
+    ui->leFPGA3_1->setText(intToBitString(Config->TrbRunSettings.OR_1_FPGA3));
+    ui->leFPGA4_0->setText(intToBitString(Config->TrbRunSettings.OR_0_FPGA4));
+    ui->leFPGA4_1->setText(intToBitString(Config->TrbRunSettings.OR_1_FPGA4));
+
+    ui->cbTimeEnable_FPGA3->setChecked(Config->TrbRunSettings.TimeEnable_FPGA3);
+    ui->cbTimeEnable_FPGA4->setChecked(Config->TrbRunSettings.TimeEnable_FPGA4);
+    ui->leTimeChannelsFPGA3->setText(intToBitStringShift1(Config->TrbRunSettings.TimeChannels_FPGA3));
+    ui->leTimeChannelsFPGA4->setText(intToBitStringShift1(Config->TrbRunSettings.TimeChannels_FPGA4));
+    ui->ledTimeWinBefore_FPGA3->setText(QString::number(Config->TrbRunSettings.TimeWinBefore_FPGA3));
+    ui->ledTimeWinAfter_FPGA3->setText(QString::number(Config->TrbRunSettings.TimeWinAfter_FPGA3));
+    ui->ledTimeWinBefore_FPGA4->setText(QString::number(Config->TrbRunSettings.TimeWinBefore_FPGA4));
+    ui->ledTimeWinAfter_FPGA4->setText(QString::number(Config->TrbRunSettings.TimeWinAfter_FPGA4));
 
     ulong rFreq = Config->TrbRunSettings.RandomPulserFrequency.toULong(nullptr, 16);
     double freq = (double)rFreq / 21.474836;
@@ -1964,6 +2062,36 @@ void MainWindow::on_pbUpdateTriggerGui_clicked()
     ulong rPeriod = Config->TrbRunSettings.Period.toULong(nullptr, 16);
     double per = (double)rPeriod * 10.0;
     ui->lePeriod0->setText( QString::number(per) );
+
+    // line 0
+    {
+        int val = Config->TrbRunSettings.PeripheryTriggerInputs0.toInt(nullptr, 16);
+        std::bitset<32> bits(val);
+        ui->cbT330->setChecked(bits.test(14));
+        ui->cbT320->setChecked(bits.test(13));
+        ui->cbT310->setChecked(bits.test(12));
+        ui->cbT300->setChecked(bits.test(11));
+
+        ui->cbT430->setChecked(bits.test(19));
+        ui->cbT420->setChecked(bits.test(18));
+        ui->cbT410->setChecked(bits.test(17));
+        ui->cbT400->setChecked(bits.test(16));
+    }
+
+    // line 1
+    {
+        int val = Config->TrbRunSettings.PeripheryTriggerInputs1.toInt(nullptr, 16);
+        std::bitset<32> bits(val);
+        ui->cbT331->setChecked(bits.test(14));
+        ui->cbT321->setChecked(bits.test(13));
+        ui->cbT311->setChecked(bits.test(12));
+        ui->cbT301->setChecked(bits.test(11));
+
+        ui->cbT431->setChecked(bits.test(19));
+        ui->cbT421->setChecked(bits.test(18));
+        ui->cbT411->setChecked(bits.test(17));
+        ui->cbT401->setChecked(bits.test(16));
+    }
 }
 
 void MainWindow::on_pbUpdateTriggerSettings_clicked()
@@ -1981,6 +2109,7 @@ void MainWindow::on_pbUpdateTriggerSettings_clicked()
     Config->TrbRunSettings.bPeriodicPulser = ui->cbPeriodicalPulser0->isChecked();
 
     Config->TrbRunSettings.bPeripheryFPGA0 = ui->cbPeripheryFPGA0->isChecked();
+    Config->TrbRunSettings.bPeripheryFPGA1 = ui->cbPeripheryFPGA1->isChecked();
 
     double freq = ui->leRandomFrequency->text().toDouble() * 21.474836;
     ulong rFreq = (ulong)freq;
@@ -1992,7 +2121,37 @@ void MainWindow::on_pbUpdateTriggerSettings_clicked()
     if (rPer > 0xffffffff) rPer = 0xffffffff;
     Config->TrbRunSettings.Period = "0x" + QString::number(rPer, 16);
 
-    qDebug() <<Config->TrbRunSettings.RandomPulserFrequency<<Config->TrbRunSettings.Period;
+    //qDebug() <<Config->TrbRunSettings.RandomPulserFrequency<<Config->TrbRunSettings.Period;
+
+    // line 0
+    {
+        int val = Config->TrbRunSettings.PeripheryTriggerInputs0.toInt(nullptr, 16);
+        std::bitset<32> bits(val);
+        bits.set(14, ui->cbT330->isChecked());
+        bits.set(13, ui->cbT320->isChecked());
+        bits.set(12, ui->cbT310->isChecked());
+        bits.set(11, ui->cbT300->isChecked());
+        bits.set(19, ui->cbT430->isChecked());
+        bits.set(18, ui->cbT420->isChecked());
+        bits.set(17, ui->cbT410->isChecked());
+        bits.set(16, ui->cbT400->isChecked());
+        Config->TrbRunSettings.PeripheryTriggerInputs0 = "0x" + QString::number(bits.to_ulong(), 16);
+    }
+    // line 1
+    {
+        int val = Config->TrbRunSettings.PeripheryTriggerInputs1.toInt(nullptr, 16);
+        std::bitset<32> bits(val);
+        bits.set(14, ui->cbT331->isChecked());
+        bits.set(13, ui->cbT321->isChecked());
+        bits.set(12, ui->cbT311->isChecked());
+        bits.set(11, ui->cbT301->isChecked());
+        bits.set(19, ui->cbT431->isChecked());
+        bits.set(18, ui->cbT421->isChecked());
+        bits.set(17, ui->cbT411->isChecked());
+        bits.set(16, ui->cbT401->isChecked());
+        Config->TrbRunSettings.PeripheryTriggerInputs1 = "0x" + QString::number(bits.to_ulong(), 16);
+    }
+
 }
 
 void MainWindow::on_pbOpenBufferWebPage_clicked()
@@ -2067,3 +2226,217 @@ void MainWindow::on_sbZeroSignalIfPeakAfter_N_editingFinished()
     Config->ZeroSignalIfPeakAfter_Negative = ui->sbZeroSignalIfPeakAfter_N->value();
     ClearData();
 }
+
+int vectorToBitInt(const QVector<int> & vec)
+{
+    int res = 0;
+    for (int i : vec)
+    {
+        if (i > 30) continue;
+        res += (1 << i);
+    }
+    return res;
+}
+
+int vectorToBitIntShift1(const QVector<int> & vec)
+{
+    int res = 0;
+    for (int i : vec)
+    {
+        if (i > 31) continue; // was 30 originally -> use signed int in the config, befare of overflow,
+        res += (1 << (i-1));  // i-1 to account for TRB time channel shift: "0" encodes c001
+    }
+    return res;
+}
+
+#include <bitset>
+QString MainWindow::intToBitString(int val)
+{
+    QVector<int> vec;
+    std::bitset<32> bs(val);
+    for (int i = 0; i < 31; i++)
+        if (bs.test(i)) vec << i;
+    return PackChannelList(vec);
+}
+
+QString MainWindow::intToBitStringShift1(int val)
+{
+    QVector<int> vec;
+    std::bitset<32> bs(val);
+    for (int i = 1; i < 32; i++)     // from 1, and 31->32 as the limit,
+        if (bs.test(i-1)) vec << i;  // i-1 to account for TRB time channel shift: "0" encodes c001
+    return PackChannelList(vec);
+}
+
+void MainWindow::on_leFPGA3_0_editingFinished()
+{
+    QVector<int> vec;
+    bool ok = ExtractNumbersFromQString(ui->leFPGA3_0->text(), &vec);
+    if (ok) Config->TrbRunSettings.OR_0_FPGA3 = vectorToBitInt(vec);
+    ui->leFPGA3_0->setText(intToBitString(Config->TrbRunSettings.OR_0_FPGA3));
+    if (!ok) message("Bad format: use, e.g., 0,1,3-5,7,10-20", this);
+}
+
+void MainWindow::on_leFPGA3_1_editingFinished()
+{
+    QVector<int> vec;
+    bool ok = ExtractNumbersFromQString(ui->leFPGA3_1->text(), &vec);
+    if (ok) Config->TrbRunSettings.OR_1_FPGA3 = vectorToBitInt(vec);
+    ui->leFPGA3_1->setText(intToBitString(Config->TrbRunSettings.OR_1_FPGA3));
+    if (!ok) message("Bad format: use, e.g., 0,1,3-5,7,10-20", this);
+}
+
+void MainWindow::on_leFPGA4_0_editingFinished()
+{
+    QVector<int> vec;
+    bool ok = ExtractNumbersFromQString(ui->leFPGA4_0->text(), &vec);
+    if (ok) Config->TrbRunSettings.OR_0_FPGA4 = vectorToBitInt(vec);
+    ui->leFPGA4_0->setText(intToBitString(Config->TrbRunSettings.OR_0_FPGA4));
+    if (!ok) message("Bad format: use, e.g., 0,1,3-5,7,10-20", this);
+}
+
+void MainWindow::on_leFPGA4_1_editingFinished()
+{
+    QVector<int> vec;
+    bool ok = ExtractNumbersFromQString(ui->leFPGA4_1->text(), &vec);
+    if (ok) Config->TrbRunSettings.OR_1_FPGA4 = vectorToBitInt(vec);
+    ui->leFPGA4_1->setText(intToBitString(Config->TrbRunSettings.OR_1_FPGA4));
+    if (!ok) message("Bad format: use, e.g., 0,1,3-5,7,10-20", this);
+}
+
+void MainWindow::on_leTimeChannelsFPGA3_editingFinished()
+{
+    ui->leTimeChannelsFPGA3->blockSignals(true); // -->
+
+    QVector<int> vec;
+    bool ok = ExtractNumbersFromQString(ui->leTimeChannelsFPGA3->text(), &vec);
+    if (!ok)
+        message("Bad format: use, e.g., 1,3-5,7,10-20    Note that 0 is not possible", this);
+    else if (vec.contains(0))
+        message("Channel 0 is reserved!", this);
+    else
+        Config->TrbRunSettings.TimeChannels_FPGA3 = vectorToBitIntShift1(vec);
+    ui->leTimeChannelsFPGA3->setText(intToBitStringShift1(Config->TrbRunSettings.TimeChannels_FPGA3));
+
+    ui->leTimeChannelsFPGA3->blockSignals(false); // <--
+}
+
+void MainWindow::on_leTimeChannelsFPGA4_editingFinished()
+{
+    ui->leTimeChannelsFPGA4->blockSignals(true); // -->
+
+    QVector<int> vec;
+    bool ok = ExtractNumbersFromQString(ui->leTimeChannelsFPGA4->text(), &vec);
+    if (!ok)
+        message("Bad format: use, e.g., 1,3-5,7,10-20    Note that 0 is not possible", this);
+    else if (vec.contains(0))
+        message("Channel 0 is reserved!", this);
+    else
+        Config->TrbRunSettings.TimeChannels_FPGA4 = vectorToBitIntShift1(vec);
+    ui->leTimeChannelsFPGA4->setText(intToBitStringShift1(Config->TrbRunSettings.TimeChannels_FPGA4));
+
+    ui->leTimeChannelsFPGA4->blockSignals(false); // <--
+}
+
+void MainWindow::on_ledTimeWinBefore_FPGA3_editingFinished()
+{
+    double  val = ui->ledTimeWinBefore_FPGA3->text().toDouble();
+    if (val < 0) val = -val;
+    if (val > 9040) val = 9040;
+    int base = val / 5;
+    Config->TrbRunSettings.TimeWinBefore_FPGA3 = base * 5;
+    ui->ledTimeWinBefore_FPGA3->setText(QString::number(Config->TrbRunSettings.TimeWinBefore_FPGA3));
+}
+
+void MainWindow::on_ledTimeWinAfter_FPGA3_editingFinished()
+{
+    double  val = ui->ledTimeWinAfter_FPGA3->text().toDouble();
+    if (val < 0) val = -val;
+    if (val > 9760) val = 9760;
+    int base = val / 5;
+    Config->TrbRunSettings.TimeWinAfter_FPGA3 = base * 5;
+    ui->ledTimeWinAfter_FPGA3->setText(QString::number(Config->TrbRunSettings.TimeWinAfter_FPGA3));
+}
+
+void MainWindow::on_ledTimeWinBefore_FPGA4_editingFinished()
+{
+    double  val = ui->ledTimeWinBefore_FPGA4->text().toDouble();
+    if (val < 0) val = -val;
+    if (val > 9040) val = 9040;
+    int base = val / 5;
+    Config->TrbRunSettings.TimeWinBefore_FPGA4 = base * 5;
+    ui->ledTimeWinBefore_FPGA4->setText(QString::number(Config->TrbRunSettings.TimeWinBefore_FPGA4));
+}
+
+void MainWindow::on_ledTimeWinAfter_FPGA4_editingFinished()
+{
+    double  val = ui->ledTimeWinAfter_FPGA4->text().toDouble();
+    if (val < 0) val = -val;
+    if (val > 9760) val = 9760;
+    int base = val / 5;
+    Config->TrbRunSettings.TimeWinAfter_FPGA4 = base * 5;
+    ui->ledTimeWinAfter_FPGA4->setText(QString::number(Config->TrbRunSettings.TimeWinAfter_FPGA4));
+}
+
+void MainWindow::on_pbWriteTimeSettingsToTrb_clicked()
+{
+    SetEnabled(false);
+    qApp->processEvents();
+
+    QString err = TrbRunManager->sendTimeSettingsToTRB();
+
+    if (!err.isEmpty()) message(err, this);
+    SetEnabled(true);
+}
+
+void MainWindow::on_pbReadTimeSettingsFromTrb_clicked()
+{
+    QString err = TrbRunManager->readTimeSettingsFromTRB();
+    if (!err.isEmpty()) message(err, this);
+
+    on_pbUpdateTriggerGui_clicked();
+}
+
+void MainWindow::on_cbTimeEnable_FPGA3_clicked(bool checked)
+{
+    Config->TrbRunSettings.TimeEnable_FPGA3 = checked;
+}
+
+void MainWindow::on_cbTimeEnable_FPGA4_clicked(bool checked)
+{
+    Config->TrbRunSettings.TimeEnable_FPGA4 = checked;
+}
+
+void MainWindow::on_pbLoadLastAndProcess_clicked()
+{
+    QString dirTxt = ui->leFolderForHldFiles->text();
+    if (dirTxt.isEmpty())
+    {
+        message("Directory is not set in 'Acquire' tab!", this);
+        return;
+    }
+    QDir dir(dirTxt);
+    if (!dir.exists())
+    {
+        message("Directory set in 'Acquire' tab does not exist!", this);
+        return;
+    }
+
+    QStringList files = dir.entryList( QStringList("*.hld"), QDir::Files, QDir::Time);
+    //qDebug() << files;
+
+    if (files.isEmpty())
+    {
+        message("No hld files are found in the directory defined in the 'Acquire' tab", this);
+        return;
+    }
+
+    QString fn = dirTxt;
+    if (fn.endsWith('/')) fn.chop(1);
+    fn += "/" + files.front();
+    ui->leFileName->setText(fn);
+    Config->FileName = fn;
+    qApp->processEvents();
+    on_pbProcessData_clicked();
+}
+

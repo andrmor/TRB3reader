@@ -9,34 +9,48 @@
 #include "TView3D.h"
 #include "TVirtualX.h"
 
-ARasterWindow::ARasterWindow(QMainWindow *parent) : QWindow()
+ARasterWindow::ARasterWindow(QMainWindow * parent) : QWidget(parent), MasterWindow(parent)
 {
-  //qDebug()<<"->Creating raster window";
-  MasterWindow = parent;
-  fBlockEvents = false;
-  fInvertedXYforDrag = false;
-  create();
+    qDebug()<<"->Creating raster window";
 
-  setGeometry(50, 50, 500, 500);
+    // set options needed to properly update the canvas when resizing the widget
+    // and to properly handle context menus and mouse move events
 
-  wid = gVirtualX->AddWindow(QWindow::winId(), QWindow::width(), QWindow::height());
-  fCanvas = new TCanvas("fCanvas", 100, 100, wid);
+    //setAttribute(Qt::WA_PaintOnScreen, false);
+    setAttribute(Qt::WA_PaintOnScreen, true); // required to add in header: QPaintEngine * paintEngine() const override {return nullptr;}
+    //setAttribute(Qt::WA_OpaquePaintEvent, true);
+    //setAttribute(Qt::WA_NativeWindow, true);
 
-  PressEventRegistered = false;
-  //qDebug() << "  ->Root canvas created";
+    setUpdatesEnabled(false);
+    setMouseTracking(true);
+    setMinimumSize(300, 200);
+
+    // register the QWidget in TVirtualX, giving its native window id
+    int wid = gVirtualX->AddWindow((ULong_t)winId(), width(), height());
+    // create the ROOT TCanvas, giving as argument the QWidget registered id
+    fCanvas = new TCanvas("Root Canvas", width(), height(), wid);
+    //TQObject::Connect("TGPopupMenu", "PoppedDown()", "TCanvas", fCanvas, "Update()");
+
+    fCanvas->SetBorderMode(0);
+    //fCanvas->SetRightMargin(0.10);
+    //fCanvas->SetLeftMargin(0.10);
+    fCanvas->SetFillColor(0);
+
+    PressEventRegistered = false;
+    qDebug() << "  ->Root canvas created";
 }
 
 ARasterWindow::~ARasterWindow()
 {
-  //qDebug()<< "     <--Starting cleanup for raster window base...";
+    //qDebug()<< "     <--Starting cleanup for raster window base...";
 
-  fCanvas->Clear();
-  delete fCanvas;
-  //qDebug()<<"        canvas deleted";
+    fCanvas->Clear();
+    delete fCanvas;
+    //qDebug()<<"        canvas deleted";
 
-  gVirtualX->RemoveWindow(wid);
-  //qDebug()<<"        window unregistered in Root";
-  //qDebug()<< "  <-Done";
+    //gVirtualX->RemoveWindow(wid); //causes strange warnings !!!***
+    //qDebug()<<"        window unregistered in Root";
+    //qDebug()<< "  <-Done";
 }
 
 void ARasterWindow::SetAsActiveRootWindow()
@@ -53,14 +67,6 @@ void ARasterWindow::UpdateRootCanvas()
 {
   //fCanvas->Modified();
   fCanvas->Update();
-}
-
-void ARasterWindow::exposeEvent(QExposeEvent *)
-{
-  if (!fCanvas) return;
-  if (fBlockEvents) return;
-  //qDebug() << "raster window -> Expose event";
-  if (isExposed()) fCanvas->Update();
 }
 
 void ARasterWindow::mouseMoveEvent(QMouseEvent *event)
@@ -235,4 +241,23 @@ void ARasterWindow::setWindowProperties(Double_t centerX, Double_t centerY, Doub
   fCanvas->cd();
   fCanvas->GetView()->SetWindow(centerX, centerY, hWidth, hHeight);
   fCanvas->GetView()->RotateView(phi,theta);
+}
+
+void ARasterWindow::paintEvent(QPaintEvent * /*event*/)
+{
+    if (fCanvas)
+    {
+        fCanvas->Resize();
+        fCanvas->Update();
+    }
+}
+
+void ARasterWindow::resizeEvent(QResizeEvent * event)
+{
+    if (fCanvas)
+    {
+        fCanvas->SetCanvasSize(event->size().width(), event->size().height());
+        fCanvas->Resize();
+        fCanvas->Update();
+    }
 }

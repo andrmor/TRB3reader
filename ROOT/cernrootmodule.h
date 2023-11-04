@@ -15,6 +15,7 @@ class ADataHub;
 class TGraph;
 class TmpObjHubClass;
 class TObject;
+class TH2D;
 class QMainWindow;
 
 class CernRootModule : public QObject
@@ -31,6 +32,11 @@ public:
     void ShowOverPosWaveWindow(bool flag);
     void ShowAllNegWaveWindow(bool flag);
     void ShowAllPosWaveWindow(bool flag);
+    void ShowNegativeSignalWindow(bool flag);
+    void ShowPositiveSignalWindow(bool flag);
+
+    void Show2DNegWindow(bool flag);
+    void Show2DPosWindow(bool flag);
 
     void ClearSingleWaveWindow();
     void ClearOverNegWaveWindow();
@@ -43,8 +49,10 @@ public:
     bool DrawAll(bool bFromDataHub, int ievent, bool bNeg, int padsX, int padsY,
                  bool bAutoscale, float Min, float Max, int SortBy_0Logic1Hardw,
                  bool bShowlabels, int Channels0_Signals1);
+    void DrawSignals(bool bFromDataHub, int ievent, bool bNeg);
+    void Draw2D(bool bNegatives, bool bFromDataHub, bool bAutoscale, double Min, double Max);
 
-    void StartGraphWindows();
+    void CreateGraphWindows();
     //const QJsonObject SaveGraphWindows() const;
     //void SetWindowGeometries(const QJsonObject &js);
     void ResetPositionOfWindows();
@@ -70,19 +78,28 @@ private:
 
     TmpObjHubClass* TmpHub;
 
-    TMultiGraph *multiGraph;
-    TGraph* gSingle;
+    TMultiGraph * multiGraph = nullptr;
+    TGraph * gSingle = nullptr;
     QVector<TGraph*> graphsNeg, graphsPos;
+    TGraph * gNegSig = nullptr;
+    TGraph * gPosSig = nullptr;
+    TH2D * h2DNeg = nullptr;
+    TH2D * h2DPos = nullptr;
 
     AGraphWindow * WOne     = nullptr;
     AGraphWindow * WOverNeg = nullptr;
     AGraphWindow * WOverPos = nullptr;
     AGraphWindow * WAllNeg  = nullptr;
     AGraphWindow * WAllPos  = nullptr;
+    AGraphWindow * WSigPos  = nullptr;
+    AGraphWindow * WSigNeg  = nullptr;
 
-    int NormalColor;
-    int RejectedColor;
-    int LineWidth;
+    AGraphWindow * W2DNeg  = nullptr;
+    AGraphWindow * W2DPos  = nullptr;
+
+    int NormalColor = 4;
+    int RejectedColor = 2;
+    int LineWidth = 2;
 
     void showGraphWindow(AGraphWindow * win, bool flag);
     void clearNegGraphVectors();
@@ -92,6 +109,7 @@ private:
 
 private slots:
     void timerTimeout();
+    void onGraphWindowRequestHide(QString idStr);
 
 signals:
     void WOneHidden();
@@ -99,6 +117,10 @@ signals:
     void WOverPosHidden();
     void WAllNegHidden();
     void WAllPosHidden();
+    void WSigNegHidden();
+    void WSigPosHidden();
+    void W2DNegHidden();
+    void W2DPosHidden();
 
 };
 

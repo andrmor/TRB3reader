@@ -27,12 +27,17 @@ public:
 
     const QString updateXML();
 
-    const QString updateCTSsetupScript();
-    const QString updateBufferSetupScript();
-    const QString sendCTStoTRB();
-    const QString ReadTriggerSettingsFromBoard();
-    const QString sendBufferControlToTRB();
-    const QString readBufferControlFromTRB();
+    QString updateCTSsetupScript();
+    QString updateBufferSetupScript();
+    QString sendCTStoTRB();
+    QString ReadTriggerSettingsFromBoard();
+    QString sendTriggerLogicToTRB();
+    QString readTriggerLogicFromTRB();
+    QString sendBufferControlToTRB();
+    QString readBufferControlFromTRB();
+
+    QString sendTimeSettingsToTRB();
+    QString readTimeSettingsFromTRB();
 
     void  checkFreeSpace();
 

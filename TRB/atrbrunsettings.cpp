@@ -23,8 +23,8 @@ ulong ATrbRunSettings::getTriggerInt() const
               128  * bMP_5 +            // 7
               256  * bMP_6 +            // 8
               512  * bMP_7 +            // 9
-              1024 * bPeripheryFPGA0 ;  // 10
-              //2048 * bMP_7 ;            // 11
+              1024 * bPeripheryFPGA0 +  // 10
+              2048 * bPeripheryFPGA1 ;  // 11
 
     r += (ulong)Mask * 0x10000;
 
@@ -51,6 +51,7 @@ void ATrbRunSettings::setTriggerInt(ulong val)
     bMP_6           = CheckBit(val, 8);
     bMP_7           = CheckBit(val, 9);
     bPeripheryFPGA0 = CheckBit(val, 10);
+    bPeripheryFPGA1 = CheckBit(val, 11);
 }
 
 const QJsonObject ATrbRunSettings::WriteToJson() const
@@ -86,10 +87,28 @@ const QJsonObject ATrbRunSettings::WriteToJson() const
         cj["PeriodicPulser"] = bPeriodicPulser;
 
         cj["bPeripheryFPGA0"] = bPeripheryFPGA0;
+        cj["bPeripheryFPGA1"] = bPeripheryFPGA1;
+
+        cj["OR_0_FPGA3"] = OR_0_FPGA3;
+        cj["OR_1_FPGA3"] = OR_1_FPGA3;
+        cj["OR_0_FPGA4"] = OR_0_FPGA4;
+        cj["OR_1_FPGA4"] = OR_1_FPGA4;
+
+        cj["TimeEnable_FPGA3"] = TimeEnable_FPGA3;
+        cj["TimeEnable_FPGA4"] = TimeEnable_FPGA4;
+        cj["TimeChannels_FPGA3"] = TimeChannels_FPGA3;
+        cj["TimeChannels_FPGA4"] = TimeChannels_FPGA4;
+        cj["TimeWinBefore_FPGA3"] = TimeWinBefore_FPGA3;
+        cj["TimeWinAfter_FPGA3"]  = TimeWinAfter_FPGA3;
+        cj["TimeWinBefore_FPGA4"] = TimeWinBefore_FPGA4;
+        cj["TimeWinAfter_FPGA4"]  = TimeWinAfter_FPGA4;
 
         cj["Mask"] = Mask;
         cj["RandomPulserFrequency"] = RandomPulserFrequency;
         cj["Period"] = Period;
+
+        cj["PeripheryTriggerInputs0"] = PeripheryTriggerInputs0;
+        cj["PeripheryTriggerInputs1"] = PeripheryTriggerInputs1;
 
         QJsonArray ar;
         for (const QString & s : TheRestCTScontrols) ar << s;
@@ -133,10 +152,28 @@ void ATrbRunSettings::ReadFromJson(const QJsonObject &json)
         parseJson(cj, "PeriodicPulser", bPeriodicPulser);
 
         parseJson(cj, "bPeripheryFPGA0", bPeripheryFPGA0);
+        parseJson(cj, "bPeripheryFPGA1", bPeripheryFPGA1);
+
+        parseJson(cj, "OR_0_FPGA3", OR_0_FPGA3);
+        parseJson(cj, "OR_1_FPGA3", OR_1_FPGA3);
+        parseJson(cj, "OR_0_FPGA4", OR_0_FPGA4);
+        parseJson(cj, "OR_1_FPGA4", OR_1_FPGA4);
+
+        parseJson(cj, "TimeEnable_FPGA3", TimeEnable_FPGA3);
+        parseJson(cj, "TimeEnable_FPGA4", TimeEnable_FPGA4);
+        parseJson(cj, "TimeChannels_FPGA3", TimeChannels_FPGA3);
+        parseJson(cj, "TimeChannels_FPGA4", TimeChannels_FPGA4);
+        parseJson(cj, "TimeWinBefore_FPGA3", TimeWinBefore_FPGA3);
+        parseJson(cj, "TimeWinAfter_FPGA3",  TimeWinAfter_FPGA3);
+        parseJson(cj, "TimeWinBefore_FPGA4", TimeWinBefore_FPGA4);
+        parseJson(cj, "TimeWinAfter_FPGA4",  TimeWinAfter_FPGA4);
 
         parseJson(cj, "Mask", Mask);
         parseJson(cj, "RandomPulserFrequency", RandomPulserFrequency);
         parseJson(cj, "Period0", Period);
+
+        parseJson(cj, "PeripheryTriggerInputs0", PeripheryTriggerInputs0);
+        parseJson(cj, "PeripheryTriggerInputs1", PeripheryTriggerInputs1);
 
         QJsonArray ar;
         parseJson(cj, "TheRestControls", ar);

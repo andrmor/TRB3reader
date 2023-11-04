@@ -24,6 +24,7 @@ public:
     bool    SetValue(int ievent, int ichannel, int isample, float value);
     void    SetValueFast(int ievent, int ichannel, int isample, float value); //no argument validity check!
 
+    const QVector<float>* GetWaveformsPtr(int ievent, int ichannel) const;
     const QVector<float>* GetWaveformPtr(int ievent, int ichannel) const;
     const QVector<float>* GetWaveformPtrFast(int ievent, int ichannel) const; //no argument validity check!
 
@@ -62,7 +63,7 @@ private:
     MasterConfig* Config;
     QVector < QVector < QVector <float> > > waveData;  // format:  [event] [hardware chanel] [sample]
 
-    static constexpr unsigned NumTimeChannels = 13;
+    static constexpr unsigned NumTimeChannels = 30;
     static constexpr double FineSpan_ns = 5.0; //ns
 
     int     numSamples;

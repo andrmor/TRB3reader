@@ -39,14 +39,7 @@ CernRootModule::CernRootModule(Trb3dataReader *Reader, Trb3signalExtractor *Extr
 
     qDebug() << "Running CERN ROOT version"<<gROOT->GetVersion();
 
-    StartGraphWindows();
-
-    gSingle = 0;
-    multiGraph = 0;
-
-    NormalColor = 4;
-    RejectedColor = 2;
-    LineWidth = 2;
+    CreateGraphWindows();
 
     TmpHub = new TmpObjHubClass();
 }
@@ -103,6 +96,9 @@ void CernRootModule::ResetPositionOfWindows()
     WOverPos->setGeometry(80,80,1000,700);
     WAllNeg->setGeometry(110,110,1000,700);
     WAllPos->setGeometry(140,140,1000,700);
+
+    W2DNeg->setGeometry(140,140,1000,700);
+    W2DPos->setGeometry(140,140,1000,700);
 }
 
 void CernRootModule::DrawSignature(bool bNeg)
@@ -178,28 +174,55 @@ void CernRootModule::onDrawRequested(TObject *obj, QString opt, bool bDoUpdate)
     if (bDoUpdate) WOne->UpdateRootCanvas();
 }
 
-void CernRootModule::StartGraphWindows()
+void CernRootModule::CreateGraphWindows()
 {
-    WOne     = new AGraphWindow("One",     MainWin); WOne->resize(1001, 601);
-    WOverNeg = new AGraphWindow("OverNeg", MainWin); WOverNeg->resize(1001, 601);
-    WOverPos = new AGraphWindow("OverPos", MainWin); WOverPos->resize(1001, 601);
-    WAllNeg  = new AGraphWindow("AllNeg",  MainWin); WAllNeg->resize(1001, 601);
-    WAllPos  = new AGraphWindow("AllPos",  MainWin); WAllPos->resize(1001, 601);
+    WOne     = new AGraphWindow("One",     MainWin);// WOne->resize(1001, 601);
+    WOverNeg = new AGraphWindow("OverNeg", MainWin);// WOverNeg->resize(1001, 601);
+    WOverPos = new AGraphWindow("OverPos", MainWin);// WOverPos->resize(1001, 601);
+    WAllNeg  = new AGraphWindow("AllNeg",  MainWin);// WAllNeg->resize(1001, 601);
+    WAllPos  = new AGraphWindow("AllPos",  MainWin);// WAllPos->resize(1001, 601);
+    WSigNeg  = new AGraphWindow("SigNeg",  MainWin);// WSigNeg->resize(1001, 601);
+    WSigPos  = new AGraphWindow("SigPos",  MainWin);// WSigPos->resize(1001, 601);
 
-    connect(WOne, SIGNAL(WasHidden()), this, SIGNAL(WOneHidden()));
-    connect(WOverNeg, SIGNAL(WasHidden()), this, SIGNAL(WOverNegHidden()));
-    connect(WOverPos, SIGNAL(WasHidden()), this, SIGNAL(WOverPosHidden()));
-    connect(WAllNeg, SIGNAL(WasHidden()), this, SIGNAL(WAllNegHidden()));
-    connect(WAllPos, SIGNAL(WasHidden()), this, SIGNAL(WAllPosHidden()));
+    W2DNeg  = new AGraphWindow("2DNeg",  MainWin); // WSigPos->resize(1001, 601);
+    W2DPos  = new AGraphWindow("2DPos",  MainWin); // WSigPos->resize(1001, 601);
+
+    connect(WOne,     &AGraphWindow::wasHidden, this, &CernRootModule::onGraphWindowRequestHide);
+    connect(WOverNeg, &AGraphWindow::wasHidden, this, &CernRootModule::onGraphWindowRequestHide);
+    connect(WOverPos, &AGraphWindow::wasHidden, this, &CernRootModule::onGraphWindowRequestHide);
+    connect(WAllNeg,  &AGraphWindow::wasHidden, this, &CernRootModule::onGraphWindowRequestHide);
+    connect(WAllPos,  &AGraphWindow::wasHidden, this, &CernRootModule::onGraphWindowRequestHide);
+    connect(WSigNeg,  &AGraphWindow::wasHidden, this, &CernRootModule::onGraphWindowRequestHide);
+    connect(WSigPos,  &AGraphWindow::wasHidden, this, &CernRootModule::onGraphWindowRequestHide);
+
+    connect(W2DNeg,  &AGraphWindow::wasHidden, this, &CernRootModule::onGraphWindowRequestHide);
+    connect(W2DPos,  &AGraphWindow::wasHidden, this, &CernRootModule::onGraphWindowRequestHide);
+}
+
+void CernRootModule::onGraphWindowRequestHide(QString idStr)
+{
+    if      (idStr == "One")     emit WOneHidden();
+    else if (idStr == "OverNeg") emit WOverNegHidden();
+    else if (idStr == "OverPos") emit WOverPosHidden();
+    else if (idStr == "AllNeg")  emit WAllNegHidden();
+    else if (idStr == "AllPos")  emit WAllPosHidden();
+    else if (idStr == "SigNeg")  emit WSigNegHidden();
+    else if (idStr == "SigPos")  emit WSigPosHidden();
+    else if (idStr == "2DNeg")   emit W2DNegHidden();
+    else if (idStr == "2DPos")   emit W2DPosHidden();
 }
 
 CernRootModule::~CernRootModule()
 {
-    delete WOne; delete WOverNeg; delete WOverPos; delete WAllNeg; delete WAllPos;
-    WOne = WOverNeg = WOverPos = WAllNeg = WAllPos = 0;
+    delete WOne; delete WOverNeg; delete WOverPos; delete WAllNeg; delete WAllPos; delete WSigNeg; delete WSigPos; delete W2DNeg; delete W2DPos;
+    WOne = WOverNeg = WOverPos = WAllNeg = WAllPos = WSigNeg = WSigPos = W2DNeg = W2DPos = nullptr;
 
-    delete gSingle; gSingle = 0;
-    delete multiGraph; multiGraph = 0;
+    delete gSingle; gSingle = nullptr;
+    delete gNegSig; gNegSig = nullptr;
+    delete gPosSig; gPosSig = nullptr;
+    delete multiGraph; multiGraph = nullptr;
+    delete h2DNeg; h2DNeg = nullptr;
+    delete h2DPos; h2DPos = nullptr;
 
     clearNegGraphVectors();
     clearPosGraphVectors();
@@ -254,6 +277,26 @@ void CernRootModule::ShowAllNegWaveWindow(bool flag)
 void CernRootModule::ShowAllPosWaveWindow(bool flag)
 {
     showGraphWindow(WAllPos, flag);
+}
+
+void CernRootModule::ShowNegativeSignalWindow(bool flag)
+{
+    showGraphWindow(WSigNeg, flag);
+}
+
+void CernRootModule::ShowPositiveSignalWindow(bool flag)
+{
+    showGraphWindow(WSigPos, flag);
+}
+
+void CernRootModule::Show2DNegWindow(bool flag)
+{
+    showGraphWindow(W2DNeg, flag);
+}
+
+void CernRootModule::Show2DPosWindow(bool flag)
+{
+    showGraphWindow(W2DPos, flag);
 }
 
 void CernRootModule::ClearSingleWaveWindow()
@@ -318,8 +361,7 @@ bool CernRootModule::DrawSingle(bool bFromDataHub, int ievent, int ichannel, boo
     const QVector<float>* wave = bFromDataHub ? DataHub->GetWaveform(ievent, ichannel) : Reader->GetWaveformPtr(ievent, ichannel);
     if (!wave) return false;
 
-    if (gSingle) delete gSingle;
-    gSingle = new TGraph();
+    delete gSingle; gSingle = new TGraph();
 
     int isam = 0;
     for (const float& val : *wave)
@@ -529,4 +571,124 @@ bool CernRootModule::DrawAll(bool bFromDataHub, int ievent, bool bNeg, int padsX
     win->SetTitle(title);
 
     return NonZeroWaves>0;
+}
+
+void CernRootModule::DrawSignals(bool bFromDataHub, int ievent, bool bNeg)
+{
+    TGraph*       & graph = (bNeg ? gNegSig : gPosSig);
+    AGraphWindow* & grwin = (bNeg ? WSigNeg : WSigPos);
+
+    const QVector<float> * sigAr = bFromDataHub ? DataHub->GetSignals(ievent) : Extractor->GetSignals(ievent);
+    if (!sigAr)
+    {
+        grwin->ClearRootCanvas();
+        grwin->UpdateRootCanvas();
+        return;
+    }
+
+    delete graph; graph = new TGraph();
+
+    const int numLogicalChan = Config->CountLogicalChannels();
+
+    int from = -1;
+    int to   = -1;
+    for (int iLogicalCh = 0; iLogicalCh < numLogicalChan; iLogicalCh++)
+    {
+        if (Config->IsIgnoredLogicalChannel(iLogicalCh)) continue;
+
+        bool bPolarity = Config->IsNegativeLogicalChannel(iLogicalCh);
+        if (bNeg != bPolarity) continue;
+
+        float sig = (bFromDataHub ? sigAr->at(iLogicalCh) : sigAr->at(Config->Map->LogicalToHardware(iLogicalCh)));
+
+        graph->SetPoint(graph->GetN(), iLogicalCh, sig);
+
+        if (from == -1) from = iLogicalCh;
+        to = iLogicalCh;
+    }
+
+    if (graph->GetN() == 0)
+    {
+        grwin->ClearRootCanvas();
+        grwin->UpdateRootCanvas();
+        return;
+    }
+
+    graph->GetXaxis()->SetTitle("Channel number");
+    graph->GetYaxis()->SetTitle("Signal, adc channels");
+    graph->SetMarkerStyle(20); graph->SetMarkerSize(0.5);
+    graph->GetXaxis()->SetRangeUser(from, to);
+    graph->SetMarkerColor(bNeg ? 4 : 2);
+    graph->SetLineColor(bNeg ? 4 : 2);
+
+    grwin->SetAsActiveRootWindow();
+    graph->Draw("APL");
+    grwin->UpdateRootCanvas();
+
+    QString title = QString(bNeg ? "Negative" : "Positive") + " polarity signals";
+    grwin->SetTitle(title);
+}
+
+void CernRootModule::Draw2D(bool bNegatives, bool bFromDataHub, bool bAutoscale, double Min, double Max)
+{
+    const int numChannels = (bFromDataHub ? DataHub->CountChannels() : Reader->CountChannels());
+    const int numEvents = (bFromDataHub ? DataHub->CountEvents() : Reader->CountEvents());
+
+    double minY = Min;
+    double maxY = Max;
+    //if (bAutoscale) {minY = maxY = 0;}
+
+    QVector<int> channels;
+    for (int iCh = 0; iCh < numChannels; iCh++)
+    {
+        if (Config->IsIgnoredLogicalChannel(iCh)) continue;
+        bool isNegativeChannel = Config->IsNegativeLogicalChannel(iCh);
+        if (isNegativeChannel == bNegatives) channels << iCh;
+    }
+    //qDebug() << channels;
+
+    if (channels.isEmpty())
+    {
+        ClearSingleWaveWindow();
+        return;
+    }
+
+    if (bAutoscale)
+    {
+        // bad feature of ROOT - cannot have in Y direction autorange and still have fixed range for X :-(
+        minY = +1e20;
+        maxY = -1e20;
+
+        for (int iEv = 0; iEv < numEvents; iEv++)
+            for (int iCh : channels)
+            {
+                const double sig = (bFromDataHub ? DataHub->GetSignalFast(iEv, iCh) : Extractor->GetSignalFast(iEv, Config->Map->LogicalToHardware(iCh) ));
+                if (sig < minY) minY = sig;
+                if (sig > maxY) maxY = sig;
+            }
+    }
+
+    TH2D* & hAll = (bNegatives ? h2DNeg : h2DPos);
+
+    delete hAll;
+    hAll = new TH2D("", "", 1+channels.last() - channels.front(), channels.front(), channels.last()+1,    50, minY, maxY);
+    //qDebug() << 1+channels.last() - channels.front() << channels.front() << channels.last()+1;
+
+    for (int iEv = 0; iEv < numEvents; iEv++)
+        for (int iCh : channels)
+        {
+            double sig = (bFromDataHub ? DataHub->GetSignalFast(iEv, iCh) : Extractor->GetSignalFast(iEv, Config->Map->LogicalToHardware(iCh) ));
+            //qDebug() << iCh << sig;
+            hAll->Fill(iCh+0.001, sig, 1);
+        }
+
+    AGraphWindow* & W2D = (bNegatives ? W2DNeg : W2DPos);
+
+    W2D->SetAsActiveRootWindow();
+    hAll->SetStats(false);
+    hAll->GetXaxis()->SetTitle("Logical channel number");
+    hAll->Draw("colz");
+    W2D->UpdateRootCanvas();
+
+    W2D->SetTitle(QString("All %1").arg(bNegatives ? "negatives" : "positives"));
 }

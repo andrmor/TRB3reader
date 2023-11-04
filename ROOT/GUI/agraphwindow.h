@@ -31,21 +31,20 @@ public:
     void restoreGeomStatus();
 
 protected:
-    void resizeEvent(QResizeEvent *event);
-    void hideEvent(QHideEvent* event);
+    //void resizeEvent(QResizeEvent *event);
+    //void hideEvent(QHideEvent* event);  do not use! it is triggered AFTER the woindow is closed, we need to intercept BEFORE --> see event() method
     bool event(QEvent *event);
 
 private:
     Ui::AGraphWindow * ui = nullptr;
 
     ARasterWindow * RasterWindow = nullptr;
-    QWidget       * QWinContainer = nullptr;
 
     QString IdStr;
     bool ColdStart = true;
 
 signals:
-    void WasHidden();
+    void wasHidden(QString idStr);
 };
 
 #endif // AGRAPHWINDOW_H

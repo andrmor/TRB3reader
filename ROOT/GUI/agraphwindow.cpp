@@ -4,6 +4,7 @@
 
 #include <QJsonObject>
 #include <QDebug>
+#include <QHBoxLayout>
 
 #include "TCanvas.h"
 
@@ -16,17 +17,20 @@ AGraphWindow::AGraphWindow(const QString & idStr, QWidget * parent) :
 
     RasterWindow = new ARasterWindow(this);
 
-    QWinContainer = QWidget::createWindowContainer(RasterWindow, this);
-    QWinContainer->setVisible(true);
-
-    QWinContainer->setGeometry(0, 0, this->width(), this->height());
-    RasterWindow->resize(this->width(), this->height());
+    //RasterWindow->resize(width(), height());
+    RasterWindow->resize(800, 500);
     RasterWindow->ForceResize();
+
+    setCentralWidget(RasterWindow);
+
+    restoreGeomStatus();
+    hide();
 }
 
 AGraphWindow::~AGraphWindow()
 {
-    qDebug() << "Destructor called for AGraphWindow";
+    storeGeomStatus();
+    //qDebug() << "Destructor called for AGraphWindow";
     delete ui;
 }
 
@@ -79,27 +83,32 @@ void AGraphWindow::SetTitle(const QString & title)
     setWindowTitle(title);
 }
 
-void AGraphWindow::resizeEvent(QResizeEvent * /*event*/)
+/*
+void AGraphWindow::resizeEvent(QResizeEvent * )
 {
     double width = this->width();
     double height = this->height();
 
-    if (QWinContainer) QWinContainer->setGeometry(0, 0, width, height);
-    if (RasterWindow) RasterWindow->ForceResize();
+    RasterWindow->ForceResize();
 }
-
-void AGraphWindow::hideEvent(QHideEvent *)
-{
-    emit WasHidden();
-}
+*/
 
 #include <QTimer>
-bool AGraphWindow::event(QEvent *event)
+bool AGraphWindow::event(QEvent * event)
 {
+    if (event->type() == QEvent::Close)
+    {
+        event->ignore();
+        emit wasHidden(IdStr);
+        return false;
+    }
+
+    /*
     if (event->type() == QEvent::WindowActivate)
     {
         RasterWindow->UpdateRootCanvas();
     }
+    */
 
     if (event->type() == QEvent::Show)
     {
@@ -107,12 +116,12 @@ bool AGraphWindow::event(QEvent *event)
         {
             //first time this window is shown
             ColdStart = false;
-            this->resize(width()+1, height());
-            this->resize(width()-1, height());
+            resize(width()+1, height());
+            resize(width()-1, height());
         }
         else
         {
-            //qDebug() << "Graph win show event";
+            qDebug() << "Graph win show event";
             //RasterWindow->UpdateRootCanvas();
             QTimer::singleShot(10, RasterWindow, [this](){RasterWindow->UpdateRootCanvas();}); // without delay canvas is not shown in Qt 5.9.5
         }

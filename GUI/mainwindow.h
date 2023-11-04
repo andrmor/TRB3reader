@@ -116,12 +116,16 @@ private slots:
     void on_sbEvent_valueChanged(int arg1);
     void on_sbChannel_valueChanged(int arg1);
 
-    //Show Waveforms
-    void on_pbShowWaveform_clicked(bool checked);
+    //Show/Hide Waveforms - triggered also by "close window" on the window itself!
+    void on_pbShowWaveform_toggled(bool checked);
     void on_pbShowOverlayNeg_toggled(bool checked);
     void on_pbShowOverlayPos_toggled(bool checked);
     void on_pbShowAllNeg_toggled(bool checked);
     void on_pbShowAllPos_toggled(bool checked);
+    void on_pbShowSignalsNegative_toggled(bool checked);
+    void on_pbShowSignalsPositive_toggled(bool checked);
+    void on_pbShowAllNegatives_toggled(bool checked);
+    void on_pbShowAllPositives_toggled(bool checked);
 
     //auto-redraws
     void on_pbGotoNextEvent_clicked();
@@ -208,6 +212,7 @@ private:
 
     void OnEventOrChannelChanged();
     void showOverlay(bool checked, bool bNeg);
+    void showSignals(bool checked, bool bNeg);
     int  getCurrentlySelectedHardwareChannel();
     void showAllWave(bool checked, bool bNeg);
     void updateSmoothAfterPedeEnableStatus();
@@ -225,6 +230,9 @@ private:
 private:
     ATrbRunControl * TrbRunManager = nullptr;
     int ZeroRateCounter = 0;
+
+    QString intToBitString(int val);
+    QString intToBitStringShift1(int val);
 
 private slots:
     void onBoardLogNewText(const QString text);
@@ -278,6 +286,22 @@ private slots:
     void on_sbZeroSignalIfPeakBefore_N_editingFinished();
     void on_sbZeroSignalIfPeakAfter_N_editingFinished();
     void on_sbEvent_editingFinished();
+
+    void on_leFPGA3_0_editingFinished();
+    void on_leFPGA3_1_editingFinished();
+    void on_leFPGA4_0_editingFinished();
+    void on_leFPGA4_1_editingFinished();
+    void on_leTimeChannelsFPGA3_editingFinished();
+    void on_leTimeChannelsFPGA4_editingFinished();
+    void on_ledTimeWinBefore_FPGA3_editingFinished();
+    void on_ledTimeWinAfter_FPGA3_editingFinished();
+    void on_ledTimeWinBefore_FPGA4_editingFinished();
+    void on_ledTimeWinAfter_FPGA4_editingFinished();
+    void on_pbWriteTimeSettingsToTrb_clicked();
+    void on_pbReadTimeSettingsFromTrb_clicked();
+    void on_cbTimeEnable_FPGA3_clicked(bool checked);
+    void on_cbTimeEnable_FPGA4_clicked(bool checked);
+    void on_pbLoadLastAndProcess_clicked();
 };
 
 #endif // MAINWINDOW_H
