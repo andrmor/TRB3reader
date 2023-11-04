@@ -2423,7 +2423,7 @@ void MainWindow::on_pbLoadLastAndProcess_clicked()
     }
 
     QStringList files = dir.entryList( QStringList("*.hld"), QDir::Files, QDir::Time);
-    qDebug() << files;
+    //qDebug() << files;
 
     if (files.isEmpty())
     {
@@ -2435,6 +2435,8 @@ void MainWindow::on_pbLoadLastAndProcess_clicked()
     if (fn.endsWith('/')) fn.chop(1);
     fn += "/" + files.front();
     ui->leFileName->setText(fn);
+    Config->FileName = fn;
+    qApp->processEvents();
     on_pbProcessData_clicked();
 }
 
