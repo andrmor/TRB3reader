@@ -31,7 +31,8 @@ public:
     void restoreGeomStatus();
 
 protected:
-    //void resizeEvent(QResizeEvent *event);
+    void resizeEvent(QResizeEvent *event) override;
+    void moveEvent(QMoveEvent *event) override;
     //void hideEvent(QHideEvent* event);  do not use! it is triggered AFTER the woindow is closed, we need to intercept BEFORE --> see event() method
     bool event(QEvent *event);
 

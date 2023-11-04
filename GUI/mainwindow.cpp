@@ -167,12 +167,14 @@ void MainWindow::on_pbProcessData_clicked()
     ui->twMain->setEnabled(true);
     ui->pbSaveTotextFile->setEnabled(true);
 
-    OnEventOrChannelChanged();
-    on_sbEvent_valueChanged(ui->sbEvent->value());
+    //OnEventOrChannelChanged();
+    if (ui->sbEvent->value() != 0) ui->sbEvent->setValue(0);
+    else on_sbEvent_valueChanged(0);
+
     updateNumEventsIndication();
 
-    on_pbShowAllNegatives_toggled(ui->pbShowAllNegatives->isChecked());
-    on_pbShowAllPositives_toggled(ui->pbShowAllNegatives->isChecked());
+    //on_pbShowAllNegatives_toggled(ui->pbShowAllNegatives->isChecked());
+    //on_pbShowAllPositives_toggled(ui->pbShowAllNegatives->isChecked());
 }
 
 const QString MainWindow::ProcessData()

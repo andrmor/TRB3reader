@@ -83,15 +83,15 @@ void AGraphWindow::SetTitle(const QString & title)
     setWindowTitle(title);
 }
 
-/*
-void AGraphWindow::resizeEvent(QResizeEvent * )
+void AGraphWindow::resizeEvent(QResizeEvent *)
 {
-    double width = this->width();
-    double height = this->height();
-
-    RasterWindow->ForceResize();
+    storeGeomStatus();
 }
-*/
+
+void AGraphWindow::moveEvent(QMoveEvent *)
+{
+    storeGeomStatus();
+}
 
 #include <QTimer>
 bool AGraphWindow::event(QEvent * event)
