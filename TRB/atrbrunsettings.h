@@ -63,11 +63,15 @@ public:
     QString Period = "0x30000000";
     QStringList TheRestCTScontrols;
 
+    bool    bTriggerGains = false;
+    std::vector<int> TriggerGains;
+    int     DefaultTriggerGain = 30;
+
     ulong   getTriggerInt() const;
     void    setTriggerInt(ulong val);
 
-    const QJsonObject   WriteToJson() const;
-    void                ReadFromJson(const QJsonObject &json);
+    QJsonObject WriteToJson() const;
+    void        ReadFromJson(const QJsonObject & json);
 };
 
 #endif // ATRBRUNSETTINGS_H

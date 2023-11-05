@@ -238,6 +238,7 @@ private:
 
     QString intToBitString(int val);
     QString intToBitStringShift1(int val);
+    void updateTriggerGainGui();
 
 private slots:
     void onBoardLogNewText(const QString text);
@@ -310,6 +311,10 @@ private slots:
     void on_sbNumberTriggerBoardChannels_editingFinished();
     void on_pbSendTriggerBoardGains_clicked();
     void on_pbSetAllTriggerGainsTo_clicked();
+    void on_cbGainsForTriggerBoard_clicked(bool checked);
+    void on_sbAllGainsTo_editingFinished();
+
+    void storeTriggerGainSettings();
 };
 
 #endif // MAINWINDOW_H

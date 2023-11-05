@@ -209,6 +209,13 @@ void ATrbRunControl::recallConfiguration()
     err = sendTimeSettingsToTRB();
     if (err.isEmpty()) emit boardLogReady("-->Updated time info saving");
     else emit boardLogReady("Error during sending timing settings:\n" + err);
+
+    if (Settings.TrbRunSettings.bTriggerGains)
+    {
+        err = sendTriggerGainsToBoard();
+        if (err.isEmpty()) emit boardLogReady("-->Updated trigger gains");
+        else emit boardLogReady("Error during sending trigger gain settings:\n" + err);
+    }
 }
 
 void ATrbRunControl::onReadyBoardLog()
@@ -815,9 +822,23 @@ QString ATrbRunControl::readTimeSettingsFromTRB()
     return "";
 }
 
-QString ATrbRunControl::sendTriggerGainsToBoard(const QString & dbFilename, const QString & hostDir)
+QString ATrbRunControl::sendTriggerGainsToBoard()
 {
-    QString err = sshCopyFileToHost(dbFilename, hostDir);
+    QString txt;
+
+    txt = "#Fixed part\n";
+
+    for (int gain : Settings.TrbRunSettings.TriggerGains)
+    {
+        txt += QString("aaaaaaa bbbbbb %0 cccccc\n").arg(gain);
+    }
+
+    QString localFN = "TriggerGains_Andr.txt";
+    bool ok = SaveTextToFile(localFN, txt);
+    if (!ok) return "Cannot update local file with trigger gain settings!";
+
+    QString hostDir = Settings.TrbRunSettings.ScriptDirOnHost;
+    QString err = sshCopyFileToHost(localFN, hostDir);
     if (!err.isEmpty()) return err;
 
     qDebug() << "Running script...";

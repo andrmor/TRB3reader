@@ -3021,6 +3021,20 @@
                </widget>
               </item>
               <item>
+               <widget class="QPushButton" name="pbUpdateTriggerSettings">
+                <property name="text">
+                 <string>...UpdateSettings</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pbUpdateTriggerGui">
+                <property name="text">
+                 <string>...UpdateTriggerGui</string>
+                </property>
+               </widget>
+              </item>
+              <item>
                <spacer name="horizontalSpacer_18">
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
@@ -3034,20 +3048,6 @@
                </spacer>
               </item>
              </layout>
-            </item>
-            <item>
-             <widget class="QPushButton" name="pbUpdateTriggerSettings">
-              <property name="text">
-               <string>...UpdateSettings</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="pbUpdateTriggerGui">
-              <property name="text">
-               <string>...UpdateTriggerGui</string>
-              </property>
-             </widget>
             </item>
             <item>
              <widget class="QPushButton" name="pbOpenCtsWebPage">
@@ -6064,8 +6064,8 @@
      <y>148</y>
     </hint>
     <hint type="destinationlabel">
-     <x>127</x>
-     <y>549</y>
+     <x>494</x>
+     <y>538</y>
     </hint>
    </hints>
   </connection>
@@ -6080,8 +6080,8 @@
      <y>175</y>
     </hint>
     <hint type="destinationlabel">
-     <x>127</x>
-     <y>549</y>
+     <x>494</x>
+     <y>538</y>
     </hint>
    </hints>
   </connection>
@@ -6096,8 +6096,8 @@
      <y>202</y>
     </hint>
     <hint type="destinationlabel">
-     <x>127</x>
-     <y>549</y>
+     <x>494</x>
+     <y>538</y>
     </hint>
    </hints>
   </connection>
@@ -6112,8 +6112,8 @@
      <y>229</y>
     </hint>
     <hint type="destinationlabel">
-     <x>127</x>
-     <y>549</y>
+     <x>494</x>
+     <y>538</y>
     </hint>
    </hints>
   </connection>
@@ -6128,8 +6128,8 @@
      <y>256</y>
     </hint>
     <hint type="destinationlabel">
-     <x>127</x>
-     <y>549</y>
+     <x>494</x>
+     <y>538</y>
     </hint>
    </hints>
   </connection>
@@ -6144,8 +6144,8 @@
      <y>283</y>
     </hint>
     <hint type="destinationlabel">
-     <x>127</x>
-     <y>549</y>
+     <x>494</x>
+     <y>538</y>
     </hint>
    </hints>
   </connection>
@@ -6160,8 +6160,8 @@
      <y>310</y>
     </hint>
     <hint type="destinationlabel">
-     <x>127</x>
-     <y>549</y>
+     <x>494</x>
+     <y>538</y>
     </hint>
    </hints>
   </connection>
@@ -6176,8 +6176,8 @@
      <y>337</y>
     </hint>
     <hint type="destinationlabel">
-     <x>127</x>
-     <y>549</y>
+     <x>494</x>
+     <y>538</y>
     </hint>
    </hints>
   </connection>
@@ -6192,8 +6192,8 @@
      <y>448</y>
     </hint>
     <hint type="destinationlabel">
-     <x>127</x>
-     <y>549</y>
+     <x>494</x>
+     <y>538</y>
     </hint>
    </hints>
   </connection>
@@ -6208,8 +6208,8 @@
      <y>476</y>
     </hint>
     <hint type="destinationlabel">
-     <x>127</x>
-     <y>549</y>
+     <x>494</x>
+     <y>538</y>
     </hint>
    </hints>
   </connection>
@@ -6224,8 +6224,8 @@
      <y>449</y>
     </hint>
     <hint type="destinationlabel">
-     <x>127</x>
-     <y>549</y>
+     <x>494</x>
+     <y>538</y>
     </hint>
    </hints>
   </connection>
@@ -6240,8 +6240,8 @@
      <y>478</y>
     </hint>
     <hint type="destinationlabel">
-     <x>127</x>
-     <y>549</y>
+     <x>494</x>
+     <y>538</y>
     </hint>
    </hints>
   </connection>
@@ -6256,8 +6256,8 @@
      <y>149</y>
     </hint>
     <hint type="destinationlabel">
-     <x>204</x>
-     <y>549</y>
+     <x>499</x>
+     <y>538</y>
     </hint>
    </hints>
   </connection>
@@ -6272,8 +6272,8 @@
      <y>149</y>
     </hint>
     <hint type="destinationlabel">
-     <x>220</x>
-     <y>545</y>
+     <x>499</x>
+     <y>538</y>
     </hint>
    </hints>
   </connection>
@@ -6288,8 +6288,8 @@
      <y>235</y>
     </hint>
     <hint type="destinationlabel">
-     <x>245</x>
-     <y>549</y>
+     <x>499</x>
+     <y>538</y>
     </hint>
    </hints>
   </connection>
@@ -6304,8 +6304,8 @@
      <y>256</y>
     </hint>
     <hint type="destinationlabel">
-     <x>254</x>
-     <y>542</y>
+     <x>499</x>
+     <y>538</y>
     </hint>
    </hints>
   </connection>
@@ -6320,8 +6320,8 @@
      <y>235</y>
     </hint>
     <hint type="destinationlabel">
-     <x>280</x>
-     <y>544</y>
+     <x>499</x>
+     <y>538</y>
     </hint>
    </hints>
   </connection>
@@ -6336,8 +6336,8 @@
      <y>256</y>
     </hint>
     <hint type="destinationlabel">
-     <x>270</x>
-     <y>547</y>
+     <x>499</x>
+     <y>538</y>
     </hint>
    </hints>
   </connection>
@@ -6352,8 +6352,8 @@
      <y>235</y>
     </hint>
     <hint type="destinationlabel">
-     <x>291</x>
-     <y>542</y>
+     <x>499</x>
+     <y>538</y>
     </hint>
    </hints>
   </connection>
@@ -6368,8 +6368,8 @@
      <y>256</y>
     </hint>
     <hint type="destinationlabel">
-     <x>297</x>
-     <y>548</y>
+     <x>499</x>
+     <y>538</y>
     </hint>
    </hints>
   </connection>
@@ -6384,8 +6384,8 @@
      <y>235</y>
     </hint>
     <hint type="destinationlabel">
-     <x>318</x>
-     <y>545</y>
+     <x>499</x>
+     <y>538</y>
     </hint>
    </hints>
   </connection>
@@ -6400,8 +6400,8 @@
      <y>256</y>
     </hint>
     <hint type="destinationlabel">
-     <x>331</x>
-     <y>546</y>
+     <x>499</x>
+     <y>538</y>
     </hint>
    </hints>
   </connection>
@@ -6416,8 +6416,8 @@
      <y>235</y>
     </hint>
     <hint type="destinationlabel">
-     <x>419</x>
-     <y>549</y>
+     <x>499</x>
+     <y>538</y>
     </hint>
    </hints>
   </connection>
@@ -6432,8 +6432,8 @@
      <y>256</y>
     </hint>
     <hint type="destinationlabel">
-     <x>435</x>
-     <y>541</y>
+     <x>499</x>
+     <y>538</y>
     </hint>
    </hints>
   </connection>
@@ -6448,8 +6448,8 @@
      <y>235</y>
     </hint>
     <hint type="destinationlabel">
-     <x>447</x>
-     <y>542</y>
+     <x>499</x>
+     <y>538</y>
     </hint>
    </hints>
   </connection>
@@ -6464,8 +6464,8 @@
      <y>256</y>
     </hint>
     <hint type="destinationlabel">
-     <x>464</x>
-     <y>549</y>
+     <x>499</x>
+     <y>538</y>
     </hint>
    </hints>
   </connection>
@@ -6480,8 +6480,8 @@
      <y>235</y>
     </hint>
     <hint type="destinationlabel">
-     <x>479</x>
-     <y>545</y>
+     <x>499</x>
+     <y>538</y>
     </hint>
    </hints>
   </connection>
@@ -6512,8 +6512,8 @@
      <y>235</y>
     </hint>
     <hint type="destinationlabel">
-     <x>513</x>
-     <y>549</y>
+     <x>499</x>
+     <y>538</y>
     </hint>
    </hints>
   </connection>
@@ -6528,8 +6528,8 @@
      <y>256</y>
     </hint>
     <hint type="destinationlabel">
-     <x>521</x>
-     <y>543</y>
+     <x>499</x>
+     <y>538</y>
     </hint>
    </hints>
   </connection>

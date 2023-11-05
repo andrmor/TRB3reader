@@ -39,7 +39,7 @@ public:
     QString sendTimeSettingsToTRB();
     QString readTimeSettingsFromTRB();
 
-    QString sendTriggerGainsToBoard(const QString & dbFilename, const QString & hostDir);
+    QString sendTriggerGainsToBoard();
 
     void  checkFreeSpace();
 

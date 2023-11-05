@@ -2446,6 +2446,12 @@ void MainWindow::on_pbLoadLastAndProcess_clicked()
 
 void MainWindow::on_sbNumberTriggerBoardChannels_editingFinished()
 {
+    updateTriggerGainGui();
+    on_pbSetAllTriggerGainsTo_clicked();
+}
+
+void MainWindow::updateTriggerGainGui()
+{
     const int num = ui->sbNumberTriggerBoardChannels->value();
     if (num == TriggerGainSpinBoxes.size()) return;
 
@@ -2460,21 +2466,20 @@ void MainWindow::on_sbNumberTriggerBoardChannels_editingFinished()
     for (int iCh = 0; iCh < num; iCh++)
     {
         QFrame * fr = new QFrame();
-            QHBoxLayout * hl = new QHBoxLayout(fr);
-            hl->setContentsMargins(2,2,2,2);
-                hl->addWidget(new QLabel( QString("Channel %0 threshold:").arg(iCh)));
-                QSpinBox * sb = new QSpinBox();
-                    sb->setMinimum(5);
-                    sb->setMaximum(40);
-                hl->addWidget(sb);
-                hl->addWidget(new QLabel("mV"));
-                hl->addStretch();
+        QHBoxLayout * hl = new QHBoxLayout(fr);
+        hl->setContentsMargins(2,2,2,2);
+        hl->addWidget(new QLabel( QString("Channel %0 threshold:").arg(iCh)));
+        QSpinBox * sb = new QSpinBox();
+        sb->setMinimum(5);
+        sb->setMaximum(40);
+        connect(sb, &QSpinBox::editingFinished, this, &MainWindow::storeTriggerGainSettings);
+        hl->addWidget(sb);
+        hl->addWidget(new QLabel("mV"));
+        hl->addStretch();
         ui->vlTriggerBoard->addWidget(fr);
 
         TriggerGainSpinBoxes.push_back(sb);
     }
-
-    on_pbSetAllTriggerGainsTo_clicked();
 }
 
 void MainWindow::on_pbSetAllTriggerGainsTo_clicked()
@@ -2482,29 +2487,29 @@ void MainWindow::on_pbSetAllTriggerGainsTo_clicked()
     const int newVal = ui->sbAllGainsTo->value();
     for (QSpinBox * sb : TriggerGainSpinBoxes)
         sb->setValue(newVal);
+
+    storeTriggerGainSettings();
 }
 
 void MainWindow::on_pbSendTriggerBoardGains_clicked()
 {
-    QString txt;
-
-    txt = "#Fixed part\n";
-
-    for (QSpinBox * sb : TriggerGainSpinBoxes)
-    {
-        int thr = sb->value();
-        txt += QString("aaaaaaa bbbbbb %0 cccccc\n").arg(thr);
-    }
-
-    QString localFN = "TriggerGains_Andr.txt";
-    bool ok = SaveTextToFile(localFN, txt);
-    if (!ok)
-    {
-        message("cannor update local file with trigger gain settings!", this);
-        return;
-    }
-
-    QString hostDir = Config->TrbRunSettings.ScriptDirOnHost;
-    QString err = TrbRunManager->sendTriggerGainsToBoard(localFN, hostDir);
+    QString err = TrbRunManager->sendTriggerGainsToBoard();
     if (!err.isEmpty()) message(err, this);
+}
+
+void MainWindow::on_cbGainsForTriggerBoard_clicked(bool checked)
+{
+    Config->TrbRunSettings.bTriggerGains = checked;
+}
+
+void MainWindow::on_sbAllGainsTo_editingFinished()
+{
+    Config->TrbRunSettings.DefaultTriggerGain = ui->sbAllGainsTo->value();
+}
+
+void MainWindow::storeTriggerGainSettings()
+{
+    Config->TrbRunSettings.TriggerGains.clear();
+    for (QSpinBox * sb : TriggerGainSpinBoxes)
+        Config->TrbRunSettings.TriggerGains.push_back(sb->value());
 }

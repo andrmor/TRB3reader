@@ -11,7 +11,7 @@
 
 ARasterWindow::ARasterWindow(QMainWindow * parent) : QWidget(parent), MasterWindow(parent)
 {
-    qDebug()<<"->Creating raster window";
+    //qDebug()<<"->Creating raster window";
 
     // set options needed to properly update the canvas when resizing the widget
     // and to properly handle context menus and mouse move events
@@ -37,7 +37,7 @@ ARasterWindow::ARasterWindow(QMainWindow * parent) : QWidget(parent), MasterWind
     fCanvas->SetFillColor(0);
 
     PressEventRegistered = false;
-    qDebug() << "  ->Root canvas created";
+    //qDebug() << "  ->Root canvas created";
 }
 
 ARasterWindow::~ARasterWindow()
