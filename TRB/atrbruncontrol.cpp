@@ -877,22 +877,22 @@ QString ATrbRunControl::formTriggerGainText()
     for (size_t iDAC = 0; iDAC < 3; iDAC++)
         for (size_t iChan = 4; iChan < 8; iChan++)
         {
-            long value = 0x8E60; // -100 mV
+            int threshold = 100;
+            long value = 0x8E60; // corresponds to -100 mV
             if (iRPC < Settings.TrbRunSettings.TriggerGains.size())
             {
-                int threshold = Settings.TrbRunSettings.TriggerGains[iRPC];
+                threshold = Settings.TrbRunSettings.TriggerGains[iRPC];
                 value = getInterpolatedGainValue(threshold);
             }
 
             QString str = "0x" + QString::number(value, 16);
             // !!!*** GUI for board (a004 here)
-            txt += QString("a004   1         3           %0         %1             3             %2\n").arg(iDAC).arg(iChan).arg(str);
+            txt += QString("a004   1         3           %0         %1             3             %2   # thr = %3 mV\n").arg(iDAC).arg(iChan).arg(str).arg(threshold);
             iRPC++;
         }
 
     return txt;
 }
-
 
 QString ATrbRunControl::sendTriggerGainsToBoard()
 {
@@ -910,17 +910,24 @@ QString ATrbRunControl::sendTriggerGainsToBoard()
     QString command = "ssh";
     QStringList args;
     args << QString("%1@%2").arg(User).arg(Host);
-    args << "~/trbsoft/daqtools/tools/dac_program.pl";  // !!!*** add control in GUI
-    args << hostDir + "/" + localFN;
 
-    qDebug() << "Requesting to run script by sending command:" << command << args;
     QProcess pr;
     pr.setProcessChannelMode(QProcess::MergedChannels);
     pr.start(command, args);
 
     if (!pr.waitForStarted(500)) return "Could not start send";
-    if (!pr.waitForFinished(2000)) return "Timeout on reply from run script!";
 
+    QString msg = "~/trbsoft/daqtools/tools/dac_program.pl " + hostDir + "/" + localFN;  // !!!*** add script filename control in GUI
+    pr.write(QByteArray(msg.toLocal8Bit().data()));
+
+    pr.closeWriteChannel();
+    if (!pr.waitForFinished(2000)) return "Timeout on attempt to execute CTS configuration";
+
+    QString reply1 = pr.readAll();
+
+    pr.close();
+
+    qDebug() << reply1;
     return "";
 }
 
