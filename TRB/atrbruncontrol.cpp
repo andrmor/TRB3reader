@@ -885,6 +885,7 @@ QString ATrbRunControl::formTriggerGainText()
             }
 
             QString str = "0x" + QString::number(value, 16);
+            // !!!*** GUI for board (a004 here)
             txt += QString("a004   1         3           %0         %1             3             %2\n").arg(iDAC).arg(iChan).arg(str);
             iRPC++;
         }
