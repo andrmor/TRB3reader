@@ -822,16 +822,80 @@ QString ATrbRunControl::readTimeSettingsFromTRB()
     return "";
 }
 
-QString ATrbRunControl::sendTriggerGainsToBoard()
+long getInterpolatedGainValue(const int mV)
+{
+    std::vector<std::pair<int,long>> data = {
+        {5, 0x3350},
+        {10, 0x3810},
+        {20, 0x41b0},
+        {30, 0x4b40},
+        {40, 0x54e0},
+        {50, 0x5e70},
+        {60, 0x6800},
+        {70, 0x71a0},
+        {80, 0x7b30},
+        {90, 0x84c0},
+        {100, 0x8e60}
+    };
+
+    if (mV <= data.front().first) return data.front().second;
+    if (mV >= data.back().first)  return data.back().second;
+
+    for (size_t i = 1; i < data.size(); i++)
+    {
+        if (mV > data[i].first) continue;
+        if (mV == data[i].first) return data[i].second;
+
+        //return data[i-1].second + (data[i].second - data[i-1].second) * (mV - data[i-1].first) / (data[i].first - data[i-1].first);
+        double coeff = 1.0 * (data[i].second - data[i-1].second) / (data[i].first - data[i-1].first);
+        return data[i-1].second + coeff * (mV - data[i-1].first);
+    }
+}
+
+QString ATrbRunControl::formTriggerGainText()
 {
     QString txt;
 
-    txt = "#Fixed part\n";
+    txt = ""
+          "#Board   Chain     ChainLen    DAC(DB)   Channel       Command       Value\n"
+          "\n"
+          "a004   1         3           0         0             3             0x5C20\n"
+          "a004   1         3           1         0             3             0x5C20\n"
+          "a004   1         3           2         0             3             0x5C20\n"
+          "a004   1         3           0         1             3             0x5C20\n"
+          "a004   1         3           1         1             3             0x5C20\n"
+          "a004   1         3           2         1             3             0x5C20\n"
+          "a004   1         3           0         2             3             0x5C20\n"
+          "a004   1         3           1         2             3             0x5C20\n"
+          "a004   1         3           2         2             3             0x5C20\n"
+          "a004   1         3           0         3             3             0x5C20\n"
+          "a004   1         3           1         3             3             0x5C20\n"
+          "a004   1         3           2         3             3             0x5C20\n"
+          "\n";
 
-    for (int gain : Settings.TrbRunSettings.TriggerGains)
-    {
-        txt += QString("aaaaaaa bbbbbb %0 cccccc\n").arg(gain);
-    }
+    size_t iRPC = 0;
+    for (size_t iDAC = 0; iDAC < 3; iDAC++)
+        for (size_t iChan = 4; iChan < 8; iChan++)
+        {
+            long value = 0x8E60; // -100 mV
+            if (iRPC < Settings.TrbRunSettings.TriggerGains.size())
+            {
+                int threshold = Settings.TrbRunSettings.TriggerGains[iRPC];
+                value = getInterpolatedGainValue(threshold);
+            }
+
+            QString str = "0x" + QString::number(value, 16);
+            txt += QString("a004   1         3           %0         %1             3             %2\n").arg(iDAC).arg(iChan).arg(str);
+            iRPC++;
+        }
+
+    return txt;
+}
+
+
+QString ATrbRunControl::sendTriggerGainsToBoard()
+{
+    QString txt = formTriggerGainText();
 
     QString localFN = "TriggerGains_Andr.txt";
     bool ok = SaveTextToFile(localFN, txt);
@@ -845,7 +909,8 @@ QString ATrbRunControl::sendTriggerGainsToBoard()
     QString command = "ssh";
     QStringList args;
     args << QString("%1@%2").arg(User).arg(Host);
-    args << "ls -a"; // !!!***
+    args << "~/trbsoft/daqtools/tools/dac_program.pl";  // !!!*** add control in GUI
+    args << hostDir + "/" + localFN;
 
     qDebug() << "Requesting to run script by sending command:" << command << args;
     QProcess pr;

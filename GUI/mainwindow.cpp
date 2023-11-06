@@ -2471,7 +2471,7 @@ void MainWindow::updateTriggerGainGui()
         hl->addWidget(new QLabel( QString("Channel %0 threshold:").arg(iCh)));
         QSpinBox * sb = new QSpinBox();
         sb->setMinimum(5);
-        sb->setMaximum(40);
+        sb->setMaximum(99);
         connect(sb, &QSpinBox::editingFinished, this, &MainWindow::storeTriggerGainSettings);
         hl->addWidget(sb);
         hl->addWidget(new QLabel("mV"));

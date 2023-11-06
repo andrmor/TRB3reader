@@ -102,6 +102,7 @@ private:
 
     const QStringList bufferRecordsToCommands();
     const QStringList CtsSettingsToCommands(bool bIncludeHidden);
+    QString formTriggerGainText();
 };
 
 #endif // ATRBRUNCONTROL_H
