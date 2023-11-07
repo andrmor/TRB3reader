@@ -167,12 +167,14 @@ void MainWindow::on_pbProcessData_clicked()
     ui->twMain->setEnabled(true);
     ui->pbSaveTotextFile->setEnabled(true);
 
-    OnEventOrChannelChanged();
-    on_sbEvent_valueChanged(ui->sbEvent->value());
+    //OnEventOrChannelChanged();
+    if (ui->sbEvent->value() != 0) ui->sbEvent->setValue(0);
+    else on_sbEvent_valueChanged(0);
+
     updateNumEventsIndication();
 
-    on_pbShowAllNegatives_toggled(ui->pbShowAllNegatives->isChecked());
-    on_pbShowAllPositives_toggled(ui->pbShowAllNegatives->isChecked());
+    //on_pbShowAllNegatives_toggled(ui->pbShowAllNegatives->isChecked());
+    //on_pbShowAllPositives_toggled(ui->pbShowAllNegatives->isChecked());
 }
 
 const QString MainWindow::ProcessData()
@@ -2440,3 +2442,74 @@ void MainWindow::on_pbLoadLastAndProcess_clicked()
     on_pbProcessData_clicked();
 }
 
+// ---- Gains for trigger board ----
+
+void MainWindow::on_sbNumberTriggerBoardChannels_editingFinished()
+{
+    updateTriggerGainGui();
+    on_pbSetAllTriggerGainsTo_clicked();
+}
+
+void MainWindow::updateTriggerGainGui()
+{
+    const int num = ui->sbNumberTriggerBoardChannels->value();
+    if (num == TriggerGainSpinBoxes.size()) return;
+
+    QLayoutItem * item = nullptr;
+    while ( (item = ui->vlTriggerBoard->takeAt(0)) )
+    {
+        delete item->widget();
+        delete item;
+    }
+    TriggerGainSpinBoxes.clear();
+
+    for (int iCh = 0; iCh < num; iCh++)
+    {
+        QFrame * fr = new QFrame();
+        QHBoxLayout * hl = new QHBoxLayout(fr);
+        hl->setContentsMargins(2,2,2,2);
+        hl->addWidget(new QLabel( QString("Channel %0 threshold:").arg(iCh)));
+        QSpinBox * sb = new QSpinBox();
+        sb->setMinimum(5);
+        sb->setMaximum(99);
+        connect(sb, &QSpinBox::editingFinished, this, &MainWindow::storeTriggerGainSettings);
+        hl->addWidget(sb);
+        hl->addWidget(new QLabel("mV"));
+        hl->addStretch();
+        ui->vlTriggerBoard->addWidget(fr);
+
+        TriggerGainSpinBoxes.push_back(sb);
+    }
+}
+
+void MainWindow::on_pbSetAllTriggerGainsTo_clicked()
+{
+    const int newVal = ui->sbAllGainsTo->value();
+    for (QSpinBox * sb : TriggerGainSpinBoxes)
+        sb->setValue(newVal);
+
+    storeTriggerGainSettings();
+}
+
+void MainWindow::on_pbSendTriggerBoardGains_clicked()
+{
+    QString err = TrbRunManager->sendTriggerGainsToBoard();
+    if (!err.isEmpty()) message(err, this);
+}
+
+void MainWindow::on_cbGainsForTriggerBoard_clicked(bool checked)
+{
+    Config->TrbRunSettings.bTriggerGains = checked;
+}
+
+void MainWindow::on_sbAllGainsTo_editingFinished()
+{
+    Config->TrbRunSettings.DefaultTriggerGain = ui->sbAllGainsTo->value();
+}
+
+void MainWindow::storeTriggerGainSettings()
+{
+    Config->TrbRunSettings.TriggerGains.clear();
+    for (QSpinBox * sb : TriggerGainSpinBoxes)
+        Config->TrbRunSettings.TriggerGains.push_back(sb->value());
+}

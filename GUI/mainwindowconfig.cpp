@@ -331,6 +331,19 @@ void MainWindow::UpdateGui()
     on_pbRefreshBufferIndication_clicked();
 
     on_pbUpdateTriggerGui_clicked();
+
+    // Trigger gains
+    ui->cbGainsForTriggerBoard->setChecked(Config->TrbRunSettings.bTriggerGains);
+    ui->sbNumberTriggerBoardChannels->setValue(Config->TrbRunSettings.TriggerGains.size());
+    ui->sbAllGainsTo->setValue(Config->TrbRunSettings.DefaultTriggerGain);
+    updateTriggerGainGui(); // resize and fill default
+    for (size_t iG = 0; iG < Config->TrbRunSettings.TriggerGains.size(); iG++)
+    {
+        if (iG < TriggerGainSpinBoxes.size())
+            TriggerGainSpinBoxes[iG]->setValue(Config->TrbRunSettings.TriggerGains[iG]);
+        else
+            qWarning() << "Mismatch in trigger gain spinboxes size";
+    }
 }
 
 // --- update Config on GUI operated by user ---

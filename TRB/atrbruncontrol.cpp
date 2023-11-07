@@ -90,7 +90,7 @@ void ATrbRunControl::RestartBoard()
     emit boardLogReady("Restart power cycle finished\n");
 }
 
-const QString ATrbRunControl::StartAcquire()
+QString ATrbRunControl::StartAcquire()
 {
     if (!prBoard) return "Board not ready!";
     if (prAcquire) return "Acquisition is already running";
@@ -209,6 +209,13 @@ void ATrbRunControl::recallConfiguration()
     err = sendTimeSettingsToTRB();
     if (err.isEmpty()) emit boardLogReady("-->Updated time info saving");
     else emit boardLogReady("Error during sending timing settings:\n" + err);
+
+    if (Settings.TrbRunSettings.bTriggerGains)
+    {
+        err = sendTriggerGainsToBoard();
+        if (err.isEmpty()) emit boardLogReady("-->Updated trigger gains");
+        else emit boardLogReady("Error during sending trigger gain settings:\n" + err);
+    }
 }
 
 void ATrbRunControl::onReadyBoardLog()
@@ -812,6 +819,115 @@ QString ATrbRunControl::readTimeSettingsFromTRB()
     Settings.TrbRunSettings.TimeWinBefore_FPGA4 = (compoundVal & 0x7fff) * 5;
 
     pr.close();
+    return "";
+}
+
+long getInterpolatedGainValue(const int mV)
+{
+    std::vector<std::pair<int,long>> data = {
+        {5, 0x3350},
+        {10, 0x3810},
+        {20, 0x41b0},
+        {30, 0x4b40},
+        {40, 0x54e0},
+        {50, 0x5e70},
+        {60, 0x6800},
+        {70, 0x71a0},
+        {80, 0x7b30},
+        {90, 0x84c0},
+        {100, 0x8e60}
+    };
+
+    if (mV <= data.front().first) return data.front().second;
+    if (mV >= data.back().first)  return data.back().second;
+
+    for (size_t i = 1; i < data.size(); i++)
+    {
+        if (mV > data[i].first) continue;
+        if (mV == data[i].first) return data[i].second;
+
+        //return data[i-1].second + (data[i].second - data[i-1].second) * (mV - data[i-1].first) / (data[i].first - data[i-1].first);
+        double coeff = 1.0 * (data[i].second - data[i-1].second) / (data[i].first - data[i-1].first);
+        return data[i-1].second + coeff * (mV - data[i-1].first);
+    }
+}
+
+QString ATrbRunControl::formTriggerGainText()
+{
+    QString txt;
+
+    txt = ""
+          "#Board   Chain     ChainLen    DAC(DB)   Channel       Command       Value\n"
+          "\n"
+          "a004   1         3           0         0             3             0x5C20\n"
+          "a004   1         3           1         0             3             0x5C20\n"
+          "a004   1         3           2         0             3             0x5C20\n"
+          "a004   1         3           0         1             3             0x5C20\n"
+          "a004   1         3           1         1             3             0x5C20\n"
+          "a004   1         3           2         1             3             0x5C20\n"
+          "a004   1         3           0         2             3             0x5C20\n"
+          "a004   1         3           1         2             3             0x5C20\n"
+          "a004   1         3           2         2             3             0x5C20\n"
+          "a004   1         3           0         3             3             0x5C20\n"
+          "a004   1         3           1         3             3             0x5C20\n"
+          "a004   1         3           2         3             3             0x5C20\n"
+          "\n";
+
+    size_t iRPC = 0;
+    for (size_t iDAC = 0; iDAC < 3; iDAC++)
+        for (size_t iChan = 4; iChan < 8; iChan++)
+        {
+            int threshold = 100;
+            long value = 0x8E60; // corresponds to -100 mV
+            if (iRPC < Settings.TrbRunSettings.TriggerGains.size())
+            {
+                threshold = Settings.TrbRunSettings.TriggerGains[iRPC];
+                value = getInterpolatedGainValue(threshold);
+            }
+
+            QString str = "0x" + QString::number(value, 16);
+            // !!!*** GUI for board (a004 here)
+            txt += QString("a004   1         3           %0         %1             3             %2   # thr = %3 mV\n").arg(iDAC).arg(iChan).arg(str).arg(threshold);
+            iRPC++;
+        }
+
+    return txt;
+}
+
+QString ATrbRunControl::sendTriggerGainsToBoard()
+{
+    QString txt = formTriggerGainText();
+
+    QString localFN = "TriggerGains_Andr.txt";
+    bool ok = SaveTextToFile(localFN, txt);
+    if (!ok) return "Cannot update local file with trigger gain settings!";
+
+    QString hostDir = Settings.TrbRunSettings.ScriptDirOnHost;
+    QString err = sshCopyFileToHost(localFN, hostDir);
+    if (!err.isEmpty()) return err;
+
+    qDebug() << "Running script...";
+    QString command = "ssh";
+    QStringList args;
+    args << QString("%1@%2").arg(User).arg(Host);
+
+    QProcess pr;
+    pr.setProcessChannelMode(QProcess::MergedChannels);
+    pr.start(command, args);
+
+    if (!pr.waitForStarted(500)) return "Could not start send";
+
+    QString msg = "~/trbsoft/daqtools/tools/dac_program.pl " + hostDir + "/" + localFN;  // !!!*** add script filename control in GUI
+    pr.write(QByteArray(msg.toLocal8Bit().data()));
+
+    pr.closeWriteChannel();
+    if (!pr.waitForFinished(2000)) return "Timeout on attempt to execute CTS configuration";
+
+    QString reply1 = pr.readAll();
+
+    pr.close();
+
+    qDebug() << reply1;
     return "";
 }
 

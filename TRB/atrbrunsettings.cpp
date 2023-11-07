@@ -54,7 +54,7 @@ void ATrbRunSettings::setTriggerInt(ulong val)
     bPeripheryFPGA1 = CheckBit(val, 11);
 }
 
-const QJsonObject ATrbRunSettings::WriteToJson() const
+QJsonObject ATrbRunSettings::WriteToJson() const
 {
     QJsonObject json;
     json["User"] = User;
@@ -115,6 +115,18 @@ const QJsonObject ATrbRunSettings::WriteToJson() const
         cj["TheRestControls"] = ar;
 
     json["CtsControl"] = cj;
+
+    // Trigger gains
+    {
+        QJsonObject js;
+            js["Enabled"] = bTriggerGains;
+            js["DefaultTriggerGain"] = DefaultTriggerGain;
+                QJsonArray ar;
+                for (int g : TriggerGains)
+                    ar.push_back(g);
+            js["Gains"] = ar;
+        json["TriggerGains"] = js;
+    }
 
     return json;
 }
@@ -180,5 +192,22 @@ void ATrbRunSettings::ReadFromJson(const QJsonObject &json)
         TheRestCTScontrols.clear();
         for (int i=0; i<ar.size(); i++) TheRestCTScontrols << ar[i].toString();
 
-    json["CtsControl"] = cj;
+    // Trigger gains
+    {
+        TriggerGains.clear();
+        bTriggerGains = false;
+        DefaultTriggerGain = 30;
+
+        QJsonObject js;
+        bool ok = parseJson(json, "TriggerGains", js);
+        if (ok)
+        {
+            parseJson(js, "Enabled", bTriggerGains);
+            parseJson(js, "DefaultTriggerGain", DefaultTriggerGain);
+            QJsonArray ar;
+            parseJson(js, "Gains", ar);
+            for (int i = 0; i < ar.size(); i++)
+                TriggerGains.push_back(ar[i].toInt());
+        }
+    }
 }
