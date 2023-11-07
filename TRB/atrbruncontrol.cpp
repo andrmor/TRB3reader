@@ -281,14 +281,17 @@ void ATrbRunControl::onReadyAcquireLog()
 
     if (txt.startsWith("---------------------------------------------\nEvents"))
     {
+        //---------------------------------------------
+        //Events:      15   Rate:   26.7 ev/s  Data:    87.1 KB  Rate: 0.132 MB/s
+        //    0         1     2       3    4     5        6   7    8     9    10
         QStringList f = log.split('\n');
         if (f.size()>2)
         {
             QString st = f.at(1);
-            QStringList ff = st.split(' ', QString::SkipEmptyParts);
-            if (ff.size() > 7)
+            QStringList ff = st.split(' ', Qt::SkipEmptyParts);
+            if (ff.size() > 9) // was 7
             {
-                //events can be in kEvents (assume mEvents too)
+                //events can be in kEvents (assume MEvents too)
                 QString sEv = ff.at(1);
                 if (sEv.right(1) == "k")
                 {
@@ -305,6 +308,7 @@ void ATrbRunControl::onReadyAcquireLog()
                 StatRate = ff.at(3).toDouble();
                 StatData = ff.at(6).toDouble();
                 StatDataUnits = ff.at(7);
+                StatTransferRate = ff.at(9).toDouble();
             }
         }
     }

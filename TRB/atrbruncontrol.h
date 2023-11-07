@@ -90,6 +90,7 @@ public:
     double StatRate = 0;
     double StatData = 0;
     QString StatDataUnits;
+    double StatTransferRate = 0; // assume always in MB/s
 
 private:
     void  recallConfiguration(); //executed after board is connected !!!

@@ -1780,6 +1780,7 @@ void MainWindow::onAcquireIsAlive()
     ui->leStatData->setText( QString::number(TrbRunManager->StatData, 'g', 4) );
     ui->leStatRate->setText( QString::number(TrbRunManager->StatRate, 'g', 4) );
     ui->labDataUnits->setText( TrbRunManager->StatDataUnits );
+    ui->leStatDataSaveRate->setText( QString::number(TrbRunManager->StatTransferRate, 'g', 4) );
 
     if (bLimitMaxEvents && TrbRunManager->StatEvents >= MaxEventsToRun && !bAlreadyStopping)
     {
@@ -1791,6 +1792,7 @@ void MainWindow::onAcquireIsAlive()
 void MainWindow::onAcquireOff()
 {
     ui->leStatRate->setText("");
+    ui->leStatDataSaveRate->setText("");
 }
 
 void MainWindow::onTimeLimitForAcquireReached()
