@@ -283,7 +283,8 @@ void ATrbRunControl::onReadyAcquireLog()
     {
         //---------------------------------------------
         //Events:      15   Rate:   26.7 ev/s  Data:    87.1 KB  Rate: 0.132 MB/s
-        //    0         1     2       3    4     5        6   7    8     9    10
+        ///   0         1     2       3    4     5        6   7    8     9    10
+        //Dropped:      0   Rate:    0.0 ev/s  Data:        0 B  Rate: 0.000 MB/s
         QStringList f = log.split('\n');
         if (f.size()>2)
         {
