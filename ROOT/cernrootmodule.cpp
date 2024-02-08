@@ -465,7 +465,8 @@ bool CernRootModule::DrawAll(bool bFromDataHub, int ievent, bool bNeg, int padsX
     {
         Min = 1e20f;
         Max = -1e20f;
-        for (int iCh=0; iCh<numChannels; ++iCh)
+        int numPads = 0;
+        for (int iCh=0; iCh<numChannels && numPads < padsX*padsY; ++iCh)
         {
             int iChannel;
             if (bFromDataHub) iChannel = iCh;
@@ -488,6 +489,7 @@ bool CernRootModule::DrawAll(bool bFromDataHub, int ievent, bool bNeg, int padsX
                 if (val < Min) Min = val;
                 if (val > Max) Max = val;
             }
+            numPads++;
         }
 
         //adding margins
@@ -498,7 +500,8 @@ bool CernRootModule::DrawAll(bool bFromDataHub, int ievent, bool bNeg, int padsX
 
     int NonZeroWaves = 0;
     int iCounter = 1;
-    for (int iCh=0; iCh<numChannels; ++iCh)
+    int numPads = 0;
+    for (int iCh=0; iCh<numChannels && numPads < padsX*padsY; ++iCh)
     {
         int iChannel;
         if (bFromDataHub) iChannel = iCh;
@@ -563,6 +566,7 @@ bool CernRootModule::DrawAll(bool bFromDataHub, int ievent, bool bNeg, int padsX
 
             gs->append(g);
             NonZeroWaves++;
+            numPads++;
         }        
     }
 
