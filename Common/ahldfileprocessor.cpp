@@ -212,7 +212,7 @@ void AHldFileProcessor::saveTimeData(int iEvent, QTextStream & outStream)
 
 bool AHldFileProcessor::sendSignalData(QTextStream &outStream, bool bUseHardware, bool bSaveTimeData)
 {
-    outStream.setRealNumberPrecision(13);
+    //outStream.setRealNumberPrecision(13);
 
     int numEvents = Extractor.CountEvents();
     int numChannels = Extractor.CountChannels();

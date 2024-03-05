@@ -34,7 +34,7 @@ private:
     QString LastError;
 
 private:
-    bool sendSignalData(QTextStream &outStream, bool bUseHardware, bool bSaveTimeData);
+    bool sendSignalData(QTextStream &outStream, bool bUseHardware, bool bSaveTimeData);  // remove commenting inside to increase data precision!
 
     void saveTimeData(int iEvent, QTextStream &outStream);
 signals:
