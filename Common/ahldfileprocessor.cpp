@@ -179,11 +179,30 @@ void AHldFileProcessor::saveTimeData(int iEvent, QTextStream & outStream)
     {
         const auto & vec = Extractor.TimeData[iEvent];
 
-        QVector<double> Channels(11, 0);
+        int chanOffset = 16;
+        int numChanToSave = 10;
+        QVector<double> Channels(numChanToSave+1, 0);
+
         for (const auto & pair : vec)
         {
-            const int index = pair.first - 1; // ignore "0" channel, shift all 1 down
-            if (index < 0 || index >= vec.size()) continue;
+            //const int index = (int)pair.first - 1; // ignore "0" channel, shift all 1 down
+            //if (index < 0 || index >= vec.size()) continue;
+            //Channels[index] = pair.second;
+            //qDebug() << pair.first << "+" << pair.second;
+
+            int index = pair.first;
+            if (index < 0) continue;
+            if (index != 0)
+            {
+                index -= chanOffset;
+                if (index > numChanToSave)
+                {
+                    qDebug() << "Bad channel index:"<<index;
+                    continue;
+                }
+            }
+
+            //qDebug() << iEvent <<"saving data:" << index << pair.second;
             Channels[index] = pair.second;
         }
 
@@ -193,6 +212,8 @@ void AHldFileProcessor::saveTimeData(int iEvent, QTextStream & outStream)
 
 bool AHldFileProcessor::sendSignalData(QTextStream &outStream, bool bUseHardware, bool bSaveTimeData)
 {
+    outStream.setRealNumberPrecision(13);
+
     int numEvents = Extractor.CountEvents();
     int numChannels = Extractor.CountChannels();
 
@@ -205,7 +226,7 @@ bool AHldFileProcessor::sendSignalData(QTextStream &outStream, bool bUseHardware
 
                 if (bSaveTimeData) saveTimeData(ie, outStream);
 
-                outStream << "\r\n";
+                outStream << "\n";
             }
     }
     else
@@ -218,7 +239,7 @@ bool AHldFileProcessor::sendSignalData(QTextStream &outStream, bool bUseHardware
 
                 if (bSaveTimeData) saveTimeData(ie, outStream);
 
-                outStream << "\r\n";
+                outStream << "\n";
             }
     }
     return true;

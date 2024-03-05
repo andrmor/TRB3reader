@@ -460,13 +460,13 @@ bool CernRootModule::DrawAll(bool bFromDataHub, int ievent, bool bNeg, int padsX
     c->Divide(padsX, padsY, 0, 0.000001f);
     gPad->Modified();
 
+    int iPad = 0;
     int numChannels = ( (bFromDataHub || SortBy_0Logic1Hardw==0) ? Config->CountLogicalChannels() : Reader->CountChannels() );
     if (bAutoscale)
     {
         Min = 1e20f;
         Max = -1e20f;
-        int numPads = 0;
-        for (int iCh=0; iCh<numChannels && numPads < padsX*padsY; ++iCh)
+        for (int iCh=0; iCh<numChannels && iPad < padsX*padsY; ++iCh)
         {
             int iChannel;
             if (bFromDataHub) iChannel = iCh;
@@ -489,7 +489,7 @@ bool CernRootModule::DrawAll(bool bFromDataHub, int ievent, bool bNeg, int padsX
                 if (val < Min) Min = val;
                 if (val > Max) Max = val;
             }
-            numPads++;
+            iPad++;
         }
 
         //adding margins
@@ -500,8 +500,8 @@ bool CernRootModule::DrawAll(bool bFromDataHub, int ievent, bool bNeg, int padsX
 
     int NonZeroWaves = 0;
     int iCounter = 1;
-    int numPads = 0;
-    for (int iCh=0; iCh<numChannels && numPads < padsX*padsY; ++iCh)
+    iPad = 0;
+    for (int iCh=0; iCh<numChannels && iPad < padsX*padsY; ++iCh)
     {
         int iChannel;
         if (bFromDataHub) iChannel = iCh;
@@ -566,7 +566,7 @@ bool CernRootModule::DrawAll(bool bFromDataHub, int ievent, bool bNeg, int padsX
 
             gs->append(g);
             NonZeroWaves++;
-            numPads++;
+            iPad++;
         }        
     }
 
