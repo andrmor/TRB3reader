@@ -319,8 +319,8 @@ void Trb3dataReader::processTimingSubEvent(hadaq::RawSubevent * subEvent, unsign
 }
 #endif
 
-void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels, int enforceNumSamples)
 #ifdef MULTIBOARD
+void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels, int enforceNumSamples)
 {
     waveData.clear();
     timeData.clear();
@@ -461,6 +461,149 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
     if (numBadEvents > 0) qDebug() << "--> " << numBadEvents << " bad events were disreguarded!";
 }
 #else
+void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels, int enforceNumSamples)
+{
+    waveData.clear();
+    timeData.clear();
+
+    std::vector<std::pair<unsigned,double>> timing;
+
+    numChannels = enforceNumChannels;
+    numSamples = enforceNumSamples;
+    numBadEvents = 0;
+    numAllEvents = 0;
+    bool bReportOnStart = true;
+
+    hadaq::ReadoutHandle ref = hadaq::ReadoutHandle::Connect(FileName.toLocal8Bit().data());
+    hadaq::RawEvent * evnt = nullptr;
+
+    while ( (evnt = ref.NextEvent(1.0)) )
+    {
+        bool bBadEvent = false;
+        int foundChannels = 0;
+
+        QVector < QVector <float> > thisEventData;  //format: [channel] [sample]
+        // all ADC addons have 48 channels, but some might be disabled and not saved in hlds
+
+        hadaq::RawSubevent * sub = nullptr;
+        while ( (sub=evnt->NextSubevent(sub)) )
+        {
+            unsigned trbSubEvSize = sub->GetSize() / 4 - 4;
+            unsigned ix = 0;
+
+            while (ix < trbSubEvSize)
+            {
+                unsigned hadata = sub->Data(ix++);
+
+                unsigned datalen = (hadata >> 16) & 0xFFFF;
+                int datakind = hadata & 0xFFFF;
+
+                if (bReportOnStart) qDebug() << "Data block with datakind: 0x" + QString::number(datakind, 16);
+
+                unsigned ixTmp = ix;  // --->  position before read
+
+                //qDebug() << QString::number(datakind, 16) << Config->isADCboard(datakind);
+                if (Config->isTimerBoard(datakind)) //boardID
+                {
+                    timing.clear();
+                    processTimingSubEvent(sub, ix, datalen, &timing);
+                }
+                else if (Config->isADCboard(datakind))
+                {
+                    // resize the vectors for the waveforms and fill the data
+                    const int oldSize = thisEventData.size();
+                    thisEventData.resize(oldSize + 48);
+
+                    int numChannelsThisSubEvent = -1;
+                    int numSamplesInThisChannel = 0;
+                    unsigned lastChannel = 999999;
+                    int sampleCounter = 0;
+                    for (unsigned iD = 0; iD < datalen; iD++)
+                    {
+                        unsigned dataWord = sub->Data(ix + iD);
+                        unsigned adcNum = ((dataWord >> 20) & 0xF);
+                        unsigned adcChan = ((dataWord >> 16) & 0xF);
+                        unsigned data = dataWord & 0xFFFF;
+                        unsigned thisChanNum = adcNum * 4 + adcChan;
+                        //qDebug() << "Chan#:" << thisChanNum << adcNum << adcChan;// << data;
+                        if (thisChanNum != lastChannel)
+                        {
+                            numChannelsThisSubEvent++;
+                            lastChannel = thisChanNum;
+
+                            if (iD != 0)
+                            {
+                                numSamplesInThisChannel = sampleCounter;
+                                if (numSamples != 0)
+                                {
+                                    if (numSamplesInThisChannel != numSamples)
+                                    {
+                                        bBadEvent = true;
+                                        if (numBadEvents < 50) qDebug() << "----- Event #" << waveData.size() << " has wrong number of samples ("<< numSamplesInThisChannel <<")\n";
+                                    }
+                                }
+                                else numSamples = numSamplesInThisChannel;
+                            }
+
+                            sampleCounter = 1;
+                            thisEventData[oldSize + thisChanNum].reserve(numSamples);
+                        }
+                        else
+                            sampleCounter++;
+
+                        thisEventData[oldSize + thisChanNum].push_back(data);
+                    }
+                    numChannelsThisSubEvent++;
+
+                    if (bReportOnStart) qDebug() << "--> This is an ADC block. Channels: " << numChannelsThisSubEvent << "   Samples: "<< numSamples;
+
+                    foundChannels = oldSize + 48;
+                }
+
+                ix = ixTmp + datalen; // <--- position before data read + datalength
+            }
+        }
+
+        if (numChannels != 0)
+        {
+            if (foundChannels != numChannels)
+            {
+                qDebug() << "Found event with wrong number of channels:"<<foundChannels<<"while expecting"<<numChannels;
+                ClearData();
+                break;
+            }
+        }
+        else numChannels = foundChannels;
+
+        //qDebug() << "Event processed.\n";
+        if (bBadEvent)
+        {
+            numBadEvents++;
+            //qDebug() << "Ignored!";
+        }
+        else
+        {
+            waveData << thisEventData;
+            timeData.push_back(timing);
+            //qDebug() << "New data size: "<<data.size();
+        }
+        bReportOnStart = false;
+        numAllEvents++;
+    }
+
+    ref.Disconnect();
+
+    qDebug() << "\n--> Data read completed";
+    qDebug() << "--> Events in the file:"<<numAllEvents;
+    qDebug() << "--> Events with data: "<< waveData.size();
+    qDebug() <<"   Channels: "<<numChannels << "  Samples: "<<numSamples;
+    if (numBadEvents > 0) qDebug() << "--> " << numBadEvents << " bad events were disreguarded!";
+}
+#endif
+
+/*
+// old "assuming" version
+void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels, int enforceNumSamples)
 {
     waveData.clear();
     timeData.clear();
@@ -602,6 +745,7 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
     if (numBadEvents > 0) qDebug() << "--> " << numBadEvents << " bad events were disreguarded!";
 }
 #endif
+*/
 
 QString Trb3dataReader::Read(const QString& FileName)
 {
@@ -840,6 +984,8 @@ void Trb3dataReader::substractPedestals()
     for (int ievent=0; ievent<waveData.size(); ievent++)
         for (int ichannel=0; ichannel<numChannels; ichannel++)
         {
+            if (waveData.at(ievent).at(ichannel).isEmpty()) continue;
+
             float pedestal = 0;
 
             switch (Config->PedestalExtractionMethod)
@@ -886,6 +1032,8 @@ void Trb3dataReader::smoothData()
     for (int ievent=0; ievent<waveData.size(); ievent++)
         for (int ichannel=0; ichannel<numChannels; ichannel++)
         {
+            if (waveData[ievent][ichannel].isEmpty()) continue;
+
             if (Config->AdjacentAveraging_bOn)
             {
                 if (Config->AdjacentAveraging_bWeighted)

@@ -235,6 +235,8 @@ float Trb3signalExtractor::extractSignalFromWaveform(int ievent, int ichannel, b
 {
     float sig;
 
+    if (Reader->GetWaveformPtrFast(ievent, ichannel)->isEmpty()) return 0;
+
     if ( Config->IsNegativeHardwareChannel(ichannel) )
     {
         sig = -extractMin(Reader->GetWaveformPtrFast(ievent, ichannel));
