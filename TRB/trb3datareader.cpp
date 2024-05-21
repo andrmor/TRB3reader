@@ -81,7 +81,7 @@ QString Trb3dataReader::GetFileInfo(const QString & FileName)
         numEvents++;
 
         // !!!
-//        break;
+        //        break;
         // !!!
     }
 
@@ -109,13 +109,13 @@ QString Trb3dataReader::GetFileInfo(const QString & FileName)
     while ( (evnt = ref.NextEvent(1.0)) )
     {
         // loop over sections
-        qDebug() << "---Event---" << numEvents;
+        //qDebug() << "---Event---" << numEvents;
         hadaq::RawSubevent * sub = 0;
         while ( (sub=evnt->NextSubevent(sub)) )
         {
-            qDebug() << "==>Id:" << QString::number(sub->GetId(), 16) << "==>Decoding:" << QString::number(sub->GetDecoding(), 16);
+            //qDebug() << "==>Id:" << QString::number(sub->GetId(), 16) << "==>Decoding:" << QString::number(sub->GetDecoding(), 16);
             unsigned trbSubEvSize = sub->GetSize() / 4 - 4;
-            qDebug() << "==>Subevent size: "<< trbSubEvSize;// << "\n";
+            //qDebug() << "==>Subevent size: "<< trbSubEvSize;// << "\n";
 
             unsigned ix = 0;
 
@@ -128,17 +128,57 @@ QString Trb3dataReader::GetFileInfo(const QString & FileName)
                 int datakind = hadata & 0xFFFF;
 
                 if (bReportOnStart) output += "Data block with datakind: 0x" + QString::number(datakind, 16) + "\n";
-                qDebug() << "====>" << QString::number(datakind, 16);
+                //qDebug() << "====>" << QString::number(datakind, 16);
 
                 unsigned ixTmp = ix;
 
+                if (Config->isTimerBoard(datakind))
+                {
+                    if (bReportOnStart) output += "--> This is a timing block.\n";
+                }
+
                 if (Config->isADCboard(datakind))
                 {
+                    int numChannels = -1;
+                    int numSamples = 0;
+                    unsigned lastChannel = 999999;
+                    int sampleCounter = 0;
+                    for (unsigned iD = 0; iD < datalen; iD++)
+                    {
+                        unsigned word = sub->Data(ix + iD);
+                        unsigned adcNum = ((word >> 20) & 0xF);
+                        unsigned adcChan = ((word >> 16) & 0xF);
+                        //unsigned data = word & 0xFFFF;
+                        unsigned thisChanNum = adcNum * 4 + adcChan;
+                        //qDebug() << "Chan#:" << thisChanNum << adcNum << adcChan;// << data;
+                        if (thisChanNum != lastChannel)
+                        {
+                            numChannels++;
+                            lastChannel = thisChanNum;
+                            if (iD != 0) numSamples = sampleCounter;
+                            sampleCounter = 1;
+                        }
+                        else
+                        {
+                            sampleCounter++;
+                        }
+                    }
+                    numChannels++;
+
+                    //qDebug() << "Channels:" << numChannels << "Samples:" << numSamples;
+                    if (bReportOnStart) output += "--> This is an ADC block. Channels: " +QString::number(numChannels) +"   Samples: " +QString::number(numSamples) +"\n";
+
+                    /*
                     // last word in the data block identifies max. ADC# and max. channel
                     // assuming they are written consecutively - seems to be the case so far
                     unsigned lastword = sub->Data( ix + datalen - 1 );
                     int ch_per_adc = ((lastword >> 16) & 0xF) + 1;
                     int n_adcs = ((lastword >> 20) & 0xF) + 1;
+
+                    QString binValStr = QString("%1").arg((long)lastword, (int)32, (int)2, QChar('0'));
+                    //int len = binVal.length();
+                    //if (binVal.length() < 32)
+                    qDebug() << binValStr << ch_per_adc << n_adcs;
 
                     int channels = ch_per_adc * n_adcs;
 
@@ -149,7 +189,10 @@ QString Trb3dataReader::GetFileInfo(const QString & FileName)
                     }
                     else
                         if (bReportOnStart) output += "==> This is an ADC block. Error: number of channels is 0!\n";
+
+                    */
                 }
+
                 ix = ixTmp + datalen;
             }
         }
@@ -157,7 +200,7 @@ QString Trb3dataReader::GetFileInfo(const QString & FileName)
         numEvents++;
 
         // !!!
-        break;
+        //break;
         // !!!
     }
 
@@ -266,11 +309,11 @@ void Trb3dataReader::processTimingSubEvent(hadaq::RawSubevent * subEvent, unsign
             }
             //else this channel appears more than once -> ignore
         }
-//        else if (hadata == 0x15555)
-//        {
-//            //qDebug() << "End of timing info block";
-//            break;
-//        }
+        //        else if (hadata == 0x15555)
+        //        {
+        //            //qDebug() << "End of timing info block";
+        //            break;
+        //        }
     }
     //qDebug() << "----";
 }
@@ -278,7 +321,7 @@ void Trb3dataReader::processTimingSubEvent(hadaq::RawSubevent * subEvent, unsign
 
 void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels, int enforceNumSamples)
 #ifdef MULTIBOARD
-{   
+{
     waveData.clear();
     timeData.clear();
 
@@ -360,12 +403,12 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
                 thisEventData[oldSize + trueChannel].resize(samples);
                 for (int iSample = 0; iSample < samples; iSample++)
                 {
-//                    unsigned hadata = sub->Data(ix++);
-//                    unsigned id   = (hadata >> 16) & 0xFFFF;
-//                    unsigned data = hadata & 0xFFFF;
-//                    if (data == 0x5555 && id == 1) break;
-//                    unsigned chan = id & 0xF;
-//                    unsigned adc  = (id >> 4) & 0xF;
+                    //                    unsigned hadata = sub->Data(ix++);
+                    //                    unsigned id   = (hadata >> 16) & 0xFFFF;
+                    //                    unsigned data = hadata & 0xFFFF;
+                    //                    if (data == 0x5555 && id == 1) break;
+                    //                    unsigned chan = id & 0xF;
+                    //                    unsigned adc  = (id >> 4) & 0xF;
                     //thisEventData[oldSize + iChannel][iSample] = (sub->Data(ix) & 0xFFFF);
                     thisEventData[oldSize + trueChannel][iSample] = (sub->Data(ix) & 0xFFFF);
                     ix++;
@@ -487,7 +530,7 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
                         thisEventData.resize( oldSize + channels );
                         for (int iChannel = 0; iChannel < channels; iChannel++)
                         {
-               // this is the block:
+                            // this is the block:
 
                             thisEventData[oldSize + iChannel].resize(samples);
                             for (int iSample = 0; iSample < samples; iSample++)
@@ -496,7 +539,7 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
                                 ix++;
                             }
 
-              // end
+                            // end
                         }
                         foundChannels = oldSize + channels;
 
@@ -808,7 +851,7 @@ void Trb3dataReader::substractPedestals()
                 break;
             case 1:
 
-/*
+                /*
             TH1 *hist;
 
             //const QVector<double> APeakFinder::findPeaks(const double sigma, const double threshold, const int MaxNumberOfPeaks, bool SuppressDraw) const
@@ -858,20 +901,20 @@ void Trb3dataReader::smoothData()
 
 void Trb3dataReader::doAdjacentAverage(QVector<float> &arr, int numPoints)
 {
-   QVector<float> arrOriginal = arr;
-   for (int is=0; is<numSamples; is++)
-   {
-       int num = 0;
-       float sum = 0;
-       for (int id=-numPoints; id<numPoints+1; id++)
-       {
-           int i = is + id;
-           if (i<0 || i>numSamples-1) continue;
-           num++;
-           sum += arrOriginal[i];
-       }
-       arr[is] = sum/num;
-   }
+    QVector<float> arrOriginal = arr;
+    for (int is=0; is<numSamples; is++)
+    {
+        int num = 0;
+        float sum = 0;
+        for (int id=-numPoints; id<numPoints+1; id++)
+        {
+            int i = is + id;
+            if (i<0 || i>numSamples-1) continue;
+            num++;
+            sum += arrOriginal[i];
+        }
+        arr[is] = sum/num;
+    }
 }
 
 void Trb3dataReader::doAdjacentWeightedAverage(QVector<float> &arr, int numPoints)
