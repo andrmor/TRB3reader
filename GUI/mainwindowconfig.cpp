@@ -344,6 +344,8 @@ void MainWindow::UpdateGui()
         else
             qWarning() << "Mismatch in trigger gain spinboxes size";
     }
+
+    ui->cbDisableIgnoredChannels->setChecked(Config->DisableIgnoredChannels);
 }
 
 // --- update Config on GUI operated by user ---

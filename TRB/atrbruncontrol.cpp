@@ -571,6 +571,7 @@ const QStringList ATrbRunControl::bufferRecordsToCommands()
 {
     QStringList txt;
     const QVector<ABufferRecord> & BufRec = Settings.getBufferRecords();
+    int channelOffset = 0;
     for (const ABufferRecord & r : BufRec)
     {
         const QString addr = "0x" + QString::number(r.Datakind, 16);
@@ -578,6 +579,33 @@ const QStringList ATrbRunControl::bufferRecordsToCommands()
         txt << QString("trbcmd w %1 0xa024 0x%2   #Buffer depth -> word count\n").arg(addr).arg(QString::number(r.Samples, 16));
         txt << QString("trbcmd w %1 0xa011 0x%2   #Samples after trigger\n").arg(addr).arg(QString::number(r.Delay, 16));
         txt << QString("trbcmd w %1 0xa015 0x%2   #Downsampling (starts from 0)\n").arg(addr).arg(QString::number(r.Downsampling, 16));
+
+        unsigned disable1 = 0;
+        unsigned disable2 = 0;
+        if (Settings.DisableIgnoredChannels)
+        {
+            unsigned factor = 1;
+            for (int i = 0; i < 32; i++)
+            {
+                int bit = Settings.IsIgnoredHardwareChannel(channelOffset + i);
+                disable1 += factor * bit;
+                factor *= 2;
+            }
+            qDebug() << "-------!!!!!!!!!!!!L----------" << QString::number(disable1, 16);
+
+            factor = 1;
+            for (int i = 32; i < 48; i++)
+            {
+                int bit = Settings.IsIgnoredHardwareChannel(channelOffset + i);
+                disable2 += factor * bit;
+                factor *= 2;
+            }
+            qDebug() << "-------!!!!!!!!!!!!H----------" << QString::number(disable2, 16);
+        }
+        txt << QString("trbcmd w %1 0xa01a 0x%2   # Lower 32 chns: Disable channels with bit true\n").arg(addr).arg(QString::number(disable1, 16));
+        txt << QString("trbcmd w %1 0xa01b 0x%2   # Upper 16 chns: Disable channels with bit true\n").arg(addr).arg(QString::number(disable2, 16));
+
+        channelOffset += 48;
     }
     qDebug() << txt;
     return txt;

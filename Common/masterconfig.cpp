@@ -232,6 +232,8 @@ void MasterConfig::writeIgnoreChannelsToJson(QJsonObject &json)
     QJsonArray arr;
     for (int i: IgnoreHardwareChannels) arr << i;
     json["IgnoreHardwareChannels"] = arr;
+
+    json["DisableIgnoredChannels"] = DisableIgnoredChannels;
 }
 
 bool MasterConfig::readIgnoreChannelsFromJson(QJsonObject &json)
@@ -242,6 +244,10 @@ bool MasterConfig::readIgnoreChannelsFromJson(QJsonObject &json)
     QJsonArray arr = json["IgnoreHardwareChannels"].toArray();
     for (int i=0; i<arr.size(); i++)
         IgnoreHardwareChannels.insert(arr[i].toInt());
+
+    DisableIgnoredChannels = false;
+    if (json.contains("IgnoreHardwareChannels"))
+        DisableIgnoredChannels = json["DisableIgnoredChannels"].toBool();
 
     return true;
 }

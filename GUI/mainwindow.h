@@ -315,6 +315,7 @@ private slots:
     void on_sbAllGainsTo_editingFinished();
 
     void storeTriggerGainSettings();
+    void on_cbDisableIgnoredChannels_clicked(bool checked);
 };
 
 #endif // MAINWINDOW_H

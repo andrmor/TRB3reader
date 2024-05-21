@@ -141,6 +141,9 @@ public:
     //trb acqusition-related settings
     ATrbRunSettings     TrbRunSettings;
 
+    // ignored channels disabled and not saved to hlds
+    bool                DisableIgnoredChannels = false;
+
     // config <-> JSON handling
     void                WriteToJson(QJsonObject& json);
     bool                ReadFromJson(QJsonObject& json);

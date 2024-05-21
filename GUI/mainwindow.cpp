@@ -2515,3 +2515,9 @@ void MainWindow::storeTriggerGainSettings()
     for (QSpinBox * sb : TriggerGainSpinBoxes)
         Config->TrbRunSettings.TriggerGains.push_back(sb->value());
 }
+
+void MainWindow::on_cbDisableIgnoredChannels_clicked(bool checked)
+{
+    Config->DisableIgnoredChannels = checked;
+}
+
