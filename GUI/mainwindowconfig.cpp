@@ -89,6 +89,8 @@ void MainWindow::WriteGUItoJson(QJsonObject &json)
 
     jsgui["SaveTime"] = ui->cbSaveTime->isChecked();
 
+    jsgui["DoNotSaveDisabledChannels"] = ui->cbDoNotSaveDisabledChannels->isChecked();
+
     jsgui["ExplorerSource"] = ui->cobExplorerSource->currentIndex();
 
     QJsonObject ja;
@@ -132,6 +134,8 @@ void MainWindow::ReadGUIfromJson(const QJsonObject& json)
     JsonToCheckbox(jsgui, "LoadAlsoPositions", ui->cbLoadIncludeReconstructed);
 
     JsonToCheckbox(jsgui, "SaveTime", ui->cbSaveTime);
+
+    JsonToCheckbox(jsgui, "DoNotSaveDisabledChannels", ui->cbDoNotSaveDisabledChannels);
 
     JsonToComboBox(jsgui, "ExplorerSource", ui->cobExplorerSource);
 
