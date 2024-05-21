@@ -20,8 +20,8 @@ public:
                       Trb3signalExtractor& Extractor,
                       ADataHub& DataHub);
 
-    bool ProcessFile(const QString FileName, bool bSaveTimeData, const QString SaveFileName = "");
-    bool SaveSignalsToFile(const QString FileName, bool bUseHardware, bool bSaveTimeData);
+    bool ProcessFile(const QString FileName, bool bSaveTimeData, const QString SaveFileName = "", bool doNotSaveSuppressedChannels = false);
+    bool SaveSignalsToFile(const QString FileName, bool bUseHardware, bool bSaveTimeData, bool doNotSaveSuppressed);
 
     const QString& GetLastError() const {return LastError;}
 
@@ -34,7 +34,7 @@ private:
     QString LastError;
 
 private:
-    bool sendSignalData(QTextStream &outStream, bool bUseHardware, bool bSaveTimeData);
+    bool sendSignalData(QTextStream &outStream, bool bUseHardware, bool bSaveTimeData, bool doNotSaveSuppressed);
 
     void saveTimeData(int iEvent, QTextStream &outStream);
 signals:

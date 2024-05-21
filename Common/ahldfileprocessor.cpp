@@ -14,7 +14,7 @@ AHldFileProcessor::AHldFileProcessor(MasterConfig& Config,
                                      ADataHub& DataHub) :
     Config(Config), Reader(Reader), Extractor(Extractor), DataHub(DataHub) {}
 
-bool AHldFileProcessor::ProcessFile(const QString FileName, bool bSaveTimeData, const QString SaveFileName)
+bool AHldFileProcessor::ProcessFile(const QString FileName, bool bSaveTimeData, const QString SaveFileName, bool doNotSaveSuppressedChannels)
 {
     if (FileName.isEmpty())
     {
@@ -100,7 +100,7 @@ bool AHldFileProcessor::ProcessFile(const QString FileName, bool bSaveTimeData, 
 
         qDebug() << "Saving to file:"<< nameSave;
         emit LogAction("Saving to file...");
-        bool bOK = SaveSignalsToFile(nameSave, false, bSaveTimeData);
+        bool bOK = SaveSignalsToFile(nameSave, false, bSaveTimeData, doNotSaveSuppressedChannels);
         if (!bOK) return false;
     }
 
@@ -150,7 +150,7 @@ bool AHldFileProcessor::ProcessFile(const QString FileName, bool bSaveTimeData, 
     return true;
 }
 
-bool AHldFileProcessor::SaveSignalsToFile(const QString FileName, bool bUseHardware, bool bSaveTimeData)
+bool AHldFileProcessor::SaveSignalsToFile(const QString FileName, bool bUseHardware, bool bSaveTimeData, bool doNotSaveSuppressed)
 {
     QFile outputFile(FileName);
     outputFile.open(QIODevice::WriteOnly);
@@ -166,7 +166,7 @@ bool AHldFileProcessor::SaveSignalsToFile(const QString FileName, bool bUseHardw
 
     if (bSaveTimeData) outStream.setRealNumberPrecision(9);
 
-    sendSignalData(outStream, bUseHardware, bSaveTimeData);
+    sendSignalData(outStream, bUseHardware, bSaveTimeData, doNotSaveSuppressed);
     if (bUseHardware) emit LogAction("Signals saved using HARDWARE channels!");
     else emit LogAction("Signals saved");
     outputFile.close();
@@ -210,7 +210,7 @@ void AHldFileProcessor::saveTimeData(int iEvent, QTextStream & outStream)
     }
 }
 
-bool AHldFileProcessor::sendSignalData(QTextStream &outStream, bool bUseHardware, bool bSaveTimeData)
+bool AHldFileProcessor::sendSignalData(QTextStream &outStream, bool bUseHardware, bool bSaveTimeData, bool doNotSaveSuppressed)
 {
     outStream.setRealNumberPrecision(13);
 
@@ -222,7 +222,11 @@ bool AHldFileProcessor::sendSignalData(QTextStream &outStream, bool bUseHardware
         for (int ie=0; ie<numEvents; ie++)
             if (!Extractor.IsRejectedEventFast(ie))
             {
-                for (int ic=0; ic<numChannels; ic++) outStream << Extractor.GetSignalFast(ie, ic) << " ";
+                for (int ic=0; ic<numChannels; ic++)
+                {
+                    //if (doNotSaveSuppressed && Config.IsIgnoredHardwareChannel(ic)) continue; // will be confusing!
+                    outStream << Extractor.GetSignalFast(ie, ic) << " ";
+                }
 
                 if (bSaveTimeData) saveTimeData(ie, outStream);
 
@@ -235,7 +239,11 @@ bool AHldFileProcessor::sendSignalData(QTextStream &outStream, bool bUseHardware
         for (int ie=0; ie<numEvents; ie++)
             if (!Extractor.IsRejectedEventFast(ie))
             {
-                for (int ic=0; ic<numChannels; ic++) outStream << Extractor.GetSignalFast(ie, Config.Map->LogicalToHardwareFast(ic)) << " ";
+                for (int ic=0; ic<numChannels; ic++)
+                {
+                    if (doNotSaveSuppressed && Config.IsIgnoredLogicalChannel(ic)) break;
+                    outStream << Extractor.GetSignalFast(ie, Config.Map->LogicalToHardwareFast(ic)) << " ";
+                }
 
                 if (bSaveTimeData) saveTimeData(ie, outStream);
 
