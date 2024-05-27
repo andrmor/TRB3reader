@@ -18,13 +18,14 @@ public:
     int     NumSamples = 0;
     bool    bDoSignalExtraction = true;
     bool    bDoScript = false;
+    int     SaveWhat = 0; // 0=signals, 1=waveforms
     bool    bDoSave = true;
     QString AddToFileName = "_proc.dat";
     bool    bDoCopyToDatahub = false;
     bool    bCopyWaveforms = false;
 
-    const QJsonObject   WriteToJson() const;
-    void                ReadFromJson(const QJsonObject &json);
+    QJsonObject WriteToJson() const;
+    void        ReadFromJson(const QJsonObject & json);
 };
 
 class ABufferRecord
@@ -56,7 +57,7 @@ public:
     QVector<ABufferRecord> & getBufferRecords() {return DatakindSet;}
     ABufferRecord *     findBufferRecord(int datakind);
     const QVector<int>  GetListOfDatakinds() const;
-    const QVector<int>  GetListOfDatakinds_Timing() const;
+    const QVector<int>  GetListOfTimingDatakinds() const;
     bool                isADCboard(int datakind) const;
     bool                isTimerBoard(int datakind) const;//{return (datakind == 0xc001);}
     void                AddDatakind(int datakind);
@@ -155,8 +156,7 @@ private:
     QVector<ABufferRecord> DatakindSet;
     QSet<int>           ValidDatakinds; // must be synchronized with DatakindSet
 
-    QVector<ABufferRecord> DatakindSet_Timing;
-    QSet<int>           ValidDatakinds_Timing; // must be synchronized with DatakindSet_Timing
+    QVector<int>        TimingDatakinds;
 
     QVector<int>        ListNegativeChannels;
     QVector<bool>       NegPol; //Quick access

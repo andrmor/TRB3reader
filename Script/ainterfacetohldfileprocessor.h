@@ -15,7 +15,7 @@ public:
     AInterfaceToHldFileProcessor(AHldFileProcessor& hldProcessor);
 
 public slots:
-    const QString ProcessFile(const QString FileName, bool bSaveTimeData, const QString SaveFileName = "");
+    const QString ProcessFile(QString FileName, int What_0signals1waves, bool bIncludeTimeData, QString SaveFileName, bool doNotSaveSuppressedChannels);
 
 private:
     AHldFileProcessor& hldProcessor;

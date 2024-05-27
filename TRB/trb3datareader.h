@@ -1,6 +1,8 @@
 #ifndef TRB3READER_H
 #define TRB3READER_H
 
+#include "trb3timingrecord.h"
+
 #include <vector>
 
 #include <QVector>
@@ -24,7 +26,7 @@ public:
     bool    SetValue(int ievent, int ichannel, int isample, float value);
     void    SetValueFast(int ievent, int ichannel, int isample, float value); //no argument validity check!
 
-    const QVector<float>* GetWaveformsPtr(int ievent, int ichannel) const;
+    //const QVector<float>* GetWaveformsPtr(int ievent, int ichannel) const;
     const QVector<float>* GetWaveformPtr(int ievent, int ichannel) const;
     const QVector<float>* GetWaveformPtrFast(int ievent, int ichannel) const; //no argument validity check!
 
@@ -57,13 +59,13 @@ public:
 
     void    ClearData();
 
-    std::vector<std::vector<std::pair<unsigned,double>>> timeData;  // format:  [event] [{channel,timeStamp}]
+    std::vector<std::vector<Trb3TimingRecord>> timeData;  // format:  [event] [channel] [inRec:timeStamp]
 
 private:
     MasterConfig* Config;
     QVector < QVector < QVector <float> > > waveData;  // format:  [event] [hardware chanel] [sample]
 
-    static constexpr unsigned NumTimeChannels = 30;
+    static constexpr unsigned NumTimeChannels = 30; // obsolete
     static constexpr double FineSpan_ns = 5.0; //ns
 
     int     numSamples;
@@ -71,6 +73,8 @@ private:
 
     int     numBadEvents;
     int     numAllEvents;
+
+    std::vector<int> TimingChannelMap;
 
     void    readRawData(const QString& FileName,
                         int enforceNumChannels,
@@ -87,9 +91,10 @@ private:
 #ifdef MULTIBOARD
     void    processTimingSubEvent(hadaq::RawSubevent * subEvent, unsigned subEventSize, std::vector<std::pair<unsigned,double>> * extractedData);
 #else
-    void    processTimingSubEvent(hadaq::RawSubevent * subEvent, unsigned ix, unsigned subEventSize, std::vector<std::pair<unsigned,double>> * extractedData);
+    void processTimingSubEvent(unsigned int datakind, hadaq::RawSubevent * subEvent, unsigned ix, unsigned subEventSize, std::vector<Trb3TimingRecord> & extractedData); // vector by channel, each has vector of time triggers
 #endif
 
+    void prepareTimeChannelConversion();
 };
 
 #endif // TRB3READER_H

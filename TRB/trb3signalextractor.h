@@ -1,6 +1,8 @@
 #ifndef TRB3SIGNALEXTRACTOR_H
 #define TRB3SIGNALEXTRACTOR_H
 
+#include "trb3timingrecord.h"
+
 #include <vector>
 
 #include <QVector>
@@ -41,7 +43,7 @@ public:
 
     float   extractSignalFromWaveform(int ievent, int ichannel, bool *Rejected = 0);
 
-    std::vector<std::vector<std::pair<unsigned,double>>> TimeData;  // format:  [event] [{channel,timeStamp}]
+    //std::vector<std::vector<Trb3TimingRecord>> TimeData;  // format:  [event] [{channel,timeStamp}]
 
 private:
     const   MasterConfig* Config;

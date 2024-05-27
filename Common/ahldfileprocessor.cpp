@@ -14,7 +14,7 @@ AHldFileProcessor::AHldFileProcessor(MasterConfig& Config,
                                      ADataHub& DataHub) :
     Config(Config), Reader(Reader), Extractor(Extractor), DataHub(DataHub) {}
 
-bool AHldFileProcessor::ProcessFile(const QString FileName, bool bSaveTimeData, const QString SaveFileName, bool doNotSaveSuppressedChannels)
+bool AHldFileProcessor::ProcessFile(const QString FileName, int What_0signals1waves, bool bIncludeTimeData, const QString SaveFileName, bool doNotSaveSuppressedChannels)
 {
     if (FileName.isEmpty())
     {
@@ -39,9 +39,6 @@ bool AHldFileProcessor::ProcessFile(const QString FileName, bool bSaveTimeData, 
         emit LogMessage(ValRes);
         return false;
     }
-
-    //numProcessedEvents += Reader.CountAllProcessedEvents();
-    //numBadEvents += Reader.CountBadEvents();
 
     // Extracting signals (or generating dummy data if disabled)
     Extractor.ClearData();
@@ -100,8 +97,24 @@ bool AHldFileProcessor::ProcessFile(const QString FileName, bool bSaveTimeData, 
 
         qDebug() << "Saving to file:"<< nameSave;
         emit LogAction("Saving to file...");
-        bool bOK = SaveSignalsToFile(nameSave, false, bSaveTimeData, doNotSaveSuppressedChannels);
-        if (!bOK) return false;
+
+        if (What_0signals1waves == 0)
+        {
+            bool bOK = SaveSignalsToFile(nameSave, false, bIncludeTimeData, doNotSaveSuppressedChannels);
+            if (!bOK) return false;
+        }
+        else if (What_0signals1waves == 1)
+        {
+            bool bOK = SaveWaveformsToFile(nameSave, false, bIncludeTimeData, doNotSaveSuppressedChannels);
+            if (!bOK) return false;
+        }
+        else
+        {
+            QString err = "Unknown option in AHldFileProcessor data processing: What_0signals1waves should be 0 or 1";
+            emit LogMessage(err);
+            LastError = err;
+            return false;
+        }
     }
 
     //Coping data to DataHub
@@ -150,7 +163,7 @@ bool AHldFileProcessor::ProcessFile(const QString FileName, bool bSaveTimeData, 
     return true;
 }
 
-bool AHldFileProcessor::SaveSignalsToFile(const QString FileName, bool bUseHardware, bool bSaveTimeData, bool doNotSaveSuppressed)
+bool AHldFileProcessor::SaveSignalsToFile(const QString & FileName, bool bUseHardware, bool bSaveTimeData, bool doNotSaveSuppressed)
 {
     QFile outputFile(FileName);
     outputFile.open(QIODevice::WriteOnly);
@@ -164,8 +177,6 @@ bool AHldFileProcessor::SaveSignalsToFile(const QString FileName, bool bUseHardw
 
     QTextStream outStream(&outputFile);
 
-    if (bSaveTimeData) outStream.setRealNumberPrecision(9);
-
     sendSignalData(outStream, bUseHardware, bSaveTimeData, doNotSaveSuppressed);
     if (bUseHardware) emit LogAction("Signals saved using HARDWARE channels!");
     else emit LogAction("Signals saved");
@@ -173,46 +184,43 @@ bool AHldFileProcessor::SaveSignalsToFile(const QString FileName, bool bUseHardw
     return true;
 }
 
+bool AHldFileProcessor::SaveWaveformsToFile(const QString & FileName, bool bUseHardware, bool bSaveTimeData, bool doNotSaveSuppressed)
+{
+    QFile outputFile(FileName);
+    outputFile.open(QIODevice::WriteOnly);
+    if(!outputFile.isOpen())
+    {
+        emit LogMessage("Failed to save waveforms");
+        LastError = "Unable to open file to save waveforms: " + FileName;
+        return false;
+    }
+
+    QTextStream outStream(&outputFile);
+
+    sendWaveformData(outStream, bUseHardware, bSaveTimeData, doNotSaveSuppressed);
+    if (bUseHardware) emit LogAction("Waveforms saved using HARDWARE channels!");
+    else emit LogAction("Waveforms saved");
+    outputFile.close();
+    return true;
+}
+
 void AHldFileProcessor::saveTimeData(int iEvent, QTextStream & outStream)
 {
-    if (iEvent < Extractor.TimeData.size())
+    if (iEvent < Reader.timeData.size())
     {
-        const auto & vec = Extractor.TimeData[iEvent];
-
-        int chanOffset = 16;
-        int numChanToSave = 10;
-        QVector<double> Channels(numChanToSave+1, 0);
-
-        for (const auto & pair : vec)
+        for (const Trb3TimingRecord & chRec : Reader.timeData[iEvent])
         {
-            //const int index = (int)pair.first - 1; // ignore "0" channel, shift all 1 down
-            //if (index < 0 || index >= vec.size()) continue;
-            //Channels[index] = pair.second;
-            //qDebug() << pair.first << "+" << pair.second;
-
-            int index = pair.first;
-            if (index < 0) continue;
-            if (index != 0)
-            {
-                index -= chanOffset;
-                if (index > numChanToSave)
-                {
-                    qDebug() << "Bad channel index:"<<index;
-                    continue;
-                }
-            }
-
-            //qDebug() << iEvent <<"saving data:" << index << pair.second;
-            Channels[index] = pair.second;
+            outStream << chRec.TimingCannel << " ";
+            for (double d : chRec.Triggers)
+                outStream << d << " ";
+            outStream << '\n';
         }
-
-        for (double time : Channels) outStream << time << " ";
     }
 }
 
 bool AHldFileProcessor::sendSignalData(QTextStream &outStream, bool bUseHardware, bool bSaveTimeData, bool doNotSaveSuppressed)
 {
-    outStream.setRealNumberPrecision(13);
+    if (bSaveTimeData) outStream.setRealNumberPrecision(13);
 
     int numEvents = Extractor.CountEvents();
     int numChannels = Extractor.CountChannels();
@@ -250,5 +258,42 @@ bool AHldFileProcessor::sendSignalData(QTextStream &outStream, bool bUseHardware
                 outStream << "\n";
             }
     }
+    return true;
+}
+
+bool AHldFileProcessor::sendWaveformData(QTextStream &outStream, bool bUseHardware, bool bSaveTimeData, bool doNotSaveSuppressed)
+{
+    if (bSaveTimeData) outStream.setRealNumberPrecision(13);
+
+    int numEvents = Reader.CountEvents();
+    int numChannels = ( bUseHardware ? Reader.CountChannels() : Config.Map->CountLogicalChannels() );
+
+    for (int ie = 0; ie < numEvents; ie++)
+    {
+        outStream << "#" << ie << "\n";
+
+        for (int ic = 0; ic < numChannels; ic++)
+        {
+            int ihardwchan;
+            if (bUseHardware) ihardwchan = ic;
+            else
+            {
+                ihardwchan = Config.Map->LogicalToHardware(ic);
+                if (doNotSaveSuppressed && Config.IsIgnoredHardwareChannel(ihardwchan)) break;
+            }
+
+            const QVector<float> * waves = Reader.GetWaveformPtrFast(ie, ihardwchan);
+            for (int i = 0; i < waves->size(); i++)
+                outStream << waves->at(i) << " ";
+            outStream << '\n';
+        }
+
+        if (bSaveTimeData)
+        {
+            saveTimeData(ie, outStream);
+            //outStream << '\n';
+        }
+    }
+
     return true;
 }

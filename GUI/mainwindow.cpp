@@ -722,6 +722,7 @@ void MainWindow::OnEventOrChannelChanged()
     ui->leSignal->setText(ss);
 
     // !!!***
+    /*
     QString timeStr;
     if (!bFromDataHub && ievent < Extractor->TimeData.size())
     {
@@ -733,6 +734,7 @@ void MainWindow::OnEventOrChannelChanged()
         }
     }
     ui->leTimes->setText(timeStr);
+    */
 }
 
 void MainWindow::on_pbShowWaveform_toggled(bool checked)
@@ -1331,27 +1333,11 @@ void MainWindow::bulkProcessorEnvelope(const QStringList FileNames)
     ui->pbStop->setChecked(false);
 
     int numErrors = 0;    
-    /*
-    numProcessedEvents = 0;
-    numBadEvents = 0;
-    for (QString name : FileNames)
-    {
-        Config->FileName = name;
-
-        bool bOK = bulkProcessCore();
-        if (!bOK) numErrors++;
-
-        updateNumEventsIndication();
-        qApp->processEvents();
-        if (bStopFlag) break;
-    }
-    */
-
     int numProcessedEvents = 0;
     int numBadEvents = 0;
     for (QString name : FileNames)
     {
-        bool bOK = HldFileProcessor.ProcessFile(name, ui->cbSaveTime->isChecked(), "", ui->cbDoNotSaveDisabledChannels->isChecked());
+        bool bOK = HldFileProcessor.ProcessFile(name, ui->cobWhatToSave->currentIndex(), ui->cbSaveTime->isChecked(), "", ui->cbDoNotSaveDisabledChannels->isChecked());
         if (!bOK) numErrors++;
 
         updateNumEventsIndication();

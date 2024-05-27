@@ -8,9 +8,9 @@ AInterfaceToHldFileProcessor::AInterfaceToHldFileProcessor(AHldFileProcessor &hl
                   "To modify settings use the global configuration.";
 }
 
-const QString AInterfaceToHldFileProcessor::ProcessFile(const QString FileName, bool bSaveTimeData, const QString SaveFileName)
+const QString AInterfaceToHldFileProcessor::ProcessFile(QString FileName, int What_0signals1waves, bool bIncludeTimeData, QString SaveFileName, bool doNotSaveSuppressedChannels)
 {
-    bool bOK = hldProcessor.ProcessFile(FileName, bSaveTimeData, SaveFileName);
+    bool bOK = hldProcessor.ProcessFile(FileName, What_0signals1waves, bIncludeTimeData, SaveFileName, doNotSaveSuppressedChannels);
     if (bOK) return "";
     else
     {

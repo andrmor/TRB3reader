@@ -318,6 +318,7 @@ private slots:
     void on_cbDisableIgnoredChannels_clicked(bool checked);
     void on_pbAddTimingDatakind_clicked();
     void on_pbRemoveTimingDatakind_clicked();
+    void on_cobWhatToSave_activated(int index);
 };
 
 #endif // MAINWINDOW_H

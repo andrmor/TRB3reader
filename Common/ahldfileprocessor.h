@@ -20,11 +20,12 @@ public:
                       Trb3signalExtractor& Extractor,
                       ADataHub& DataHub);
 
-    bool ProcessFile(const QString FileName, bool bSaveTimeData, const QString SaveFileName = "", bool doNotSaveSuppressedChannels = false);
-    bool SaveSignalsToFile(const QString FileName, bool bUseHardware, bool bSaveTimeData, bool doNotSaveSuppressed);
+    //bool ProcessFile(const QString FileName, bool bSaveTimeData, const QString SaveFileName = "", bool doNotSaveSuppressedChannels = false);
+    bool ProcessFile(const QString FileName, int What_0signals1waves, bool bIncludeTimeData, const QString SaveFileName, bool doNotSaveSuppressedChannels);
+    bool SaveSignalsToFile(const QString & FileName, bool bUseHardware, bool bSaveTimeData, bool doNotSaveSuppressed);
+    bool SaveWaveformsToFile(const QString & FileName, bool bUseHardware, bool bSaveTimeData, bool doNotSaveSuppressed);
 
     const QString& GetLastError() const {return LastError;}
-
 
 private:
     MasterConfig& Config;
@@ -35,6 +36,7 @@ private:
 
 private:
     bool sendSignalData(QTextStream &outStream, bool bUseHardware, bool bSaveTimeData, bool doNotSaveSuppressed);
+    bool sendWaveformData(QTextStream &outStream, bool bUseHardware, bool bSaveTimeData, bool doNotSaveSuppressed);
 
     void saveTimeData(int iEvent, QTextStream &outStream);
 signals:

@@ -224,7 +224,7 @@ void MainWindow::UpdateGui()
 
     //Timing datakinds
     ui->lwTimingDatakinds->clear();
-    QVector<int> timingDatakinds = Config->GetListOfDatakinds_Timing();
+    QVector<int> timingDatakinds = Config->GetListOfTimingDatakinds();
     if ( timingDatakinds.size() > 1 ) std::sort(timingDatakinds.begin(), timingDatakinds.end());
     for (int i : timingDatakinds)
     {
@@ -318,6 +318,7 @@ void MainWindow::UpdateGui()
     ui->cbBulkExtract->setChecked( Config->HldProcessSettings.bDoSignalExtraction );
     ui->cbAutoExecuteScript->setChecked( Config->HldProcessSettings.bDoScript );
     ui->cbSaveSignalsToFiles->setChecked( Config->HldProcessSettings.bDoSave );
+    ui->cobWhatToSave->setCurrentIndex( Config->HldProcessSettings.SaveWhat );
     ui->leAddToProcessed->setText( Config->HldProcessSettings.AddToFileName );
     ui->cbBulkCopyToDatahub->setChecked( Config->HldProcessSettings.bDoCopyToDatahub );
     ui->cbBulkAlsoCopyWaveforms->setChecked( Config->HldProcessSettings.bCopyWaveforms );
@@ -556,6 +557,11 @@ void MainWindow::on_cbAutoExecuteScript_clicked()
 void MainWindow::on_cbSaveSignalsToFiles_clicked()
 {
     Config->HldProcessSettings.bDoSave = ui->cbSaveSignalsToFiles->isChecked();
+}
+
+void MainWindow::on_cobWhatToSave_activated(int index)
+{
+    Config->HldProcessSettings.SaveWhat = index;
 }
 
 void MainWindow::on_leAddToProcessed_editingFinished()

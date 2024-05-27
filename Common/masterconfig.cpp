@@ -36,14 +36,9 @@ const QVector<int> MasterConfig::GetListOfDatakinds() const
     return vec;
 }
 
-const QVector<int> MasterConfig::GetListOfDatakinds_Timing() const
+const QVector<int> MasterConfig::GetListOfTimingDatakinds() const
 {
-    QVector<int> vec;
-    for (const int & i : ValidDatakinds_Timing)
-        vec << i;
-
-    if ( vec.size() > 1 ) std::sort(vec.begin(), vec.end());
-    return vec;
+    return TimingDatakinds;
 }
 
 bool MasterConfig::isADCboard(int datakind) const
@@ -53,7 +48,7 @@ bool MasterConfig::isADCboard(int datakind) const
 
 bool MasterConfig::isTimerBoard(int datakind) const
 {
-    return ValidDatakinds_Timing.contains(datakind);
+    return TimingDatakinds.contains(datakind);
 }
 
 void MasterConfig::AddDatakind(int datakind)
@@ -75,19 +70,13 @@ void MasterConfig::RemoveDatakind(int datakind)
 
 void MasterConfig::AddDatakind_Timing(int datakind)
 {
-    if (ValidDatakinds_Timing.contains(datakind)) return;
-
-    DatakindSet_Timing << ABufferRecord(datakind);
-    ValidDatakinds_Timing << datakind;
+    if (TimingDatakinds.contains(datakind)) return;
+    TimingDatakinds << datakind;
 }
 
 void MasterConfig::RemoveDatakind_Timing(int datakind)
 {
-    for (int i=0; i<DatakindSet_Timing.size(); i++)
-        if (DatakindSet_Timing.at(i).Datakind == datakind)
-            DatakindSet_Timing.remove(i);
-
-    ValidDatakinds_Timing.remove(datakind);
+    TimingDatakinds.removeAll(datakind);
 }
 
 void MasterConfig::SetNegativeChannels(const QVector<int> &list)
@@ -126,9 +115,8 @@ void MasterConfig::WriteToJson(QJsonObject &json)
     json["DatakindSets"] = ar;
 
     QJsonArray arT;
-    for (const ABufferRecord & r : DatakindSet_Timing)
-        arT << r.toJson();
-    json["TimingDatakindSets"] = arT;
+    for (int i : TimingDatakinds) arT << i;
+    json["TimingDatakinds"] = arT;
 }
 
 bool MasterConfig::ReadFromJson(QJsonObject &json)
@@ -174,15 +162,10 @@ bool MasterConfig::ReadFromJson(QJsonObject &json)
         }
     }
 
-    QJsonArray ar = json["TimingDatakindSets"].toArray();
-    for (int i=0; i<ar.size(); i++)
-    {
-        QJsonObject js = ar[i].toObject();
-        ABufferRecord rec;
-        rec.readFromJson(js);
-        DatakindSet_Timing << rec;
-        ValidDatakinds_Timing << rec.Datakind;
-    }
+    TimingDatakinds.clear();
+    QJsonArray ar = json["TimingDatakinds"].toArray();
+    for (int i = 0; i < ar.size(); i++)
+        TimingDatakinds << ar[i].toInt();
 
     return true;
 }
@@ -517,7 +500,7 @@ bool MasterConfig::IsIgnoredLogicalChannel(int iLogical) const
 
 // -------- hld file processor settings ---------
 
-const QJsonObject AHldProcessSettings::WriteToJson() const
+QJsonObject AHldProcessSettings::WriteToJson() const
 {
     QJsonObject js;
 
@@ -526,6 +509,7 @@ const QJsonObject AHldProcessSettings::WriteToJson() const
     js["DoExtraction"] =     bDoSignalExtraction;
     js["DoScript"] =         bDoScript;
     js["DoSave"] =           bDoSave;
+    js["SaveWhat"] =         SaveWhat;
     js["AddToFileName"] =    AddToFileName;
     js["DoCopyToDatahub"] =  bDoCopyToDatahub;
     js["IncludeWaveforms"] = bCopyWaveforms;
@@ -540,6 +524,7 @@ void AHldProcessSettings::ReadFromJson(const QJsonObject &json)
     parseJson(json, "DoExtraction",     bDoSignalExtraction);
     parseJson(json, "DoScript",         bDoScript);
     parseJson(json, "DoSave",           bDoSave);
+    parseJson(json, "SaveWhat",         SaveWhat);
     parseJson(json, "AddToFileName",    AddToFileName);
     parseJson(json, "DoCopyToDatahub",  bDoCopyToDatahub);
     parseJson(json, "IncludeWaveforms", bCopyWaveforms);

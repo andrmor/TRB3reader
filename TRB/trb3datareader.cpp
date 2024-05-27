@@ -266,14 +266,15 @@ void Trb3dataReader::processTimingSubEvent(hadaq::RawSubevent * subEvent, unsign
     }
 }
 #else
-void Trb3dataReader::processTimingSubEvent(hadaq::RawSubevent * subEvent, unsigned ix, unsigned subEventSize, std::vector<std::pair<unsigned, double>> * extractedData)
+void Trb3dataReader::processTimingSubEvent(unsigned datakind, hadaq::RawSubevent * subEvent, unsigned ix, unsigned subEventSize,
+                                           std::vector<Trb3TimingRecord> & extractedData)
 {
-    unsigned epoch = 0;
-    std::array<bool,NumTimeChannels> seenChannels; seenChannels.fill(false);
-
     //qDebug() << "Timing subevent size:" << subEventSize;
-    unsigned index = 0;
-    while (index++ < subEventSize) // loop over subsubevents
+    unsigned epoch = 0;
+    int previousChannel = -1;
+    int lastRecordIndex = -1;
+    unsigned subeventIndex = 0;
+    while (subeventIndex++ < subEventSize) // loop over subsubevents
     {
         unsigned hadata = subEvent->Data(ix++);
         //qDebug() << "--> " << QString::number(hadata, 16) << QString::number(hadata, 2);
@@ -289,33 +290,70 @@ void Trb3dataReader::processTimingSubEvent(hadaq::RawSubevent * subEvent, unsign
             const unsigned coarse  = hadata & 0x000007ff;    // 10-0
             const unsigned fine    = (hadata >> 12) & 0x3ff; // 21-12
             const unsigned channel = (hadata >> 22) & 0x7f;  // 28-22
-            //qDebug() << "--timedata: coarse"<< coarse << "fine" << fine << "channel" << channel;
-            if (channel >= NumTimeChannels)
-            {
-                qCritical() << "Bad channel number:" << channel;
-                exit(222);
-            }
-            if (!seenChannels[channel])
-            {
-                seenChannels[channel] = true;
+            //qDebug() << "-----TTTT---- channel" << channel << " -->  timedata: coarse"<< coarse << "fine" << fine;
 
-                const double timeFromFine  = FineSpan_ns * fine / 0x400;   // 5ps resolution?
-                const double timeFromCorse = FineSpan_ns * coarse;
-                const double timeFromEpoch = FineSpan_ns * 0x800 * epoch;
-                const double time = timeFromEpoch + timeFromCorse + timeFromFine; // ns
-                //qDebug() << "Time contributions (ns) from fine, corse and epoc:" << timeFromFine << timeFromCorse << timeFromEpoch << " Global:" << time << "ns";
+            if (channel == 0) continue; // do not store master trigger info
 
-                if (extractedData) extractedData->push_back( {channel,time} );
+            if (channel != previousChannel)
+            {
+                // new channel data
+                extractedData.push_back(Trb3TimingRecord (datakind, channel));
+                extractedData.back().updateTimingChannel(TimingChannelMap);
+
+                lastRecordIndex++;
+                previousChannel = channel;
             }
-            //else this channel appears more than once -> ignore
+
+            const double timeFromFine  = FineSpan_ns * fine / 0x400;   // 5ps resolution?
+            const double timeFromCorse = FineSpan_ns * coarse;
+            const double timeFromEpoch = FineSpan_ns * 0x800 * epoch;
+            const double time = timeFromEpoch + timeFromCorse + timeFromFine; // ns
+            //qDebug() << "Time contributions (ns) from fine, corse and epoc:" << timeFromFine << timeFromCorse << timeFromEpoch << " Global:" << time << "ns";
+            extractedData[lastRecordIndex].Triggers.push_back(time);
         }
-        //        else if (hadata == 0x15555)
-        //        {
-        //            //qDebug() << "End of timing info block";
-        //            break;
-        //        }
     }
     //qDebug() << "----";
+}
+
+#include <bitset>
+std::vector<int> convertWordToChannels(int word)
+{
+    std::vector<int> vec;
+    std::bitset<32> bs(word);
+    for (int i = 1; i < 32; i++)     // from 1, and 31->32 as the limit,
+        if (bs.test(i-1)) vec.push_back(i);  // i-1 to account for TRB time channel shift: "0" encodes c001
+    return vec;
+}
+
+void Trb3dataReader::prepareTimeChannelConversion()
+{
+    TimingChannelMap = std::vector<int>(64, -1);
+
+    std::vector<int> board1 = convertWordToChannels(Config->TrbRunSettings.TimeChannels_FPGA3);
+    std::vector<int> board2 = convertWordToChannels(Config->TrbRunSettings.TimeChannels_FPGA4);
+
+    int index = 0;
+    if (Config->TrbRunSettings.TimeEnable_FPGA3)
+    {
+        for (int i : board1)
+        {
+            if (i < 1 || i > 32) continue;
+            TimingChannelMap[i-1] = index;
+            index++;
+        }
+    }
+
+    if (Config->TrbRunSettings.TimeEnable_FPGA4)
+    {
+        for (int i : board2)
+        {
+            if (i < 1 || i > 32) continue;
+            TimingChannelMap[32+i-1] = index;
+            index++;
+        }
+    }
+
+    for (int i = 0; i < 64; i++) qDebug() << i << i -32 << TimingChannelMap[i];
 }
 #endif
 
@@ -465,8 +503,10 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
 {
     waveData.clear();
     timeData.clear();
+    prepareTimeChannelConversion();
+    //qDebug() << TimingChannelMap;
 
-    std::vector<std::pair<unsigned,double>> timing;
+    std::vector<Trb3TimingRecord> timingThisEvent;
 
     numChannels = enforceNumChannels;
     numSamples = enforceNumSamples;
@@ -484,6 +524,8 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
 
         QVector < QVector <float> > thisEventData;  //format: [channel] [sample]
         // all ADC addons have 48 channels, but some might be disabled and not saved in hlds
+
+        timingThisEvent.clear();
 
         hadaq::RawSubevent * sub = nullptr;
         while ( (sub=evnt->NextSubevent(sub)) )
@@ -505,8 +547,12 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
                 //qDebug() << QString::number(datakind, 16) << Config->isADCboard(datakind);
                 if (Config->isTimerBoard(datakind)) //boardID
                 {
-                    timing.clear();
-                    processTimingSubEvent(sub, ix, datalen, &timing);
+                    //timing.clear();
+                    //qDebug() << QString::number(datakind, 16);
+                    std::vector<Trb3TimingRecord> data;
+                    processTimingSubEvent(datakind, sub, ix, datalen, data);
+                    if (!data.empty())
+                        timingThisEvent.insert(timingThisEvent.end(), std::make_move_iterator(data.begin()), std::make_move_iterator(data.end()));
                 }
                 else if (Config->isADCboard(datakind))
                 {
@@ -584,7 +630,7 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
         else
         {
             waveData << thisEventData;
-            timeData.push_back(timing);
+            timeData.push_back(timingThisEvent);
             //qDebug() << "New data size: "<<data.size();
         }
         bReportOnStart = false;
