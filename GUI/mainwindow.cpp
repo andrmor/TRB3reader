@@ -1206,17 +1206,15 @@ const QString MainWindow::PackMappingList(QVector<int> vec)
 void MainWindow::on_pbAddDatakind_clicked()
 {
     bool bOK;
-    //int datakind = QInputDialog::getInt(this, "TRBreader", "Input new datakind to add", 0, 0, 0xFFFF, 1, &bOK);
-    QString datakindStr = QInputDialog::getText(this, "TRBreader", "Input new address (start with 0x for hexadecimal)", QLineEdit::Normal,
-                                             QString(), &bOK);
+    QString datakindStr = QInputDialog::getText(this, "TRBreader", "Input new address (start with 0x for hexadecimal)",
+                                                QLineEdit::Normal, QString(), &bOK);
     int datakind = 0;
     if (datakindStr.startsWith("0x"))
         datakind = datakindStr.toInt(&bOK, 16);
     else
         datakind = datakindStr.toInt(&bOK, 10);
 
-    if (bOK)
-        Config->AddDatakind(datakind);
+    if (bOK) Config->AddDatakind(datakind);
     UpdateGui();
 }
 
@@ -1225,16 +1223,50 @@ void MainWindow::on_pbRemoveDatakind_clicked()
     int raw = ui->lwDatakinds->currentRow();
     if (raw < 0)
     {
-        message("Select datakind in th elist to remove by left-clicking on it", this);
+        message("Select datakind in the list to remove by left-clicking on it", this);
         return;
     }
     QString sel = ui->lwDatakinds->currentItem()->text();
     QStringList sl = sel.split(" ");
-    if (sl.size()>1)
+    if (sl.size() > 1)
     {
         QString dk = sl.first();
         int datakind = dk.toInt(0, 16);
         Config->RemoveDatakind(datakind);
+    }
+    UpdateGui();
+}
+
+void MainWindow::on_pbAddTimingDatakind_clicked()
+{
+    bool bOK;
+    QString datakindStr = QInputDialog::getText(this, "TRBreader", "Input new address (start with 0x for hexadecimal)",
+                                                QLineEdit::Normal, QString(), &bOK);
+    int datakind = 0;
+    if (datakindStr.startsWith("0x"))
+        datakind = datakindStr.toInt(&bOK, 16);
+    else
+        datakind = datakindStr.toInt(&bOK, 10);
+
+    if (bOK) Config->AddDatakind_Timing(datakind);
+    UpdateGui();
+}
+
+void MainWindow::on_pbRemoveTimingDatakind_clicked()
+{
+    int raw = ui->lwTimingDatakinds->currentRow();
+    if (raw < 0)
+    {
+        message("Select datakind in the list to remove by left-clicking on it", this);
+        return;
+    }
+    QString sel = ui->lwTimingDatakinds->currentItem()->text();
+    QStringList sl = sel.split(" ");
+    if (sl.size() > 1)
+    {
+        QString dk = sl.first();
+        int datakind = dk.toInt(0, 16);
+        Config->RemoveDatakind_Timing(datakind);
     }
     UpdateGui();
 }
@@ -2520,4 +2552,3 @@ void MainWindow::on_cbDisableIgnoredChannels_clicked(bool checked)
 {
     Config->DisableIgnoredChannels = checked;
 }
-

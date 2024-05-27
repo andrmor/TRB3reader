@@ -316,6 +316,8 @@ private slots:
 
     void storeTriggerGainSettings();
     void on_cbDisableIgnoredChannels_clicked(bool checked);
+    void on_pbAddTimingDatakind_clicked();
+    void on_pbRemoveTimingDatakind_clicked();
 };
 
 #endif // MAINWINDOW_H

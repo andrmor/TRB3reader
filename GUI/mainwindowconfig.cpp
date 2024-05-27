@@ -210,7 +210,7 @@ void MainWindow::UpdateGui()
 {
     //qDebug() << "--- Updating GUI";
 
-    //datakinds
+    //DAC datakinds
     ui->lwDatakinds->clear();
     QVector<int> datakinds = Config->GetListOfDatakinds();
     if ( datakinds.size() > 1 ) std::sort(datakinds.begin(), datakinds.end());
@@ -220,6 +220,18 @@ void MainWindow::UpdateGui()
         QListWidgetItem* item = new QListWidgetItem(s);
         item->setTextAlignment(Qt::AlignCenter);
         ui->lwDatakinds->addItem(item);
+    }
+
+    //Timing datakinds
+    ui->lwTimingDatakinds->clear();
+    QVector<int> timingDatakinds = Config->GetListOfDatakinds_Timing();
+    if ( timingDatakinds.size() > 1 ) std::sort(timingDatakinds.begin(), timingDatakinds.end());
+    for (int i : timingDatakinds)
+    {
+        QString s = QString("0x%1 (%2)").arg(QString::number(i, 16)).arg(QString::number(i));
+        QListWidgetItem* item = new QListWidgetItem(s);
+        item->setTextAlignment(Qt::AlignCenter);
+        ui->lwTimingDatakinds->addItem(item);
     }
 
     ui->leFileName->setText(Config->FileName);

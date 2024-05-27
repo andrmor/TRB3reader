@@ -36,6 +36,26 @@ const QVector<int> MasterConfig::GetListOfDatakinds() const
     return vec;
 }
 
+const QVector<int> MasterConfig::GetListOfDatakinds_Timing() const
+{
+    QVector<int> vec;
+    for (const int & i : ValidDatakinds_Timing)
+        vec << i;
+
+    if ( vec.size() > 1 ) std::sort(vec.begin(), vec.end());
+    return vec;
+}
+
+bool MasterConfig::isADCboard(int datakind) const
+{
+    return ValidDatakinds.contains(datakind);
+}
+
+bool MasterConfig::isTimerBoard(int datakind) const
+{
+    return ValidDatakinds_Timing.contains(datakind);
+}
+
 void MasterConfig::AddDatakind(int datakind)
 {
     if (ValidDatakinds.contains(datakind)) return;
@@ -51,6 +71,23 @@ void MasterConfig::RemoveDatakind(int datakind)
             DatakindSet.remove(i);
 
     ValidDatakinds.remove(datakind);
+}
+
+void MasterConfig::AddDatakind_Timing(int datakind)
+{
+    if (ValidDatakinds_Timing.contains(datakind)) return;
+
+    DatakindSet_Timing << ABufferRecord(datakind);
+    ValidDatakinds_Timing << datakind;
+}
+
+void MasterConfig::RemoveDatakind_Timing(int datakind)
+{
+    for (int i=0; i<DatakindSet_Timing.size(); i++)
+        if (DatakindSet_Timing.at(i).Datakind == datakind)
+            DatakindSet_Timing.remove(i);
+
+    ValidDatakinds_Timing.remove(datakind);
 }
 
 void MasterConfig::SetNegativeChannels(const QVector<int> &list)
@@ -87,6 +124,11 @@ void MasterConfig::WriteToJson(QJsonObject &json)
     for (const ABufferRecord & r : DatakindSet)
         ar << r.toJson();
     json["DatakindSets"] = ar;
+
+    QJsonArray arT;
+    for (const ABufferRecord & r : DatakindSet_Timing)
+        arT << r.toJson();
+    json["TimingDatakindSets"] = arT;
 }
 
 bool MasterConfig::ReadFromJson(QJsonObject &json)
@@ -130,6 +172,16 @@ bool MasterConfig::ReadFromJson(QJsonObject &json)
             DatakindSet << ABufferRecord(dk);
             ValidDatakinds << dk;
         }
+    }
+
+    QJsonArray ar = json["TimingDatakindSets"].toArray();
+    for (int i=0; i<ar.size(); i++)
+    {
+        QJsonObject js = ar[i].toObject();
+        ABufferRecord rec;
+        rec.readFromJson(js);
+        DatakindSet_Timing << rec;
+        ValidDatakinds_Timing << rec.Datakind;
     }
 
     return true;

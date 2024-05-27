@@ -56,10 +56,13 @@ public:
     QVector<ABufferRecord> & getBufferRecords() {return DatakindSet;}
     ABufferRecord *     findBufferRecord(int datakind);
     const QVector<int>  GetListOfDatakinds() const;
-    bool                isADCboard(int datakind) const {return ValidDatakinds.contains(datakind);}
-    bool                isTimerBoard(int datakind) const {return (datakind == 0xa004);}//{return (datakind == 0xc001);}
+    const QVector<int>  GetListOfDatakinds_Timing() const;
+    bool                isADCboard(int datakind) const;
+    bool                isTimerBoard(int datakind) const;//{return (datakind == 0xc001);}
     void                AddDatakind(int datakind);
     void                RemoveDatakind(int datakind);
+    void                AddDatakind_Timing(int datakind);
+    void                RemoveDatakind_Timing(int datakind);
 
     //negative/positive channels
     const QVector<int>& GetListOfNegativeChannels() const {return ListNegativeChannels;}
@@ -151,6 +154,9 @@ public:
 private:
     QVector<ABufferRecord> DatakindSet;
     QSet<int>           ValidDatakinds; // must be synchronized with DatakindSet
+
+    QVector<ABufferRecord> DatakindSet_Timing;
+    QSet<int>           ValidDatakinds_Timing; // must be synchronized with DatakindSet_Timing
 
     QVector<int>        ListNegativeChannels;
     QVector<bool>       NegPol; //Quick access

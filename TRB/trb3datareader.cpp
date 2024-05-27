@@ -166,7 +166,7 @@ QString Trb3dataReader::GetFileInfo(const QString & FileName)
                     numChannels++;
 
                     //qDebug() << "Channels:" << numChannels << "Samples:" << numSamples;
-                    if (bReportOnStart) output += "--> This is an ADC block. Channels: " +QString::number(numChannels) +"   Samples: " +QString::number(numSamples) +"\n";
+                    if (bReportOnStart) output += "--> This is an ADC block. 48 channels (" +QString::number(numChannels) +" enabled)   Samples: " +QString::number(numSamples) +"\n";
 
                     /*
                     // last word in the data block identifies max. ADC# and max. channel
