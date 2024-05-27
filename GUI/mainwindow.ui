@@ -30,7 +30,7 @@
     <item>
      <widget class="QTabWidget" name="twMain">
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab_8">
        <attribute name="title">
@@ -5059,9 +5059,18 @@
          </spacer>
         </item>
         <item>
-         <widget class="QLineEdit" name="leTimes">
-          <property name="readOnly">
-           <bool>false</bool>
+         <widget class="QListWidget" name="lwTriggers">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>75</height>
+           </size>
           </property>
          </widget>
         </item>

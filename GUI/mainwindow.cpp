@@ -721,20 +721,30 @@ void MainWindow::OnEventOrChannelChanged()
     }
     ui->leSignal->setText(ss);
 
-    // !!!***
-    /*
-    QString timeStr;
-    if (!bFromDataHub && ievent < Extractor->TimeData.size())
+    ui->lwTriggers->clear();
+
+    if (!bFromDataHub && ievent < Reader->timeData.size())
     {
-        const std::vector<std::pair<unsigned,double>> & vec = Extractor->TimeData[ievent];
-        for (const auto & rec : vec)
+        std::vector<Trb3TimingRecord> & vec = Reader->timeData[ievent];
+        for (const Trb3TimingRecord & rec : vec)
         {
-            if (!timeStr.isEmpty()) timeStr += "; ";
-            timeStr += QString("Chan %0 -> %1ns").arg(rec.first).arg(rec.second);
+            QString rawCh = QString::number(rec.InternalChannel) + "/" + "0x"+ QString::number(rec.BoardDatakind, 16);
+            QString str = "Ch: ";
+            if (rec.TimingCannel != -1) str += QString::number(rec.TimingCannel) + " (" + rawCh + ")";
+            else str += rawCh;
+
+            str += " --> ";
+            if (!rec.Triggers.empty())
+            {
+                str += QString::number(rec.Triggers.front(), 'f', 0) + "ns  ";
+
+                for (size_t i = 1; i < rec.Triggers.size(); i++)
+                    str += "+" + QString::number(rec.Triggers[i] - rec.Triggers.front(), 'f', 0) + "ns  ";
+            }
+
+            ui->lwTriggers->addItem(str);
         }
     }
-    ui->leTimes->setText(timeStr);
-    */
 }
 
 void MainWindow::on_pbShowWaveform_toggled(bool checked)
