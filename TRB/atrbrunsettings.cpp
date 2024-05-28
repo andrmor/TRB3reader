@@ -74,6 +74,9 @@ QJsonObject ATrbRunSettings::WriteToJson() const
     json["MaxEvents"] = MaxEvents;
 
     QJsonObject cj;
+        cj["ThrottleOn"] = ThrottleOn;
+        cj["Throttle"] = Throttle;
+
         cj["MP_0"] = bMP_0;
         cj["MP_1"] = bMP_1;
         cj["MP_2"] = bMP_2;
@@ -151,6 +154,9 @@ void ATrbRunSettings::ReadFromJson(const QJsonObject &json)
 
     QJsonObject cj;
     parseJson(json, "CtsControl", cj);
+        parseJson(cj, "ThrottleOn", ThrottleOn);
+        parseJson(cj, "Throttle", Throttle);
+
         parseJson(cj, "MP_0", bMP_0);
         parseJson(cj, "MP_1", bMP_1);
         parseJson(cj, "MP_2", bMP_2);
@@ -190,7 +196,14 @@ void ATrbRunSettings::ReadFromJson(const QJsonObject &json)
         QJsonArray ar;
         parseJson(cj, "TheRestControls", ar);
         TheRestCTScontrols.clear();
-        for (int i=0; i<ar.size(); i++) TheRestCTScontrols << ar[i].toString();
+        for (int i=0; i<ar.size(); i++)
+        {
+            const QString line = ar[i].toString();
+            if (line.startsWith("trbcmd w 0xc001 0xa00c 0x80000000"))
+                continue;
+            TheRestCTScontrols << line;
+        }
+        qDebug() << "!!!---!!!\n" << TheRestCTScontrols;
 
     // Trigger gains
     {

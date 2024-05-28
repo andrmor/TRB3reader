@@ -2058,6 +2058,9 @@ void MainWindow::on_pbRestartTrb_clicked()
 #include <bitset>
 void MainWindow::on_pbUpdateTriggerGui_clicked()
 {
+    ui->cbThrottle->setChecked(Config->TrbRunSettings.ThrottleOn);
+    ui->sbThrottleValue->setValue(Config->TrbRunSettings.Throttle);
+
     ui->cbMP0->setChecked(Config->TrbRunSettings.bMP_0);
     ui->cbMP1->setChecked(Config->TrbRunSettings.bMP_1);
     ui->cbMP2->setChecked(Config->TrbRunSettings.bMP_2);
@@ -2128,6 +2131,9 @@ void MainWindow::on_pbUpdateTriggerGui_clicked()
 
 void MainWindow::on_pbUpdateTriggerSettings_clicked()
 {
+    Config->TrbRunSettings.ThrottleOn = ui->cbThrottle->isChecked();
+    Config->TrbRunSettings.Throttle = ui->sbThrottleValue->value();
+
     Config->TrbRunSettings.bMP_0 = ui->cbMP0->isChecked();
     Config->TrbRunSettings.bMP_1 = ui->cbMP1->isChecked();
     Config->TrbRunSettings.bMP_2 = ui->cbMP2->isChecked();

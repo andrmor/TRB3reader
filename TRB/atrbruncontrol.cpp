@@ -626,6 +626,10 @@ const QStringList ATrbRunControl::CtsSettingsToCommands(bool bIncludeHidden)
     txt << QString("trbcmd w 0xc001 0xa153 %1   # periphery trigger inpits 0\n").arg(RunSettings.PeripheryTriggerInputs0);
     txt << QString("trbcmd w 0xc001 0xa154 %1   # periphery trigger inputs 1\n").arg(RunSettings.PeripheryTriggerInputs1);
 
+    if (RunSettings.Throttle > 1024) RunSettings.Throttle = 1024;
+    unsigned val = 0x80000000 + (RunSettings.ThrottleOn * 1024) + (RunSettings.Throttle - 1);
+    txt << QString("trbcmd w 0xc001 0xa00c 0x%1   # throttle control\n").arg(val,16);
+
     if (bIncludeHidden)
     {
         txt << "#\n# The 'hidden' part:\n";
@@ -1171,6 +1175,12 @@ QString ATrbRunControl::ReadTriggerSettingsFromBoard()
             else if (line.at(3) == "0xa158") RunSettings.Period = line.at(4);
             else if (line.at(3) == "0xa153") RunSettings.PeripheryTriggerInputs0 = line.at(4);
             else if (line.at(3) == "0xa154") RunSettings.PeripheryTriggerInputs1 = line.at(4);
+            else if (line.at(3) == "0xa00c")
+            {
+                unsigned val = line.at(4).toUInt(nullptr, 16);
+                RunSettings.ThrottleOn = (val & 0x400);
+                RunSettings.Throttle = (val & 0x18F) + 1;
+            }
             else
             {
                 if (!s.contains("setbit") && !s.contains("clearbit"))

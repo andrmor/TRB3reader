@@ -30,7 +30,7 @@
     <item>
      <widget class="QTabWidget" name="twMain">
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_8">
        <attribute name="title">
@@ -40,7 +40,7 @@
         <item>
          <widget class="QTabWidget" name="tabWidget">
           <property name="currentIndex">
-           <number>0</number>
+           <number>5</number>
           </property>
           <widget class="QWidget" name="tab_11">
            <attribute name="title">
@@ -3053,6 +3053,70 @@
                      </widget>
                     </item>
                    </layout>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer_22">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_88">
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QCheckBox" name="cbThrottle">
+                    <property name="text">
+                     <string>Throttle</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_35">
+                    <property name="text">
+                     <string>Max rate:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QSpinBox" name="sbThrottleValue">
+                    <property name="minimum">
+                     <number>1</number>
+                    </property>
+                    <property name="maximum">
+                     <number>1024</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_122">
+                    <property name="text">
+                     <string>kHz</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_60">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
                   </item>
                  </layout>
                 </item>
@@ -6190,12 +6254,12 @@
    <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>118</x>
-     <y>281</y>
+     <x>124</x>
+     <y>333</y>
     </hint>
     <hint type="destinationlabel">
-     <x>436</x>
-     <y>282</y>
+     <x>573</x>
+     <y>334</y>
     </hint>
    </hints>
   </connection>
@@ -6206,12 +6270,12 @@
    <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>118</x>
-     <y>311</y>
+     <x>124</x>
+     <y>365</y>
     </hint>
     <hint type="destinationlabel">
-     <x>488</x>
-     <y>311</y>
+     <x>539</x>
+     <y>365</y>
     </hint>
    </hints>
   </connection>
@@ -6242,8 +6306,8 @@
      <y>148</y>
     </hint>
     <hint type="destinationlabel">
-     <x>494</x>
-     <y>538</y>
+     <x>526</x>
+     <y>586</y>
     </hint>
    </hints>
   </connection>
@@ -6258,8 +6322,8 @@
      <y>175</y>
     </hint>
     <hint type="destinationlabel">
-     <x>494</x>
-     <y>538</y>
+     <x>526</x>
+     <y>586</y>
     </hint>
    </hints>
   </connection>
@@ -6274,8 +6338,8 @@
      <y>202</y>
     </hint>
     <hint type="destinationlabel">
-     <x>494</x>
-     <y>538</y>
+     <x>526</x>
+     <y>586</y>
     </hint>
    </hints>
   </connection>
@@ -6290,8 +6354,8 @@
      <y>229</y>
     </hint>
     <hint type="destinationlabel">
-     <x>494</x>
-     <y>538</y>
+     <x>526</x>
+     <y>586</y>
     </hint>
    </hints>
   </connection>
@@ -6306,8 +6370,8 @@
      <y>256</y>
     </hint>
     <hint type="destinationlabel">
-     <x>494</x>
-     <y>538</y>
+     <x>526</x>
+     <y>586</y>
     </hint>
    </hints>
   </connection>
@@ -6322,8 +6386,8 @@
      <y>283</y>
     </hint>
     <hint type="destinationlabel">
-     <x>494</x>
-     <y>538</y>
+     <x>526</x>
+     <y>586</y>
     </hint>
    </hints>
   </connection>
@@ -6338,8 +6402,8 @@
      <y>310</y>
     </hint>
     <hint type="destinationlabel">
-     <x>494</x>
-     <y>538</y>
+     <x>526</x>
+     <y>586</y>
     </hint>
    </hints>
   </connection>
@@ -6354,8 +6418,8 @@
      <y>360</y>
     </hint>
     <hint type="destinationlabel">
-     <x>494</x>
-     <y>538</y>
+     <x>526</x>
+     <y>586</y>
     </hint>
    </hints>
   </connection>
@@ -6367,11 +6431,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>274</x>
-     <y>480</y>
+     <y>467</y>
     </hint>
     <hint type="destinationlabel">
-     <x>494</x>
-     <y>538</y>
+     <x>526</x>
+     <y>586</y>
     </hint>
    </hints>
   </connection>
@@ -6383,11 +6447,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>274</x>
-     <y>510</y>
+     <y>497</y>
     </hint>
     <hint type="destinationlabel">
-     <x>494</x>
-     <y>538</y>
+     <x>526</x>
+     <y>586</y>
     </hint>
    </hints>
   </connection>
@@ -6399,11 +6463,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>486</x>
-     <y>481</y>
+     <y>468</y>
     </hint>
     <hint type="destinationlabel">
-     <x>494</x>
-     <y>538</y>
+     <x>526</x>
+     <y>586</y>
     </hint>
    </hints>
   </connection>
@@ -6415,11 +6479,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>486</x>
-     <y>512</y>
+     <y>499</y>
     </hint>
     <hint type="destinationlabel">
-     <x>494</x>
-     <y>538</y>
+     <x>526</x>
+     <y>586</y>
     </hint>
    </hints>
   </connection>
@@ -6434,8 +6498,8 @@
      <y>149</y>
     </hint>
     <hint type="destinationlabel">
-     <x>499</x>
-     <y>538</y>
+     <x>526</x>
+     <y>586</y>
     </hint>
    </hints>
   </connection>
@@ -6450,8 +6514,8 @@
      <y>149</y>
     </hint>
     <hint type="destinationlabel">
-     <x>499</x>
-     <y>538</y>
+     <x>526</x>
+     <y>586</y>
     </hint>
    </hints>
   </connection>
@@ -6466,8 +6530,8 @@
      <y>252</y>
     </hint>
     <hint type="destinationlabel">
-     <x>499</x>
-     <y>538</y>
+     <x>526</x>
+     <y>586</y>
     </hint>
    </hints>
   </connection>
@@ -6482,8 +6546,8 @@
      <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>499</x>
-     <y>538</y>
+     <x>526</x>
+     <y>586</y>
     </hint>
    </hints>
   </connection>
@@ -6498,8 +6562,8 @@
      <y>252</y>
     </hint>
     <hint type="destinationlabel">
-     <x>499</x>
-     <y>538</y>
+     <x>526</x>
+     <y>586</y>
     </hint>
    </hints>
   </connection>
@@ -6514,8 +6578,8 @@
      <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>499</x>
-     <y>538</y>
+     <x>526</x>
+     <y>586</y>
     </hint>
    </hints>
   </connection>
@@ -6530,8 +6594,8 @@
      <y>252</y>
     </hint>
     <hint type="destinationlabel">
-     <x>499</x>
-     <y>538</y>
+     <x>526</x>
+     <y>586</y>
     </hint>
    </hints>
   </connection>
@@ -6546,8 +6610,8 @@
      <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>499</x>
-     <y>538</y>
+     <x>526</x>
+     <y>586</y>
     </hint>
    </hints>
   </connection>
@@ -6562,8 +6626,8 @@
      <y>252</y>
     </hint>
     <hint type="destinationlabel">
-     <x>499</x>
-     <y>538</y>
+     <x>526</x>
+     <y>586</y>
     </hint>
    </hints>
   </connection>
@@ -6578,8 +6642,8 @@
      <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>499</x>
-     <y>538</y>
+     <x>526</x>
+     <y>586</y>
     </hint>
    </hints>
   </connection>
@@ -6594,8 +6658,8 @@
      <y>252</y>
     </hint>
     <hint type="destinationlabel">
-     <x>499</x>
-     <y>538</y>
+     <x>526</x>
+     <y>586</y>
     </hint>
    </hints>
   </connection>
@@ -6610,8 +6674,8 @@
      <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>499</x>
-     <y>538</y>
+     <x>526</x>
+     <y>586</y>
     </hint>
    </hints>
   </connection>
@@ -6626,8 +6690,8 @@
      <y>252</y>
     </hint>
     <hint type="destinationlabel">
-     <x>499</x>
-     <y>538</y>
+     <x>526</x>
+     <y>586</y>
     </hint>
    </hints>
   </connection>
@@ -6642,8 +6706,8 @@
      <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>499</x>
-     <y>538</y>
+     <x>526</x>
+     <y>586</y>
     </hint>
    </hints>
   </connection>
@@ -6658,8 +6722,8 @@
      <y>252</y>
     </hint>
     <hint type="destinationlabel">
-     <x>499</x>
-     <y>538</y>
+     <x>526</x>
+     <y>586</y>
     </hint>
    </hints>
   </connection>
@@ -6674,8 +6738,8 @@
      <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>485</x>
-     <y>537</y>
+     <x>526</x>
+     <y>586</y>
     </hint>
    </hints>
   </connection>
@@ -6690,8 +6754,8 @@
      <y>252</y>
     </hint>
     <hint type="destinationlabel">
-     <x>499</x>
-     <y>538</y>
+     <x>526</x>
+     <y>586</y>
     </hint>
    </hints>
   </connection>
@@ -6706,8 +6770,8 @@
      <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>499</x>
-     <y>538</y>
+     <x>526</x>
+     <y>586</y>
     </hint>
    </hints>
   </connection>
@@ -6724,6 +6788,38 @@
     <hint type="destinationlabel">
      <x>89</x>
      <y>132</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cbThrottle</sender>
+   <signal>clicked()</signal>
+   <receiver>pbUpdateTriggerSettings</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>225</x>
+     <y>530</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>449</x>
+     <y>573</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sbThrottleValue</sender>
+   <signal>editingFinished()</signal>
+   <receiver>pbUpdateTriggerSettings</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>380</x>
+     <y>534</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>491</x>
+     <y>569</y>
     </hint>
    </hints>
   </connection>

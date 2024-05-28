@@ -28,6 +28,9 @@ public:
     bool    bLimitEvents = false;
     int     MaxEvents  = 100;
 
+    bool    ThrottleOn = false;
+    int     Throttle = 10;
+
     bool    bMP_0 = false;
     bool    bMP_1 = false;
     bool    bMP_2 = false;
