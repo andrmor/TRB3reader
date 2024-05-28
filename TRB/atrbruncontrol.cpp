@@ -627,8 +627,9 @@ const QStringList ATrbRunControl::CtsSettingsToCommands(bool bIncludeHidden)
     txt << QString("trbcmd w 0xc001 0xa154 %1   # periphery trigger inputs 1\n").arg(RunSettings.PeripheryTriggerInputs1);
 
     if (RunSettings.Throttle > 1024) RunSettings.Throttle = 1024;
-    unsigned val = 0x80000000 + (RunSettings.ThrottleOn * 1024) + (RunSettings.Throttle - 1);
-    txt << QString("trbcmd w 0xc001 0xa00c 0x%1   # throttle control\n").arg(val,16);
+    if (RunSettings.Throttle < 0)    RunSettings.Throttle = 0;
+    unsigned val = 0x80000000 + ((unsigned)RunSettings.ThrottleOn * 1024) + (RunSettings.Throttle - 1);
+    txt << QString("trbcmd w 0xc001 0xa00c 0x%1   # throttle control\n").arg( QString::number(val,16) );
 
     if (bIncludeHidden)
     {

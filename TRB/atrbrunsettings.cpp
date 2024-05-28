@@ -203,7 +203,6 @@ void ATrbRunSettings::ReadFromJson(const QJsonObject &json)
                 continue;
             TheRestCTScontrols << line;
         }
-        qDebug() << "!!!---!!!\n" << TheRestCTScontrols;
 
     // Trigger gains
     {
