@@ -15,14 +15,16 @@ SOURCES += ROOT/cernrootmodule.cpp \
            ROOT/GUI/agraphwindow.cpp \
            Script/histgraphinterfaces.cpp \
            Common/tmpobjhubclass.cpp \
-           ROOT/apeakfinder.cpp
+           ROOT/apeakfinder.cpp \
+           TRB/trb3timingrecord.cpp
 
 HEADERS += ROOT/cernrootmodule.h \
            ROOT/GUI/arasterwindow.h \
            ROOT/GUI/agraphwindow.h \
            Script/histgraphinterfaces.h \
            Common/tmpobjhubclass.h \
-           ROOT/apeakfinder.h
+           ROOT/apeakfinder.h \
+           TRB/trb3timingrecord.h
 
 FORMS   += ROOT/GUI/agraphwindow.ui
 
@@ -32,8 +34,8 @@ INCLUDEPATH += ROOT/GUI
 
 #---DABC---
 DEFINES += DABC
-DABCPATH = /home/exnote/dabc
-#DABCPATH = /home/andr/dabc
+#DABCPATH = /home/exnote/dabc
+DABCPATH = /home/andr/dabc
 INCLUDEPATH += $$DABCPATH/include
 INCLUDEPATH += $$DABCPATH/include/hadaq
 LIBS += -L$$DABCPATH/lib/ -lDabcBase -lDabcMbs -lDabcHadaq

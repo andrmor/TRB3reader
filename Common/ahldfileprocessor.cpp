@@ -249,7 +249,7 @@ bool AHldFileProcessor::sendSignalData(QTextStream &outStream, bool bUseHardware
             {
                 for (int ic=0; ic<numChannels; ic++)
                 {
-                    if (doNotSaveSuppressed && Config.IsIgnoredLogicalChannel(ic)) break;
+                    if (doNotSaveSuppressed && Config.IsIgnoredLogicalChannel(ic)) continue;
                     outStream << Extractor.GetSignalFast(ie, Config.Map->LogicalToHardwareFast(ic)) << " ";
                 }
 
@@ -279,7 +279,7 @@ bool AHldFileProcessor::sendWaveformData(QTextStream &outStream, bool bUseHardwa
             else
             {
                 ihardwchan = Config.Map->LogicalToHardware(ic);
-                if (doNotSaveSuppressed && Config.IsIgnoredHardwareChannel(ihardwchan)) break;
+                if (doNotSaveSuppressed && Config.IsIgnoredHardwareChannel(ihardwchan)) continue;
             }
 
             const QVector<float> * waves = Reader.GetWaveformPtrFast(ie, ihardwchan);
