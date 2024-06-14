@@ -57,11 +57,7 @@ SOURCES += main.cpp \
     GUI/mainwindowconfig.cpp \
     Common/afiletools.cpp \
     Script/ainterfacetomessagewindow.cpp \
-    Script/ascriptmanager.cpp \
-    Script/coreinterfaces.cpp \    
     GUI/mainwindowscript.cpp \
-    GUI/ascriptwindow.cpp \
-    Common/ahighlighters.cpp \
     Common/amessage.cpp \
     Common/completingtexteditclass.cpp \    
     Script/ainterfacetowaveforms.cpp \
@@ -74,7 +70,6 @@ SOURCES += main.cpp \
     Script/ainterfacetowebsocket.cpp \
     Common/ahldfileprocessor.cpp \
     Script/ainterfacetohldfileprocessor.cpp \
-    Script/ainterfacetomultithread.cpp \
     Net/awebsocketsession.cpp \
     Net/awebsocketsessionserver.cpp \
     Script/awebserverinterface.cpp \
@@ -93,10 +88,6 @@ HEADERS  += GUI/mainwindow.h \
     Common/afiletools.h \
     Script/ainterfacetomessagewindow.h \
     Script/ascriptinterface.h \
-    Script/ascriptmanager.h \
-    Script/coreinterfaces.h \    
-    GUI/ascriptwindow.h \
-    Common/ahighlighters.h \
     Common/amessage.h \
     Common/completingtexteditclass.h \    
     Script/ainterfacetowaveforms.h \
@@ -109,7 +100,6 @@ HEADERS  += GUI/mainwindow.h \
     Script/ainterfacetowebsocket.h \
     Common/ahldfileprocessor.h \
     Script/ainterfacetohldfileprocessor.h \
-    Script/ainterfacetomultithread.h \
     Script/ascriptinterfacefactory.h \
     Net/awebsocketsession.h \
     Net/awebsocketsessionserver.h \
@@ -121,7 +111,6 @@ HEADERS  += GUI/mainwindow.h \
     GUI/abufferdelegate.h
 
 FORMS    += GUI/mainwindow.ui \
-    GUI/ascriptwindow.ui \
     GUI/aeditchannelsdialog.ui \
     aservermonitorwindow.ui \
     GUI/abufferdelegate.ui

@@ -149,7 +149,7 @@ void ARasterWindow::mousePressEvent(QMouseEvent *event)
   if (event->button() == Qt::RightButton) fCanvas->HandleInput(kButton3Down, event->x(), event->y());
 
   if (!fCanvas->HasViewer3D() || !fCanvas->GetView()) return;
-  if (event->button() == Qt::MidButton)
+  if (event->button() == Qt::MiddleButton)
     {
       //fCanvas->HandleInput(kButton2Down, event->x(), event->y());
       lastX = event->x();
@@ -189,7 +189,7 @@ void ARasterWindow::wheelEvent(QWheelEvent *event)
   fCanvas->cd();
   //int x = event->x();
   //int y = event->y();
-  double factor = (event->delta()<0) ? 1.25 : 0.8;
+  double factor = (event->angleDelta().y() < 0) ? 1.25 : 0.8;
 
   fCanvas->GetView()->ZoomView(0, 1.0/factor);
 

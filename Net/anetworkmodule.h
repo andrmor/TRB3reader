@@ -33,7 +33,7 @@ public:
     bool makeHttpRequest(const QString & url, QString & replyOrError, int timeout_ms);
 
 public slots:
-  void OnWebSocketTextMessageReceived(QString message);
+  void OnWebSocketTextMessageReceived(QString message); // !!!***
   void OnClientDisconnected();
 
 private slots:

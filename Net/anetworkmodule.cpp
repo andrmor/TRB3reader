@@ -1,5 +1,5 @@
 #include "anetworkmodule.h"
-#include "ascriptmanager.h"
+//#include "ascriptmanager.h"
 #include "awebsocketsessionserver.h"
 
 #include <QDebug>
@@ -58,7 +58,7 @@ void ANetworkModule::OnWebSocketTextMessageReceived(QString message)
 {
     qDebug() << "Websocket server: Message (script) received";
     qDebug() << "  Evaluating as JavaScript";
-
+/*
     int line = ScriptManager->FindSyntaxError(message);
     if (line != -1)
     {
@@ -84,6 +84,7 @@ void ANetworkModule::OnWebSocketTextMessageReceived(QString message)
             }
         }
     }
+*/
 }
 
 void ANetworkModule::OnClientDisconnected()

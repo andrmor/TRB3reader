@@ -7,7 +7,7 @@
 #include "anetworkmodule.h"
 
 #include "mainwindow.h"
-#include "ascriptwindow.h"
+//#include "ascriptwindow.h"
 
 #include <QDebug>
 #include <QStandardPaths>

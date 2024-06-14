@@ -3,6 +3,7 @@
 #include <QFile>
 #include <QMessageBox>
 #include <QDebug>
+#include <QRegularExpression>
 
 int LoadDoubleVectorsFromFile(QString FileName, QVector<double>* x)
 {

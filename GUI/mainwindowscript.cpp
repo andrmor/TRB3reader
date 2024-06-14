@@ -2,8 +2,8 @@
 #include "ui_mainwindow.h"
 #include "masterconfig.h"
 #include "afiletools.h"
-#include "ascriptwindow.h"
-#include "coreinterfaces.h"
+//#include "ascriptwindow.h"
+//#include "coreinterfaces.h"
 #include "histgraphinterfaces.h"
 #include "ainterfacetomessagewindow.h"
 #include "ainterfacetoextractor.h"
@@ -13,7 +13,7 @@
 #include "ainterfacetodata.h"
 #include "ainterfacetowebsocket.h"
 #include "ainterfacetohldfileprocessor.h"
-#include "ainterfacetomultithread.h"
+//#include "ainterfacetomultithread.h"
 #include "awebserverinterface.h"
 #include "anetworkmodule.h"
 
@@ -29,7 +29,8 @@
 
 void MainWindow::CreateScriptWindow()
 {
-    //  qDebug() << "Creating script window...";
+    qDebug() << "Creating script window...";
+/*
     ScriptWindow = new AScriptWindow(Config, Network.getScriptManager(), this);
 
     //  qDebug() << "Registering script units...";
@@ -102,6 +103,7 @@ void MainWindow::CreateScriptWindow()
 #endif
 
     ScriptWindow->UpdateHighlight();
+*/
 }
 
 void MainWindow::onGlobalScriptStarted()
@@ -118,6 +120,6 @@ void MainWindow::onGlobalScriptFinished()
 
 void MainWindow::on_actionOpen_script_window_triggered()
 {
-  ScriptWindow->showNormal();
-  ScriptWindow->raise();
+//  ScriptWindow->showNormal();
+//  ScriptWindow->raise();
 }

@@ -11,7 +11,7 @@ class Trb3dataReader;
 class Trb3signalExtractor;
 class QTextStream;
 class CernRootModule;
-class AScriptWindow;
+//class AScriptWindow;
 class ADispatcher;
 class ADataHub;
 class AHldFileProcessor;
@@ -49,12 +49,12 @@ public slots:
 
     void ReadGUIfromJson(const QJsonObject &json);  // slot since used by Dispatcher
     void WriteGUItoJson(QJsonObject& json);         // slot since used by Dispatcher
-    void SaveWindowSettings();                      // slot since used by Dispatcher
-    void LoadWindowSettings();                      // slot since used by Dispatcher
+    void SaveWindowSettings();                      // slot since used by Dispatcher   // !!!***
+    void LoadWindowSettings();                      // slot since used by Dispatcher   // !!!***
 
     void onGlobalScriptStarted();
     void onGlobalScriptFinished();
-    void saveCompleteState();
+    void saveCompleteState();     // !!!***
 
     void onShowMessageRequest(const QString message);
     void onShowActionRequest(const QString action);
@@ -112,7 +112,7 @@ private slots:
     void on_sbIntegrateTo_editingFinished();
 
     //menu actions
-    void on_actionReset_positions_of_all_windows_triggered();
+    void on_actionReset_positions_of_all_windows_triggered(); // !!!***
     void on_actionOpen_script_window_triggered();
 
     //event / channel changed
@@ -189,7 +189,7 @@ private:
 
     //owned objects
     Ui::MainWindow* ui;
-    AScriptWindow * ScriptWindow = nullptr;
+//    AScriptWindow * ScriptWindow = nullptr;
     CernRootModule * RootModule = nullptr;
     AServerMonitorWindow * ServerWindow = nullptr;
 
@@ -227,7 +227,7 @@ private:
     const QString PackMappingList(QVector<int> vec);
     bool ExtractNumbersFromQString(const QString input, QVector<int>* ToAdd);
     //bool bulkProcessCore();
-    void bulkProcessorEnvelope(const QStringList FileNames);
+    void bulkProcessorEnvelope(const QStringList FileNames); // !!!***
     void updateNumEventsIndication();
 
 private:

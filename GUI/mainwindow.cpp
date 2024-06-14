@@ -4,7 +4,7 @@
 #include "afiletools.h"
 #include "ajsontools.h"
 #include "channelmapper.h"
-#include "ascriptwindow.h"
+//#include "ascriptwindow.h"
 #include "amessage.h"
 #include "adispatcher.h"
 #include "aeditchannelsdialog.h"
@@ -96,13 +96,15 @@ MainWindow::MainWindow(MasterConfig* Config,
 
     //Creating script window, registering script units, and setting up QObject connections
     CreateScriptWindow();
-    connect(&HldFileProcessor, &AHldFileProcessor::RequestExecuteScript, ScriptWindow, &AScriptWindow::ExecuteScriptInFirstTab);
+    // !!!***
+//    connect(&HldFileProcessor, &AHldFileProcessor::RequestExecuteScript, ScriptWindow, &AScriptWindow::ExecuteScriptInFirstTab);
 
     //Loading window settings
     LoadWindowSettings();
     QJsonObject jsS;
     LoadJsonFromFile(jsS, Dispatcher->ConfigDir+"/scripting.json");
-    if (!jsS.isEmpty()) ScriptWindow->ReadFromJson(jsS);
+    // !!!***
+//    if (!jsS.isEmpty()) ScriptWindow->ReadFromJson(jsS);
 
     //misc gui settings
     menuBar()->setNativeMenuBar(false);  //otherwise on some system menu bar is not wisible!
@@ -128,7 +130,7 @@ MainWindow::~MainWindow()
     delete elTimer;
 
     delete TrbRunManager;
-    delete ScriptWindow;
+//    delete ScriptWindow;
     delete ui;
 }
 
@@ -137,7 +139,7 @@ void MainWindow::SetEnabled(bool flag)
     ui->twMain->setEnabled(flag);
     menuBar()->setEnabled(flag);
 
-    ScriptWindow->setEnabled(flag);
+//    ScriptWindow->setEnabled(flag);
 }
 
 void MainWindow::on_pbSelectFile_clicked()
@@ -1048,7 +1050,7 @@ void MainWindow::on_actionReset_positions_of_all_windows_triggered()
     //setGeometry(10,10,600,800);
     this->move(10, 10); this->resize(600, 800);
     //ScriptWindow->setGeometry(670,10,600,800);
-    ScriptWindow->move(670, 10); ScriptWindow->resize(600, 800);
+//    ScriptWindow->move(670, 10); ScriptWindow->resize(600, 800); // !!!***
 
     RootModule->ResetPositionOfWindows();
 }
@@ -1296,7 +1298,7 @@ void MainWindow::on_pbPrintHLDfileProperties_clicked()
 
 void MainWindow::on_pbProcessAllFromDir_clicked()
 {
-    QString dir = QFileDialog::getExistingDirectory(this, "Select directory with hld files to convert", Config->WorkingDir, 0);
+    QString dir = QFileDialog::getExistingDirectory(this, "Select directory with hld files to convert", Config->WorkingDir);
     if (dir.isEmpty()) return;
     Config->WorkingDir = QFileInfo(dir).absolutePath();
 
@@ -1332,11 +1334,15 @@ void MainWindow::bulkProcessorEnvelope(const QStringList FileNames)
 {
     if (!ui->cbKeepEvents->isChecked()) DataHub->Clear();
     ui->pteBulkLog->clear();
+
+    // !!!***
+    /*
     if (ui->cbAutoExecuteScript->isChecked())
     {
         ScriptWindow->show();
         ScriptWindow->OpenFirstTab();
     }
+    */
 
     ui->twMain->setEnabled(false);
     ui->pbStop->setVisible(true);

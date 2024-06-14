@@ -11,7 +11,7 @@
 #include "adispatcher.h"
 #include "ahldfileprocessor.h"
 #include "anetworkmodule.h"
-#include "ascriptmanager.h"
+//#include "ascriptmanager.h"
 
 int main(int argc, char *argv[])
 {
@@ -25,8 +25,11 @@ int main(int argc, char *argv[])
     Trb3dataReader Reader(&Config);
     Trb3signalExtractor Extractor(&Config, &Reader);
     AHldFileProcessor HldFileProcessor(Config, Reader, Extractor, DataHub);
-    AScriptManager ScriptManager;
-    ANetworkModule Network(&ScriptManager);
+
+//    !!!***
+//    AScriptManager ScriptManager;
+//    ANetworkModule Network(&ScriptManager); // !!!***
+    ANetworkModule Network(nullptr); // !!!***
 
     ADispatcher Dispatcher(&Config, &Reader, &Extractor, &Network);
 

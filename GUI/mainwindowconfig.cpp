@@ -5,7 +5,7 @@
 #include "channelmapper.h"
 #include "trb3signalextractor.h"
 #include "trb3datareader.h"
-#include "ascriptwindow.h"
+//#include "ascriptwindow.h"
 #include "adispatcher.h"
 #include "adatahub.h"
 #include "amessage.h"
@@ -47,7 +47,7 @@ void MainWindow::saveCompleteState()
 {
     //save script-related config
     QJsonObject jsS;
-    ScriptWindow->WriteToJson(jsS);
+//    ScriptWindow->WriteToJson(jsS);
     SaveJsonToFile(jsS, Dispatcher->ConfigDir+"/scripting.json");
 
     Dispatcher->SaveConfig(Dispatcher->AutosaveFile);
@@ -165,7 +165,8 @@ void MainWindow::SaveWindowSettings()
     QJsonObject json;
 
     json["Main"] = SaveWindowToJson(x(), y(), width(), height(), true);
-    json["ScriptWindow"] = SaveWindowToJson(ScriptWindow->x(), ScriptWindow->y(), ScriptWindow->width(), ScriptWindow->height(), ScriptWindow->isVisible());
+    // !!!***
+//    json["ScriptWindow"] = SaveWindowToJson(ScriptWindow->x(), ScriptWindow->y(), ScriptWindow->width(), ScriptWindow->height(), ScriptWindow->isVisible());
 
     //json["GraphWindows"] = RootModule->SaveGraphWindows();
 
@@ -190,14 +191,15 @@ void MainWindow::LoadWindowSettings()
         //setGeometry(x, y, w, h); // introduces a shift up on Windows7
     }
 
+    // !!!***
     if (js.contains("Main"))
     {
         QJsonObject jsScript = js["ScriptWindow"].toObject();
         LoadWindowFromJson(jsScript, x, y, w, h, bVis);
-        ScriptWindow->move(x, y);
-        ScriptWindow->resize(w, h);
+//        ScriptWindow->move(x, y);
+//        ScriptWindow->resize(w, h);
         //ScriptWindow->setGeometry(x, y, w, h); // introduces a shift up on Windows7
-        ScriptWindow->setVisible(bVis);
+//        ScriptWindow->setVisible(bVis);
     }
 
     //QJsonObject jsW;

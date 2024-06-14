@@ -286,14 +286,14 @@ void CompletingTextEditClass::wheelEvent(QWheelEvent *e)
   if (e->modifiers().testFlag(Qt::ControlModifier))
     {
       int size = font().pointSize();
-      if (e->delta() > 0) setFontSizeAndEmitSignal(++size);
+      if (e->angleDelta().y() > 0) setFontSizeAndEmitSignal(++size);
       else setFontSizeAndEmitSignal(--size); //check is there: cannot go < 1
     }
   else
     {
       //scroll
       int vas = this->verticalScrollBar()->value();
-      this->verticalScrollBar()->setValue(vas - e->delta()*0.5);
+      this->verticalScrollBar()->setValue(vas - e->angleDelta().y()*0.5);
     }
 }
 
