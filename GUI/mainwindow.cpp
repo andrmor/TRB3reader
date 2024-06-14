@@ -632,6 +632,8 @@ void MainWindow::on_cbAutoscaleY_clicked()
 
 void MainWindow::OnEventOrChannelChanged()
 {
+    RootModule->storeWindowGeometries();
+
     int ievent = ui->sbEvent->value();
     int val = ui->sbChannel->value();
 

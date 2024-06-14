@@ -26,6 +26,8 @@ public:
     CernRootModule(Trb3dataReader* Reader, Trb3signalExtractor* Extractor, MasterConfig* Config, ADataHub* DataHub, int refreshInterval = 100);
     ~CernRootModule();
 
+    void storeWindowGeometries();
+
     //Graph windows show/hide
     void ShowSingleWaveWindow(bool flag);
     void ShowOverNegWaveWindow(bool flag);

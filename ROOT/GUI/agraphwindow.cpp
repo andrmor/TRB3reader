@@ -83,14 +83,17 @@ void AGraphWindow::SetTitle(const QString & title)
     setWindowTitle(title);
 }
 
+#include <QTimer>
 void AGraphWindow::resizeEvent(QResizeEvent *)
 {
-    storeGeomStatus();
+    //storeGeomStatus();
+    //QTimer::singleShot(100, this, &AGraphWindow::storeGeomStatus);
 }
 
 void AGraphWindow::moveEvent(QMoveEvent *)
 {
-    storeGeomStatus();
+    //storeGeomStatus();
+    //QTimer::singleShot(100, this, &AGraphWindow::storeGeomStatus);
 }
 
 #include <QTimer>
@@ -133,6 +136,7 @@ bool AGraphWindow::event(QEvent * event)
 #include <QSettings>
 void AGraphWindow::storeGeomStatus()
 {
+    //qDebug() << "store" << IdStr;
     QSettings settings;
     settings.beginGroup(IdStr);
     settings.setValue("geometry", saveGeometry());
@@ -143,6 +147,7 @@ void AGraphWindow::storeGeomStatus()
 
 void AGraphWindow::restoreGeomStatus()
 {
+    //qDebug() << "restore" << IdStr;
     QSettings settings;
     settings.beginGroup(IdStr);
     restoreGeometry(settings.value("geometry").toByteArray());
@@ -160,8 +165,8 @@ void AGraphWindow::onMainWinButtonClicked(bool show)
 {
     if (show)
     {
-        restoreGeomStatus();
         showNormal();
+        restoreGeomStatus();
         activateWindow();
     }
     else

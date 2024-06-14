@@ -232,6 +232,12 @@ CernRootModule::~CernRootModule()
     delete RootApp;
 }
 
+void CernRootModule::storeWindowGeometries()
+{
+    std::vector<AGraphWindow*> wins = {WOne, WOverNeg, WOverPos, WAllNeg, WAllPos, WSigNeg, WSigPos, W2DNeg, W2DPos};
+    for (auto * w : wins) w->storeGeomStatus();
+}
+
 void CernRootModule::timerTimeout()
 {
     gSystem->ProcessEvents();
