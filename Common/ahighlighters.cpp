@@ -15,7 +15,7 @@ AHighlighterScriptWindow::AHighlighterScriptWindow(QTextDocument *parent)
                          << "\\bthrow\\b" << "\\btry\\b" << "\\bvar\\b" << "\\bpush\\b" << "\\btypeof\\b"
                          << "\\Math.\\b" << "\\Array.\\b" << "\\String.\\b";
          foreach (const QString &pattern, keywordPatterns) {
-             rule.pattern = QRegExp(pattern);
+             rule.pattern = QRegularExpression(pattern);
              rule.format = keywordFormat;
              highlightingRules.append(rule);
          }
@@ -23,39 +23,39 @@ AHighlighterScriptWindow::AHighlighterScriptWindow(QTextDocument *parent)
        /*
          classFormat.setFontWeight(QFont::Bold);
          classFormat.setForeground(Qt::darkMagenta);
-         rule.pattern = QRegExp("\\bQ[A-Za-z]+\\b");
+         rule.pattern = QRegularExpression("\\bQ[A-Za-z]+\\b");
          rule.format = classFormat;
          highlightingRules.append(rule);
 */
 
          singleLineCommentFormat.setForeground(Qt::darkGreen);
-         rule.pattern = QRegExp("//[^\n]*");
+         rule.pattern = QRegularExpression("//[^\n]*");
          rule.format = singleLineCommentFormat;
          highlightingRules.append(rule);
 
          multiLineCommentFormat.setForeground(Qt::darkGreen);
 
          quotationFormat.setForeground(Qt::darkGreen);
-         QRegExp rx("\".*\"");
-         rx.setMinimal(true); //fixes the problem with "xdsfdsfds" +variable+ "dsfdsfdsf"
+         QRegularExpression rx("\".*\"");
+         //rx.setMinimal(true); //fixes the problem with "xdsfdsfds" +variable+ "dsfdsfdsf"
          rule.pattern = rx;
          rule.format = quotationFormat;
          highlightingRules.append(rule);
 
          charFormat.setForeground(Qt::darkGreen);
-         rule.pattern = QRegExp("'.'");
+         rule.pattern = QRegularExpression("'.'");
          rule.format = charFormat;
          highlightingRules.append(rule);
 /*
          functionFormat.setFontItalic(true);
          functionFormat.setForeground(Qt::blue);
-         rule.pattern = QRegExp("\\b[A-Za-z0-9_]+(?=\\()");
+         rule.pattern = QRegularExpression("\\b[A-Za-z0-9_]+(?=\\()");
          rule.format = functionFormat;
          highlightingRules.append(rule);
 */
 
-         commentStartExpression = QRegExp("/\\*");
-         commentEndExpression = QRegExp("\\*/");
+         commentStartExpression = QRegularExpression("/\\*");
+         commentEndExpression = QRegularExpression("\\*/");
 }
 
 
@@ -71,13 +71,13 @@ void AHighlighterScriptWindow::setCustomCommands(QStringList functions, QStringL
     QVector<HighlightingRule> hr;
     foreach (const QString &pattern, functions)
       {
-        rule.pattern = QRegExp("\\b"+pattern+"(?=\\()");
+        rule.pattern = QRegularExpression("\\b"+pattern+"(?=\\()");
         rule.format = customKeywordFormat;
         hr.append(rule);
       }
     foreach (const QString &pattern, constants)
       {
-        rule.pattern = QRegExp("\\b"+pattern+"\\b(?![\\(\\{\\[])");
+        rule.pattern = QRegularExpression("\\b"+pattern+"\\b(?![\\(\\{\\[])");
         rule.format = customKeywordFormat;
         hr.append(rule);
       }
@@ -89,7 +89,7 @@ void AHighlighterScriptWindow::highlightBlock(const QString &text)
 {
     foreach (const HighlightingRule &rule, highlightingRules)
       {
-             QRegExp expression(rule.pattern);
+             QRegularExpression expression(rule.pattern);
              int index = expression.indexIn(text);
              while (index >= 0) {
                  int length = expression.matchedLength();
@@ -142,13 +142,13 @@ void AHighlighterLrfScript::setFixedVariables()
   QVector<HighlightingRule> hr;
 //  foreach (const QString &pattern, functions)
 //    {
-//      rule.pattern = QRegExp("\\b"+pattern+"(?=\\()");
+//      rule.pattern = QRegularExpression("\\b"+pattern+"(?=\\()");
 //      rule.format = customKeywordFormat;
 //      hr.append(rule);
 //    }
   foreach (const QString &pattern, variables)
     {
-      rule.pattern = QRegExp("\\b"+pattern+"\\b(?![\\(\\{\\[])");
+      rule.pattern = QRegularExpression("\\b"+pattern+"\\b(?![\\(\\{\\[])");
       rule.format = customKeywordFormat;
       hr.append(rule);
     }

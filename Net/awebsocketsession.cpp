@@ -168,7 +168,7 @@ bool AWebSocketSession::SendJson(const QJsonObject &json)
     if ( !ConfirmSendPossible() ) return false;
 
     QJsonDocument doc(json);
-    QByteArray ba = doc.toBinaryData();
+    QByteArray ba = doc.toJson();
 
     socket->sendBinaryMessage(ba);
 

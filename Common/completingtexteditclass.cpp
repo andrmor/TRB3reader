@@ -332,8 +332,8 @@ void CompletingTextEditClass::insertCompletion(const QString &completion)
       {
        tc.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor);
        QString selected = tc.selectedText();
-       //qDebug() << "<-" <<selected << selected.left(1).contains(QRegExp("[A-Za-z0-9.]"));
-       if ( !selected.left(1).contains(QRegExp("[A-Za-z0-9._]")) )
+       //qDebug() << "<-" <<selected << selected.left(1).contains(QRegularExpression("[A-Za-z0-9.]"));
+       if ( !selected.left(1).contains(QRegularExpression("[A-Za-z0-9._]")) )
          {
            tc.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
            break;
@@ -347,9 +347,9 @@ void CompletingTextEditClass::insertCompletion(const QString &completion)
       {
         tc.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
         QString selected = tc.selectedText();
-        //qDebug() << "->"<< selected << selected.right(1).contains(QRegExp("[A-Za-z0-9.]"));
+        //qDebug() << "->"<< selected << selected.right(1).contains(QRegularExpression("[A-Za-z0-9.]"));
         OnRight = selected.right(1);
-        if ( !OnRight.contains(QRegExp("[A-Za-z0-9._]")) )
+        if ( !OnRight.contains(QRegularExpression("[A-Za-z0-9._]")) )
           {
             tc.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor);
             break;
@@ -394,7 +394,7 @@ void CompletingTextEditClass::onCursorPositionChanged()
         {
           tc.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor);
           QString selected = tc.selectedText();
-          //qDebug() << selected << selected.left(1).contains(QRegExp("[A-Za-z0-9.]"));
+          //qDebug() << selected << selected.left(1).contains(QRegularExpression("[A-Za-z0-9.]"));
           if ( selected.left(1) == ")" ) break;
           if ( selected.left(1) == "\n" ) break;
           if ( selected.left(1) == "(")
@@ -426,12 +426,12 @@ void CompletingTextEditClass::onCursorPositionChanged()
   tc.select(QTextCursor::WordUnderCursor);
   QString selection = tc.selectedText();
   color = QColor(Qt::green).lighter(170);
-  QRegExp exl("[0-9 (){}\\[\\]=+\\-*/\\|~^.,:;\"'<>\\#\\$\\&\\?]");
+  QRegularExpression exl("[0-9 (){}\\[\\]=+\\-*/\\|~^.,:;\"'<>\\#\\$\\&\\?]");
   QString test = selection.simplified();
   test.remove(exl);
   if (!test.isEmpty())
     {
-      QRegExp pat("\\b"+selection+"\\b");
+      QRegularExpression pat("\\b"+selection+"\\b");
       QTextCursor cursor = document()->find(pat, 0, QTextDocument::FindCaseSensitively);
       while(cursor.hasSelection())
         {
@@ -444,7 +444,7 @@ void CompletingTextEditClass::onCursorPositionChanged()
       setExtraSelections(extraSelections);
 
       //variable highlight test
-      QRegExp patvar("\\bvar\\s"+selection+"\\b");
+      QRegularExpression patvar("\\bvar\\s"+selection+"\\b");
       QTextCursor cursor1 = document()->find(patvar, tc, QTextDocument::FindCaseSensitively | QTextDocument::FindBackward);
       if (cursor1.hasSelection() && cursor1 != tc)
         {
@@ -491,7 +491,7 @@ void CompletingTextEditClass::onCursorPositionChanged()
         {
           tc.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor);
           selected = tc.selectedText();
-          //qDebug() << selected << selected.left(1).contains(QRegExp("[A-Za-z0-9.]"));
+          //qDebug() << selected << selected.left(1).contains(QRegularExpression("[A-Za-z0-9.]"));
           QString s = selected.left(1);
           if ( s == same )
             {
@@ -542,7 +542,7 @@ void CompletingTextEditClass::onCursorPositionChanged()
         {
           tc.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
           selected = tc.selectedText();
-          //qDebug() << selected << selected.left(1).contains(QRegExp("[A-Za-z0-9.]"));
+          //qDebug() << selected << selected.left(1).contains(QRegularExpression("[A-Za-z0-9.]"));
           QString s = selected.right(1);
           if ( s == same )
             {
@@ -591,8 +591,8 @@ QString CompletingTextEditClass::textUnderCursor() const
       {
        tc.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor);
        selected = tc.selectedText();
-       //qDebug() << selected << selected.left(1).contains(QRegExp("[A-Za-z0-9.]"));
-       if ( !selected.left(1).contains(QRegExp("[A-Za-z0-9._]")) ) return selected.remove(0,1);
+       //qDebug() << selected << selected.left(1).contains(QRegularExpression("[A-Za-z0-9.]"));
+       if ( !selected.left(1).contains(QRegularExpression("[A-Za-z0-9._]")) ) return selected.remove(0,1);
       }
     while (tc.position() != 0);
 
@@ -607,8 +607,8 @@ QString CompletingTextEditClass::SelectObjFunctUnderCursor(QTextCursor *cursor) 
     {
      tc.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor);
      QString selected = tc.selectedText();
-     //qDebug() << "<-" <<selected << selected.left(1).contains(QRegExp("[A-Za-z0-9.]"));
-     if ( !selected.left(1).contains(QRegExp("[A-Za-z0-9._]")) )
+     //qDebug() << "<-" <<selected << selected.left(1).contains(QRegularExpression("[A-Za-z0-9.]"));
+     if ( !selected.left(1).contains(QRegularExpression("[A-Za-z0-9._]")) )
        {
          tc.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
          break;
@@ -621,8 +621,8 @@ QString CompletingTextEditClass::SelectObjFunctUnderCursor(QTextCursor *cursor) 
       tc.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
       QString selected = tc.selectedText();
       if (selected.isEmpty()) continue;
-      //qDebug() << "->"<< selected << selected.right(1).contains(QRegExp("[A-Za-z0-9.]"));
-      if ( !selected.right(1).contains(QRegExp("[A-Za-z0-9._]")) )
+      //qDebug() << "->"<< selected << selected.right(1).contains(QRegularExpression("[A-Za-z0-9.]"));
+      if ( !selected.right(1).contains(QRegularExpression("[A-Za-z0-9._]")) )
         {
           tc.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor);
           break;

@@ -130,7 +130,7 @@ void AWebSocketSessionServer::ReplyWithBinaryObject(const QVariant &object)
         QVariantMap vm = object.toMap();
         QJsonObject js = QJsonObject::fromVariantMap(vm);
         QJsonDocument doc(js);
-        client->sendBinaryMessage(doc.toBinaryData());
+        client->sendBinaryMessage(doc.toJson());
         client->sendTextMessage("{ \"binary\" : \"object\" }");
     }
     else

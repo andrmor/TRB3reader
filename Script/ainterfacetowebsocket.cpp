@@ -174,7 +174,7 @@ const QVariant AInterfaceToWebSocket::GetBinaryReplyAsObject()
         return "";
     }
     const QByteArray& ba = socket->GetBinaryReply();
-    QJsonDocument doc = QJsonDocument::fromBinaryData(ba);
+    QJsonDocument doc = QJsonDocument::fromJson(ba);
     QJsonObject json = doc.object();
 
     QVariantMap vm = json.toVariantMap();

@@ -73,6 +73,7 @@ void AInterfaceToMessageWindow::clear()
   e->clear();
 }
 
+#include <QElapsedTimer>
 void AInterfaceToMessageWindow::show(const QString txt, int ms)
 {
   if (!bEnabled) return;
@@ -90,7 +91,7 @@ void AInterfaceToMessageWindow::show(const QString txt, int ms)
   D->show();
   D->raise();
   bActivated = true;
-  QTime t;
+  QElapsedTimer t;
   t.restart();
   do qApp->processEvents();
   while (t.elapsed()<ms);

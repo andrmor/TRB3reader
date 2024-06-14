@@ -20,12 +20,12 @@ int LoadDoubleVectorsFromFile(QString FileName, QVector<double>* x)
     }
 
   QTextStream in(&file);
-  QRegExp rx("(\\ |\\,|\\:|\\t)"); //separators: ' ' or ',' or ':' or '\t'
+  QRegularExpression rx("(\\ |\\,|\\:|\\t)"); //separators: ' ' or ',' or ':' or '\t'
   x->resize(0);
   while(!in.atEnd())
        {
           QString line = in.readLine();
-          QStringList fields = line.split(rx, QString::SkipEmptyParts);
+          QStringList fields = line.split(rx, Qt::SkipEmptyParts);
 
           bool ok1= false;
           double xx;
@@ -63,13 +63,13 @@ int LoadDoubleVectorsFromFile(QString FileName, QVector<double>* x, QVector<doub
     }
 
   QTextStream in(&file);
-  QRegExp rx("(\\ |\\,|\\:|\\t)"); //separators: ' ' or ',' or ':' or '\t'
+  QRegularExpression rx("(\\ |\\,|\\:|\\t)"); //separators: ' ' or ',' or ':' or '\t'
   x->resize(0);
   y->resize(0);
   while(!in.atEnd())
        {
           QString line = in.readLine();
-          QStringList fields = line.split(rx, QString::SkipEmptyParts);
+          QStringList fields = line.split(rx, Qt::SkipEmptyParts);
 
           bool ok1=false, ok2;
           double xx, yy;
@@ -111,14 +111,14 @@ int LoadDoubleVectorsFromFile(QString FileName, QVector<double>* x, QVector<doub
     }
 
   QTextStream in(&file);
-  QRegExp rx("(\\ |\\,|\\:|\\t)"); //separators: ' ' or ',' or ':' or '\t'
+  QRegularExpression rx("(\\ |\\,|\\:|\\t)"); //separators: ' ' or ',' or ':' or '\t'
   x->resize(0);
   y->resize(0);
   z->resize(0);
   while(!in.atEnd())
        {
           QString line = in.readLine();
-          QStringList fields = line.split(rx, QString::SkipEmptyParts);
+          QStringList fields = line.split(rx, Qt::SkipEmptyParts);
 
           bool ok1=false, ok2, ok3;
           double xx, yy, zz;
@@ -225,7 +225,7 @@ int LoadIntVectorsFromFile(QString FileName, QVector<int>* x)
     }
 
   QTextStream in(&file);
-  QRegExp rx("(\\ |\\,|\\:|\\t)"); //separators: ' ' or ',' or ':' or '\t'
+  QRegularExpression rx("(\\ |\\,|\\:|\\t)"); //separators: ' ' or ',' or ':' or '\t'
   x->resize(0);
   while(!in.atEnd())
        {
@@ -266,7 +266,7 @@ int LoadIntVectorsFromFile(QString FileName, QVector<int> *x, QVector<int> *y)
     }
 
   QTextStream in(&file);
-  QRegExp rx("(\\ |\\,|\\:|\\t)"); //separators: ' ' or ',' or ':' or '\t'
+  QRegularExpression rx("(\\ |\\,|\\:|\\t)"); //separators: ' ' or ',' or ':' or '\t'
   x->resize(0);
   y->resize(0);
   while(!in.atEnd())

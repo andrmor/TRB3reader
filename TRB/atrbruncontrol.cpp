@@ -261,7 +261,7 @@ void ATrbRunControl::onReadyBoardLog()
             {
                 int iStop = log.indexOf('\n', iStart);
                 QString str = log.mid(iStart, iStop-iStart);
-                QStringList sl = str.split('|', QString::SkipEmptyParts);
+                QStringList sl = str.split('|', Qt::SkipEmptyParts);
                 if (sl.size()>2)
                 {
                     QString srate = sl.at(2).simplified();
@@ -378,7 +378,7 @@ const QString ATrbRunControl::sendCommandToHost(const QString &command)
     QString com = "ssh";
     QStringList args;
     args << QString("%1@%2").arg(User).arg(Host);
-    args << command.split(' ', QString::SkipEmptyParts);
+    args << command.split(' ', Qt::SkipEmptyParts);
     qDebug() << "Sending to host:" << com << args;
 
     QProcess pr;
@@ -700,7 +700,7 @@ QString ATrbRunControl::readBufferControlFromTRB()
     if (!pr.waitForFinished(2000)) return "Timeout on attempt to execute Buffer configuration";
 
     QString reply = pr.readAll();
-    QStringList sl = reply.split('\n', QString::SkipEmptyParts);
+    QStringList sl = reply.split('\n', Qt::SkipEmptyParts);
 
     //clean login messages
     while (!sl.isEmpty() && !sl.first().startsWith("0x"))
@@ -718,21 +718,21 @@ QString ATrbRunControl::readBufferControlFromTRB()
         ulong Samples, Delay, Downsampling;
         bool bOK;
 
-        QStringList l = sl.at(icounter).split(' ', QString::SkipEmptyParts);
+        QStringList l = sl.at(icounter).split(' ', Qt::SkipEmptyParts);
         if (l.size() !=2 || l.first() != addr)
             return "unexpected format of reply line";
         Samples = l.last().toULong(&bOK, 16);
         if (!bOK) return "unexpected format of reply line";
         icounter++;
 
-        l = sl.at(icounter).split(' ', QString::SkipEmptyParts);
+        l = sl.at(icounter).split(' ', Qt::SkipEmptyParts);
         if (l.size() !=2 || l.first() != addr)
             return "unexpected format of reply line";
         Delay = l.last().toULong(&bOK, 16);
         if (!bOK) return "unexpected format of reply line";
         icounter++;
 
-        l = sl.at(icounter).split(' ', QString::SkipEmptyParts);
+        l = sl.at(icounter).split(' ', Qt::SkipEmptyParts);
         if (l.size() !=2 || l.first() != addr)
             return "unexpected format of reply line";
         Downsampling = l.last().toULong(&bOK, 16);
@@ -1046,7 +1046,7 @@ void ATrbRunControl::checkFreeSpace()
         QString command = "ssh";
         QStringList args;
 
-        //QStringList sl = dir.split('/',QString::SkipEmptyParts);
+        //QStringList sl = dir.split('/',Qt::SkipEmptyParts);
         //if (sl.isEmpty()) dir = "/";
         //else dir = '/' + sl.first();
 
@@ -1088,12 +1088,12 @@ void ATrbRunControl::onFreeSpaceCheckerReady()
         if (sl.size() > 1)
         {
             QString line = sl.first();
-            QStringList f = line.split(' ', QString::SkipEmptyParts);
+            QStringList f = line.split(' ', Qt::SkipEmptyParts);
             if (f.size() > 2 )
             {
                 int blockSize = 1024; //default
                 QString br = f.at(1);
-                f = br.split('-', QString::SkipEmptyParts);
+                f = br.split('-', Qt::SkipEmptyParts);
                 QString record = f.first();
                 bool bOK;
                 if (record.endsWith('k') || record.endsWith('K'))
@@ -1121,7 +1121,7 @@ void ATrbRunControl::onFreeSpaceCheckerReady()
 
                 //in blocks
                 line = sl.at(1);
-                f = line.split(' ', QString::SkipEmptyParts);
+                f = line.split(' ', Qt::SkipEmptyParts);
                 if (f.size() > 4 )
                 {
                     QString ssize = f.at(3);
@@ -1161,10 +1161,10 @@ QString ATrbRunControl::ReadTriggerSettingsFromBoard()
     if (reply.startsWith("# CTS Configuration dump") && reply.endsWith("# Enable all triggers\n"))
     {
         RunSettings.TheRestCTScontrols.clear();
-        const QStringList sl = reply.split('\n', QString::SkipEmptyParts);
+        const QStringList sl = reply.split('\n', Qt::SkipEmptyParts);
         for (const QString & s : sl)
         {
-            QStringList line = s.split(' ', QString::SkipEmptyParts);
+            QStringList line = s.split(' ', Qt::SkipEmptyParts);
             if (line.size() < 5) continue;
 
             if (line.at(3) == "0xa101")

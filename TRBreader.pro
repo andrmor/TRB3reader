@@ -33,7 +33,6 @@ INCLUDEPATH += ROOT/GUI
 #-----------
 
 #---DABC---
-DEFINES += DABC
 #DABCPATH = /home/exnote/dabc
 DABCPATH = /home/andr/dabc
 INCLUDEPATH += $$DABCPATH/include
@@ -43,12 +42,10 @@ LIBS += -L$$DABCPATH/lib/ -lDabcBase -lDabcMbs -lDabcHadaq
 
 QT += core gui
 QT += widgets
-QT += script
 QT += websockets
 
 TARGET = TRBreader
 TEMPLATE = app
-
 
 SOURCES += main.cpp \
     GUI/mainwindow.cpp \

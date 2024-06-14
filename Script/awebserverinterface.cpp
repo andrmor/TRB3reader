@@ -45,7 +45,7 @@ void AWebServerInterface::ClearBuffer()
 const QVariant AWebServerInterface::GetBufferAsObject() const
 {
     const QByteArray& ba = Server.getBinary();
-    QJsonDocument doc =  QJsonDocument::fromBinaryData(ba);
+    QJsonDocument doc =  QJsonDocument::fromJson(ba);
     QJsonObject json = doc.object();
 
     QVariantMap vm = json.toVariantMap();

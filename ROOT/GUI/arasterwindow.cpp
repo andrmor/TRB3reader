@@ -103,7 +103,7 @@ void ARasterWindow::mouseMoveEvent(QMouseEvent *event)
         //if (!PressEventRegistered) return;
         //fCanvas->HandleInput(kButton3Motion, event->x(), event->y());
       }
-    else if (event->buttons() & Qt::MidButton)
+    else if (event->buttons() & Qt::MiddleButton)
       {
         //middle-pressed move
         if (!PressEventRegistered) return;

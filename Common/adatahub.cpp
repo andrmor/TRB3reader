@@ -502,8 +502,8 @@ const QString ADataHub::Load(const QString &AppendFromFileName, bool bLoadPositi
             qApp->processEvents();
         }
 
-        QRegExp rx("(\\ |\\,|\\:|\\t)");
-        QStringList fields = s.split(rx, QString::SkipEmptyParts);
+        QRegularExpression rx("(\\ |\\,|\\:|\\t)");
+        QStringList fields = s.split(rx, Qt::SkipEmptyParts);
         if (fields.size() < upperLim) continue;
 
         QVector<float>* vec = new QVector<float>(numChannels);

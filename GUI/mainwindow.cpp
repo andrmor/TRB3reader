@@ -232,8 +232,8 @@ void MainWindow::on_pbLoadPolarities_clicked()
         return;
     }
     AllText = AllText.simplified();
-    QRegExp rx("(\\ |\\,|\\:|\\t)"); //separators: ' ' or ',' or ':' or '\t'
-    QStringList sl = AllText.split(rx, QString::SkipEmptyParts);
+    QRegularExpression rx("(\\ |\\,|\\:|\\t)"); //separators: ' ' or ',' or ':' or '\t'
+    QStringList sl = AllText.split(rx, Qt::SkipEmptyParts);
 
     bool bStrangies = false;
     for (QString& s : sl)
@@ -273,8 +273,8 @@ void MainWindow::on_pbEditMap_clicked()
     ExtractNumbersFromQString(str, &vec);
 
     /*
-    QRegExp rx("(\\ |\\,|\\:|\\t|\\n)");
-    QStringList fields = str.split(rx, QString::SkipEmptyParts);
+    QRegularExpression rx("(\\ |\\,|\\:|\\t|\\n)");
+    QStringList fields = str.split(rx, Qt::SkipEmptyParts);
     QVector<int> vec;
     for (QString str : fields)
     {
@@ -311,8 +311,8 @@ void MainWindow::on_pbAddMapping_clicked()
         return;
     }
     AllText = AllText.simplified();
-    QRegExp rx("(\\ |\\,|\\:|\\t)"); //separators: ' ' or ',' or ':' or '\t'
-    QStringList sl = AllText.split(rx, QString::SkipEmptyParts);
+    QRegularExpression rx("(\\ |\\,|\\:|\\t)"); //separators: ' ' or ',' or ':' or '\t'
+    QStringList sl = AllText.split(rx, Qt::SkipEmptyParts);
 
     bool bStrangies = false;
     for (QString& s : sl)
@@ -377,8 +377,8 @@ void MainWindow::on_pbAddListHardwChToIgnore_clicked()
         return;
     }
     AllText = AllText.simplified();
-    QRegExp rx("(\\ |\\,|\\:|\\t)"); //separators: ' ' or ',' or ':' or '\t'
-    QStringList sl = AllText.split(rx, QString::SkipEmptyParts);
+    QRegularExpression rx("(\\ |\\,|\\:|\\t)"); //separators: ' ' or ',' or ':' or '\t'
+    QStringList sl = AllText.split(rx, Qt::SkipEmptyParts);
 
     bool bStrangies = false;
     for (QString& s : sl)
@@ -1063,9 +1063,9 @@ bool MainWindow::ExtractNumbersFromQString(const QString input, QVector<int> *To
 {
   ToAdd->clear();
 
-  QRegExp rx("(\\,|\\-|\\ )");
+  QRegularExpression rx("(\\,|\\-|\\ )");
 
-  QStringList fields = input.split(rx, QString::SkipEmptyParts);
+  QStringList fields = input.split(rx, Qt::SkipEmptyParts);
 
   /*
   if (fields.size() == 0 )
@@ -1075,8 +1075,8 @@ bool MainWindow::ExtractNumbersFromQString(const QString input, QVector<int> *To
     }
   */
 
-  //fields = input.split(",", QString::SkipEmptyParts);
-  fields = input.split(QRegExp("(\\,|\\ )"), QString::SkipEmptyParts);
+  //fields = input.split(",", Qt::SkipEmptyParts);
+  fields = input.split(QRegularExpression("(\\,|\\ )"), Qt::SkipEmptyParts);
     //qDebug()<<"found "<<fields.size()<<" records"<<fields;
 
   for (int i=0; i<fields.size(); i++)
@@ -1084,7 +1084,7 @@ bool MainWindow::ExtractNumbersFromQString(const QString input, QVector<int> *To
       QString thisField = fields[i];
 
       //are there "-" separated fields?
-      QStringList subFields = thisField.split("-", QString::SkipEmptyParts);
+      QStringList subFields = thisField.split("-", Qt::SkipEmptyParts);
 
       if (subFields.size() > 2 || subFields.size() == 0) return false;
       else if (subFields.size() == 1)
@@ -1613,8 +1613,8 @@ void MainWindow::on_pbLoadToDataHub_clicked()
             qApp->processEvents();
         }
 
-        QRegExp rx("(\\ |\\,|\\:|\\t)");
-        QStringList fields = s.split(rx, QString::SkipEmptyParts);
+        QRegularExpression rx("(\\ |\\,|\\:|\\t)");
+        QStringList fields = s.split(rx, Qt::SkipEmptyParts);
         if (fields.size() < upperLim) continue;
 
         QVector<float>* vec = new QVector<float>(numChannels);
