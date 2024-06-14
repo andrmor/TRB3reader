@@ -101,13 +101,33 @@ QString Trb3dataReader::GetFileInfo(const QString & FileName)
     QString output;
 
     bool bReportOnStart = true;
-    int numEvents = 0;
+    numEvents = 0;
 
     hadaq::ReadoutHandle ref = hadaq::ReadoutHandle::Connect(FileName.toLocal8Bit().data());
     hadaq::RawEvent* evnt = 0;
 
+    bool startFlag = true;
     while ( (evnt = ref.NextEvent(1.0)) )
     {
+        unsigned evDate = evnt->GetDate();
+        unsigned evTime = evnt->GetTime();
+        //qDebug() << evDate << evTime;
+        unsigned yearSince1900 = (evDate & 0xff0000) / 0x10000;
+        unsigned monthFromZero = (evDate & 0xff00) / 0x100;
+        unsigned dayFromOne    = (evDate & 0xff);
+        unsigned hours   = (evTime & 0xff0000) / 0x10000;
+        unsigned minutes = (evTime & 0xff00) / 0x100;
+        unsigned seconds = (evTime & 0xff);
+        //qDebug() << "date:" << yearSince1900 << monthFromZero << dayFromOne;
+        //qDebug() << "time:" << hours << minutes << seconds;
+        QDateTime dateTime(QDate(1900+yearSince1900, 1+monthFromZero, dayFromOne), QTime(hours, minutes, seconds));
+        if (startFlag)
+        {
+            timeOfStart = dateTime;
+            startFlag = false;
+        }
+        else timeOfEnd = dateTime;  // will be updated until the end
+
         // loop over sections
         //qDebug() << "---Event---" << numEvents;
         hadaq::RawSubevent * sub = 0;
@@ -353,7 +373,7 @@ void Trb3dataReader::prepareTimeChannelConversion()
         }
     }
 
-    for (int i = 0; i < 64; i++) qDebug() << i << i -32 << TimingChannelMap[i];
+    //for (int i = 0; i < 64; i++) qDebug() << i << i -32 << TimingChannelMap[i];
 }
 #endif
 
@@ -517,10 +537,30 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
     hadaq::ReadoutHandle ref = hadaq::ReadoutHandle::Connect(FileName.toLocal8Bit().data());
     hadaq::RawEvent * evnt = nullptr;
 
+    bool startFlag = true;
     while ( (evnt = ref.NextEvent(1.0)) )
     {
         bool bBadEvent = false;
         int foundChannels = 0;
+
+        unsigned evDate = evnt->GetDate();
+        unsigned evTime = evnt->GetTime();
+        //qDebug() << evDate << evTime;
+        unsigned yearSince1900 = (evDate & 0xff0000) / 0x10000;
+        unsigned monthFromZero = (evDate & 0xff00) / 0x100;
+        unsigned dayFromOne    = (evDate & 0xff);
+        unsigned hours   = (evTime & 0xff0000) / 0x10000;
+        unsigned minutes = (evTime & 0xff00) / 0x100;
+        unsigned seconds = (evTime & 0xff);
+        //qDebug() << "date:" << yearSince1900 << monthFromZero << dayFromOne;
+        //qDebug() << "time:" << hours << minutes << seconds;
+        QDateTime dateTime(QDate(1900+yearSince1900, 1+monthFromZero, dayFromOne), QTime(hours, minutes, seconds));
+        if (startFlag)
+        {
+            timeOfStart = dateTime;
+            startFlag = false;
+        }
+        else timeOfEnd = dateTime;  // will be updated until the end
 
         QVector < QVector <float> > thisEventData;  //format: [channel] [sample]
         // all ADC addons have 48 channels, but some might be disabled and not saved in hlds

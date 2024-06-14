@@ -40,7 +40,7 @@
         <item>
          <widget class="QTabWidget" name="tabWidget">
           <property name="currentIndex">
-           <number>5</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab_11">
            <attribute name="title">
@@ -5787,6 +5787,13 @@
            <widget class="QLineEdit" name="leAddToProcessed">
             <property name="text">
              <string>_proc.dat</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="cbAddRunTime">
+            <property name="text">
+             <string>Add run time in seconds</string>
             </property>
            </widget>
           </item>

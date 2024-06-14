@@ -319,6 +319,7 @@ private slots:
     void on_pbAddTimingDatakind_clicked();
     void on_pbRemoveTimingDatakind_clicked();
     void on_cobWhatToSave_activated(int index);
+    void on_cbAddRunTime_clicked(bool checked);
 };
 
 #endif // MAINWINDOW_H

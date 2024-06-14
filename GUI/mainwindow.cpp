@@ -1287,6 +1287,7 @@ void MainWindow::on_pbRemoveTimingDatakind_clicked()
     UpdateGui();
 }
 
+#include <QTimeZone>
 void MainWindow::on_pbPrintHLDfileProperties_clicked()
 {
     QString FileName = QFileDialog::getOpenFileName(this, "Select HLD file to inspect", Config->WorkingDir, "*.hld");
@@ -1296,6 +1297,14 @@ void MainWindow::on_pbPrintHLDfileProperties_clicked()
     QString s = Reader->GetFileInfo(FileName);
     ui->pteHLDfileProperties->clear();
     ui->pteHLDfileProperties->appendPlainText(s);
+
+    unsigned duration = Reader->timeOfStart.secsTo(Reader->timeOfEnd);
+    if (duration == 0) duration = 1;
+    QString txt = "\nStart of acquisition: " + Reader->timeOfStart.toTimeZone(QTimeZone (2 * 3600)).toString("hh:mm:ss on dd MMMM yyyy") + "\n" +
+                  "  End of acquisition: " + Reader->timeOfEnd.toTimeZone(QTimeZone (2 * 3600)).toString("hh:mm:ss on dd MMMM yyyy") + "\n" +
+                  "Duration: " + QString::number(duration) + " s\n" +
+                  "Average event rate: " + QString::number(Reader->numEvents / duration) + " per second";
+    ui->pteHLDfileProperties->appendPlainText(txt);
 }
 
 void MainWindow::on_pbProcessAllFromDir_clicked()

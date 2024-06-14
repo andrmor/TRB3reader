@@ -21,6 +21,7 @@ public:
     int     SaveWhat = 0; // 0=signals, 1=waveforms
     bool    bDoSave = true;
     QString AddToFileName = "_proc.dat";
+    bool    AddRunTime = false;
     bool    bDoCopyToDatahub = false;
     bool    bCopyWaveforms = false;
 

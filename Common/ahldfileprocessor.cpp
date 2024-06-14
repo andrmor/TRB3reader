@@ -91,7 +91,13 @@ bool AHldFileProcessor::ProcessFile(const QString FileName, int What_0signals1wa
         if (SaveFileName.isEmpty())
         {
             QFileInfo fi(FileName);
-            nameSave = fi.path() + "/" + fi.completeBaseName() + Config.HldProcessSettings.AddToFileName;
+            QString extra = Config.HldProcessSettings.AddToFileName;
+            if (Config.HldProcessSettings.AddRunTime)
+            {
+                long runDuration = Reader.timeOfStart.secsTo(Reader.timeOfEnd);
+                extra = "_" + QString::number(runDuration) + extra;
+            }
+            nameSave = fi.path() + "/" + fi.completeBaseName() + extra;
         }
         else nameSave = SaveFileName;
 

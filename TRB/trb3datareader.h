@@ -7,6 +7,7 @@
 
 #include <QVector>
 #include <QString>
+#include <QDateTime>
 
 class MasterConfig;
 
@@ -60,6 +61,10 @@ public:
     void    ClearData();
 
     std::vector<std::vector<Trb3TimingRecord>> timeData;  // format:  [event] [channel] [inRec:timeStamp]
+
+    QDateTime timeOfStart;
+    QDateTime timeOfEnd;
+    int numEvents = 0;
 
 private:
     MasterConfig* Config;

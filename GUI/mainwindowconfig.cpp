@@ -322,6 +322,7 @@ void MainWindow::UpdateGui()
     ui->cbSaveSignalsToFiles->setChecked( Config->HldProcessSettings.bDoSave );
     ui->cobWhatToSave->setCurrentIndex( Config->HldProcessSettings.SaveWhat );
     ui->leAddToProcessed->setText( Config->HldProcessSettings.AddToFileName );
+    ui->cbAddRunTime->setChecked( Config->HldProcessSettings.AddRunTime );
     ui->cbBulkCopyToDatahub->setChecked( Config->HldProcessSettings.bDoCopyToDatahub );
     ui->cbBulkAlsoCopyWaveforms->setChecked( Config->HldProcessSettings.bCopyWaveforms );
 
@@ -569,6 +570,11 @@ void MainWindow::on_cobWhatToSave_activated(int index)
 void MainWindow::on_leAddToProcessed_editingFinished()
 {
     Config->HldProcessSettings.AddToFileName = ui->leAddToProcessed->text();
+}
+
+void MainWindow::on_cbAddRunTime_clicked(bool checked)
+{
+    Config->HldProcessSettings.AddRunTime = checked;
 }
 
 void MainWindow::on_cbBulkCopyToDatahub_clicked()
