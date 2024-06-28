@@ -115,10 +115,6 @@ private slots:
     void on_actionReset_positions_of_all_windows_triggered(); // !!!***
     void on_actionOpen_script_window_triggered();
 
-    //event / channel changed
-    void on_sbEvent_valueChanged(int arg1);
-    void on_sbChannel_valueChanged(int arg1);
-
     //Show/Hide Waveforms - triggered also by "close window" on the window itself!
     void on_pbShowWaveform_toggled(bool checked);
     void on_pbShowOverlayNeg_toggled(bool checked);
@@ -213,6 +209,8 @@ private:
     bool saveSignalsToFile(const QString FileName, bool bUseHardware);
     bool sendSignalData(QTextStream& outStream, bool bUseHardware = false);
 
+    void onEventChanged(int arg1);
+    void onChannelChanged();
     void OnEventOrChannelChanged();
     void showOverlay(bool checked, bool bNeg);
     void showSignals(bool checked, bool bNeg);
@@ -320,6 +318,11 @@ private slots:
     void on_pbRemoveTimingDatakind_clicked();
     void on_cobWhatToSave_activated(int index);
     void on_cbAddRunTime_clicked(bool checked);
+    void on_pbGotoFirstEvent_clicked();
+    void on_pbGotoPreviousEvent_clicked();
+    void on_pbGotoLastEvent_clicked();
+    void on_pbGotoPreviousChannel_clicked();
+    void on_sbChannel_editingFinished();
 };
 
 #endif // MAINWINDOW_H

@@ -171,7 +171,7 @@ void MainWindow::on_pbProcessData_clicked()
 
     //OnEventOrChannelChanged();
     if (ui->sbEvent->value() != 0) ui->sbEvent->setValue(0);
-    else on_sbEvent_valueChanged(0);
+    else onEventChanged(0);
 
     updateNumEventsIndication();
 
@@ -570,14 +570,14 @@ void MainWindow::on_pbStop_toggled(bool checked)
 void MainWindow::on_sbEvent_editingFinished()
 {
     int arg1 = ui->sbEvent->value();
-    on_sbEvent_valueChanged(arg1);
+    onEventChanged(arg1);
 }
 
-void MainWindow::on_sbEvent_valueChanged(int arg1)
+void MainWindow::onEventChanged(int arg1)
 {
     if (!Reader || arg1 >= Reader->CountEvents())
     {
-        ui->sbEvent->setValue(0);
+        ui->sbEvent->setValue(Reader->CountEvents() - 1);
         return;
     }
 
@@ -595,7 +595,7 @@ void MainWindow::on_sbEvent_valueChanged(int arg1)
     if (ui->pbShowSignalsPositive->isChecked()) on_pbShowSignalsPositive_toggled(true);
 }
 
-void MainWindow::on_sbChannel_valueChanged(int)
+void MainWindow::onChannelChanged()
 {
     OnEventOrChannelChanged();
 
@@ -621,46 +621,48 @@ int MainWindow::getCurrentlySelectedHardwareChannel()
 void MainWindow::on_cobHardwareOrLogical_activated(int /*index*/)
 {
     OnEventOrChannelChanged();
-    on_sbEvent_valueChanged(ui->sbEvent->value());
+    onEventChanged(ui->sbEvent->value());
 }
 
 void MainWindow::on_cbAutoscaleY_clicked()
 {
     OnEventOrChannelChanged();
-    on_sbEvent_valueChanged(ui->sbEvent->value());
+    onEventChanged(ui->sbEvent->value());
 }
 
 void MainWindow::OnEventOrChannelChanged()
 {
     RootModule->storeWindowGeometries();
 
-    int ievent = ui->sbEvent->value();
-    int val = ui->sbChannel->value();
+    int iEvent = ui->sbEvent->value();
+    int iChannel = ui->sbChannel->value();
 
     int iHardwChan;
-    bool bFromDataHub = (ui->cobExplorerSource->currentIndex()==1);
-    bool bUseLogical = (bFromDataHub || ui->cobHardwareOrLogical->currentIndex()==1);
+    bool bFromDataHub = (ui->cobExplorerSource->currentIndex() == 1);
+    bool bUseLogical = (bFromDataHub || ui->cobHardwareOrLogical->currentIndex() == 1);
 
     // Update channel indication
     if (bUseLogical)
     {
-        ui->leLogic->setText(QString::number(val));
-        if (val>=Config->CountLogicalChannels())
-        {
-            ui->sbChannel->setValue(0);
-            return;
-        }
+        if (iChannel >= Config->CountLogicalChannels())
+            iChannel = Config->CountLogicalChannels() - 1;
+        ui->sbChannel->setValue(iChannel);
+        ui->leLogic->setText(QString::number(iChannel));
 
-        iHardwChan = Config->Map->LogicalToHardware(val);
+        iHardwChan = Config->Map->LogicalToHardware(iChannel);
         if ( iHardwChan < 0 ) ui->leHardw->setText("n.a.");
         else ui->leHardw->setText(QString::number(iHardwChan));
     }
     else
     {
-        iHardwChan = val;
-        ui->leHardw->setText(QString::number(val));
+        iHardwChan = iChannel;
+        if (iHardwChan >= Reader->CountChannels())
+            iHardwChan = Reader->CountChannels() - 1;
 
-        int ilogical = Config->Map->HardwareToLogical(val);
+        ui->sbChannel->setValue(iHardwChan);
+        ui->leHardw->setText(QString::number(iHardwChan));
+
+        int ilogical = Config->Map->HardwareToLogical(iChannel);
         QString s;
         if ( ilogical < 0 ) s = "n.a.";
         else s = QString::number(ilogical);
@@ -671,12 +673,12 @@ void MainWindow::OnEventOrChannelChanged()
     QString s = ( bNegative ? "Neg" : "Pos");
     ui->lePolar->setText(s);
 
-    // Check is channel number is valid
+    // Check is channel number is valid // obsolete!
     int max = (bUseLogical ? Config->CountLogicalChannels() : Reader->CountChannels());
     max--;
-    if (val > max )
+    if (iChannel > max )
     {
-        if (val == 0) return; //in case no channels are defined
+        if (iChannel == 0) return; //in case no channels are defined
         ui->sbChannel->setValue(max);
         return;  // will return to this cycle with on_changed signal
     }
@@ -688,7 +690,7 @@ void MainWindow::OnEventOrChannelChanged()
         ui->leSignal->setText("");
         return;
     }
-    if (ievent>numEvents)
+    if (iEvent>numEvents)
     {
         ui->sbEvent->setValue(numEvents-1);
         return;
@@ -696,14 +698,14 @@ void MainWindow::OnEventOrChannelChanged()
     QString ss;
     if (bFromDataHub)
     {
-        if (DataHub->IsRejected(ievent)) ss = "Rejected event";
+        if (DataHub->IsRejected(iEvent)) ss = "Rejected event";
         else
         {
             const int numChannels = DataHub->CountChannels();
-            if ( val >= numChannels ) ss = "n.a.";  //paranoic :)
+            if ( iChannel >= numChannels ) ss = "n.a.";  //paranoic :)
             else
             {
-                double signal = DataHub->GetSignal(ievent, val);
+                double signal = DataHub->GetSignal(iEvent, iChannel);
                 if ( std::isnan(signal) ) ss = "n.a.";
                 else ss = QString::number(signal);
             }
@@ -711,13 +713,13 @@ void MainWindow::OnEventOrChannelChanged()
     }
     else
     {
-        if (Extractor->IsRejectedEventFast(ievent)) ss = "Rejected event";
+        if (Extractor->IsRejectedEventFast(iEvent)) ss = "Rejected event";
         else
         {
             if ( iHardwChan < 0 ) ss = "n.a.";
             else
             {
-                double signal = Extractor->GetSignalFast(ievent, iHardwChan);
+                double signal = Extractor->GetSignalFast(iEvent, iHardwChan);
                 if ( std::isnan(signal) ) ss = "n.a.";
                 else ss = QString::number(signal);
             }
@@ -727,9 +729,9 @@ void MainWindow::OnEventOrChannelChanged()
 
     ui->lwTriggers->clear();
 
-    if (!bFromDataHub && ievent < Reader->timeData.size())
+    if (!bFromDataHub && iEvent < Reader->timeData.size())
     {
-        std::vector<Trb3TimingRecord> & vec = Reader->timeData[ievent];
+        std::vector<Trb3TimingRecord> & vec = Reader->timeData[iEvent];
         for (const Trb3TimingRecord & rec : vec)
         {
             QString rawCh = QString::number(rec.InternalChannel) + "/" + "0x"+ QString::number(rec.BoardDatakind, 16);
@@ -976,35 +978,71 @@ void MainWindow::on_cobSortBy_activated(int)
 void MainWindow::on_ledMinNeg_editingFinished()
 {
     OnEventOrChannelChanged();
-    on_sbEvent_valueChanged(ui->sbEvent->value());
+    onEventChanged(ui->sbEvent->value());
 }
 
 void MainWindow::on_ledMaxNeg_editingFinished()
 {
     OnEventOrChannelChanged();
-    on_sbEvent_valueChanged(ui->sbEvent->value());
+    onEventChanged(ui->sbEvent->value());
 }
 
 void MainWindow::on_ledMinPos_editingFinished()
 {
     OnEventOrChannelChanged();
-    on_sbEvent_valueChanged(ui->sbEvent->value());
+    onEventChanged(ui->sbEvent->value());
 }
 
 void MainWindow::on_ledMaxPos_editingFinished()
 {
     OnEventOrChannelChanged();
-    on_sbEvent_valueChanged(ui->sbEvent->value());
+    onEventChanged(ui->sbEvent->value());
+}
+
+void MainWindow::on_pbGotoFirstEvent_clicked()
+{
+    ui->sbEvent->setValue(0);
+    onEventChanged(0);
 }
 
 void MainWindow::on_pbGotoNextEvent_clicked()
 {
-    ui->sbEvent->setValue(ui->sbEvent->value()+1);
+    int newEv = ui->sbEvent->value() + 1;
+    ui->sbEvent->setValue(newEv);
+    onEventChanged(newEv);
+}
+
+void MainWindow::on_pbGotoPreviousEvent_clicked()
+{
+    int newEv = ui->sbEvent->value() - 1;
+    ui->sbEvent->setValue(newEv);
+    onEventChanged(newEv);
+}
+
+void MainWindow::on_pbGotoLastEvent_clicked()
+{
+    int newEv = Reader->CountEvents() - 1;
+    ui->sbEvent->setValue(newEv);
+    onEventChanged(newEv);
+}
+
+void MainWindow::on_pbGotoPreviousChannel_clicked()
+{
+    int newChan = ui->sbChannel->value() - 1;
+    ui->sbChannel->setValue(newChan);
+    onChannelChanged();
 }
 
 void MainWindow::on_pbGotoNextChannel_clicked()
 {
-    ui->sbChannel->setValue(ui->sbChannel->value()+1);
+    int newChan = ui->sbChannel->value() + 1;
+    ui->sbChannel->setValue(newChan);
+    onChannelChanged();
+}
+
+void MainWindow::on_sbChannel_editingFinished()
+{
+    onChannelChanged();
 }
 
 void MainWindow::on_sbAllNegX_editingFinished()
@@ -1539,7 +1577,7 @@ void MainWindow::on_cobExplorerSource_currentIndexChanged(int index)
     ui->cobSortBy->setVisible(bDirect);
 
     OnEventOrChannelChanged();
-    on_sbEvent_valueChanged(ui->sbEvent->value());
+    onEventChanged(ui->sbEvent->value());
 }
 
 void MainWindow::updateNumEventsIndication()
