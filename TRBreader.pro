@@ -1,16 +1,18 @@
 
 #---Operation mode---
 #DEFINES += MULTIBOARD  #setup used in Bern
+CONFIG += TextToSpeech  #text-to-speech support, requires Qt's multimedia and texttospeech modules
 #comment the line above to define setup with a single (large) TRB3 board
 #
 
 #---CERN ROOT---
-DEFINES += CERN_ROOT
+DEFINES += CERN_ROOT  # obsolete
 
 INCLUDEPATH += $$system(root-config --incdir)
 LIBS += $$system(root-config --libs) -lSpectrum #-lGeom -lGeomPainter -lGeomBuilder -lMinuit2
 
 SOURCES += ROOT/cernrootmodule.cpp \
+           GUI/atexttospeechconfigurator.cpp \
            ROOT/GUI/arasterwindow.cpp \
            ROOT/GUI/agraphwindow.cpp \
            Script/histgraphinterfaces.cpp \
@@ -19,6 +21,7 @@ SOURCES += ROOT/cernrootmodule.cpp \
            TRB/trb3timingrecord.cpp
 
 HEADERS += ROOT/cernrootmodule.h \
+           GUI/atexttospeechconfigurator.h \
            ROOT/GUI/arasterwindow.h \
            ROOT/GUI/agraphwindow.h \
            Script/histgraphinterfaces.h \
@@ -26,7 +29,8 @@ HEADERS += ROOT/cernrootmodule.h \
            ROOT/apeakfinder.h \
            TRB/trb3timingrecord.h
 
-FORMS   += ROOT/GUI/agraphwindow.ui
+FORMS   += ROOT/GUI/agraphwindow.ui \
+    GUI/atexttospeechconfigurator.ui
 
 INCLUDEPATH += ROOT
 INCLUDEPATH += ROOT/GUI
@@ -120,3 +124,13 @@ INCLUDEPATH += Script
 INCLUDEPATH += GUI
 INCLUDEPATH += TRB
 INCLUDEPATH += Net
+
+#---SPEECh---
+TextToSpeech {
+    DEFINES += TextToSpeechEnabled
+    QT += texttospeech
+
+    SOURCES += GUI/atexttospeech.cpp
+    HEADERS += GUI/atexttospeech.h
+}
+#-----------

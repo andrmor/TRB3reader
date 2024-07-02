@@ -23,6 +23,11 @@ class QElapsedTimer;
 class ABufferDelegate;
 class QSpinBox;
 
+#ifdef TextToSpeechEnabled
+class ATextToSpeech;
+class ATextToSpeechConfigurator;
+#endif
+
 namespace Ui {
 class MainWindow;
 }
@@ -203,6 +208,11 @@ private:
     QTimer * timerAutoFreeSpace = nullptr;
     bool bAlreadyStopping = false;
 
+#ifdef TextToSpeechEnabled
+    ATextToSpeech * TextToSpeechHub = nullptr;
+    ATextToSpeechConfigurator * TextToSpeechWindow = nullptr;
+#endif
+
 private:
     const QString ProcessData(); //returns error message if any
     void LogMessage(const QString message);
@@ -323,6 +333,7 @@ private slots:
     void on_pbGotoLastEvent_clicked();
     void on_pbGotoPreviousChannel_clicked();
     void on_sbChannel_editingFinished();
+    void on_actionConfigure_triggered();
 };
 
 #endif // MAINWINDOW_H

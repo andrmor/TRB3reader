@@ -17,13 +17,7 @@
 #include "awebserverinterface.h"
 #include "anetworkmodule.h"
 
-#ifdef CERN_ROOT
-  #include "cernrootmodule.h"
-#endif
-
-#ifdef SPEECH
-  #include "ainterfacetospeech.h"
-#endif
+#include "cernrootmodule.h"
 
 #include <QDebug>
 
@@ -58,7 +52,6 @@ void MainWindow::CreateScriptWindow()
     AInterfaceToExtractor* ext = new AInterfaceToExtractor(Config, Extractor);
     ScriptWindow->SetInterfaceObject(ext, "ext");
 
-#ifdef CERN_ROOT
     //  qDebug() << "-> graph...";
     AInterfaceToGraph* graph = new AInterfaceToGraph(RootModule->GetTmpHub());
     ScriptWindow->SetInterfaceObject(graph, "graph");
@@ -66,7 +59,6 @@ void MainWindow::CreateScriptWindow()
     //  qDebug() << "-> hist...";
     AInterfaceToHist* hist = new AInterfaceToHist(RootModule->GetTmpHub());
     ScriptWindow->SetInterfaceObject(hist, "hist");
-#endif
 
 #ifdef SPEECH
     //  qDebug() << "-> speech...";
@@ -98,9 +90,7 @@ void MainWindow::CreateScriptWindow()
     QObject::connect(ScriptWindow, &AScriptWindow::RequestStateSave, this, &MainWindow::saveCompleteState);
     QObject::connect(ScriptWindow, &AScriptWindow::RequestUpdateMainWindowGui, this, &MainWindow::UpdateGui);
 
-#ifdef CERN_ROOT
     QObject::connect(ScriptWindow, SIGNAL(RequestDraw(TObject*,QString,bool)), RootModule, SLOT(onDrawRequested(TObject*,QString,bool)));
-#endif
 
     ScriptWindow->UpdateHighlight();
 */

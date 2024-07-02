@@ -89,3 +89,5 @@ $RECYCLE.BIN/
 *.lnk
 
 build/Desktop_Qt_5_15_2_GCC_64bit-Debug/
+
+build/Desktop_Qt_6_7_2-Debug/

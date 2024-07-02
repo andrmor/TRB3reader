@@ -6195,7 +6195,7 @@
      <x>0</x>
      <y>0</y>
      <width>793</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -6224,10 +6224,17 @@
     </property>
     <addaction name="actionConfigure_WebSocket_server"/>
    </widget>
+   <widget class="QMenu" name="menuSpeech">
+    <property name="title">
+     <string>Speech</string>
+    </property>
+    <addaction name="actionConfigure"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
    <addaction name="menuScript"/>
    <addaction name="menuServer"/>
+   <addaction name="menuSpeech"/>
   </widget>
   <action name="actionLoad_config">
    <property name="text">
@@ -6252,6 +6259,11 @@
   <action name="actionConfigure_WebSocket_server">
    <property name="text">
     <string>Configure WebSocket server</string>
+   </property>
+  </action>
+  <action name="actionConfigure">
+   <property name="text">
+    <string>Configure</string>
    </property>
   </action>
  </widget>

@@ -18,6 +18,11 @@
 #include "ahldfileprocessor.h"
 #include "anetworkmodule.h"
 
+#ifdef TextToSpeechEnabled
+#include "atexttospeech.h"
+#include "atexttospeechconfigurator.h"
+#endif
+
 #include <QDebug>
 #include <QFileDialog>
 #include <QMessageBox>
@@ -117,13 +122,22 @@ MainWindow::MainWindow(MasterConfig* Config,
     ServerWindow = new AServerMonitorWindow(*this, Network, this);
     QObject::connect(&Network, &ANetworkModule::StatusChanged, ServerWindow, &AServerMonitorWindow::onServerstatusChanged);
     QObject::connect(&Network, &ANetworkModule::ReportTextToGUI, ServerWindow, &AServerMonitorWindow::appendText);
+
+#ifdef TextToSpeechEnabled
+    TextToSpeechHub = new ATextToSpeech();
+    TextToSpeechWindow = new ATextToSpeechConfigurator(*TextToSpeechHub);
+#endif
 }
 
 MainWindow::~MainWindow()
 {
-#ifdef CERN_ROOT
-    delete RootModule;
+#ifdef TextToSpeechEnabled
+    TextToSpeechWindow->close();
+    delete TextToSpeechWindow; TextToSpeechWindow = nullptr;
+    delete TextToSpeechHub; TextToSpeechHub = nullptr;
 #endif
+
+    delete RootModule;
 
     delete watchdogTimer;
     delete aTimer;
@@ -2609,3 +2623,11 @@ void MainWindow::on_cbDisableIgnoredChannels_clicked(bool checked)
 {
     Config->DisableIgnoredChannels = checked;
 }
+
+void MainWindow::on_actionConfigure_triggered()
+{
+#ifdef TextToSpeechEnabled
+    TextToSpeechWindow->showNormal();
+#endif
+}
+

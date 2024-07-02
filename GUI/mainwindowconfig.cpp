@@ -19,9 +19,7 @@
 #include <QFileInfo>
 #include <QTimer>
 
-#ifdef CERN_ROOT
 #include "cernrootmodule.h"
-#endif
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
@@ -36,9 +34,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
     TrbRunManager->StopBoard();
 
-#ifdef CERN_ROOT
-    delete RootModule; RootModule = 0;
-#endif
+    delete RootModule; RootModule = nullptr;
 
     QMainWindow::closeEvent(event);
 }
