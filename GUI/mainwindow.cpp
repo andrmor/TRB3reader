@@ -1861,7 +1861,7 @@ void MainWindow::onBoardIsAlive(double currentAccepetedRate)
             TellRate_NumCurrent++;
             if (TellRate_NumCurrent == TellRate_NumAverage)
             {
-                double average = TellRate_SoFarAccumulated / TellRate_NumCurrent;
+                int average = TellRate_SoFarAccumulated / TellRate_NumCurrent;
                 TextToSpeechHub->say(QString::number(average));
                 TellRate_NumCurrent = 0;
                 TellRate_SoFarAccumulated = 0;
