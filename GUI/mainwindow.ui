@@ -30,7 +30,7 @@
     <item>
      <widget class="QTabWidget" name="twMain">
       <property name="currentIndex">
-       <number>2</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_8">
        <attribute name="title">
@@ -4259,6 +4259,20 @@
               <width>100</width>
               <height>16777215</height>
              </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="cbTellMeRate">
+            <property name="contextMenuPolicy">
+             <enum>Qt::CustomContextMenu</enum>
+            </property>
+            <property name="toolTip">
+             <string>Use voice module to tell the rate
+Right-click to set the averaging time</string>
+            </property>
+            <property name="text">
+             <string>tell me</string>
             </property>
            </widget>
           </item>

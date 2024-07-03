@@ -36,6 +36,8 @@ public:
     void say(const QString & text);
     void stop();
 
+    bool isBusy() const;
+
     QString getCurrentEngineName() const;
     QVoice  getCurrentVoice() const;
     QLocale getCurrentLocale() const;

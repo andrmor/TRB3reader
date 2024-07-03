@@ -1853,9 +1853,36 @@ void MainWindow::onBoardIsAlive(double currentAccepetedRate)
         ui->leCurrentAceptedRate->setText(tr);
         ui->leCurAceptTrigrate_onAcquire->setText(tr);
         if (currentAccepetedRate > 0) ZeroRateCounter = 0;
+
+#ifdef TextToSpeechEnabled
+        if (ui->cbTellMeRate->isChecked())
+        {
+            TellRate_SoFarAccumulated += currentAccepetedRate;
+            TellRate_NumCurrent++;
+            if (TellRate_NumCurrent == TellRate_NumAverage)
+            {
+                double average = TellRate_SoFarAccumulated / TellRate_NumCurrent;
+                TextToSpeechHub->say(QString::number(average));
+                TellRate_NumCurrent = 0;
+                TellRate_SoFarAccumulated = 0;
+            }
+        }
+#endif
     }
     else ZeroRateCounter++;
     watchdogTimer->start();
+}
+
+void MainWindow::on_cbTellMeRate_customContextMenuRequested(const QPoint &)
+{
+    //void guitools::inputInteger(const QString &text, int &input, int min, int max, QWidget *parent)
+    bool ok;
+    int res = QInputDialog::getInt(this, "", "Average during seconds:", TellRate_NumAverage, 1, 100, 1, &ok);
+    if (!ok) return;
+
+    TellRate_NumAverage = res;
+    TellRate_NumCurrent = 0;
+    TellRate_SoFarAccumulated = 0;
 }
 
 void MainWindow::onBoardDisconnected()
@@ -2630,4 +2657,3 @@ void MainWindow::on_actionConfigure_triggered()
     TextToSpeechWindow->showNormal();
 #endif
 }
-

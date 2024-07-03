@@ -93,6 +93,12 @@ void ATextToSpeech::stop()
     if (Engine) Engine->stop();
 }
 
+bool ATextToSpeech::isBusy() const
+{
+    if (!Engine) return false;
+    return (Engine->state() != QTextToSpeech::Speaking);
+}
+
 QString ATextToSpeech::getCurrentEngineName() const
 {
     if (!Engine) return "default";

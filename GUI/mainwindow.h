@@ -242,6 +242,10 @@ private:
     ATrbRunControl * TrbRunManager = nullptr;
     int ZeroRateCounter = 0;
 
+    int    TellRate_NumAverage = 5;
+    int    TellRate_NumCurrent = 0;
+    double TellRate_SoFarAccumulated = 0;
+
     std::vector<QSpinBox*> TriggerGainSpinBoxes;
 
     QString intToBitString(int val);
@@ -334,6 +338,7 @@ private slots:
     void on_pbGotoPreviousChannel_clicked();
     void on_sbChannel_editingFinished();
     void on_actionConfigure_triggered();
+    void on_cbTellMeRate_customContextMenuRequested(const QPoint &pos);
 };
 
 #endif // MAINWINDOW_H
