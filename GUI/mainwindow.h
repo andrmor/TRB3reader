@@ -11,7 +11,6 @@ class Trb3dataReader;
 class Trb3signalExtractor;
 class QTextStream;
 class CernRootModule;
-//class AScriptWindow;
 class ADispatcher;
 class ADataHub;
 class AHldFileProcessor;
@@ -22,6 +21,8 @@ class QTimer;
 class QElapsedTimer;
 class ABufferDelegate;
 class QSpinBox;
+class AGuiFromScrWin;
+class AScriptWindow;
 
 #ifdef TextToSpeechEnabled
 class ATextToSpeech;
@@ -190,9 +191,11 @@ private:
 
     //owned objects
     Ui::MainWindow* ui;
-//    AScriptWindow * ScriptWindow = nullptr;
     CernRootModule * RootModule = nullptr;
     AServerMonitorWindow * ServerWindow = nullptr;
+
+    AGuiFromScrWin * GuiFromScrWin = nullptr;
+    AScriptWindow * JScriptWin = nullptr;
 
     //gui misc
     bool bStopFlag;

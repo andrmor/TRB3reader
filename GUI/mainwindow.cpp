@@ -2657,3 +2657,140 @@ void MainWindow::on_actionConfigure_triggered()
     TextToSpeechWindow->showNormal();
 #endif
 }
+
+#include "ascripthub.h"
+#include "aguifromscrwin.h"
+#include "ascriptwindow.h"
+
+void MainWindow::CreateScriptWindow()
+{
+    qDebug() << "Creating script window...";
+
+    AScriptHub * ScriptHub = &AScriptHub::getInstance();
+    GuiFromScrWin = new AGuiFromScrWin(this);
+    ScriptHub->addGuiScriptUnit(GuiFromScrWin);
+    qDebug() << "Creating JScript window";
+    JScriptWin = new AScriptWindow(EScriptLanguage::JavaScript, this);
+    JScriptWin->registerInterfaces();
+    connect(ScriptHub,  &AScriptHub::clearOutput_JS,      JScriptWin, &AScriptWindow::clearOutput, Qt::QueuedConnection);
+    connect(ScriptHub,  &AScriptHub::outputText_JS,       JScriptWin, &AScriptWindow::outputText, Qt::QueuedConnection);
+    connect(ScriptHub,  &AScriptHub::outputHtml_JS,       JScriptWin, &AScriptWindow::outputHtml, Qt::QueuedConnection);
+    connect(ScriptHub,  &AScriptHub::outputFromBuffer_JS, JScriptWin, &AScriptWindow::outputFromBuffer, Qt::QueuedConnection);
+    connect(ScriptHub,  &AScriptHub::reportProgress_JS,   JScriptWin, &AScriptWindow::onProgressChanged, Qt::QueuedConnection);
+    connect(ScriptHub,  &AScriptHub::showAbortMessage_JS, JScriptWin, &AScriptWindow::outputAbortMessage);
+//    connect(JScriptWin, &AScriptWindow::requestUpdateGui, this,       &MainWindow::updateAllGuiFromConfig);
+    JScriptWin->updateGui();
+
+#ifdef ANTS3_PYTHON
+    qDebug() << "Creating Python window";
+    PythonWin = new AScriptWindow(EScriptLanguage::Python, this);
+    PythonWin->registerInterfaces();
+    connect(ScriptHub,  &AScriptHub::clearOutput_P,       PythonWin, &AScriptWindow::clearOutput);
+    connect(ScriptHub,  &AScriptHub::outputText_P,        PythonWin, &AScriptWindow::outputText);
+    connect(ScriptHub,  &AScriptHub::outputHtml_P,        PythonWin, &AScriptWindow::outputHtml);
+    connect(ScriptHub,  &AScriptHub::outputFromBuffer_P,  PythonWin, &AScriptWindow::outputFromBuffer);
+    connect(ScriptHub,  &AScriptHub::reportProgress_P,    JScriptWin, &AScriptWindow::onProgressChanged);
+    connect(ScriptHub,  &AScriptHub::showAbortMessage_P,  PythonWin, &AScriptWindow::outputAbortMessage);
+    connect(PythonWin,  &AScriptWindow::requestUpdateGui, this,      &MainWindow::updateAllGuiFromConfig);
+    connect(GeoTreeWin, &AGeoTreeWin::requestAddPythonScript,   PythonWin, &AScriptWindow::onRequestAddScript);
+    PythonWin->updateGui();
+#endif
+
+
+
+
+
+
+
+
+
+
+    /*
+    ScriptWindow = new AScriptWindow(Config, Network.getScriptManager(), this);
+
+    //  qDebug() << "Registering script units...";
+
+    //  qDebug() << "-> main...";
+    ScriptWindow->SetInterfaceObject(0); //initialization
+
+    //  qDebug() << "-> config...";
+    AInterfaceToConfig* conf = new AInterfaceToConfig(Config, Dispatcher);
+    ScriptWindow->SetInterfaceObject(conf, "config");
+
+    //  qDebug() << "-> hld file processor...";
+    AInterfaceToHldFileProcessor* hld = new AInterfaceToHldFileProcessor(HldFileProcessor);
+    ScriptWindow->SetInterfaceObject(hld, "hld");
+
+    //  qDebug() << "-> data hub...";
+    AInterfaceToData* dat = new AInterfaceToData(DataHub);
+    ScriptWindow->SetInterfaceObject(dat, "events");
+
+    //  qDebug() << "-> waveforms...";
+    AInterfaceToWaveforms* wav = new AInterfaceToWaveforms(Config, Reader);
+    ScriptWindow->SetInterfaceObject(wav, "wav");
+
+    //  qDebug() << "-> extractor...";
+    AInterfaceToExtractor* ext = new AInterfaceToExtractor(Config, Extractor);
+    ScriptWindow->SetInterfaceObject(ext, "ext");
+
+    //  qDebug() << "-> graph...";
+    AInterfaceToGraph* graph = new AInterfaceToGraph(RootModule->GetTmpHub());
+    ScriptWindow->SetInterfaceObject(graph, "graph");
+
+    //  qDebug() << "-> hist...";
+    AInterfaceToHist* hist = new AInterfaceToHist(RootModule->GetTmpHub());
+    ScriptWindow->SetInterfaceObject(hist, "hist");
+
+#ifdef SPEECH
+    //  qDebug() << "-> speech...";
+    speech = new AInterfaceToSpeech();
+    ScriptWindow->SetInterfaceObject(speech, "speech");
+#endif
+
+    AInterfaceToWebSocket* web = new AInterfaceToWebSocket();
+    ScriptWindow->SetInterfaceObject(web, "web");
+
+    AWebServerInterface* server = new AWebServerInterface(*Network.WebSocketServer);
+    ScriptWindow->SetInterfaceObject(server, "server");
+
+
+
+    //  qDebug() << "-> msg...";
+    AInterfaceToMessageWindow* txt = new AInterfaceToMessageWindow(ScriptWindow);
+    ScriptWindow->SetInterfaceObject(txt, "msg");
+
+    AInterfaceToMultiThread* threads = new AInterfaceToMultiThread(ScriptWindow->GetScriptManager());
+    ScriptWindow->SetInterfaceObject(threads, "threads");
+
+    //  qDebug() << "Done!";
+
+    ScriptWindow->SetShowEvaluationResult(true);
+
+    QObject::connect(ScriptWindow, SIGNAL(onStart()), this, SLOT(onGlobalScriptStarted()));
+    QObject::connect(ScriptWindow, SIGNAL(success(QString)), this, SLOT(onGlobalScriptFinished()));
+    QObject::connect(ScriptWindow, &AScriptWindow::RequestStateSave, this, &MainWindow::saveCompleteState);
+    QObject::connect(ScriptWindow, &AScriptWindow::RequestUpdateMainWindowGui, this, &MainWindow::UpdateGui);
+
+    QObject::connect(ScriptWindow, SIGNAL(RequestDraw(TObject*,QString,bool)), RootModule, SLOT(onDrawRequested(TObject*,QString,bool)));
+
+    ScriptWindow->UpdateHighlight();
+*/
+}
+
+void MainWindow::onGlobalScriptStarted()
+{
+    this->setEnabled(true);
+    qApp->processEvents();
+}
+
+void MainWindow::onGlobalScriptFinished()
+{
+    UpdateGui();
+    this->setEnabled(true);
+}
+
+void MainWindow::on_actionOpen_script_window_triggered()
+{
+    JScriptWin->showNormal();
+    JScriptWin->raise();
+}

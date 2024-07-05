@@ -24,7 +24,18 @@ SOURCES += ROOT/cernrootmodule.cpp \
            Script/ScriptInterfaces/agraph_si.cpp \
            Script/ScriptInterfaces/agui_si.cpp \
            Script/ScriptInterfaces/ahist_si.cpp \
+           Script/ScriptInterfaces/amsg_si.cpp \
            Script/ScriptInterfaces/arootstyle_si.cpp \
+           Script/ScriptInterfaces/awindowinterfacebase.cpp \
+           Script/ScriptWindow/aargumentcounter.cpp \
+           Script/ScriptWindow/ahighlighters.cpp \
+           Script/ScriptWindow/ascriptbook.cpp \
+           Script/ScriptWindow/ascriptexample.cpp \
+           Script/ScriptWindow/ascriptexampledatabase.cpp \
+           Script/ScriptWindow/ascriptexampleexplorer.cpp \
+           Script/ScriptWindow/atabrecord.cpp \
+           Script/ScriptWindow/atextedit.cpp \
+           Script/ScriptWindow/atextoutputwindow.cpp \
            Script/acore_si.cpp \
            Script/aguifromscrwin.cpp \
            Script/aguiwindow.cpp \
@@ -40,6 +51,7 @@ SOURCES += ROOT/cernrootmodule.cpp \
            Script/ascriptinterface.cpp \
            Script/ascriptmessenger.cpp \
            Script/ascriptobjstore.cpp \
+           Script/ScriptWindow/ascriptwindow.cpp \
            Script/avirtualscriptmanager.cpp \
            TRB/trb3timingrecord.cpp
 
@@ -56,7 +68,18 @@ HEADERS += ROOT/cernrootmodule.h \
            Script/ScriptInterfaces/agraph_si.h \
            Script/ScriptInterfaces/agui_si.h \
            Script/ScriptInterfaces/ahist_si.h \
+           Script/ScriptInterfaces/amsg_si.h \
            Script/ScriptInterfaces/arootstyle_si.h \
+           Script/ScriptInterfaces/awindowinterfacebase.h \
+           Script/ScriptWindow/aargumentcounter.h \
+           Script/ScriptWindow/ahighlighters.h \
+           Script/ScriptWindow/ascriptbook.h \
+           Script/ScriptWindow/ascriptexample.h \
+           Script/ScriptWindow/ascriptexampledatabase.h \
+           Script/ScriptWindow/ascriptexampleexplorer.h \
+           Script/ScriptWindow/atabrecord.h \
+           Script/ScriptWindow/atextedit.h \
+           Script/ScriptWindow/atextoutputwindow.h \
            Script/acore_si.h \
            Script/aguifromscrwin.h \
            Script/aguiwindow.h \
@@ -72,12 +95,15 @@ HEADERS += ROOT/cernrootmodule.h \
            Script/ascriptinterface.h \
            Script/ascriptmessenger.h \
            Script/ascriptobjstore.h \
+           Script/ScriptWindow/ascriptwindow.h \
            Script/avirtualscriptmanager.h \
            Script/escriptlanguage.h \
            TRB/trb3timingrecord.h
 
 FORMS   += ROOT/GUI/agraphwindow.ui \
-    GUI/atexttospeechconfigurator.ui
+    GUI/atexttospeechconfigurator.ui \
+    Script/ScriptWindow/ascriptexampleexplorer.ui \
+    Script/ScriptWindow/ascriptwindow.ui
 
 INCLUDEPATH += ROOT
 INCLUDEPATH += ROOT/GUI
@@ -110,7 +136,6 @@ SOURCES += main.cpp \
     GUI/mainwindowconfig.cpp \
     Common/afiletools.cpp \
     Script/ainterfacetomessagewindow.cpp \
-    GUI/mainwindowscript.cpp \
     Common/amessage.cpp \
     Common/completingtexteditclass.cpp \    
     Script/ainterfacetowaveforms.cpp \
@@ -169,6 +194,7 @@ FORMS    += GUI/mainwindow.ui \
 INCLUDEPATH += Common
 INCLUDEPATH += Script
 INCLUDEPATH += Script/ScriptInterfaces
+INCLUDEPATH += Script/ScriptWindow
 INCLUDEPATH += GUI
 INCLUDEPATH += TRB
 INCLUDEPATH += Net
