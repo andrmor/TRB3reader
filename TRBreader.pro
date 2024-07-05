@@ -12,21 +12,25 @@ INCLUDEPATH += $$system(root-config --incdir)
 LIBS += $$system(root-config --libs) -lSpectrum #-lGeom -lGeomPainter -lGeomBuilder -lMinuit2
 
 SOURCES += ROOT/cernrootmodule.cpp \
+           ROOT/GUI/arasterwindow.cpp \
+           ROOT/GUI/agraphwindow.cpp \
+           ROOT/apeakfinder.cpp \
            Common/arandomhub.cpp \
            Common/astopwatch.cpp \
+           Common/tmpobjhubclass.cpp \
            GUI/alineedit.cpp \
            GUI/atexttospeechconfigurator.cpp \
            GUI/guitools.cpp \
-           ROOT/GUI/arasterwindow.cpp \
-           ROOT/GUI/agraphwindow.cpp \
-           Common/tmpobjhubclass.cpp \
-           ROOT/apeakfinder.cpp \
+           Script/ScriptInterfaces/ascriptinterface.cpp \
+           Script/ScriptInterfaces/acore_si.cpp \
+           Script/ScriptInterfaces/amath_si.cpp \
            Script/ScriptInterfaces/agraph_si.cpp \
            Script/ScriptInterfaces/agui_si.cpp \
            Script/ScriptInterfaces/ahist_si.cpp \
            Script/ScriptInterfaces/amsg_si.cpp \
            Script/ScriptInterfaces/arootstyle_si.cpp \
            Script/ScriptInterfaces/awindowinterfacebase.cpp \
+           Script/ScriptWindow/ascriptwindow.cpp \
            Script/ScriptWindow/aargumentcounter.cpp \
            Script/ScriptWindow/ahighlighters.cpp \
            Script/ScriptWindow/ascriptbook.cpp \
@@ -36,41 +40,41 @@ SOURCES += ROOT/cernrootmodule.cpp \
            Script/ScriptWindow/atabrecord.cpp \
            Script/ScriptWindow/atextedit.cpp \
            Script/ScriptWindow/atextoutputwindow.cpp \
-           Script/acore_si.cpp \
            Script/aguifromscrwin.cpp \
            Script/aguiwindow.cpp \
            Script/ajscriptmanager.cpp \
            Script/ajscriptworker.cpp \
-           Script/amath_si.cpp \
            Script/arootgraphrecord.cpp \
            Script/aroothistrecord.cpp \
            Script/arootobjbase.cpp \
            Script/arootobjcollection.cpp \
            Script/ascripthelpentry.cpp \
            Script/ascripthub.cpp \
-           Script/ascriptinterface.cpp \
            Script/ascriptmessenger.cpp \
            Script/ascriptobjstore.cpp \
-           Script/ScriptWindow/ascriptwindow.cpp \
            Script/avirtualscriptmanager.cpp \
            TRB/trb3timingrecord.cpp
 
 HEADERS += ROOT/cernrootmodule.h \
+           ROOT/GUI/arasterwindow.h \
+           ROOT/GUI/agraphwindow.h \
+           ROOT/apeakfinder.h \
            Common/arandomhub.h \
            Common/astopwatch.h \
+           Common/tmpobjhubclass.h \
            GUI/alineedit.h \
            GUI/atexttospeechconfigurator.h \
            GUI/guitools.h \
-           ROOT/GUI/arasterwindow.h \
-           ROOT/GUI/agraphwindow.h \
-           Common/tmpobjhubclass.h \
-           ROOT/apeakfinder.h \
+           Script/ScriptInterfaces/ascriptinterface.h \
+           Script/ScriptInterfaces/acore_si.h \
+           Script/ScriptInterfaces/amath_si.h \
            Script/ScriptInterfaces/agraph_si.h \
            Script/ScriptInterfaces/agui_si.h \
            Script/ScriptInterfaces/ahist_si.h \
            Script/ScriptInterfaces/amsg_si.h \
            Script/ScriptInterfaces/arootstyle_si.h \
            Script/ScriptInterfaces/awindowinterfacebase.h \
+           Script/ScriptWindow/ascriptwindow.h \
            Script/ScriptWindow/aargumentcounter.h \
            Script/ScriptWindow/ahighlighters.h \
            Script/ScriptWindow/ascriptbook.h \
@@ -80,22 +84,18 @@ HEADERS += ROOT/cernrootmodule.h \
            Script/ScriptWindow/atabrecord.h \
            Script/ScriptWindow/atextedit.h \
            Script/ScriptWindow/atextoutputwindow.h \
-           Script/acore_si.h \
            Script/aguifromscrwin.h \
            Script/aguiwindow.h \
            Script/ajscriptmanager.h \
            Script/ajscriptworker.h \
-           Script/amath_si.h \
            Script/arootgraphrecord.h \
            Script/aroothistrecord.h \
            Script/arootobjbase.h \
            Script/arootobjcollection.h \
            Script/ascripthelpentry.h \
            Script/ascripthub.h \
-           Script/ascriptinterface.h \
            Script/ascriptmessenger.h \
            Script/ascriptobjstore.h \
-           Script/ScriptWindow/ascriptwindow.h \
            Script/avirtualscriptmanager.h \
            Script/escriptlanguage.h \
            TRB/trb3timingrecord.h
