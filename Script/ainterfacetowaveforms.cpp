@@ -22,7 +22,7 @@ int AInterfaceToWaveforms::countSamples() const
     return Reader->CountSamples();
 }
 
-float AInterfaceToWaveforms::getValue(int ievent, int iHardwChannel, int isample) const
+float AInterfaceToWaveforms::getValue(int ievent, int iHardwChannel, int isample)
 {
     float val = Reader->GetValue(ievent, iHardwChannel, isample);
     if ( std::isnan(val) ) abort("Failed to get waveform value!");
@@ -30,7 +30,7 @@ float AInterfaceToWaveforms::getValue(int ievent, int iHardwChannel, int isample
     return val;
 }
 
-float AInterfaceToWaveforms::getValueFast(int ievent, int iHardwChannel, int isample) const
+float AInterfaceToWaveforms::getValueFast(int ievent, int iHardwChannel, int isample)
 {
     return Reader->GetValueFast(ievent, iHardwChannel, isample);
 }
@@ -47,7 +47,7 @@ void AInterfaceToWaveforms::setValueFast(int ievent, int iHardwChannel, int isam
     Reader->SetValueFast(ievent, iHardwChannel, isample, value);
 }
 
-const QVariant AInterfaceToWaveforms::getWaveform(int ievent, int iHardwChannel) const
+QVariant AInterfaceToWaveforms::getWaveform(int ievent, int iHardwChannel)
 {
     const QVector<float> *wave = Reader->GetWaveformPtr(ievent, iHardwChannel);
     if (!wave)
@@ -62,7 +62,7 @@ const QVariant AInterfaceToWaveforms::getWaveform(int ievent, int iHardwChannel)
     return jv.toVariant();
 }
 
-const QVariant AInterfaceToWaveforms::getWaveformFast(int ievent, int iHardwChannel) const
+QVariant AInterfaceToWaveforms::getWaveformFast(int ievent, int iHardwChannel)
 {
     const QVector<float> *wave = Reader->GetWaveformPtrFast(ievent, iHardwChannel);
 
@@ -113,7 +113,7 @@ void AInterfaceToWaveforms::setWaveformFast(int ievent, int ichannel, const QVar
     Reader->SetWaveformFast(ievent, ichannel, vec);
 }
 
-float AInterfaceToWaveforms::getMax(int ievent, int iHardwChannel) const
+float AInterfaceToWaveforms::getMax(int ievent, int iHardwChannel)
 {
     float val = Reader->GetMax(ievent, iHardwChannel);
     if ( std::isnan(val) ) abort("Failed to get waveform value!");
@@ -121,12 +121,12 @@ float AInterfaceToWaveforms::getMax(int ievent, int iHardwChannel) const
     return val;
 }
 
-float AInterfaceToWaveforms::getMaxFast(int ievent, int iHardwChannel) const
+float AInterfaceToWaveforms::getMaxFast(int ievent, int iHardwChannel)
 {
     return Reader->GetMaxFast(ievent, iHardwChannel);
 }
 
-float AInterfaceToWaveforms::getMin(int ievent, int iHardwChannel) const
+float AInterfaceToWaveforms::getMin(int ievent, int iHardwChannel)
 {
     float val = Reader->GetMin(ievent, iHardwChannel);
     if ( std::isnan(val) ) abort("Failed to get waveform value!");
@@ -134,12 +134,12 @@ float AInterfaceToWaveforms::getMin(int ievent, int iHardwChannel) const
     return val;
 }
 
-float AInterfaceToWaveforms::getMinFast(int ievent, int iHardwChannel) const
+float AInterfaceToWaveforms::getMinFast(int ievent, int iHardwChannel)
 {
     return Reader->GetMinFast(ievent, iHardwChannel);
 }
 
-int AInterfaceToWaveforms::getMaxSample(int ievent, int iHardwChannel) const
+int AInterfaceToWaveforms::getMaxSample(int ievent, int iHardwChannel)
 {
     int val = Reader->GetMaxSample(ievent, iHardwChannel);
     if (val < 0) abort("Failed to get sample number!");
@@ -147,12 +147,12 @@ int AInterfaceToWaveforms::getMaxSample(int ievent, int iHardwChannel) const
     return val;
 }
 
-int AInterfaceToWaveforms::getMaxSampleFast(int ievent, int iHardwChannel) const
+int AInterfaceToWaveforms::getMaxSampleFast(int ievent, int iHardwChannel)
 {
     return Reader->GetMaxSampleFast(ievent, iHardwChannel);
 }
 
-int AInterfaceToWaveforms::getMinSample(int ievent, int iHardwChannel) const
+int AInterfaceToWaveforms::getMinSample(int ievent, int iHardwChannel)
 {
     int val = Reader->GetMinSample(ievent, iHardwChannel);
     if (val < 0) abort("Failed to get sample number!");
@@ -160,12 +160,12 @@ int AInterfaceToWaveforms::getMinSample(int ievent, int iHardwChannel) const
     return val;
 }
 
-int AInterfaceToWaveforms::getMinSampleFast(int ievent, int iHardwChannel) const
+int AInterfaceToWaveforms::getMinSampleFast(int ievent, int iHardwChannel)
 {
     return Reader->GetMinSampleFast(ievent, iHardwChannel);
 }
 
-int AInterfaceToWaveforms::getSampleWhereFirstAbove(int ievent, int iHardwChannel, int threshold) const
+int AInterfaceToWaveforms::getSampleWhereFirstAbove(int ievent, int iHardwChannel, int threshold)
 {
     int isample = Reader->GetSampleWhereFirstAbove(ievent, iHardwChannel, threshold);
     if (isample < 0) abort("Failed to get sample number!");
@@ -173,12 +173,12 @@ int AInterfaceToWaveforms::getSampleWhereFirstAbove(int ievent, int iHardwChanne
     return isample;
 }
 
-int AInterfaceToWaveforms::getSampleWhereFirstAboveFast(int ievent, int iHardwChannel, int threshold) const
+int AInterfaceToWaveforms::getSampleWhereFirstAboveFast(int ievent, int iHardwChannel, int threshold)
 {
     return Reader->GetSampleWhereFirstAboveFast(ievent, iHardwChannel, threshold);
 }
 
-int AInterfaceToWaveforms::getSampleWhereFirstBelow(int ievent, int iHardwChannel, int threshold) const
+int AInterfaceToWaveforms::getSampleWhereFirstBelow(int ievent, int iHardwChannel, int threshold)
 {
     int isample = Reader->GetSampleWhereFirstBelow(ievent, iHardwChannel, threshold);
     if (isample < 0) abort("Failed to get sample number!");
@@ -186,7 +186,7 @@ int AInterfaceToWaveforms::getSampleWhereFirstBelow(int ievent, int iHardwChanne
     return isample;
 }
 
-int AInterfaceToWaveforms::getSampleWhereFirstBelowFast(int ievent, int iHardwChannel, int threshold) const
+int AInterfaceToWaveforms::getSampleWhereFirstBelowFast(int ievent, int iHardwChannel, int threshold)
 {
     return Reader->GetSampleWhereFirstBelowFast(ievent, iHardwChannel, threshold);
 }

@@ -1,42 +1,54 @@
 #ifndef ASCRIPTINTERFACE_H
 #define ASCRIPTINTERFACE_H
 
-#include <QString>
-#include <QHash>
+#include "escriptlanguage.h"
+#include "ascripthelpentry.h"
+
+#include <vector>
+#include <map>
+
 #include <QObject>
+#include <QString>
 
 class AScriptInterface : public QObject
 {
-  Q_OBJECT
+    Q_OBJECT
 
 public:
-  AScriptInterface() {}
-  AScriptInterface(const AScriptInterface& other) : QObject(), H(other.H), Description(other.Description) {}
+    AScriptInterface() : QObject() {}
+    virtual ~AScriptInterface(){}
 
-  virtual bool InitOnRun() {return true;}                     // automatically called before script evaluation
-  virtual void ForceStop() {}                                 // called when abort was triggered by any other module
+    virtual bool beforeRun() {return true;}   // automatically called before script evaluation
+    virtual bool afterRun()  {return true;}   // automatically called after  script evaluation
+    virtual void abortRun()  {}
 
-  virtual bool IsMultithreadCapable() const {return false;}   // should be accessible in multithread script mode?
-  const QString getDescription() const
-    {return Description + (IsMultithreadCapable()?"\nMultithread-capable":"");}  // description text for the unit in GUI
+    virtual AScriptInterface * cloneBase() const = 0;
+
+//    virtual bool isMultithreadCapable() const {return false;}
+
+    const QString & getMethodHelp(const QString & method, int numArguments) const;
+
+    QString                    Name;
+    QString                    Description;
+
+    //std::map<QString, QString> Help;
+    std::map<QString, AScriptHelpEntry> Help;
+
+    std::map<QString, QString> DeprecatedMethods;
+    std::map<QString, QString> RemovedMethods;
+
+    bool bGuiThread      = true;
+
+    EScriptLanguage Lang = EScriptLanguage::JavaScript;
 
 public slots:
-  const QString help(QString method) const                    //automatically requested to obtain help strings
-  {
-    if (method.endsWith("()")) method.remove("()");
-    if (method.endsWith("(")) method.remove("(");
-    if (!H.contains(method)) return "";
-    return H[method];
-  }
-
-signals:
-  void AbortScriptEvaluation(const QString) const;      //abort request is automatically linked to abort slot of core unit
+    QString help() const;
 
 protected:
-  QHash<QString, QString> H;
-  QString Description;
+    void abort(const QString & message);
 
-  void abort(const QString message = "Aborted!") const {emit AbortScriptEvaluation(message);}
+private:
+    QString NoHelp = "Description not provided";
 };
 
 #endif // ASCRIPTINTERFACE_H

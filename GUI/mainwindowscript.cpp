@@ -4,7 +4,7 @@
 #include "afiletools.h"
 //#include "ascriptwindow.h"
 //#include "coreinterfaces.h"
-#include "histgraphinterfaces.h"
+//#include "histgraphinterfaces.h"
 #include "ainterfacetomessagewindow.h"
 #include "ainterfacetoextractor.h"
 #include "ainterfacetowaveforms.h"

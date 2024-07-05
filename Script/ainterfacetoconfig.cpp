@@ -117,7 +117,7 @@ void AInterfaceToConfig::setKeyValue(QString Key, const QVariant val)
     return;
 }
 
-const QVariant AInterfaceToConfig::getKeyValue(QString Key)
+QVariant AInterfaceToConfig::getKeyValue(QString Key)
 {
     LastError = "";
 
@@ -216,29 +216,29 @@ int AInterfaceToConfig::countLogicalChannels() const
     return Config->CountLogicalChannels();
 }
 
-bool AInterfaceToConfig::isNegativeHardwareChannel(int iHardwChannel) const
+bool AInterfaceToConfig::isNegativeHardwareChannel(int iHardwChannel)
 {
     return Config->IsNegativeHardwareChannel(iHardwChannel);
 }
 
-bool AInterfaceToConfig::isNegativeLogicalChannel(int iLogicalChannel) const
+bool AInterfaceToConfig::isNegativeLogicalChannel(int iLogicalChannel)
 {
     const int iHardwCh = Config->Map->LogicalToHardware(iLogicalChannel);
     return Config->IsNegativeHardwareChannel(iHardwCh);
 }
 
-bool AInterfaceToConfig::isIgnoredHardwareChannel(int iHardwChannel) const
+bool AInterfaceToConfig::isIgnoredHardwareChannel(int iHardwChannel)
 {
     return Config->IsIgnoredHardwareChannel(iHardwChannel);
 }
 
-bool AInterfaceToConfig::isIgnoredLogicalChannel(int iLogicalChannel) const
+bool AInterfaceToConfig::isIgnoredLogicalChannel(int iLogicalChannel)
 {
     const int iHardwCh = Config->Map->LogicalToHardware(iLogicalChannel);
     return Config->IsIgnoredHardwareChannel(iHardwCh);
 }
 
-int AInterfaceToConfig::toHardware(int iLogicalChannel) const
+int AInterfaceToConfig::toHardware(int iLogicalChannel)
 {
     int ihardw = Config->Map->LogicalToHardware(iLogicalChannel);
     if ( ihardw < 0 )
@@ -249,7 +249,7 @@ int AInterfaceToConfig::toHardware(int iLogicalChannel) const
     return ihardw;
 }
 
-int AInterfaceToConfig::toLogical(int iHardwChannel) const
+int AInterfaceToConfig::toLogical(int iHardwChannel)
 {
     int ilogical = Config->Map->HardwareToLogical(iHardwChannel);
     if ( ilogical < 0 )

@@ -12,21 +12,68 @@ INCLUDEPATH += $$system(root-config --incdir)
 LIBS += $$system(root-config --libs) -lSpectrum #-lGeom -lGeomPainter -lGeomBuilder -lMinuit2
 
 SOURCES += ROOT/cernrootmodule.cpp \
+           Common/arandomhub.cpp \
+           Common/astopwatch.cpp \
+           GUI/alineedit.cpp \
            GUI/atexttospeechconfigurator.cpp \
+           GUI/guitools.cpp \
            ROOT/GUI/arasterwindow.cpp \
            ROOT/GUI/agraphwindow.cpp \
-           Script/histgraphinterfaces.cpp \
            Common/tmpobjhubclass.cpp \
            ROOT/apeakfinder.cpp \
+           Script/ScriptInterfaces/agraph_si.cpp \
+           Script/ScriptInterfaces/agui_si.cpp \
+           Script/ScriptInterfaces/ahist_si.cpp \
+           Script/ScriptInterfaces/arootstyle_si.cpp \
+           Script/acore_si.cpp \
+           Script/aguifromscrwin.cpp \
+           Script/aguiwindow.cpp \
+           Script/ajscriptmanager.cpp \
+           Script/ajscriptworker.cpp \
+           Script/amath_si.cpp \
+           Script/arootgraphrecord.cpp \
+           Script/aroothistrecord.cpp \
+           Script/arootobjbase.cpp \
+           Script/arootobjcollection.cpp \
+           Script/ascripthelpentry.cpp \
+           Script/ascripthub.cpp \
+           Script/ascriptinterface.cpp \
+           Script/ascriptmessenger.cpp \
+           Script/ascriptobjstore.cpp \
+           Script/avirtualscriptmanager.cpp \
            TRB/trb3timingrecord.cpp
 
 HEADERS += ROOT/cernrootmodule.h \
+           Common/arandomhub.h \
+           Common/astopwatch.h \
+           GUI/alineedit.h \
            GUI/atexttospeechconfigurator.h \
+           GUI/guitools.h \
            ROOT/GUI/arasterwindow.h \
            ROOT/GUI/agraphwindow.h \
-           Script/histgraphinterfaces.h \
            Common/tmpobjhubclass.h \
            ROOT/apeakfinder.h \
+           Script/ScriptInterfaces/agraph_si.h \
+           Script/ScriptInterfaces/agui_si.h \
+           Script/ScriptInterfaces/ahist_si.h \
+           Script/ScriptInterfaces/arootstyle_si.h \
+           Script/acore_si.h \
+           Script/aguifromscrwin.h \
+           Script/aguiwindow.h \
+           Script/ajscriptmanager.h \
+           Script/ajscriptworker.h \
+           Script/amath_si.h \
+           Script/arootgraphrecord.h \
+           Script/aroothistrecord.h \
+           Script/arootobjbase.h \
+           Script/arootobjcollection.h \
+           Script/ascripthelpentry.h \
+           Script/ascripthub.h \
+           Script/ascriptinterface.h \
+           Script/ascriptmessenger.h \
+           Script/ascriptobjstore.h \
+           Script/avirtualscriptmanager.h \
+           Script/escriptlanguage.h \
            TRB/trb3timingrecord.h
 
 FORMS   += ROOT/GUI/agraphwindow.ui \
@@ -47,6 +94,8 @@ LIBS += -L$$DABCPATH/lib/ -lDabcBase -lDabcMbs -lDabcHadaq
 QT += core gui
 QT += widgets
 QT += websockets
+
+QT += qml   #this is for qjsengine
 
 TARGET = TRBreader
 TEMPLATE = app
@@ -91,7 +140,6 @@ HEADERS  += GUI/mainwindow.h \
     Common/ajsontools.h \
     Common/afiletools.h \
     Script/ainterfacetomessagewindow.h \
-    Script/ascriptinterface.h \
     Common/amessage.h \
     Common/completingtexteditclass.h \    
     Script/ainterfacetowaveforms.h \
@@ -104,7 +152,6 @@ HEADERS  += GUI/mainwindow.h \
     Script/ainterfacetowebsocket.h \
     Common/ahldfileprocessor.h \
     Script/ainterfacetohldfileprocessor.h \
-    Script/ascriptinterfacefactory.h \
     Net/awebsocketsession.h \
     Net/awebsocketsessionserver.h \
     Script/awebserverinterface.h \
@@ -121,11 +168,12 @@ FORMS    += GUI/mainwindow.ui \
 
 INCLUDEPATH += Common
 INCLUDEPATH += Script
+INCLUDEPATH += Script/ScriptInterfaces
 INCLUDEPATH += GUI
 INCLUDEPATH += TRB
 INCLUDEPATH += Net
 
-#---SPEECh---
+#---SPEECH---
 TextToSpeech {
     DEFINES += TextToSpeechEnabled
     QT += texttospeech

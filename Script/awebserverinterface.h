@@ -22,10 +22,10 @@ public slots:
     void           SendObject(const QVariant& object);
     void           SendObjectAsJSON(const QVariant& object);
 
-    bool           IsBufferEmpty() const;
+    bool           IsBufferEmpty();
     void           ClearBuffer();
 
-    const QVariant GetBufferAsObject() const;
+    QVariant       GetBufferAsObject() const;
     bool           SaveBufferToFile(const QString& fileName);
 
     void           SendProgressReport(int percents);

@@ -15,12 +15,12 @@ AInterfaceToData::AInterfaceToData(ADataHub* DataHub) :
     Description = "Gives access to DataHub.";
 }
 
-int AInterfaceToData::countEvents() const
+int AInterfaceToData::countEvents()
 {
     return DataHub->CountEvents();
 }
 
-int AInterfaceToData::countChannels() const
+int AInterfaceToData::countChannels()
 {
     return DataHub->CountChannels();
 }
@@ -63,17 +63,17 @@ void AInterfaceToData::addEvent(const QVariant signalArray)
     DataHub->AddEvent(ev);
 }
 
-float AInterfaceToData::getSignal(int ievent, int iLogicalChannel) const
+float AInterfaceToData::getSignal(int ievent, int iLogicalChannel)
 {
     return DataHub->GetSignal(ievent, iLogicalChannel);
 }
 
-float AInterfaceToData::getSignalFast(int ievent, int iLogicalChannel) const
+float AInterfaceToData::getSignalFast(int ievent, int iLogicalChannel)
 {
     return DataHub->GetSignalFast(ievent, iLogicalChannel);
 }
 
-const QVariant AInterfaceToData::getSignals(int ievent) const
+QVariant AInterfaceToData::getSignals(int ievent)
 {
     const QVector<float>* vec = DataHub->GetSignals(ievent);
     if (!vec) return QVariantList();
@@ -84,7 +84,7 @@ const QVariant AInterfaceToData::getSignals(int ievent) const
     return jv.toVariant();
 }
 
-const QVariant AInterfaceToData::getSignalsFast(int ievent) const
+QVariant AInterfaceToData::getSignalsFast(int ievent)
 {
     const QVector<float>* vec = DataHub->GetSignalsFast(ievent);
 
@@ -160,12 +160,12 @@ void AInterfaceToData::setSignalsFast(int ievent, const QVariant arrayOfValues)
     DataHub->SetSignalsFast(ievent, &vec);
 }
 
-bool AInterfaceToData::isRejectedEvent(int ievent) const
+bool AInterfaceToData::isRejectedEvent(int ievent)
 {
     return DataHub->IsRejected(ievent);
 }
 
-bool AInterfaceToData::isRejectedEventFast(int ievent) const
+bool AInterfaceToData::isRejectedEventFast(int ievent)
 {
     return DataHub->IsRejectedFast(ievent);
 }
@@ -187,7 +187,7 @@ void AInterfaceToData::setAllRejected(bool flag)
     DataHub->SetAllRejectedFlag(flag);
 }
 
-const QVariant AInterfaceToData::getPosition(int ievent) const
+QVariant AInterfaceToData::getPosition(int ievent)
 {
     const float* pos = DataHub->GetPosition(ievent);
     if (!pos)
@@ -202,7 +202,7 @@ const QVariant AInterfaceToData::getPosition(int ievent) const
     return jv.toVariant();
 }
 
-const QVariant AInterfaceToData::getPositionFast(int ievent) const
+QVariant AInterfaceToData::getPositionFast(int ievent)
 {
     const float* pos = DataHub->GetPosition(ievent);
 
@@ -226,7 +226,7 @@ void AInterfaceToData::setPositionFast(int ievent, float x, float y, float z)
     DataHub->SetPositionFast(ievent, x, y, z);
 }
 
-const QVariant AInterfaceToData::getWaveforms(int ievent)
+QVariant AInterfaceToData::getWaveforms(int ievent)
 {
     const QVector< QVector<float>* >* vec = DataHub->GetWaveforms(ievent);
     if (!vec)
@@ -248,7 +248,7 @@ const QVariant AInterfaceToData::getWaveforms(int ievent)
     return jv.toVariant();
 }
 
-float AInterfaceToData::getWaveformMax(int ievent, int ichannel) const
+float AInterfaceToData::getWaveformMax(int ievent, int ichannel)
 {
     float val = DataHub->GetWaveformMax(ievent, ichannel);
     if (std::isnan(val))
@@ -256,7 +256,7 @@ float AInterfaceToData::getWaveformMax(int ievent, int ichannel) const
     return val;
 }
 
-float AInterfaceToData::getWaveformMin(int ievent, int ichannel) const
+float AInterfaceToData::getWaveformMin(int ievent, int ichannel)
 {
     float val = DataHub->GetWaveformMin(ievent, ichannel);
     if (std::isnan(val))
@@ -264,7 +264,7 @@ float AInterfaceToData::getWaveformMin(int ievent, int ichannel) const
     return val;
 }
 
-int AInterfaceToData::getWaveformMaxSample(int ievent, int ichannel) const
+int AInterfaceToData::getWaveformMaxSample(int ievent, int ichannel)
 {
     int val = DataHub->GetWaveformMaxSample(ievent, ichannel);
     if (val < 0)
@@ -272,7 +272,7 @@ int AInterfaceToData::getWaveformMaxSample(int ievent, int ichannel) const
     return val;
 }
 
-int AInterfaceToData::getWaveformMinSample(int ievent, int ichannel) const
+int AInterfaceToData::getWaveformMinSample(int ievent, int ichannel)
 {
     int val = DataHub->GetWaveformMinSample(ievent, ichannel);
     if (val < 0)
@@ -280,7 +280,7 @@ int AInterfaceToData::getWaveformMinSample(int ievent, int ichannel) const
     return val;
 }
 
-int AInterfaceToData::getWaveformSampleWhereFirstBelow(int ievent, int ichannel, float threshold) const
+int AInterfaceToData::getWaveformSampleWhereFirstBelow(int ievent, int ichannel, float threshold)
 {
     int val = DataHub->GetWaveformSampleWhereFirstBelow(ievent, ichannel, threshold);
     if (val < 0)
@@ -288,7 +288,7 @@ int AInterfaceToData::getWaveformSampleWhereFirstBelow(int ievent, int ichannel,
     return val;
 }
 
-int AInterfaceToData::getWaveformSampleWhereFirstAbove(int ievent, int ichannel, float threshold) const
+int AInterfaceToData::getWaveformSampleWhereFirstAbove(int ievent, int ichannel, float threshold)
 {
     int val = DataHub->GetWaveformSampleWhereFirstAbove(ievent, ichannel, threshold);
     if (val < 0)
@@ -360,7 +360,7 @@ void AInterfaceToData::setMultiplicityFast(int ievent, QVariant px_py_pz_nx_ny_n
     DataHub->SetMultiplicityNegativeFast(ievent, arrNeg);
 }
 
-const QVariant AInterfaceToData::getMultiplicity(int ievent) const
+QVariant AInterfaceToData::getMultiplicity(int ievent)
 {
     const int* multPos = DataHub->GetMultiplicityPositive(ievent);
     if (!multPos)
@@ -377,7 +377,7 @@ const QVariant AInterfaceToData::getMultiplicity(int ievent) const
     return jv.toVariant();
 }
 
-const QVariant AInterfaceToData::getMultiplicityFast(int ievent) const
+QVariant AInterfaceToData::getMultiplicityFast(int ievent)
 {
     const int* multPos = DataHub->GetMultiplicityPositiveFast(ievent);
     const int* multNeg = DataHub->GetMultiplicityNegativeFast(ievent);
@@ -453,7 +453,7 @@ void AInterfaceToData::setSumSignalsFast(int ievent, QVariant px_py_pz_nx_ny_nz)
     DataHub->SetSumSignalNegativeFast(ievent, arrNeg);
 }
 
-const QVariant AInterfaceToData::getSumSignals(int ievent) const
+QVariant AInterfaceToData::getSumSignals(int ievent)
 {
     const float* sumPos = DataHub->GetSumSignalPositive(ievent);
     if (!sumPos)
@@ -470,7 +470,7 @@ const QVariant AInterfaceToData::getSumSignals(int ievent) const
     return jv.toVariant();
 }
 
-const QVariant AInterfaceToData::getSumSignalsFast(int ievent) const
+QVariant AInterfaceToData::getSumSignalsFast(int ievent)
 {
     const float* sumPos = DataHub->GetSumSignalPositiveFast(ievent);
     const float* sumNeg = DataHub->GetSumSignalNegativeFast(ievent);
@@ -482,7 +482,7 @@ const QVariant AInterfaceToData::getSumSignalsFast(int ievent) const
     return jv.toVariant();
 }
 
-void AInterfaceToData::save(const QString& FileName, bool bSavePositions, bool bSkipRejected) const
+void AInterfaceToData::save(const QString& FileName, bool bSavePositions, bool bSkipRejected)
 {
     const QString ErrStr = DataHub->Save(FileName, bSavePositions, bSkipRejected);
 
