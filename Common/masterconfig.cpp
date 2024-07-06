@@ -6,8 +6,25 @@
 #include <QJsonArray>
 #include <QDebug>
 
+MasterConfig &MasterConfig::getInstance()
+{
+    static MasterConfig instance;
+    return instance;
+}
+
+const MasterConfig & MasterConfig::getConstInstance()
+{
+    return getInstance();
+}
+
+#include "QStandardPaths"
 MasterConfig::MasterConfig()
 {
+    ConfigDir = QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation) + "/TRBreader";
+    AutosaveFile = ConfigDir+"/autosave.json";
+    WinSetFile = ConfigDir+"/winset.json";
+    qDebug() << "-> Config dir:" << ConfigDir;
+
     Map = new ChannelMapper();
 }
 
@@ -452,6 +469,16 @@ bool MasterConfig::IsNegativeLogicalChannel(int iLogical) const
     int iHardwChannel = Map->LogicalToHardware(iLogical);
     if ( iHardwChannel >= NegPol.size() || iHardwChannel < 0 ) return false;
     return NegPol.at(iHardwChannel);
+}
+
+QString MasterConfig::getScriptingFileName(EScriptLanguage scriptLanguage) const
+{
+    QString ret = ConfigDir + "/";
+    if (scriptLanguage == EScriptLanguage::JavaScript)
+        ret += "JS_scripting.json";
+    else
+        ret += "Python_scripting.json";
+    return ret;
 }
 
 bool MasterConfig::SetMapping(const QVector<int> &mapping)

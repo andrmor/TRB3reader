@@ -382,15 +382,15 @@ void AScriptWindow::highlightErrorLine(int line)
     te->setExtraSelections(esList);
 }
 
+#include "masterconfig.h"
 void AScriptWindow::WriteToJson()
 {
-    // TODO
-/*
-    if (ScriptLanguage == EScriptLanguage::JavaScript)
-        writeToJson(GlobSet.JavaScriptJson);
-    else
-        writeToJson(GlobSet.PythonJson);
-*/
+    const MasterConfig & Config = MasterConfig::getConstInstance();
+    QString fileName = Config.getScriptingFileName(ScriptLanguage);
+
+    QJsonObject js;
+    writeToJson(js);
+    SaveJsonToFile(js, fileName);
 }
 
 void AScriptWindow::writeToJson(QJsonObject & json) const
@@ -416,11 +416,12 @@ void AScriptWindow::writeToJson(QJsonObject & json) const
 
 void AScriptWindow::ReadFromJson()
 {
-    // TODO !!!***
-    /*
-    if (ScriptLanguage == EScriptLanguage::JavaScript) readFromJson(GlobSet.JavaScriptJson);
-    else                                               readFromJson(GlobSet.PythonJson);
-*/
+    const MasterConfig & Config = MasterConfig::getConstInstance();
+    QString fileName = Config.getScriptingFileName(ScriptLanguage);
+
+    QJsonObject js;
+    LoadJsonFromFile(js, fileName);
+    readFromJson(js);
 }
 
 void AScriptWindow::removeAllBooksExceptFirst()

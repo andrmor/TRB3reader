@@ -4,7 +4,7 @@
 #include "afiletools.h"
 #include "ajsontools.h"
 #include "channelmapper.h"
-//#include "ascriptwindow.h"
+#include "ascriptwindow.h"
 #include "amessage.h"
 #include "adispatcher.h"
 #include "aeditchannelsdialog.h"
@@ -34,21 +34,20 @@
 
 #include <cmath>
 
-MainWindow::MainWindow(MasterConfig* Config,
-                       ADispatcher *Dispatcher,
+MainWindow::MainWindow(ADispatcher *Dispatcher,
                        ADataHub* DataHub,
                        Trb3dataReader* Reader,
                        Trb3signalExtractor* Extractor,
                        AHldFileProcessor& HldFileProcessor, ANetworkModule &Network,
                        QWidget *parent) :
     QMainWindow(parent),
-    Config(Config), Dispatcher(Dispatcher), DataHub(DataHub), Reader(Reader), Extractor(Extractor), HldFileProcessor(HldFileProcessor), Network(Network),
+    Config(MasterConfig::getInstance()), Dispatcher(Dispatcher), DataHub(DataHub), Reader(Reader), Extractor(Extractor), HldFileProcessor(HldFileProcessor), Network(Network),
     ui(new Ui::MainWindow)
 {
     bStopFlag = false;
     ui->setupUi(this);
 
-    TrbRunManager = new ATrbRunControl(*Config, Network, Dispatcher->ConfigDir);
+    TrbRunManager = new ATrbRunControl(Network, Config.ConfigDir);
     QObject::connect(TrbRunManager, &ATrbRunControl::sigBoardIsAlive, this, &MainWindow::onBoardIsAlive);
     QObject::connect(TrbRunManager, &ATrbRunControl::sigBoardOff, this, &MainWindow::onBoardDisconnected);
     QObject::connect(TrbRunManager, &ATrbRunControl::boardLogReady, this, &MainWindow::onBoardLogNewText);
@@ -80,7 +79,7 @@ MainWindow::MainWindow(MasterConfig* Config,
     ui->pbRefreshBufferIndication->setVisible(false);
     ui->pbUpdateTriggerGui->setVisible(false);
 
-    RootModule = new CernRootModule(Reader, Extractor, Config, DataHub);
+    RootModule = new CernRootModule(Reader, Extractor, DataHub);
     RootModule->setMainWindow(this);
     connect(RootModule, &CernRootModule::WOneHidden, [=](){ui->pbShowWaveform->setChecked(false);});
     connect(RootModule, &CernRootModule::WOverNegHidden, [=](){ui->pbShowOverlayNeg->setChecked(false);});
@@ -106,10 +105,9 @@ MainWindow::MainWindow(MasterConfig* Config,
 
     //Loading window settings
     LoadWindowSettings();
-    QJsonObject jsS;
-    LoadJsonFromFile(jsS, Dispatcher->ConfigDir+"/scripting.json");
-    // !!!***
-//    if (!jsS.isEmpty()) ScriptWindow->ReadFromJson(jsS);
+
+    // loading scripts
+    JScriptWin->ReadFromJson();
 
     //misc gui settings
     menuBar()->setNativeMenuBar(false);  //otherwise on some system menu bar is not wisible!
@@ -158,12 +156,12 @@ void MainWindow::SetEnabled(bool flag)
 
 void MainWindow::on_pbSelectFile_clicked()
 {
-    QString FileName = QFileDialog::getOpenFileName(this, "Select TRB file", Config->WorkingDir, "HLD files (*.hld)");
+    QString FileName = QFileDialog::getOpenFileName(this, "Select TRB file", Config.WorkingDir, "HLD files (*.hld)");
     if (FileName.isEmpty()) return;
-    Config->WorkingDir = QFileInfo(FileName).absolutePath();
+    Config.WorkingDir = QFileInfo(FileName).absolutePath();
 
     ui->leFileName->setText(FileName);
-    Config->FileName = FileName;
+    Config.FileName = FileName;
     LogMessage("New file selected");
 }
 
@@ -195,10 +193,10 @@ void MainWindow::on_pbProcessData_clicked()
 
 const QString MainWindow::ProcessData()
 {
-    if (Config->FileName.isEmpty()) return "File name not defined!";
+    if (Config.FileName.isEmpty()) return "File name not defined!";
 
     LogMessage("Reading hld file...");
-    QString err = Reader->Read(Config->FileName);
+    QString err = Reader->Read(Config.FileName);
     if (!err.isEmpty()) return err;
 
     LogMessage("Extracting signals...");
@@ -215,7 +213,7 @@ void MainWindow::LogMessage(const QString message)
 
 void MainWindow::on_pbEditListOfNegatives_clicked()
 {
-    QString old =  PackChannelList(Config->GetListOfNegativeChannels());
+    QString old =  PackChannelList(Config.GetListOfNegativeChannels());
     AEditChannelsDialog* D = new AEditChannelsDialog("List of negative channels", old, "Example: 0, 2, 5-15, 7, 30-45");
     int res = D->exec();
     if (res != 1) return;
@@ -230,7 +228,7 @@ void MainWindow::on_pbEditListOfNegatives_clicked()
     vec.clear();
     for (int i: set) vec << i;
 
-    Config->SetNegativeChannels(vec);
+    Config.SetNegativeChannels(vec);
     UpdateGui();
 }
 
@@ -266,7 +264,7 @@ void MainWindow::on_pbLoadPolarities_clicked()
 
     if (bStrangies) message("There were some unexpected fields in the file which were ignored!", this);
 
-    Config->SetNegativeChannels(negList);
+    Config.SetNegativeChannels(negList);
 
     ClearData();
     LogMessage("Polarities updated");
@@ -277,7 +275,7 @@ void MainWindow::on_pbLoadPolarities_clicked()
 void MainWindow::on_pbEditMap_clicked()
 {
     QString old;
-    for (int i : Config->GetMapping()) old += QString::number(i) + " ";
+    for (int i : Config.GetMapping()) old += QString::number(i) + " ";
 
     AEditChannelsDialog* D = new AEditChannelsDialog("Hardware channels sorted by logical number", old, "Example: 5 4-0 6 12-25");
     int res = D->exec();
@@ -305,7 +303,7 @@ void MainWindow::on_pbEditMap_clicked()
     }
     */
 
-    bool bOK = Config->SetMapping(vec);
+    bool bOK = Config.SetMapping(vec);
     if (!bOK) message("Ignored: there are non-unique channel numbers in the list!", this);
 
     UpdateGui();
@@ -345,10 +343,10 @@ void MainWindow::on_pbAddMapping_clicked()
 
     if (bStrangies) message("There were some unexpected fields in the file which were ignored!", this);
 
-    bOK = Config->SetMapping(arr);
+    bOK = Config.SetMapping(arr);
     if (bOK)
     {
-        //Config->Map->Validate(Reader->CountChannels(), true);
+        //Config.Map->Validate(Reader->CountChannels(), true);
         LogMessage("Mapping updated");
     }
     else message("Ignored: There are non-unique channel numbers in the list!", this);
@@ -358,7 +356,7 @@ void MainWindow::on_pbAddMapping_clicked()
 
 void MainWindow::on_pbEditIgnoreChannelList_clicked()
 {
-    QString old =  PackChannelList(Config->GetListOfIgnoreChannels());
+    QString old =  PackChannelList(Config.GetListOfIgnoreChannels());
     AEditChannelsDialog* D = new AEditChannelsDialog("List of ignored hardware channels", old, "Example: 2, 5-15, 30-45");
     int res = D->exec();
     if (res != 1) return;
@@ -373,7 +371,7 @@ void MainWindow::on_pbEditIgnoreChannelList_clicked()
     vec.clear();
     for (int i: set) vec << i;
 
-    Config->SetListOfIgnoreChannels(vec);
+    Config.SetListOfIgnoreChannels(vec);
     UpdateGui();
 }
 
@@ -411,7 +409,7 @@ void MainWindow::on_pbAddListHardwChToIgnore_clicked()
 
     if (bStrangies) message("There were some unexpected fields in the file which were ignored!", this);
 
-    Config->SetListOfIgnoreChannels(arr);
+    Config.SetListOfIgnoreChannels(arr);
 
     LogMessage("Ignored channels were updated");
 
@@ -448,7 +446,7 @@ void MainWindow::on_pteMapping_customContextMenuRequested(const QPoint &pos)
 
       if (selectedItem == Validate)
         {
-          const QString err = Config->Map->Validate();
+          const QString err = Config.Map->Validate();
           QString output;
           if (err.isEmpty()) output = "Map is valid";
           else output = "Map is NOT valid:\n" + err;
@@ -463,12 +461,12 @@ void MainWindow::on_pteMapping_customContextMenuRequested(const QPoint &pos)
           QString title;
           if (selectedItem == PrintToLogical)
           {
-              list = Config->Map->PrintToLogical();
+              list = Config.Map->PrintToLogical();
               title = "Hardware -> Logical";
           }
           else
           {
-              list = Config->Map->PrintToHardware();
+              list = Config.Map->PrintToHardware();
               title = "Logical -> Hardware";
           }
 
@@ -513,7 +511,7 @@ void MainWindow::on_pbSaveTotextFile_clicked()
     }
 
     bool bUseHardware = false;
-    if (!Config->Map->Validate().isEmpty())
+    if (!Config.Map->Validate().isEmpty())
     {
         int ret = QMessageBox::warning(this, "TRB3reader", "Channel map not valid!\nSave data without mapping (use hardware channels)?", QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
         if (ret == QMessageBox::Cancel) return;
@@ -562,12 +560,12 @@ bool MainWindow::sendSignalData(QTextStream &outStream, bool bUseHardware)
     }
     else
     {
-        numChannels = Config->CountLogicalChannels();
+        numChannels = Config.CountLogicalChannels();
         for (int ie=0; ie<numEvents; ie++)
             if (!Extractor->IsRejectedEventFast(ie))
             {
                 for (int ic=0; ic<numChannels; ic++)
-                    outStream << Extractor->GetSignalFast(ie, Config->Map->LogicalToHardwareFast(ic)) << " ";
+                    outStream << Extractor->GetSignalFast(ie, Config.Map->LogicalToHardwareFast(ic)) << " ";
                 outStream << "\r\n";
             }
     }
@@ -623,7 +621,7 @@ int MainWindow::getCurrentlySelectedHardwareChannel()
 
     int iHardwChan;
 
-    if (bUseLogical)                          iHardwChan = Config->Map->LogicalToHardware(val);
+    if (bUseLogical)                          iHardwChan = Config.Map->LogicalToHardware(val);
     else
     {
         if (val >= Reader->CountChannels())  iHardwChan = -1;
@@ -658,12 +656,12 @@ void MainWindow::OnEventOrChannelChanged()
     // Update channel indication
     if (bUseLogical)
     {
-        if (iChannel >= Config->CountLogicalChannels())
-            iChannel = Config->CountLogicalChannels() - 1;
+        if (iChannel >= Config.CountLogicalChannels())
+            iChannel = Config.CountLogicalChannels() - 1;
         ui->sbChannel->setValue(iChannel);
         ui->leLogic->setText(QString::number(iChannel));
 
-        iHardwChan = Config->Map->LogicalToHardware(iChannel);
+        iHardwChan = Config.Map->LogicalToHardware(iChannel);
         if ( iHardwChan < 0 ) ui->leHardw->setText("n.a.");
         else ui->leHardw->setText(QString::number(iHardwChan));
     }
@@ -676,19 +674,19 @@ void MainWindow::OnEventOrChannelChanged()
         ui->sbChannel->setValue(iHardwChan);
         ui->leHardw->setText(QString::number(iHardwChan));
 
-        int ilogical = Config->Map->HardwareToLogical(iChannel);
+        int ilogical = Config.Map->HardwareToLogical(iChannel);
         QString s;
         if ( ilogical < 0 ) s = "n.a.";
         else s = QString::number(ilogical);
         ui->leLogic->setText(s);
     }
 
-    bool bNegative = Config->IsNegativeHardwareChannel(iHardwChan);
+    bool bNegative = Config.IsNegativeHardwareChannel(iHardwChan);
     QString s = ( bNegative ? "Neg" : "Pos");
     ui->lePolar->setText(s);
 
     // Check is channel number is valid // obsolete!
-    int max = (bUseLogical ? Config->CountLogicalChannels() : Reader->CountChannels());
+    int max = (bUseLogical ? Config.CountLogicalChannels() : Reader->CountChannels());
     max--;
     if (iChannel > max )
     {
@@ -803,7 +801,7 @@ void MainWindow::on_pbShowWaveform_toggled(bool checked)
         }
     }
 
-    bool bNegative = bFromDataHub ? Config->IsNegativeLogicalChannel(ichannel) : Config->IsNegativeHardwareChannel(ichannel);
+    bool bNegative = bFromDataHub ? Config.IsNegativeLogicalChannel(ichannel) : Config.IsNegativeHardwareChannel(ichannel);
     double Min, Max;
     if (bNegative)
     {
@@ -1282,7 +1280,7 @@ void MainWindow::on_pbAddDatakind_clicked()
     else
         datakind = datakindStr.toInt(&bOK, 10);
 
-    if (bOK) Config->AddDatakind(datakind);
+    if (bOK) Config.AddDatakind(datakind);
     UpdateGui();
 }
 
@@ -1300,7 +1298,7 @@ void MainWindow::on_pbRemoveDatakind_clicked()
     {
         QString dk = sl.first();
         int datakind = dk.toInt(0, 16);
-        Config->RemoveDatakind(datakind);
+        Config.RemoveDatakind(datakind);
     }
     UpdateGui();
 }
@@ -1316,7 +1314,7 @@ void MainWindow::on_pbAddTimingDatakind_clicked()
     else
         datakind = datakindStr.toInt(&bOK, 10);
 
-    if (bOK) Config->AddDatakind_Timing(datakind);
+    if (bOK) Config.AddDatakind_Timing(datakind);
     UpdateGui();
 }
 
@@ -1334,7 +1332,7 @@ void MainWindow::on_pbRemoveTimingDatakind_clicked()
     {
         QString dk = sl.first();
         int datakind = dk.toInt(0, 16);
-        Config->RemoveDatakind_Timing(datakind);
+        Config.RemoveDatakind_Timing(datakind);
     }
     UpdateGui();
 }
@@ -1342,9 +1340,9 @@ void MainWindow::on_pbRemoveTimingDatakind_clicked()
 #include <QTimeZone>
 void MainWindow::on_pbPrintHLDfileProperties_clicked()
 {
-    QString FileName = QFileDialog::getOpenFileName(this, "Select HLD file to inspect", Config->WorkingDir, "*.hld");
+    QString FileName = QFileDialog::getOpenFileName(this, "Select HLD file to inspect", Config.WorkingDir, "*.hld");
     if (FileName.isEmpty()) return;
-    Config->WorkingDir = QFileInfo(FileName).absolutePath();
+    Config.WorkingDir = QFileInfo(FileName).absolutePath();
 
     QString s = Reader->GetFileInfo(FileName);
     ui->pteHLDfileProperties->clear();
@@ -1361,9 +1359,9 @@ void MainWindow::on_pbPrintHLDfileProperties_clicked()
 
 void MainWindow::on_pbProcessAllFromDir_clicked()
 {
-    QString dir = QFileDialog::getExistingDirectory(this, "Select directory with hld files to convert", Config->WorkingDir);
+    QString dir = QFileDialog::getExistingDirectory(this, "Select directory with hld files to convert", Config.WorkingDir);
     if (dir.isEmpty()) return;
-    Config->WorkingDir = QFileInfo(dir).absolutePath();
+    Config.WorkingDir = QFileInfo(dir).absolutePath();
 
     if (!QDir(dir).exists())
     {
@@ -1383,9 +1381,9 @@ void MainWindow::on_pbProcessAllFromDir_clicked()
 
 void MainWindow::on_pbProcessSelectedFiles_clicked()
 {
-    QStringList names = QFileDialog::getOpenFileNames(this, "Select hld files to be processed", Config->WorkingDir, "*.hld");
+    QStringList names = QFileDialog::getOpenFileNames(this, "Select hld files to be processed", Config.WorkingDir, "*.hld");
     if (names.isEmpty()) return;
-    Config->WorkingDir = QFileInfo(names.first()).absolutePath();
+    Config.WorkingDir = QFileInfo(names.first()).absolutePath();
 
     bulkProcessorEnvelope(names);
 
@@ -1449,17 +1447,17 @@ void MainWindow::onShowActionRequest(const QString action)
 /*
 bool MainWindow::bulkProcessCore()
 {
-    if (Config->FileName.isEmpty())
+    if (Config.FileName.isEmpty())
     {
         ui->pteBulkLog->appendPlainText("---- File name not defined!");
         return false;
     }
     LogMessage("Reading hld file...");
-    ui->pteBulkLog->appendPlainText("Processing " + QFileInfo(Config->FileName).fileName());
-    qDebug() << "Processing" <<  Config->FileName;
+    ui->pteBulkLog->appendPlainText("Processing " + QFileInfo(Config.FileName).fileName());
+    qDebug() << "Processing" <<  Config.FileName;
 
     // Reading waveforms, pefroming optional smoothing/pedestal substraction
-    bool ok = Reader->Read(Config->FileName);
+    bool ok = Reader->Read(Config.FileName);
     if (!ok)
     {
         ui->pteBulkLog->appendPlainText("---- File read failed!");
@@ -1506,9 +1504,9 @@ bool MainWindow::bulkProcessCore()
         ui->pteBulkLog->appendPlainText("---- Extractor data not valid -> ignoring this file");
         return false;
     }
-    if (!Config->Map->Validate().isEmpty())
+    if (!Config.Map->Validate().isEmpty())
     {
-        qDebug() << Config->Map->Validate();
+        qDebug() << Config.Map->Validate();
         ui->pteBulkLog->appendPlainText("---- Conflict with channel map -> ignoring this file");
         return false;
     }
@@ -1516,7 +1514,7 @@ bool MainWindow::bulkProcessCore()
     // saving to individual files
     if (ui->cbSaveSignalsToFiles->isChecked())
     {
-        QFileInfo fi(Config->FileName);
+        QFileInfo fi(Config.FileName);
         QString nameSave = fi.path() + "/" + fi.completeBaseName() + ui->leAddToProcessed->text();
         qDebug() << "Saving to file:"<< nameSave;
         saveSignalsToFile(nameSave, false);
@@ -1526,7 +1524,7 @@ bool MainWindow::bulkProcessCore()
     if (ui->cbBulkCopyToDatahub->isChecked())
     {
         qDebug() << "Copying to DataHub...";
-        const QVector<int>& map = Config->Map->GetMapToHardware();
+        const QVector<int>& map = Config.Map->GetMapToHardware();
 
         for (int iev=0; iev<numEvents; iev++)
         {
@@ -1549,7 +1547,7 @@ bool MainWindow::bulkProcessCore()
                 QVector< QVector<float>* > vec;
                 for (int ihardw : map)
                 {
-                    if (Extractor->GetSignalFast(iev, ihardw) == 0 || Config->IsIgnoredHardwareChannel(ihardw)) vec << 0;
+                    if (Extractor->GetSignalFast(iev, ihardw) == 0 || Config.IsIgnoredHardwareChannel(ihardw)) vec << 0;
                     else
                     {
                         QVector<float>* wave = new QVector<float>();
@@ -1570,9 +1568,9 @@ bool MainWindow::bulkProcessCore()
 
 void MainWindow::on_pbSaveSignalsFromDataHub_clicked()
 {
-    QString FileName = QFileDialog::getSaveFileName(this, "Save events from DataHub", Config->WorkingDir, "Data files (*.dat *.txt);;All files (*.*)");
+    QString FileName = QFileDialog::getSaveFileName(this, "Save events from DataHub", Config.WorkingDir, "Data files (*.dat *.txt);;All files (*.*)");
     if (FileName.isEmpty()) return;
-    Config->WorkingDir = QFileInfo(FileName).absolutePath();
+    Config.WorkingDir = QFileInfo(FileName).absolutePath();
 
     bool bSavePositions = ui->cbAddReconstructedPositions->isChecked();
     bool bSkipRejected = ui->cbSaveOnlyGood->isChecked();
@@ -1649,9 +1647,9 @@ void MainWindow::on_pbLoadToDataHub_clicked()
         if (mb.clickedButton() == ConfAlways) bNeverRemindAppendToHub = true;
     }
 
-    QString FileName = QFileDialog::getOpenFileName(this, "Load events", Config->WorkingDir, "Data files (*.dat *.txt);;All files (*.*)");
+    QString FileName = QFileDialog::getOpenFileName(this, "Load events", Config.WorkingDir, "Data files (*.dat *.txt);;All files (*.*)");
     if (FileName.isEmpty()) return;
-    Config->WorkingDir = QFileInfo(FileName).absolutePath();
+    Config.WorkingDir = QFileInfo(FileName).absolutePath();
 
     QFile inFile( FileName );
     inFile.open(QIODevice::ReadOnly);
@@ -1665,7 +1663,7 @@ void MainWindow::on_pbLoadToDataHub_clicked()
     this->setEnabled(false);
     ui->prbMainBar->setVisible(true);
 
-    int numChannels = Config->CountLogicalChannels();
+    int numChannels = Config.CountLogicalChannels();
     int upperLim = numChannels;
     bool bLoadXYZ = ui->cbLoadIncludeReconstructed->isChecked();
     if (bLoadXYZ) upperLim += 3;
@@ -1942,66 +1940,66 @@ void MainWindow::on_pbOpenBufferControl_clicked()
 
 void MainWindow::on_leUser_editingFinished()
 {
-    Config->TrbRunSettings.User = ui->leUser->text();
+    Config.TrbRunSettings.User = ui->leUser->text();
 }
 
 void MainWindow::on_leHost_editingFinished()
 {
-    Config->TrbRunSettings.Host = ui->leHost->text();
+    Config.TrbRunSettings.Host = ui->leHost->text();
 }
 
 void MainWindow::on_leDirOnHost_editingFinished()
 {
-    Config->TrbRunSettings.ScriptDirOnHost = ui->leDirOnHost->text();
+    Config.TrbRunSettings.ScriptDirOnHost = ui->leDirOnHost->text();
 }
 
 void MainWindow::on_leStartupScriptOnHost_editingFinished()
 {
-    Config->TrbRunSettings.StartupScriptOnHost = ui->leStartupScriptOnHost->text();
+    Config.TrbRunSettings.StartupScriptOnHost = ui->leStartupScriptOnHost->text();
 }
 
 void MainWindow::on_leStorageXmlOnHost_editingFinished()
 {
-    Config->TrbRunSettings.StorageXML = ui->leStorageXmlOnHost->text();
+    Config.TrbRunSettings.StorageXML = ui->leStorageXmlOnHost->text();
 }
 
 void MainWindow::on_leFolderForHldFiles_editingFinished()
 {
-    Config->TrbRunSettings.HldDirOnHost = ui->leFolderForHldFiles->text();
+    Config.TrbRunSettings.HldDirOnHost = ui->leFolderForHldFiles->text();
     TrbRunManager->checkFreeSpace();
 }
 
 void MainWindow::on_leiHldFileSize_editingFinished()
 {
-    Config->TrbRunSettings.MaxHldSizeMb = ui->leiHldFileSize->text().toInt();
+    Config.TrbRunSettings.MaxHldSizeMb = ui->leiHldFileSize->text().toInt();
 }
 
 void MainWindow::on_ledTimeSpan_editingFinished()
 {
-    Config->TrbRunSettings.TimeLimit = ui->ledTimeSpan->text().toDouble();
+    Config.TrbRunSettings.TimeLimit = ui->ledTimeSpan->text().toDouble();
 }
 
 void MainWindow::on_cobTimeUnits_activated(int index)
 {
-         if (index == 1)  Config->TrbRunSettings.TimeMultiplier = 60;
-    else if (index == 2)  Config->TrbRunSettings.TimeMultiplier = 60*60;
-    else                  Config->TrbRunSettings.TimeMultiplier = 1;
+         if (index == 1)  Config.TrbRunSettings.TimeMultiplier = 60;
+    else if (index == 2)  Config.TrbRunSettings.TimeMultiplier = 60*60;
+    else                  Config.TrbRunSettings.TimeMultiplier = 1;
 }
 
 void MainWindow::on_cbLimitedTime_clicked(bool checked)
 {
-    Config->TrbRunSettings.bLimitTime = checked;
+    Config.TrbRunSettings.bLimitTime = checked;
     //if (checked) ui->cbLimitEvents->setChecked(false);
 }
 
 void MainWindow::on_cbLimitEvents_clicked(bool checked)
 {
-    Config->TrbRunSettings.bLimitEvents = checked;
+    Config.TrbRunSettings.bLimitEvents = checked;
     //if (checked) ui->cbLimitedTime->setChecked(false);
 }
 void MainWindow::on_leiMaxEvents_editingFinished()
 {
-    Config->TrbRunSettings.MaxEvents = ui->leiMaxEvents->text().toInt();
+    Config.TrbRunSettings.MaxEvents = ui->leiMaxEvents->text().toInt();
 }
 
 void MainWindow::on_pbReadTriggerSettingsFromTrb_clicked()
@@ -2054,7 +2052,7 @@ void MainWindow::on_pbRefreshBufferIndication_clicked()
 {
     ui->lwBufferControl->clear();
 
-    const QVector<ABufferRecord> & recs = Config->getBufferRecords();
+    const QVector<ABufferRecord> & recs = Config.getBufferRecords();
     for (const ABufferRecord & r : recs)
     {
         QListWidgetItem * item = new QListWidgetItem();
@@ -2110,7 +2108,7 @@ void MainWindow::onBufferDeleagateChanged(ABufferDelegate * del)
     int addr, samples, delay, down;
     del->getValues(addr, samples, delay, down);
 
-    ABufferRecord * rec = Config->findBufferRecord(addr);
+    ABufferRecord * rec = Config.findBufferRecord(addr);
     if (!rec)
     {
         qWarning() << "Error in find buffer record!";
@@ -2122,7 +2120,7 @@ void MainWindow::onBufferDeleagateChanged(ABufferDelegate * del)
 
     if (ui->cbBufferSameValues->isChecked())
     {
-        QVector<ABufferRecord> & br = Config->getBufferRecords();
+        QVector<ABufferRecord> & br = Config.getBufferRecords();
         for (ABufferRecord & r : br)
             if (&r != rec)
                 r.updateValues(samples, delay, down);
@@ -2154,49 +2152,49 @@ void MainWindow::on_pbRestartTrb_clicked()
 #include <bitset>
 void MainWindow::on_pbUpdateTriggerGui_clicked()
 {
-    ui->cbThrottle->setChecked(Config->TrbRunSettings.ThrottleOn);
-    ui->sbThrottleValue->setValue(Config->TrbRunSettings.Throttle);
+    ui->cbThrottle->setChecked(Config.TrbRunSettings.ThrottleOn);
+    ui->sbThrottleValue->setValue(Config.TrbRunSettings.Throttle);
 
-    ui->cbMP0->setChecked(Config->TrbRunSettings.bMP_0);
-    ui->cbMP1->setChecked(Config->TrbRunSettings.bMP_1);
-    ui->cbMP2->setChecked(Config->TrbRunSettings.bMP_2);
-    ui->cbMP3->setChecked(Config->TrbRunSettings.bMP_3);
-    ui->cbMP4->setChecked(Config->TrbRunSettings.bMP_4);
-    ui->cbMP5->setChecked(Config->TrbRunSettings.bMP_5);
-    ui->cbMP6->setChecked(Config->TrbRunSettings.bMP_6);
-    ui->cbMP7->setChecked(Config->TrbRunSettings.bMP_7);
+    ui->cbMP0->setChecked(Config.TrbRunSettings.bMP_0);
+    ui->cbMP1->setChecked(Config.TrbRunSettings.bMP_1);
+    ui->cbMP2->setChecked(Config.TrbRunSettings.bMP_2);
+    ui->cbMP3->setChecked(Config.TrbRunSettings.bMP_3);
+    ui->cbMP4->setChecked(Config.TrbRunSettings.bMP_4);
+    ui->cbMP5->setChecked(Config.TrbRunSettings.bMP_5);
+    ui->cbMP6->setChecked(Config.TrbRunSettings.bMP_6);
+    ui->cbMP7->setChecked(Config.TrbRunSettings.bMP_7);
 
-    ui->cbRandomPulser->setChecked(Config->TrbRunSettings.bRandPulser);
-    ui->cbPeriodicalPulser0->setChecked(Config->TrbRunSettings.bPeriodicPulser);
+    ui->cbRandomPulser->setChecked(Config.TrbRunSettings.bRandPulser);
+    ui->cbPeriodicalPulser0->setChecked(Config.TrbRunSettings.bPeriodicPulser);
 
-    ui->cbPeripheryFPGA0->setChecked(Config->TrbRunSettings.bPeripheryFPGA0);
-    ui->cbPeripheryFPGA1->setChecked(Config->TrbRunSettings.bPeripheryFPGA1);
+    ui->cbPeripheryFPGA0->setChecked(Config.TrbRunSettings.bPeripheryFPGA0);
+    ui->cbPeripheryFPGA1->setChecked(Config.TrbRunSettings.bPeripheryFPGA1);
 
-    ui->leFPGA3_0->setText(intToBitString(Config->TrbRunSettings.OR_0_FPGA3));
-    ui->leFPGA3_1->setText(intToBitString(Config->TrbRunSettings.OR_1_FPGA3));
-    ui->leFPGA4_0->setText(intToBitString(Config->TrbRunSettings.OR_0_FPGA4));
-    ui->leFPGA4_1->setText(intToBitString(Config->TrbRunSettings.OR_1_FPGA4));
+    ui->leFPGA3_0->setText(intToBitString(Config.TrbRunSettings.OR_0_FPGA3));
+    ui->leFPGA3_1->setText(intToBitString(Config.TrbRunSettings.OR_1_FPGA3));
+    ui->leFPGA4_0->setText(intToBitString(Config.TrbRunSettings.OR_0_FPGA4));
+    ui->leFPGA4_1->setText(intToBitString(Config.TrbRunSettings.OR_1_FPGA4));
 
-    ui->cbTimeEnable_FPGA3->setChecked(Config->TrbRunSettings.TimeEnable_FPGA3);
-    ui->cbTimeEnable_FPGA4->setChecked(Config->TrbRunSettings.TimeEnable_FPGA4);
-    ui->leTimeChannelsFPGA3->setText(intToBitStringShift1(Config->TrbRunSettings.TimeChannels_FPGA3));
-    ui->leTimeChannelsFPGA4->setText(intToBitStringShift1(Config->TrbRunSettings.TimeChannels_FPGA4));
-    ui->ledTimeWinBefore_FPGA3->setText(QString::number(Config->TrbRunSettings.TimeWinBefore_FPGA3));
-    ui->ledTimeWinAfter_FPGA3->setText(QString::number(Config->TrbRunSettings.TimeWinAfter_FPGA3));
-    ui->ledTimeWinBefore_FPGA4->setText(QString::number(Config->TrbRunSettings.TimeWinBefore_FPGA4));
-    ui->ledTimeWinAfter_FPGA4->setText(QString::number(Config->TrbRunSettings.TimeWinAfter_FPGA4));
+    ui->cbTimeEnable_FPGA3->setChecked(Config.TrbRunSettings.TimeEnable_FPGA3);
+    ui->cbTimeEnable_FPGA4->setChecked(Config.TrbRunSettings.TimeEnable_FPGA4);
+    ui->leTimeChannelsFPGA3->setText(intToBitStringShift1(Config.TrbRunSettings.TimeChannels_FPGA3));
+    ui->leTimeChannelsFPGA4->setText(intToBitStringShift1(Config.TrbRunSettings.TimeChannels_FPGA4));
+    ui->ledTimeWinBefore_FPGA3->setText(QString::number(Config.TrbRunSettings.TimeWinBefore_FPGA3));
+    ui->ledTimeWinAfter_FPGA3->setText(QString::number(Config.TrbRunSettings.TimeWinAfter_FPGA3));
+    ui->ledTimeWinBefore_FPGA4->setText(QString::number(Config.TrbRunSettings.TimeWinBefore_FPGA4));
+    ui->ledTimeWinAfter_FPGA4->setText(QString::number(Config.TrbRunSettings.TimeWinAfter_FPGA4));
 
-    ulong rFreq = Config->TrbRunSettings.RandomPulserFrequency.toULong(nullptr, 16);
+    ulong rFreq = Config.TrbRunSettings.RandomPulserFrequency.toULong(nullptr, 16);
     double freq = (double)rFreq / 21.474836;
     ui->leRandomFrequency->setText( QString::number(freq) );
 
-    ulong rPeriod = Config->TrbRunSettings.Period.toULong(nullptr, 16);
+    ulong rPeriod = Config.TrbRunSettings.Period.toULong(nullptr, 16);
     double per = (double)rPeriod * 10.0;
     ui->lePeriod0->setText( QString::number(per) );
 
     // line 0
     {
-        int val = Config->TrbRunSettings.PeripheryTriggerInputs0.toInt(nullptr, 16);
+        int val = Config.TrbRunSettings.PeripheryTriggerInputs0.toInt(nullptr, 16);
         std::bitset<32> bits(val);
         ui->cbT330->setChecked(bits.test(14));
         ui->cbT320->setChecked(bits.test(13));
@@ -2211,7 +2209,7 @@ void MainWindow::on_pbUpdateTriggerGui_clicked()
 
     // line 1
     {
-        int val = Config->TrbRunSettings.PeripheryTriggerInputs1.toInt(nullptr, 16);
+        int val = Config.TrbRunSettings.PeripheryTriggerInputs1.toInt(nullptr, 16);
         std::bitset<32> bits(val);
         ui->cbT331->setChecked(bits.test(14));
         ui->cbT321->setChecked(bits.test(13));
@@ -2227,39 +2225,39 @@ void MainWindow::on_pbUpdateTriggerGui_clicked()
 
 void MainWindow::on_pbUpdateTriggerSettings_clicked()
 {
-    Config->TrbRunSettings.ThrottleOn = ui->cbThrottle->isChecked();
-    Config->TrbRunSettings.Throttle = ui->sbThrottleValue->value();
+    Config.TrbRunSettings.ThrottleOn = ui->cbThrottle->isChecked();
+    Config.TrbRunSettings.Throttle = ui->sbThrottleValue->value();
 
-    Config->TrbRunSettings.bMP_0 = ui->cbMP0->isChecked();
-    Config->TrbRunSettings.bMP_1 = ui->cbMP1->isChecked();
-    Config->TrbRunSettings.bMP_2 = ui->cbMP2->isChecked();
-    Config->TrbRunSettings.bMP_3 = ui->cbMP3->isChecked();
-    Config->TrbRunSettings.bMP_4 = ui->cbMP4->isChecked();
-    Config->TrbRunSettings.bMP_5 = ui->cbMP5->isChecked();
-    Config->TrbRunSettings.bMP_6 = ui->cbMP6->isChecked();
-    Config->TrbRunSettings.bMP_7 = ui->cbMP7->isChecked();
+    Config.TrbRunSettings.bMP_0 = ui->cbMP0->isChecked();
+    Config.TrbRunSettings.bMP_1 = ui->cbMP1->isChecked();
+    Config.TrbRunSettings.bMP_2 = ui->cbMP2->isChecked();
+    Config.TrbRunSettings.bMP_3 = ui->cbMP3->isChecked();
+    Config.TrbRunSettings.bMP_4 = ui->cbMP4->isChecked();
+    Config.TrbRunSettings.bMP_5 = ui->cbMP5->isChecked();
+    Config.TrbRunSettings.bMP_6 = ui->cbMP6->isChecked();
+    Config.TrbRunSettings.bMP_7 = ui->cbMP7->isChecked();
 
-    Config->TrbRunSettings.bRandPulser = ui->cbRandomPulser->isChecked();
-    Config->TrbRunSettings.bPeriodicPulser = ui->cbPeriodicalPulser0->isChecked();
+    Config.TrbRunSettings.bRandPulser = ui->cbRandomPulser->isChecked();
+    Config.TrbRunSettings.bPeriodicPulser = ui->cbPeriodicalPulser0->isChecked();
 
-    Config->TrbRunSettings.bPeripheryFPGA0 = ui->cbPeripheryFPGA0->isChecked();
-    Config->TrbRunSettings.bPeripheryFPGA1 = ui->cbPeripheryFPGA1->isChecked();
+    Config.TrbRunSettings.bPeripheryFPGA0 = ui->cbPeripheryFPGA0->isChecked();
+    Config.TrbRunSettings.bPeripheryFPGA1 = ui->cbPeripheryFPGA1->isChecked();
 
     double freq = ui->leRandomFrequency->text().toDouble() * 21.474836;
     ulong rFreq = (ulong)freq;
     if (rFreq > 0xffffffff) rFreq = 0xffffffff;
-    Config->TrbRunSettings.RandomPulserFrequency = "0x" + QString::number(rFreq, 16);
+    Config.TrbRunSettings.RandomPulserFrequency = "0x" + QString::number(rFreq, 16);
 
     double per = 0.1 * ui->lePeriod0->text().toDouble();
     ulong rPer = (ulong)per;
     if (rPer > 0xffffffff) rPer = 0xffffffff;
-    Config->TrbRunSettings.Period = "0x" + QString::number(rPer, 16);
+    Config.TrbRunSettings.Period = "0x" + QString::number(rPer, 16);
 
-    //qDebug() <<Config->TrbRunSettings.RandomPulserFrequency<<Config->TrbRunSettings.Period;
+    //qDebug() <<Config.TrbRunSettings.RandomPulserFrequency<<Config.TrbRunSettings.Period;
 
     // line 0
     {
-        int val = Config->TrbRunSettings.PeripheryTriggerInputs0.toInt(nullptr, 16);
+        int val = Config.TrbRunSettings.PeripheryTriggerInputs0.toInt(nullptr, 16);
         std::bitset<32> bits(val);
         bits.set(14, ui->cbT330->isChecked());
         bits.set(13, ui->cbT320->isChecked());
@@ -2269,11 +2267,11 @@ void MainWindow::on_pbUpdateTriggerSettings_clicked()
         bits.set(18, ui->cbT420->isChecked());
         bits.set(17, ui->cbT410->isChecked());
         bits.set(16, ui->cbT400->isChecked());
-        Config->TrbRunSettings.PeripheryTriggerInputs0 = "0x" + QString::number(bits.to_ulong(), 16);
+        Config.TrbRunSettings.PeripheryTriggerInputs0 = "0x" + QString::number(bits.to_ulong(), 16);
     }
     // line 1
     {
-        int val = Config->TrbRunSettings.PeripheryTriggerInputs1.toInt(nullptr, 16);
+        int val = Config.TrbRunSettings.PeripheryTriggerInputs1.toInt(nullptr, 16);
         std::bitset<32> bits(val);
         bits.set(14, ui->cbT331->isChecked());
         bits.set(13, ui->cbT321->isChecked());
@@ -2283,7 +2281,7 @@ void MainWindow::on_pbUpdateTriggerSettings_clicked()
         bits.set(18, ui->cbT421->isChecked());
         bits.set(17, ui->cbT411->isChecked());
         bits.set(16, ui->cbT401->isChecked());
-        Config->TrbRunSettings.PeripheryTriggerInputs1 = "0x" + QString::number(bits.to_ulong(), 16);
+        Config.TrbRunSettings.PeripheryTriggerInputs1 = "0x" + QString::number(bits.to_ulong(), 16);
     }
 
 }
@@ -2309,55 +2307,55 @@ void MainWindow::on_cbAutocheckFreeSpace_toggled(bool checked)
 
 void MainWindow::on_cbTrapezoidal_clicked(bool checked)
 {
-    Config->bTrapezoidal = checked;
+    Config.bTrapezoidal = checked;
     ClearData();
 }
 
 void MainWindow::on_sbTrapezoidalL_editingFinished()
 {
-    Config->TrapezoidalL = ui->sbTrapezoidalL->value();
+    Config.TrapezoidalL = ui->sbTrapezoidalL->value();
     ClearData();
 }
 
 void MainWindow::on_sbTrapezoidalG_editingFinished()
 {
-    Config->TrapezoidalG = ui->sbTrapezoidalG->value();
+    Config.TrapezoidalG = ui->sbTrapezoidalG->value();
     ClearData();
 }
 
 void MainWindow::on_cbZeroSignalIfPeakOutside_P_clicked(bool checked)
 {
-    Config->bZeroSignalIfPeakOutside_Positive = checked;
+    Config.bZeroSignalIfPeakOutside_Positive = checked;
     ClearData();
 }
 
 void MainWindow::on_sbZeroSignalIfPeakBefore_P_editingFinished()
 {
-    Config->ZeroSignalIfPeakBefore_Positive = ui->sbZeroSignalIfPeakBefore_P->value();
+    Config.ZeroSignalIfPeakBefore_Positive = ui->sbZeroSignalIfPeakBefore_P->value();
     ClearData();
 }
 
 void MainWindow::on_sbZeroSignalIfPeakAfter_P_editingFinished()
 {
-    Config->ZeroSignalIfPeakAfter_Positive = ui->sbZeroSignalIfPeakAfter_P->value();
+    Config.ZeroSignalIfPeakAfter_Positive = ui->sbZeroSignalIfPeakAfter_P->value();
     ClearData();
 }
 
 void MainWindow::on_cbZeroSignalIfPeakOutside_N_clicked(bool checked)
 {
-    Config->bZeroSignalIfPeakOutside_Negative = checked;
+    Config.bZeroSignalIfPeakOutside_Negative = checked;
     ClearData();
 }
 
 void MainWindow::on_sbZeroSignalIfPeakBefore_N_editingFinished()
 {
-    Config->ZeroSignalIfPeakBefore_Negative = ui->sbZeroSignalIfPeakBefore_N->value();
+    Config.ZeroSignalIfPeakBefore_Negative = ui->sbZeroSignalIfPeakBefore_N->value();
     ClearData();
 }
 
 void MainWindow::on_sbZeroSignalIfPeakAfter_N_editingFinished()
 {
-    Config->ZeroSignalIfPeakAfter_Negative = ui->sbZeroSignalIfPeakAfter_N->value();
+    Config.ZeroSignalIfPeakAfter_Negative = ui->sbZeroSignalIfPeakAfter_N->value();
     ClearData();
 }
 
@@ -2406,8 +2404,8 @@ void MainWindow::on_leFPGA3_0_editingFinished()
 {
     QVector<int> vec;
     bool ok = ExtractNumbersFromQString(ui->leFPGA3_0->text(), &vec);
-    if (ok) Config->TrbRunSettings.OR_0_FPGA3 = vectorToBitInt(vec);
-    ui->leFPGA3_0->setText(intToBitString(Config->TrbRunSettings.OR_0_FPGA3));
+    if (ok) Config.TrbRunSettings.OR_0_FPGA3 = vectorToBitInt(vec);
+    ui->leFPGA3_0->setText(intToBitString(Config.TrbRunSettings.OR_0_FPGA3));
     if (!ok) message("Bad format: use, e.g., 0,1,3-5,7,10-20", this);
 }
 
@@ -2415,8 +2413,8 @@ void MainWindow::on_leFPGA3_1_editingFinished()
 {
     QVector<int> vec;
     bool ok = ExtractNumbersFromQString(ui->leFPGA3_1->text(), &vec);
-    if (ok) Config->TrbRunSettings.OR_1_FPGA3 = vectorToBitInt(vec);
-    ui->leFPGA3_1->setText(intToBitString(Config->TrbRunSettings.OR_1_FPGA3));
+    if (ok) Config.TrbRunSettings.OR_1_FPGA3 = vectorToBitInt(vec);
+    ui->leFPGA3_1->setText(intToBitString(Config.TrbRunSettings.OR_1_FPGA3));
     if (!ok) message("Bad format: use, e.g., 0,1,3-5,7,10-20", this);
 }
 
@@ -2424,8 +2422,8 @@ void MainWindow::on_leFPGA4_0_editingFinished()
 {
     QVector<int> vec;
     bool ok = ExtractNumbersFromQString(ui->leFPGA4_0->text(), &vec);
-    if (ok) Config->TrbRunSettings.OR_0_FPGA4 = vectorToBitInt(vec);
-    ui->leFPGA4_0->setText(intToBitString(Config->TrbRunSettings.OR_0_FPGA4));
+    if (ok) Config.TrbRunSettings.OR_0_FPGA4 = vectorToBitInt(vec);
+    ui->leFPGA4_0->setText(intToBitString(Config.TrbRunSettings.OR_0_FPGA4));
     if (!ok) message("Bad format: use, e.g., 0,1,3-5,7,10-20", this);
 }
 
@@ -2433,8 +2431,8 @@ void MainWindow::on_leFPGA4_1_editingFinished()
 {
     QVector<int> vec;
     bool ok = ExtractNumbersFromQString(ui->leFPGA4_1->text(), &vec);
-    if (ok) Config->TrbRunSettings.OR_1_FPGA4 = vectorToBitInt(vec);
-    ui->leFPGA4_1->setText(intToBitString(Config->TrbRunSettings.OR_1_FPGA4));
+    if (ok) Config.TrbRunSettings.OR_1_FPGA4 = vectorToBitInt(vec);
+    ui->leFPGA4_1->setText(intToBitString(Config.TrbRunSettings.OR_1_FPGA4));
     if (!ok) message("Bad format: use, e.g., 0,1,3-5,7,10-20", this);
 }
 
@@ -2449,8 +2447,8 @@ void MainWindow::on_leTimeChannelsFPGA3_editingFinished()
     else if (vec.contains(0))
         message("Channel 0 is reserved!", this);
     else
-        Config->TrbRunSettings.TimeChannels_FPGA3 = vectorToBitIntShift1(vec);
-    ui->leTimeChannelsFPGA3->setText(intToBitStringShift1(Config->TrbRunSettings.TimeChannels_FPGA3));
+        Config.TrbRunSettings.TimeChannels_FPGA3 = vectorToBitIntShift1(vec);
+    ui->leTimeChannelsFPGA3->setText(intToBitStringShift1(Config.TrbRunSettings.TimeChannels_FPGA3));
 
     ui->leTimeChannelsFPGA3->blockSignals(false); // <--
 }
@@ -2466,8 +2464,8 @@ void MainWindow::on_leTimeChannelsFPGA4_editingFinished()
     else if (vec.contains(0))
         message("Channel 0 is reserved!", this);
     else
-        Config->TrbRunSettings.TimeChannels_FPGA4 = vectorToBitIntShift1(vec);
-    ui->leTimeChannelsFPGA4->setText(intToBitStringShift1(Config->TrbRunSettings.TimeChannels_FPGA4));
+        Config.TrbRunSettings.TimeChannels_FPGA4 = vectorToBitIntShift1(vec);
+    ui->leTimeChannelsFPGA4->setText(intToBitStringShift1(Config.TrbRunSettings.TimeChannels_FPGA4));
 
     ui->leTimeChannelsFPGA4->blockSignals(false); // <--
 }
@@ -2478,8 +2476,8 @@ void MainWindow::on_ledTimeWinBefore_FPGA3_editingFinished()
     if (val < 0) val = -val;
     if (val > 9040) val = 9040;
     int base = val / 5;
-    Config->TrbRunSettings.TimeWinBefore_FPGA3 = base * 5;
-    ui->ledTimeWinBefore_FPGA3->setText(QString::number(Config->TrbRunSettings.TimeWinBefore_FPGA3));
+    Config.TrbRunSettings.TimeWinBefore_FPGA3 = base * 5;
+    ui->ledTimeWinBefore_FPGA3->setText(QString::number(Config.TrbRunSettings.TimeWinBefore_FPGA3));
 }
 
 void MainWindow::on_ledTimeWinAfter_FPGA3_editingFinished()
@@ -2488,8 +2486,8 @@ void MainWindow::on_ledTimeWinAfter_FPGA3_editingFinished()
     if (val < 0) val = -val;
     if (val > 9760) val = 9760;
     int base = val / 5;
-    Config->TrbRunSettings.TimeWinAfter_FPGA3 = base * 5;
-    ui->ledTimeWinAfter_FPGA3->setText(QString::number(Config->TrbRunSettings.TimeWinAfter_FPGA3));
+    Config.TrbRunSettings.TimeWinAfter_FPGA3 = base * 5;
+    ui->ledTimeWinAfter_FPGA3->setText(QString::number(Config.TrbRunSettings.TimeWinAfter_FPGA3));
 }
 
 void MainWindow::on_ledTimeWinBefore_FPGA4_editingFinished()
@@ -2498,8 +2496,8 @@ void MainWindow::on_ledTimeWinBefore_FPGA4_editingFinished()
     if (val < 0) val = -val;
     if (val > 9040) val = 9040;
     int base = val / 5;
-    Config->TrbRunSettings.TimeWinBefore_FPGA4 = base * 5;
-    ui->ledTimeWinBefore_FPGA4->setText(QString::number(Config->TrbRunSettings.TimeWinBefore_FPGA4));
+    Config.TrbRunSettings.TimeWinBefore_FPGA4 = base * 5;
+    ui->ledTimeWinBefore_FPGA4->setText(QString::number(Config.TrbRunSettings.TimeWinBefore_FPGA4));
 }
 
 void MainWindow::on_ledTimeWinAfter_FPGA4_editingFinished()
@@ -2508,8 +2506,8 @@ void MainWindow::on_ledTimeWinAfter_FPGA4_editingFinished()
     if (val < 0) val = -val;
     if (val > 9760) val = 9760;
     int base = val / 5;
-    Config->TrbRunSettings.TimeWinAfter_FPGA4 = base * 5;
-    ui->ledTimeWinAfter_FPGA4->setText(QString::number(Config->TrbRunSettings.TimeWinAfter_FPGA4));
+    Config.TrbRunSettings.TimeWinAfter_FPGA4 = base * 5;
+    ui->ledTimeWinAfter_FPGA4->setText(QString::number(Config.TrbRunSettings.TimeWinAfter_FPGA4));
 }
 
 void MainWindow::on_pbWriteTimeSettingsToTrb_clicked()
@@ -2533,12 +2531,12 @@ void MainWindow::on_pbReadTimeSettingsFromTrb_clicked()
 
 void MainWindow::on_cbTimeEnable_FPGA3_clicked(bool checked)
 {
-    Config->TrbRunSettings.TimeEnable_FPGA3 = checked;
+    Config.TrbRunSettings.TimeEnable_FPGA3 = checked;
 }
 
 void MainWindow::on_cbTimeEnable_FPGA4_clicked(bool checked)
 {
-    Config->TrbRunSettings.TimeEnable_FPGA4 = checked;
+    Config.TrbRunSettings.TimeEnable_FPGA4 = checked;
 }
 
 void MainWindow::on_pbLoadLastAndProcess_clicked()
@@ -2569,7 +2567,7 @@ void MainWindow::on_pbLoadLastAndProcess_clicked()
     if (fn.endsWith('/')) fn.chop(1);
     fn += "/" + files.front();
     ui->leFileName->setText(fn);
-    Config->FileName = fn;
+    Config.FileName = fn;
     qApp->processEvents();
     on_pbProcessData_clicked();
 }
@@ -2631,24 +2629,24 @@ void MainWindow::on_pbSendTriggerBoardGains_clicked()
 
 void MainWindow::on_cbGainsForTriggerBoard_clicked(bool checked)
 {
-    Config->TrbRunSettings.bTriggerGains = checked;
+    Config.TrbRunSettings.bTriggerGains = checked;
 }
 
 void MainWindow::on_sbAllGainsTo_editingFinished()
 {
-    Config->TrbRunSettings.DefaultTriggerGain = ui->sbAllGainsTo->value();
+    Config.TrbRunSettings.DefaultTriggerGain = ui->sbAllGainsTo->value();
 }
 
 void MainWindow::storeTriggerGainSettings()
 {
-    Config->TrbRunSettings.TriggerGains.clear();
+    Config.TrbRunSettings.TriggerGains.clear();
     for (QSpinBox * sb : TriggerGainSpinBoxes)
-        Config->TrbRunSettings.TriggerGains.push_back(sb->value());
+        Config.TrbRunSettings.TriggerGains.push_back(sb->value());
 }
 
 void MainWindow::on_cbDisableIgnoredChannels_clicked(bool checked)
 {
-    Config->DisableIgnoredChannels = checked;
+    Config.DisableIgnoredChannels = checked;
 }
 
 void MainWindow::on_actionConfigure_triggered()

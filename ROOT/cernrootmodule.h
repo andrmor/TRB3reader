@@ -23,7 +23,7 @@ class CernRootModule : public QObject
     Q_OBJECT
 
 public:
-    CernRootModule(Trb3dataReader* Reader, Trb3signalExtractor* Extractor, MasterConfig* Config, ADataHub* DataHub, int refreshInterval = 100);
+    CernRootModule(Trb3dataReader* Reader, Trb3signalExtractor* Extractor, ADataHub* DataHub, int refreshInterval = 100);
     ~CernRootModule();
 
     void storeWindowGeometries();
@@ -71,7 +71,7 @@ public slots:
 private:
     Trb3dataReader* Reader;
     Trb3signalExtractor* Extractor;
-    MasterConfig* Config;
+    MasterConfig & Config;
     ADataHub* DataHub;
 
     QMainWindow * MainWin = nullptr;

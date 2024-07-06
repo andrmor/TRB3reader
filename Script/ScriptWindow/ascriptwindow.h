@@ -45,7 +45,7 @@ public:
     void registerInterfaces();
     void updateGui(); //highlighter, helper etc - call it to take into account all changes introduced by introduction of new interface units!
 
-    void WriteToJson(); // !!!*** TODO
+    void WriteToJson();
     void ReadFromJson(); // !!!*** TODO
 
     void onBusyOn();

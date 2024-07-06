@@ -38,8 +38,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(MasterConfig* Config,
-                        ADispatcher* Dispatcher,
+    explicit MainWindow(ADispatcher* Dispatcher,
                         ADataHub* DataHub,
                         Trb3dataReader* Reader,
                         Trb3signalExtractor* Extractor,
@@ -180,14 +179,13 @@ protected:
     void closeEvent(QCloseEvent* event);
 
 private:
-    //aliases
-    MasterConfig* Config;
-    ADispatcher* Dispatcher;
-    ADataHub* DataHub;
-    Trb3dataReader* Reader;
-    Trb3signalExtractor* Extractor;
-    AHldFileProcessor& HldFileProcessor;
-    ANetworkModule& Network;
+    MasterConfig        & Config;
+    ADispatcher         * Dispatcher;
+    ADataHub            * DataHub;
+    Trb3dataReader      * Reader;
+    Trb3signalExtractor * Extractor;
+    AHldFileProcessor   & HldFileProcessor;
+    ANetworkModule      & Network;
 
     //owned objects
     Ui::MainWindow* ui;

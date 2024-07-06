@@ -10,8 +10,8 @@
 
 const float NaN = std::numeric_limits<float>::quiet_NaN();
 
-Trb3dataReader::Trb3dataReader(MasterConfig *Config) :
-    Config(Config), numSamples(0), numChannels(0) {}
+Trb3dataReader::Trb3dataReader() :
+    Config(MasterConfig::getInstance()) {}
 
 
 QString Trb3dataReader::GetFileInfo(const QString & FileName)
@@ -41,8 +41,8 @@ QString Trb3dataReader::GetFileInfo(const QString & FileName)
             const unsigned trbSubEvSize = sub->GetSize() / 4 - 4;
             qDebug() << "==>Subevent size: "<< trbSubEvSize;// << "\n";
 
-            if (Config->isTimerBoard(boardID)) processTimingSubEvent(sub, trbSubEvSize, nullptr);
-            else if (Config->isADCboard(boardID))
+            if (Config.isTimerBoard(boardID)) processTimingSubEvent(sub, trbSubEvSize, nullptr);
+            else if (Config.isADCboard(boardID))
             {
                 // time processing is to add later
                 const unsigned lastRec = sub->Data(trbSubEvSize-3);
@@ -152,12 +152,12 @@ QString Trb3dataReader::GetFileInfo(const QString & FileName)
 
                 unsigned ixTmp = ix;
 
-                if (Config->isTimerBoard(datakind))
+                if (Config.isTimerBoard(datakind))
                 {
                     if (bReportOnStart) output += "--> This is a timing block.\n";
                 }
 
-                if (Config->isADCboard(datakind))
+                if (Config.isADCboard(datakind))
                 {
                     int numChannels = -1;
                     int numSamples = 0;
@@ -349,11 +349,11 @@ void Trb3dataReader::prepareTimeChannelConversion()
 {
     TimingChannelMap = std::vector<int>(64, -1);
 
-    std::vector<int> board1 = convertWordToChannels(Config->TrbRunSettings.TimeChannels_FPGA3);
-    std::vector<int> board2 = convertWordToChannels(Config->TrbRunSettings.TimeChannels_FPGA4);
+    std::vector<int> board1 = convertWordToChannels(Config.TrbRunSettings.TimeChannels_FPGA3);
+    std::vector<int> board2 = convertWordToChannels(Config.TrbRunSettings.TimeChannels_FPGA4);
 
     int index = 0;
-    if (Config->TrbRunSettings.TimeEnable_FPGA3)
+    if (Config.TrbRunSettings.TimeEnable_FPGA3)
     {
         for (int i : board1)
         {
@@ -363,7 +363,7 @@ void Trb3dataReader::prepareTimeChannelConversion()
         }
     }
 
-    if (Config->TrbRunSettings.TimeEnable_FPGA4)
+    if (Config.TrbRunSettings.TimeEnable_FPGA4)
     {
         for (int i : board2)
         {
@@ -408,12 +408,12 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
 
             const unsigned trbSubEvSize = sub->GetSize() / 4 - 4;
 
-            if (Config->isTimerBoard(boardID))
+            if (Config.isTimerBoard(boardID))
             {
                 timing.clear();
                 processTimingSubEvent(sub, trbSubEvSize, &timing);
             }
-            if (!Config->isADCboard(boardID)) continue;
+            if (!Config.isADCboard(boardID)) continue;
 
             const unsigned lastRec = sub->Data(trbSubEvSize-3);
             qDebug() << "--->Last data record" << QString::number(lastRec, 16);
@@ -584,8 +584,8 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
 
                 unsigned ixTmp = ix;  // --->  position before read
 
-                //qDebug() << QString::number(datakind, 16) << Config->isADCboard(datakind);
-                if (Config->isTimerBoard(datakind)) //boardID
+                //qDebug() << QString::number(datakind, 16) << Config.isADCboard(datakind);
+                if (Config.isTimerBoard(datakind)) //boardID
                 {
                     //timing.clear();
                     //qDebug() << QString::number(datakind, 16);
@@ -594,7 +594,7 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
                     if (!data.empty())
                         timingThisEvent.insert(timingThisEvent.end(), std::make_move_iterator(data.begin()), std::make_move_iterator(data.end()));
                 }
-                else if (Config->isADCboard(datakind))
+                else if (Config.isADCboard(datakind))
                 {
                     // resize the vectors for the waveforms and fill the data
                     const int oldSize = thisEventData.size();
@@ -731,13 +731,13 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
 
                 unsigned ixTmp = ix;  // --->  position before read
 
-                //qDebug() << QString::number(datakind, 16) << Config->isADCboard(datakind);
-                if (Config->isTimerBoard(datakind)) //boardID
+                //qDebug() << QString::number(datakind, 16) << Config.isADCboard(datakind);
+                if (Config.isTimerBoard(datakind)) //boardID
                 {
                     timing.clear();
                     processTimingSubEvent(sub, ix, datalen, &timing);
                 }
-                if (Config->isADCboard(datakind))
+                if (Config.isADCboard(datakind))
                 {
                     // last word in the data block identifies max. ADC# and max. channel
                     // assuming they are written consecutively - seems to be the case so far
@@ -836,11 +836,11 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
 QString Trb3dataReader::Read(const QString& FileName)
 {
     qDebug() << "--> Reading hld file...";
-    readRawData(FileName, Config->HldProcessSettings.NumChannels, Config->HldProcessSettings.NumSamples);
+    readRawData(FileName, Config.HldProcessSettings.NumChannels, Config.HldProcessSettings.NumSamples);
 
-    if ( Config->HldProcessSettings.NumChannels != 0)
+    if ( Config.HldProcessSettings.NumChannels != 0)
     {
-        if ( Config->HldProcessSettings.NumChannels != numChannels )
+        if ( Config.HldProcessSettings.NumChannels != numChannels )
         {
             waveData.clear();
             timeData.clear();
@@ -852,17 +852,17 @@ QString Trb3dataReader::Read(const QString& FileName)
 
     if (isEmpty()) return "--- Read of hld file failed or all events were rejected!";
 
-    bool bOK = Config->UpdateNumberOfHardwareChannels(numChannels);
+    bool bOK = Config.UpdateNumberOfHardwareChannels(numChannels);
     if (!bOK) return "The number of hardware channels in the file (" + QString::number(numChannels) + ") is incompatible with the defined number of logical channels";
 
-    if (Config->bSmoothingBeforePedestals)
+    if (Config.bSmoothingBeforePedestals)
     {
-        if (Config->bSmoothWaveforms)
+        if (Config.bSmoothWaveforms)
         {
             qDebug() << "--> Smoothing waveforms...";
             smoothData();
         }
-        if (Config->bPedestalSubstraction)
+        if (Config.bPedestalSubstraction)
         {
             qDebug() << "--> Substracting pedestals...";
             substractPedestals();
@@ -870,12 +870,12 @@ QString Trb3dataReader::Read(const QString& FileName)
     }
     else
     {
-        if (Config->bPedestalSubstraction)
+        if (Config.bPedestalSubstraction)
         {
             qDebug() << "--> Substracting pedestals...";
             substractPedestals();
         }
-        if (Config->bSmoothWaveforms)
+        if (Config.bSmoothWaveforms)
         {
             qDebug() << "--> Smoothing waveforms...";
             smoothData();
@@ -1074,12 +1074,12 @@ void Trb3dataReader::substractPedestals()
 
             float pedestal = 0;
 
-            switch (Config->PedestalExtractionMethod)
+            switch (Config.PedestalExtractionMethod)
             {
             case 0:
-                for (int isample = Config->PedestalFrom; isample <= Config->PedestalTo; isample++)
+                for (int isample = Config.PedestalFrom; isample <= Config.PedestalTo; isample++)
                     pedestal += waveData.at(ievent).at(ichannel).at(isample);
-                pedestal /= ( Config->PedestalTo + 1 - Config->PedestalFrom );
+                pedestal /= ( Config.PedestalTo + 1 - Config.PedestalFrom );
                 break;
             case 1:
 
@@ -1103,7 +1103,7 @@ void Trb3dataReader::substractPedestals()
 
                 break;
             default:
-                qDebug() << "Invalid pedestal extraction method index: "<< Config->PedestalExtractionMethod;
+                qDebug() << "Invalid pedestal extraction method index: "<< Config.PedestalExtractionMethod;
                 throw std::invalid_argument( "invalid pedestal extraction method index" );
                 break;
             }
@@ -1120,16 +1120,16 @@ void Trb3dataReader::smoothData()
         {
             if (waveData[ievent][ichannel].isEmpty()) continue;
 
-            if (Config->AdjacentAveraging_bOn)
+            if (Config.AdjacentAveraging_bOn)
             {
-                if (Config->AdjacentAveraging_bWeighted)
-                    doAdjacentWeightedAverage(waveData[ievent][ichannel], Config->AdjacentAveraging_NumPoints);
+                if (Config.AdjacentAveraging_bWeighted)
+                    doAdjacentWeightedAverage(waveData[ievent][ichannel], Config.AdjacentAveraging_NumPoints);
                 else
-                    doAdjacentAverage        (waveData[ievent][ichannel], Config->AdjacentAveraging_NumPoints);
+                    doAdjacentAverage        (waveData[ievent][ichannel], Config.AdjacentAveraging_NumPoints);
             }
 
-            if (Config->bTrapezoidal)
-                applyTrapezoidal(waveData[ievent][ichannel], Config->TrapezoidalL, Config->TrapezoidalG);
+            if (Config.bTrapezoidal)
+                applyTrapezoidal(waveData[ievent][ichannel], Config.TrapezoidalL, Config.TrapezoidalG);
         }
 }
 

@@ -5,7 +5,7 @@
 #include "channelmapper.h"
 #include "trb3signalextractor.h"
 #include "trb3datareader.h"
-//#include "ascriptwindow.h"
+#include "ascriptwindow.h"
 #include "adispatcher.h"
 #include "adatahub.h"
 #include "amessage.h"
@@ -42,11 +42,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
 void MainWindow::saveCompleteState()
 {
     //save script-related config
-    QJsonObject jsS;
-//    ScriptWindow->WriteToJson(jsS);
-    SaveJsonToFile(jsS, Dispatcher->ConfigDir+"/scripting.json");
-
-    Dispatcher->SaveConfig(Dispatcher->AutosaveFile);
+    JScriptWin->WriteToJson();
+    Dispatcher->SaveConfig(Config.AutosaveFile);
 }
 
 void MainWindow::on_actionLoad_config_triggered()
@@ -166,13 +163,13 @@ void MainWindow::SaveWindowSettings()
 
     //json["GraphWindows"] = RootModule->SaveGraphWindows();
 
-    SaveJsonToFile(json, Dispatcher->WinSetFile);
+    SaveJsonToFile(json, Config.WinSetFile);
 }
 
 void MainWindow::LoadWindowSettings()
 {
     QJsonObject js;
-    LoadJsonFromFile(js, Dispatcher->WinSetFile);
+    LoadJsonFromFile(js, Config.WinSetFile);
     if (js.isEmpty()) return;
 
     int x=10, y=10, w=500, h=700;
@@ -210,7 +207,7 @@ void MainWindow::UpdateGui()
 
     //DAC datakinds
     ui->lwDatakinds->clear();
-    QVector<int> datakinds = Config->GetListOfDatakinds();
+    QVector<int> datakinds = Config.GetListOfDatakinds();
     if ( datakinds.size() > 1 ) std::sort(datakinds.begin(), datakinds.end());
     for (int i : datakinds)
     {
@@ -222,7 +219,7 @@ void MainWindow::UpdateGui()
 
     //Timing datakinds
     ui->lwTimingDatakinds->clear();
-    QVector<int> timingDatakinds = Config->GetListOfTimingDatakinds();
+    QVector<int> timingDatakinds = Config.GetListOfTimingDatakinds();
     if ( timingDatakinds.size() > 1 ) std::sort(timingDatakinds.begin(), timingDatakinds.end());
     for (int i : timingDatakinds)
     {
@@ -232,368 +229,368 @@ void MainWindow::UpdateGui()
         ui->lwTimingDatakinds->addItem(item);
     }
 
-    ui->leFileName->setText(Config->FileName);
+    ui->leFileName->setText(Config.FileName);
 
     ui->ptePolarity->clear();    
-    //for (int i: Config->GetListOfNegativeChannels()) s += QString::number(i)+" ";
-    QString s = PackChannelList(Config->GetListOfNegativeChannels());
+    //for (int i: Config.GetListOfNegativeChannels()) s += QString::number(i)+" ";
+    QString s = PackChannelList(Config.GetListOfNegativeChannels());
     ui->ptePolarity->appendPlainText(s);
 
     ui->pteMapping->clear();
     s.clear();
-    for (int i: Config->GetMapping()) s += QString::number(i)+" ";
+    for (int i: Config.GetMapping()) s += QString::number(i)+" ";
     ui->pteMapping->appendPlainText(s);
-    //ui->pteMapping->appendPlainText(PackMappingList(Config->GetMapping()));
+    //ui->pteMapping->appendPlainText(PackMappingList(Config.GetMapping()));
 
     ui->pteIgnoreHardwareChannels->clear();
 //    s.clear();
 //    std::vector<int> ign;
-//    for (int i: Config->IgnoreHardwareChannels) ign.push_back(i);
+//    for (int i: Config.IgnoreHardwareChannels) ign.push_back(i);
 //    std::sort(ign.begin(), ign.end());
 //    for (int i: ign) s += QString::number(i)+" ";
-    s = PackChannelList(Config->GetListOfIgnoreChannels());
+    s = PackChannelList(Config.GetListOfIgnoreChannels());
     ui->pteIgnoreHardwareChannels->appendPlainText(s);
 
-    ui->cbSubstractPedestal->setChecked(Config->bPedestalSubstraction);
-        ui->cobPedestalExtractionMethod->setCurrentIndex(Config->PedestalExtractionMethod);
-        ui->sbPedestalFrom->setValue(Config->PedestalFrom);
-        ui->sbPedestalTo->setValue(Config->PedestalTo);
-        ui->ledPedestalPeakSigma->setText( QString::number(Config->PedestalPeakSigma) );
-        ui->ledPedestalPeakThreshold->setText( QString::number(Config->PedestalPeakThreshold) );
+    ui->cbSubstractPedestal->setChecked(Config.bPedestalSubstraction);
+        ui->cobPedestalExtractionMethod->setCurrentIndex(Config.PedestalExtractionMethod);
+        ui->sbPedestalFrom->setValue(Config.PedestalFrom);
+        ui->sbPedestalTo->setValue(Config.PedestalTo);
+        ui->ledPedestalPeakSigma->setText( QString::number(Config.PedestalPeakSigma) );
+        ui->ledPedestalPeakThreshold->setText( QString::number(Config.PedestalPeakThreshold) );
 
 
-    ui->cbSmoothWaveforms->setChecked(Config->bSmoothWaveforms);
-    ui->cbSmoothBeforePedestal->setChecked(Config->bSmoothingBeforePedestals);
-        ui->cbAdjacentAveraging->setChecked(Config->AdjacentAveraging_bOn);
-            ui->sbAdjAvPoints->setValue(Config->AdjacentAveraging_NumPoints);
-            ui->cbAdjAvWeighted->setChecked(Config->AdjacentAveraging_bWeighted);
+    ui->cbSmoothWaveforms->setChecked(Config.bSmoothWaveforms);
+    ui->cbSmoothBeforePedestal->setChecked(Config.bSmoothingBeforePedestals);
+        ui->cbAdjacentAveraging->setChecked(Config.AdjacentAveraging_bOn);
+            ui->sbAdjAvPoints->setValue(Config.AdjacentAveraging_NumPoints);
+            ui->cbAdjAvWeighted->setChecked(Config.AdjacentAveraging_bWeighted);
 
-    ui->cbTrapezoidal->setChecked(Config->bTrapezoidal);
-        ui->sbTrapezoidalL->setValue(Config->TrapezoidalL);
-        ui->sbTrapezoidalG->setValue(Config->TrapezoidalG);
+    ui->cbTrapezoidal->setChecked(Config.bTrapezoidal);
+        ui->sbTrapezoidalL->setValue(Config.TrapezoidalL);
+        ui->sbTrapezoidalG->setValue(Config.TrapezoidalG);
 
-    int method = Config->SignalExtractionMethod;
+    int method = Config.SignalExtractionMethod;
     if (method <= 3) ui->cobSignalExtractionMethod->setCurrentIndex(method);
     else
         message("Signal extraction method in config file is not valid in this version of program", this);
 
 
-    ui->sbExtractAllFromSampleNumber->setValue(Config->CommonSampleNumber);
-    ui->sbIntegrateFrom->setValue(Config->IntegrateFrom);
-    ui->sbIntegrateTo->setValue(Config->IntegrateTo);
+    ui->sbExtractAllFromSampleNumber->setValue(Config.CommonSampleNumber);
+    ui->sbIntegrateFrom->setValue(Config.IntegrateFrom);
+    ui->sbIntegrateTo->setValue(Config.IntegrateTo);
 
-    ui->cbZeroSignalIfReverseMax->setChecked(Config->bZeroSignalIfReverse);
-        ui->ledReverseMaxLimit->setText(QString::number(Config->ReverseMaxThreshold));
+    ui->cbZeroSignalIfReverseMax->setChecked(Config.bZeroSignalIfReverse);
+        ui->ledReverseMaxLimit->setText(QString::number(Config.ReverseMaxThreshold));
 
-    ui->cbZeroSignalIfPeakOutside_P->setChecked(Config->bZeroSignalIfPeakOutside_Positive);
-    ui->cbZeroSignalIfPeakOutside_N->setChecked(Config->bZeroSignalIfPeakOutside_Negative);
-        ui->sbZeroSignalIfPeakBefore_P->setValue(Config->ZeroSignalIfPeakBefore_Positive);
-        ui->sbZeroSignalIfPeakBefore_N->setValue(Config->ZeroSignalIfPeakBefore_Negative);
-        ui->sbZeroSignalIfPeakAfter_P->setValue(Config->ZeroSignalIfPeakAfter_Positive);
-        ui->sbZeroSignalIfPeakAfter_N->setValue(Config->ZeroSignalIfPeakAfter_Negative);
+    ui->cbZeroSignalIfPeakOutside_P->setChecked(Config.bZeroSignalIfPeakOutside_Positive);
+    ui->cbZeroSignalIfPeakOutside_N->setChecked(Config.bZeroSignalIfPeakOutside_Negative);
+        ui->sbZeroSignalIfPeakBefore_P->setValue(Config.ZeroSignalIfPeakBefore_Positive);
+        ui->sbZeroSignalIfPeakBefore_N->setValue(Config.ZeroSignalIfPeakBefore_Negative);
+        ui->sbZeroSignalIfPeakAfter_P->setValue(Config.ZeroSignalIfPeakAfter_Positive);
+        ui->sbZeroSignalIfPeakAfter_N->setValue(Config.ZeroSignalIfPeakAfter_Negative);
 
-    ui->cbPosThreshold->setChecked(Config->bPositiveThreshold);
-    ui->ledPosThresholdMin->setText(QString::number(Config->PositiveThreshold));
+    ui->cbPosThreshold->setChecked(Config.bPositiveThreshold);
+    ui->ledPosThresholdMin->setText(QString::number(Config.PositiveThreshold));
 
-    ui->cbNegThreshold->setChecked(Config->bNegativeThreshold);
-    ui->ledNegThresholdMin->setText(QString::number(Config->NegativeThreshold));
+    ui->cbNegThreshold->setChecked(Config.bNegativeThreshold);
+    ui->ledNegThresholdMin->setText(QString::number(Config.NegativeThreshold));
 
-    ui->cbIgnorePosThreshold->setChecked(Config->bPositiveIgnore);
-    ui->ledPosIgnoreMax->setText(QString::number(Config->PositiveIgnore));
+    ui->cbIgnorePosThreshold->setChecked(Config.bPositiveIgnore);
+    ui->ledPosIgnoreMax->setText(QString::number(Config.PositiveIgnore));
 
-    ui->cbIgnoreNegThreshold->setChecked(Config->bNegativeIgnore);
-    ui->ledNegIgnoreMax->setText(QString::number(Config->NegativeIgnore));
+    ui->cbIgnoreNegThreshold->setChecked(Config.bNegativeIgnore);
+    ui->ledNegIgnoreMax->setText(QString::number(Config.NegativeIgnore));
 
-    ui->cbNegMaxSignalGate->setChecked(Config->bNegMaxGate);
-    ui->sbNegMaxFrom->setValue(Config->NegMaxGateFrom);
-    ui->sbNegMaxTo->setValue(Config->NegMaxGateTo);
-    ui->cbPosMaxSignalGate->setChecked(Config->bPosMaxGate);
-    ui->sbPosMaxFrom->setValue(Config->PosMaxGateFrom);
-    ui->sbPosMaxTo->setValue(Config->PosMaxGateTo);
+    ui->cbNegMaxSignalGate->setChecked(Config.bNegMaxGate);
+    ui->sbNegMaxFrom->setValue(Config.NegMaxGateFrom);
+    ui->sbNegMaxTo->setValue(Config.NegMaxGateTo);
+    ui->cbPosMaxSignalGate->setChecked(Config.bPosMaxGate);
+    ui->sbPosMaxFrom->setValue(Config.PosMaxGateFrom);
+    ui->sbPosMaxTo->setValue(Config.PosMaxGateTo);
 
-    ui->sbNumChannels->setValue( Config->HldProcessSettings.NumChannels );
-    ui->sbNumSamples->setValue( Config->HldProcessSettings.NumSamples );
-    ui->cbBulkExtract->setChecked( Config->HldProcessSettings.bDoSignalExtraction );
-    ui->cbAutoExecuteScript->setChecked( Config->HldProcessSettings.bDoScript );
-    ui->cbSaveSignalsToFiles->setChecked( Config->HldProcessSettings.bDoSave );
-    ui->cobWhatToSave->setCurrentIndex( Config->HldProcessSettings.SaveWhat );
-    ui->leAddToProcessed->setText( Config->HldProcessSettings.AddToFileName );
-    ui->cbAddRunTime->setChecked( Config->HldProcessSettings.AddRunTime );
-    ui->cbBulkCopyToDatahub->setChecked( Config->HldProcessSettings.bDoCopyToDatahub );
-    ui->cbBulkAlsoCopyWaveforms->setChecked( Config->HldProcessSettings.bCopyWaveforms );
+    ui->sbNumChannels->setValue( Config.HldProcessSettings.NumChannels );
+    ui->sbNumSamples->setValue( Config.HldProcessSettings.NumSamples );
+    ui->cbBulkExtract->setChecked( Config.HldProcessSettings.bDoSignalExtraction );
+    ui->cbAutoExecuteScript->setChecked( Config.HldProcessSettings.bDoScript );
+    ui->cbSaveSignalsToFiles->setChecked( Config.HldProcessSettings.bDoSave );
+    ui->cobWhatToSave->setCurrentIndex( Config.HldProcessSettings.SaveWhat );
+    ui->leAddToProcessed->setText( Config.HldProcessSettings.AddToFileName );
+    ui->cbAddRunTime->setChecked( Config.HldProcessSettings.AddRunTime );
+    ui->cbBulkCopyToDatahub->setChecked( Config.HldProcessSettings.bDoCopyToDatahub );
+    ui->cbBulkAlsoCopyWaveforms->setChecked( Config.HldProcessSettings.bCopyWaveforms );
 
     updateNumEventsIndication();
     OnEventOrChannelChanged();
 
-    ui->leUser->setText(Config->TrbRunSettings.User);
-    ui->leHost->setText(Config->TrbRunSettings.Host);
+    ui->leUser->setText(Config.TrbRunSettings.User);
+    ui->leHost->setText(Config.TrbRunSettings.Host);
 
-    ui->leDirOnHost->setText(Config->TrbRunSettings.ScriptDirOnHost);
-    ui->leStartupScriptOnHost->setText(Config->TrbRunSettings.StartupScriptOnHost);
-    ui->leStorageXmlOnHost->setText(Config->TrbRunSettings.StorageXML);
+    ui->leDirOnHost->setText(Config.TrbRunSettings.ScriptDirOnHost);
+    ui->leStartupScriptOnHost->setText(Config.TrbRunSettings.StartupScriptOnHost);
+    ui->leStorageXmlOnHost->setText(Config.TrbRunSettings.StorageXML);
 
-    ui->leFolderForHldFiles->setText(Config->TrbRunSettings.HldDirOnHost);
-    ui->leiHldFileSize->setText( QString::number(Config->TrbRunSettings.MaxHldSizeMb) );
+    ui->leFolderForHldFiles->setText(Config.TrbRunSettings.HldDirOnHost);
+    ui->leiHldFileSize->setText( QString::number(Config.TrbRunSettings.MaxHldSizeMb) );
 
-    ui->ledTimeSpan->setText( QString::number(Config->TrbRunSettings.TimeLimit, 'g', 4 ) );
+    ui->ledTimeSpan->setText( QString::number(Config.TrbRunSettings.TimeLimit, 'g', 4 ) );
     int index = 0;
-    if (Config->TrbRunSettings.TimeMultiplier == 60) index = 1;
-    else if (Config->TrbRunSettings.TimeMultiplier == 60*60) index = 2;
+    if (Config.TrbRunSettings.TimeMultiplier == 60) index = 1;
+    else if (Config.TrbRunSettings.TimeMultiplier == 60*60) index = 2;
     ui->cobTimeUnits->setCurrentIndex(index);
-    ui->cbLimitedTime->setChecked(Config->TrbRunSettings.bLimitTime);
-    ui->cbLimitEvents->setChecked(Config->TrbRunSettings.bLimitEvents);
-    ui->leiMaxEvents->setText( QString::number(Config->TrbRunSettings.MaxEvents) );
+    ui->cbLimitedTime->setChecked(Config.TrbRunSettings.bLimitTime);
+    ui->cbLimitEvents->setChecked(Config.TrbRunSettings.bLimitEvents);
+    ui->leiMaxEvents->setText( QString::number(Config.TrbRunSettings.MaxEvents) );
 
     on_pbRefreshBufferIndication_clicked();
 
     on_pbUpdateTriggerGui_clicked();
 
     // Trigger gains
-    ui->cbGainsForTriggerBoard->setChecked(Config->TrbRunSettings.bTriggerGains);
-    ui->sbNumberTriggerBoardChannels->setValue(Config->TrbRunSettings.TriggerGains.size());
-    ui->sbAllGainsTo->setValue(Config->TrbRunSettings.DefaultTriggerGain);
+    ui->cbGainsForTriggerBoard->setChecked(Config.TrbRunSettings.bTriggerGains);
+    ui->sbNumberTriggerBoardChannels->setValue(Config.TrbRunSettings.TriggerGains.size());
+    ui->sbAllGainsTo->setValue(Config.TrbRunSettings.DefaultTriggerGain);
     updateTriggerGainGui(); // resize and fill default
-    for (size_t iG = 0; iG < Config->TrbRunSettings.TriggerGains.size(); iG++)
+    for (size_t iG = 0; iG < Config.TrbRunSettings.TriggerGains.size(); iG++)
     {
         if (iG < TriggerGainSpinBoxes.size())
-            TriggerGainSpinBoxes[iG]->setValue(Config->TrbRunSettings.TriggerGains[iG]);
+            TriggerGainSpinBoxes[iG]->setValue(Config.TrbRunSettings.TriggerGains[iG]);
         else
             qWarning() << "Mismatch in trigger gain spinboxes size";
     }
 
-    ui->cbDisableIgnoredChannels->setChecked(Config->DisableIgnoredChannels);
+    ui->cbDisableIgnoredChannels->setChecked(Config.DisableIgnoredChannels);
 }
 
 // --- update Config on GUI operated by user ---
 void MainWindow::on_cbSubstractPedestal_clicked(bool checked)
 {
-    Config->bPedestalSubstraction = checked;
+    Config.bPedestalSubstraction = checked;
     ClearData();
 }
 
 void MainWindow::on_sbPedestalFrom_editingFinished()
 {
-    Config->PedestalFrom = ui->sbPedestalFrom->value();
+    Config.PedestalFrom = ui->sbPedestalFrom->value();
     ClearData();
 }
 
 void MainWindow::on_sbPedestalTo_editingFinished()
 {
-    Config->PedestalTo = ui->sbPedestalTo->value();
+    Config.PedestalTo = ui->sbPedestalTo->value();
     ClearData();
 }
 
 void MainWindow::on_cbSmoothWaveforms_clicked(bool checked)
 {
-    Config->bSmoothWaveforms = checked;
+    Config.bSmoothWaveforms = checked;
     ClearData();
 }
 
 void MainWindow::on_cbSmoothBeforePedestal_clicked(bool checked)
 {
-    Config->bSmoothingBeforePedestals = checked;
+    Config.bSmoothingBeforePedestals = checked;
     ClearData();
 }
 
 void MainWindow::on_cbAdjacentAveraging_clicked(bool checked)
 {
-    Config->AdjacentAveraging_bOn = checked;
+    Config.AdjacentAveraging_bOn = checked;
     ClearData();
 }
 
 void MainWindow::on_sbAdjAvPoints_editingFinished()
 {
-    Config->AdjacentAveraging_NumPoints = ui->sbAdjAvPoints->value();
+    Config.AdjacentAveraging_NumPoints = ui->sbAdjAvPoints->value();
     ClearData();
 }
 
 void MainWindow::on_cbAdjAvWeighted_clicked(bool checked)
 {
-    Config->AdjacentAveraging_bWeighted = checked;
+    Config.AdjacentAveraging_bWeighted = checked;
     ClearData();
 }
 
 void MainWindow::on_cobSignalExtractionMethod_activated(int index)
 {
-    Config->SignalExtractionMethod = index;
+    Config.SignalExtractionMethod = index;
     ClearData();
 }
 
 void MainWindow::on_cbZeroSignalIfReverseMax_clicked(bool checked)
 {
-    Config->bZeroSignalIfReverse = checked;
+    Config.bZeroSignalIfReverse = checked;
     ClearData();
 }
 
 void MainWindow::on_ledReverseMaxLimit_editingFinished()
 {
-    Config->ReverseMaxThreshold = ui->ledReverseMaxLimit->text().toDouble();
+    Config.ReverseMaxThreshold = ui->ledReverseMaxLimit->text().toDouble();
     ClearData();
 }
 
 void MainWindow::on_cbPosThreshold_clicked(bool checked)
 {
-    Config->bPositiveThreshold = checked;
+    Config.bPositiveThreshold = checked;
     ClearData();
 }
 
 void MainWindow::on_cbNegThreshold_clicked(bool checked)
 {
-    Config->bNegativeThreshold = checked;
+    Config.bNegativeThreshold = checked;
     ClearData();
 }
 
 void MainWindow::on_ledPosThresholdMin_editingFinished()
 {
-    Config->PositiveThreshold = ui->ledPosThresholdMin->text().toDouble();
+    Config.PositiveThreshold = ui->ledPosThresholdMin->text().toDouble();
     ClearData();
 }
 
 void MainWindow::on_ledNegThresholdMin_editingFinished()
 {
-    Config->NegativeThreshold = ui->ledNegThresholdMin->text().toDouble();
+    Config.NegativeThreshold = ui->ledNegThresholdMin->text().toDouble();
     ClearData();
 }
 
 void MainWindow::on_cbIgnorePosThreshold_clicked(bool checked)
 {
-    Config->bPositiveIgnore = checked;
+    Config.bPositiveIgnore = checked;
     ClearData();
 }
 
 void MainWindow::on_cbIgnoreNegThreshold_clicked(bool checked)
 {
-    Config->bNegativeIgnore = checked;
+    Config.bNegativeIgnore = checked;
     ClearData();
 }
 
 void MainWindow::on_ledPosIgnoreMax_editingFinished()
 {
-    Config->PositiveIgnore = ui->ledPosIgnoreMax->text().toDouble();
+    Config.PositiveIgnore = ui->ledPosIgnoreMax->text().toDouble();
     ClearData();
 }
 
 void MainWindow::on_ledNegIgnoreMax_editingFinished()
 {
-    Config->NegativeIgnore = ui->ledNegIgnoreMax->text().toDouble();
+    Config.NegativeIgnore = ui->ledNegIgnoreMax->text().toDouble();
     ClearData();
 }
 
 void MainWindow::on_cbPosMaxSignalGate_clicked(bool checked)
 {
-    Config->bPosMaxGate = checked;
+    Config.bPosMaxGate = checked;
     ClearData();
 }
 
 void MainWindow::on_cbNegMaxSignalGate_clicked(bool checked)
 {
-    Config->bNegMaxGate = checked;
+    Config.bNegMaxGate = checked;
     ClearData();
 }
 
 void MainWindow::on_sbPosMaxFrom_editingFinished()
 {
-    Config->PosMaxGateFrom = ui->sbPosMaxFrom->value();
+    Config.PosMaxGateFrom = ui->sbPosMaxFrom->value();
     ClearData();
 }
 
 void MainWindow::on_sbPosMaxTo_editingFinished()
 {
-    Config->PosMaxGateTo = ui->sbPosMaxTo->value();
+    Config.PosMaxGateTo = ui->sbPosMaxTo->value();
     ClearData();
 }
 
 void MainWindow::on_sbNegMaxFrom_editingFinished()
 {
-    Config->NegMaxGateFrom = ui->sbNegMaxFrom->value();
+    Config.NegMaxGateFrom = ui->sbNegMaxFrom->value();
     ClearData();
 }
 
 void MainWindow::on_sbNegMaxTo_editingFinished()
 {
-    Config->NegMaxGateTo = ui->sbNegMaxTo->value();
+    Config.NegMaxGateTo = ui->sbNegMaxTo->value();
     ClearData();
 }
 
 void MainWindow::on_sbExtractAllFromSampleNumber_editingFinished()
 {
-    Config->CommonSampleNumber = ui->sbExtractAllFromSampleNumber->value();
+    Config.CommonSampleNumber = ui->sbExtractAllFromSampleNumber->value();
     ClearData();
 }
 
 void MainWindow::on_sbIntegrateFrom_editingFinished()
 {
-    Config->IntegrateFrom = ui->sbIntegrateFrom->value();
+    Config.IntegrateFrom = ui->sbIntegrateFrom->value();
     ClearData();
 }
 
 void MainWindow::on_sbIntegrateTo_editingFinished()
 {
-    Config->IntegrateTo = ui->sbIntegrateTo->value();
+    Config.IntegrateTo = ui->sbIntegrateTo->value();
     ClearData();
 }
 
 void MainWindow::on_sbNumChannels_editingFinished()
 {
-    Config->HldProcessSettings.NumChannels = ui->sbNumChannels->value();
+    Config.HldProcessSettings.NumChannels = ui->sbNumChannels->value();
 }
 
 void MainWindow::on_sbNumSamples_editingFinished()
 {
-    Config->HldProcessSettings.NumSamples = ui->sbNumSamples->value();
+    Config.HldProcessSettings.NumSamples = ui->sbNumSamples->value();
 }
 
 void MainWindow::on_cbBulkExtract_clicked()
 {
-    Config->HldProcessSettings.bDoSignalExtraction = ui->cbBulkExtract->isChecked();
+    Config.HldProcessSettings.bDoSignalExtraction = ui->cbBulkExtract->isChecked();
 }
 
 void MainWindow::on_cbAutoExecuteScript_clicked()
 {
-    Config->HldProcessSettings.bDoScript = ui->cbAutoExecuteScript->isChecked();
+    Config.HldProcessSettings.bDoScript = ui->cbAutoExecuteScript->isChecked();
 }
 
 void MainWindow::on_cbSaveSignalsToFiles_clicked()
 {
-    Config->HldProcessSettings.bDoSave = ui->cbSaveSignalsToFiles->isChecked();
+    Config.HldProcessSettings.bDoSave = ui->cbSaveSignalsToFiles->isChecked();
 }
 
 void MainWindow::on_cobWhatToSave_activated(int index)
 {
-    Config->HldProcessSettings.SaveWhat = index;
+    Config.HldProcessSettings.SaveWhat = index;
 }
 
 void MainWindow::on_leAddToProcessed_editingFinished()
 {
-    Config->HldProcessSettings.AddToFileName = ui->leAddToProcessed->text();
+    Config.HldProcessSettings.AddToFileName = ui->leAddToProcessed->text();
 }
 
 void MainWindow::on_cbAddRunTime_clicked(bool checked)
 {
-    Config->HldProcessSettings.AddRunTime = checked;
+    Config.HldProcessSettings.AddRunTime = checked;
 }
 
 void MainWindow::on_cbBulkCopyToDatahub_clicked()
 {
-    Config->HldProcessSettings.bDoCopyToDatahub = ui->cbBulkCopyToDatahub->isChecked();
+    Config.HldProcessSettings.bDoCopyToDatahub = ui->cbBulkCopyToDatahub->isChecked();
 }
 
 void MainWindow::on_cbBulkAlsoCopyWaveforms_clicked()
 {
-    Config->HldProcessSettings.bCopyWaveforms = ui->cbBulkAlsoCopyWaveforms->isChecked();
+    Config.HldProcessSettings.bCopyWaveforms = ui->cbBulkAlsoCopyWaveforms->isChecked();
 }
 
 void MainWindow::on_cobPedestalExtractionMethod_activated(int index)
 {
-    Config->PedestalExtractionMethod = index;
+    Config.PedestalExtractionMethod = index;
 }
 
 void MainWindow::on_ledPedestalPeakSigma_editingFinished()
 {
-    Config->PedestalPeakSigma = ui->ledPedestalPeakSigma->text().toDouble();
+    Config.PedestalPeakSigma = ui->ledPedestalPeakSigma->text().toDouble();
 }
 
 void MainWindow::on_ledPedestalPeakThreshold_editingFinished()
 {
-    Config->PedestalPeakThreshold = ui->ledPedestalPeakThreshold->text().toDouble();
+    Config.PedestalPeakThreshold = ui->ledPedestalPeakThreshold->text().toDouble();
 }

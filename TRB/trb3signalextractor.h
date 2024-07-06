@@ -13,7 +13,7 @@ class MasterConfig;
 class Trb3signalExtractor
 {
 public:
-    Trb3signalExtractor(const MasterConfig *Config, const Trb3dataReader* Reader);
+    Trb3signalExtractor(const Trb3dataReader * Reader);
 
     bool    ExtractSignals();
     void    GenerateDummyData(); // called from bulk processor if extraction is disabled
@@ -46,7 +46,7 @@ public:
     //std::vector<std::vector<Trb3TimingRecord>> TimeData;  // format:  [event] [{channel,timeStamp}]
 
 private:
-    const   MasterConfig* Config;
+    const   MasterConfig & Config;
     const   Trb3dataReader* Reader;
     QVector < QVector <float> > signalData;  // format:  [ievent] [ichanel]            this is (peak - pedestal)
     QVector<bool> RejectedEvents;

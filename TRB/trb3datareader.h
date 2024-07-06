@@ -16,7 +16,7 @@ namespace hadaq {struct RawSubevent;}
 class Trb3dataReader
 {
 public:
-    Trb3dataReader(MasterConfig * Config);
+    Trb3dataReader();
 
     QString GetFileInfo(const QString &FileName); // used only in the gui when clicking "...print file data structure"
     QString Read(const QString &FileName); // Reading waveform data from the file, optional - substract pedestals and apply smoothing
@@ -67,14 +67,14 @@ public:
     int numEvents = 0;
 
 private:
-    MasterConfig* Config;
+    MasterConfig & Config;
     QVector < QVector < QVector <float> > > waveData;  // format:  [event] [hardware chanel] [sample]
 
     static constexpr unsigned NumTimeChannels = 30; // obsolete
     static constexpr double FineSpan_ns = 5.0; //ns
 
-    int     numSamples;
-    int     numChannels;
+    int     numSamples  = 0;
+    int     numChannels = 0;
 
     int     numBadEvents;
     int     numAllEvents;

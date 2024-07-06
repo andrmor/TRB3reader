@@ -8,8 +8,8 @@
 
 const float NaN = std::numeric_limits<float>::quiet_NaN();
 
-Trb3signalExtractor::Trb3signalExtractor(const MasterConfig *Config, const Trb3dataReader* Reader) :
-    Config(Config), Reader(Reader), numChannels(0) {}
+Trb3signalExtractor::Trb3signalExtractor(const Trb3dataReader* Reader) :
+    Config(MasterConfig::getConstInstance()), Reader(Reader), numChannels(0) {}
 
 bool Trb3signalExtractor::ExtractSignals()
 {    
@@ -131,9 +131,9 @@ void Trb3signalExtractor::ExtractAllSignals()
     const int numSamples = Reader->CountSamples();
     if (numSamples == 0) return;
 
-    if (Config->SignalExtractionMethod == 2 &&  (Config->CommonSampleNumber<0 || Config->CommonSampleNumber>=numSamples) )
+    if (Config.SignalExtractionMethod == 2 &&  (Config.CommonSampleNumber<0 || Config.CommonSampleNumber>=numSamples) )
     {
-        qWarning() << "Common sample number "<< Config->CommonSampleNumber<<"is not valid. Number of samples in the data:"<< numSamples;
+        qWarning() << "Common sample number "<< Config.CommonSampleNumber<<"is not valid. Number of samples in the data:"<< numSamples;
         return;
     }
 
@@ -146,7 +146,7 @@ void Trb3signalExtractor::ExtractAllSignals()
         NegMaxValue = PosMaxValue = -1.0e10;
         for (int ichannel=0; ichannel<numChannels; ichannel++)
         {
-            if (Config->IsIgnoredHardwareChannel(ichannel) )
+            if (Config.IsIgnoredHardwareChannel(ichannel) )
             {
                 signalData[ievent][ichannel] = 0;
                 continue;
@@ -157,17 +157,17 @@ void Trb3signalExtractor::ExtractAllSignals()
         if (RejectedEvents.at(ievent)) continue;
 
         // if activated, check that the maximum is reached in the allowed gate
-        if (Config->bNegMaxGate)
+        if (Config.bNegMaxGate)
         {
-            if (iNegMaxSample < Config->NegMaxGateFrom  || iNegMaxSample > Config->NegMaxGateTo )
+            if (iNegMaxSample < Config.NegMaxGateFrom  || iNegMaxSample > Config.NegMaxGateTo )
             {
                 RejectedEvents[ievent] = true;
                 continue;
             }
         }
-        else if (Config->bPosMaxGate)
+        else if (Config.bPosMaxGate)
         {
-            if (iPosMaxSample < Config->PosMaxGateFrom  || iPosMaxSample > Config->PosMaxGateTo )
+            if (iPosMaxSample < Config.PosMaxGateFrom  || iPosMaxSample > Config.PosMaxGateTo )
             {
                 RejectedEvents[ievent] = true;
                 continue;
@@ -175,7 +175,7 @@ void Trb3signalExtractor::ExtractAllSignals()
         }
 
         // for methods 1 and 2 reading signal value at the same sample #
-        switch (Config->SignalExtractionMethod)
+        switch (Config.SignalExtractionMethod)
         {
         case 0: break; //already done
         case 1:
@@ -183,7 +183,7 @@ void Trb3signalExtractor::ExtractAllSignals()
             for (int ichannel=0; ichannel<numChannels; ichannel++)
               {
                 if (signalData.at(ievent).at(ichannel) == 0) continue; //respect suppression - applicable since it operates with max of waveform
-                if ( Config->IsNegativeHardwareChannel(ichannel) )
+                if ( Config.IsNegativeHardwareChannel(ichannel) )
                     signalData[ievent][ichannel] = -Reader->GetValueFast(ievent, ichannel, iNegMaxSample);
                 else
                     signalData[ievent][ichannel] = Reader->GetValueFast(ievent, ichannel, iPosMaxSample);
@@ -193,10 +193,10 @@ void Trb3signalExtractor::ExtractAllSignals()
             for (int ichannel=0; ichannel<numChannels; ichannel++)
               {
                 if (signalData.at(ievent).at(ichannel) == 0) continue; //respect suppression - applicable since it operates with max of waveform
-                if ( Config->IsNegativeHardwareChannel(ichannel) )
-                    signalData[ievent][ichannel] = -Reader->GetValueFast(ievent, ichannel, Config->CommonSampleNumber);
+                if ( Config.IsNegativeHardwareChannel(ichannel) )
+                    signalData[ievent][ichannel] = -Reader->GetValueFast(ievent, ichannel, Config.CommonSampleNumber);
                 else
-                    signalData[ievent][ichannel] = Reader->GetValueFast(ievent, ichannel, Config->CommonSampleNumber);
+                    signalData[ievent][ichannel] = Reader->GetValueFast(ievent, ichannel, Config.CommonSampleNumber);
               }
             break;
         case 3:
@@ -205,12 +205,12 @@ void Trb3signalExtractor::ExtractAllSignals()
                 if (signalData.at(ievent).at(ichannel) == 0) continue; //respect suppression - applicable since it operates with max of waveform
                 const QVector<float>* wave = Reader->GetWaveformPtrFast(ievent, ichannel);
                 float val = 0;
-                for (int isam = Config->IntegrateFrom; isam<=Config->IntegrateTo; ++isam)
+                for (int isam = Config.IntegrateFrom; isam<=Config.IntegrateTo; ++isam)
                 {
                     if (isam < wave->size()) val += wave->at(isam);
                     else break;
                 }
-                signalData[ievent][ichannel] = ( (Config->IsNegativeHardwareChannel(ichannel)) ? -val : val);
+                signalData[ievent][ichannel] = ( (Config.IsNegativeHardwareChannel(ichannel)) ? -val : val);
             }
             break;
         default:
@@ -237,32 +237,32 @@ float Trb3signalExtractor::extractSignalFromWaveform(int ievent, int ichannel, b
 
     if (Reader->GetWaveformPtrFast(ievent, ichannel)->isEmpty()) return 0;
 
-    if ( Config->IsNegativeHardwareChannel(ichannel) )
+    if ( Config.IsNegativeHardwareChannel(ichannel) )
     {
         sig = -extractMin(Reader->GetWaveformPtrFast(ievent, ichannel));
 
-        if (Config->bZeroSignalIfPeakOutside_Negative)
+        if (Config.bZeroSignalIfPeakOutside_Negative)
         {
-            if (iMin < Config->ZeroSignalIfPeakBefore_Negative) return 0;
-            if (iMin > Config->ZeroSignalIfPeakAfter_Negative)  return 0;
+            if (iMin < Config.ZeroSignalIfPeakBefore_Negative) return 0;
+            if (iMin > Config.ZeroSignalIfPeakAfter_Negative)  return 0;
         }
 
-        if (Config->bNegativeThreshold)
-            if (sig < Config->NegativeThreshold)
+        if (Config.bNegativeThreshold)
+            if (sig < Config.NegativeThreshold)
             {
                 if (WasSetToZero) *WasSetToZero = true;
                 return 0;
             }
 
-        if (Config->bNegativeIgnore)
-            if (sig > Config->NegativeIgnore)
+        if (Config.bNegativeIgnore)
+            if (sig > Config.NegativeIgnore)
             {
                 RejectedEvents[ievent] = true;
                 return sig;
             }
 
-        if (Config->bZeroSignalIfReverse)
-            if ( extractMax(Reader->GetWaveformPtrFast(ievent, ichannel)) > Config->ReverseMaxThreshold*sig)
+        if (Config.bZeroSignalIfReverse)
+            if ( extractMax(Reader->GetWaveformPtrFast(ievent, ichannel)) > Config.ReverseMaxThreshold*sig)
             {
                 if (WasSetToZero) *WasSetToZero = true;
                 return 0;
@@ -278,28 +278,28 @@ float Trb3signalExtractor::extractSignalFromWaveform(int ievent, int ichannel, b
     {
         sig = extractMax(Reader->GetWaveformPtrFast(ievent, ichannel));
 
-        if (Config->bZeroSignalIfPeakOutside_Positive)
+        if (Config.bZeroSignalIfPeakOutside_Positive)
         {
-            if (iMax < Config->ZeroSignalIfPeakBefore_Positive) return 0;
-            if (iMax > Config->ZeroSignalIfPeakAfter_Positive)  return 0;
+            if (iMax < Config.ZeroSignalIfPeakBefore_Positive) return 0;
+            if (iMax > Config.ZeroSignalIfPeakAfter_Positive)  return 0;
         }
 
-        if (Config->bPositiveThreshold)
-            if (sig < Config->PositiveThreshold)
+        if (Config.bPositiveThreshold)
+            if (sig < Config.PositiveThreshold)
             {
                 if (WasSetToZero) *WasSetToZero = true;
                 return 0;
             }
 
-        if (Config->bPositiveIgnore)
-            if (sig > Config->PositiveIgnore)
+        if (Config.bPositiveIgnore)
+            if (sig > Config.PositiveIgnore)
             {
                 RejectedEvents[ievent] = true;
                 return sig;
             }
 
-        if (Config->bZeroSignalIfReverse)
-            if ( -extractMin(Reader->GetWaveformPtrFast(ievent, ichannel)) > Config->ReverseMaxThreshold*sig)
+        if (Config.bZeroSignalIfReverse)
+            if ( -extractMin(Reader->GetWaveformPtrFast(ievent, ichannel)) > Config.ReverseMaxThreshold*sig)
             {
                 if (WasSetToZero) *WasSetToZero = true;
                 return 0;

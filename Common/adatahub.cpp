@@ -140,7 +140,10 @@ int AOneEvent::GetWaveformSampleWhereFirstAbove(int ichannel, float threshold) c
     return -1;
 }
 
-ADataHub::ADataHub(const MasterConfig &Config) : Config(Config) {}
+// ------------------------------
+
+ADataHub::ADataHub() :
+    Config(MasterConfig::getConstInstance()) {}
 
 ADataHub::~ADataHub()
 {

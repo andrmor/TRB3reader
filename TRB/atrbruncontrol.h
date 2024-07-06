@@ -13,7 +13,7 @@ class ATrbRunControl : public QObject
 {
     Q_OBJECT
 public:
-    ATrbRunControl(MasterConfig & settings, ANetworkModule & Network, const QString & exchangeDir);
+    ATrbRunControl(ANetworkModule & Network, const QString & exchangeDir);
 
     const QString StartBoard();
     void StopBoard();
@@ -68,7 +68,7 @@ signals:
     void freeSpaceCheckReady(long bytes); //can be -1 for n.a.
 
 private:    
-    MasterConfig & Settings;
+    MasterConfig    & Settings;
     ATrbRunSettings & RunSettings;
     ANetworkModule & Network;
     const QString sExchangeDir;

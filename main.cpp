@@ -20,20 +20,18 @@ int main(int argc, char *argv[])
     //SUPPRESS WARNINGS about ssl
     QLoggingCategory::setFilterRules("qt.network.ssl.warning=false");
 
-    MasterConfig Config;
-    ADataHub DataHub(Config);
-    Trb3dataReader Reader(&Config);
-    Trb3signalExtractor Extractor(&Config, &Reader);
-    AHldFileProcessor HldFileProcessor(Config, Reader, Extractor, DataHub);
+    ADataHub DataHub;
+    Trb3dataReader Reader;
+    Trb3signalExtractor Extractor(&Reader);
+    AHldFileProcessor HldFileProcessor(Reader, Extractor, DataHub);
 
 //    !!!***
-//    AScriptManager ScriptManager;
 //    ANetworkModule Network(&ScriptManager); // !!!***
     ANetworkModule Network(nullptr); // !!!***
 
-    ADispatcher Dispatcher(&Config, &Reader, &Extractor, &Network);
+    ADispatcher Dispatcher(&Reader, &Extractor, &Network);
 
-    MainWindow MW(&Config, &Dispatcher, &DataHub, &Reader, &Extractor, HldFileProcessor, Network);
+    MainWindow MW(&Dispatcher, &DataHub, &Reader, &Extractor, HldFileProcessor, Network);
     MW.show();
 
     QObject::connect(&Dispatcher, &ADispatcher::RequestUpdateGui, &MW, &MainWindow::UpdateGui);
