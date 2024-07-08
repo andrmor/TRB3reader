@@ -43,6 +43,8 @@ void MainWindow::saveCompleteState()
 {
     //save script-related config
     JScriptWin->WriteToJson();
+    JScriptWin->storeGeomStatus();
+
     Dispatcher->SaveConfig(Config.AutosaveFile);
 }
 
@@ -185,15 +187,7 @@ void MainWindow::LoadWindowSettings()
     }
 
     // !!!***
-    if (js.contains("Main"))
-    {
-        QJsonObject jsScript = js["ScriptWindow"].toObject();
-        LoadWindowFromJson(jsScript, x, y, w, h, bVis);
-//        ScriptWindow->move(x, y);
-//        ScriptWindow->resize(w, h);
-        //ScriptWindow->setGeometry(x, y, w, h); // introduces a shift up on Windows7
-//        ScriptWindow->setVisible(bVis);
-    }
+    JScriptWin->restoreGeomStatus();
 
     //QJsonObject jsW;
     //parseJson(js, "GraphWindows", jsW);

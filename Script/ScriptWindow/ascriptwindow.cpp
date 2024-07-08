@@ -139,6 +139,9 @@ AScriptWindow::AScriptWindow(EScriptLanguage lang, QWidget * parent) :
         recordsFileName += "PythonExamples.txt";
         pathToExamples  += "/scripts/python/";
     }
+
+    // TODO !!!***
+    /*
     QFile file(recordsFileName);
     if (!file.open(QIODevice::ReadOnly))
         guitools::message("Failed to open file with script example database:\n" + recordsFileName, this);
@@ -152,6 +155,7 @@ AScriptWindow::AScriptWindow(EScriptLanguage lang, QWidget * parent) :
         ExampleExplorer->setWindowModality(Qt::WindowModal);
         QObject::connect(ExampleExplorer, &AScriptExampleExplorer::requestLoadScript, this, &AScriptWindow::onLoadRequested);
     }
+    */
 }
 
 AScriptWindow::~AScriptWindow()
