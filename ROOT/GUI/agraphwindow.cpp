@@ -133,6 +133,16 @@ bool AGraphWindow::event(QEvent * event)
     return QMainWindow::event(event);
 }
 
+void AGraphWindow::onDrawRequest(TObject *obj, QString options, bool )
+{
+    //qDebug() << "Here!!!!" << IdStr;
+    showNormal();
+    activateWindow();
+    SetAsActiveRootWindow();
+    obj->Draw(options.toLatin1().data());
+    UpdateRootCanvas();
+}
+
 #include <QSettings>
 void AGraphWindow::storeGeomStatus()
 {

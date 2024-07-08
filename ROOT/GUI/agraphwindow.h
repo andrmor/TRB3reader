@@ -8,6 +8,7 @@ class AGraphWindow;
 }
 
 class ARasterWindow;
+class TObject;
 
 class AGraphWindow : public QMainWindow
 {
@@ -34,7 +35,10 @@ protected:
     void resizeEvent(QResizeEvent *event) override;
     void moveEvent(QMoveEvent *event) override;
     //void hideEvent(QHideEvent* event);  do not use! it is triggered AFTER the woindow is closed, we need to intercept BEFORE --> see event() method
-    bool event(QEvent *event);
+    bool event(QEvent *event) override;
+
+public slots:
+    void onDrawRequest(TObject * obj, QString options, bool fFocus);
 
 private:
     Ui::AGraphWindow * ui = nullptr;

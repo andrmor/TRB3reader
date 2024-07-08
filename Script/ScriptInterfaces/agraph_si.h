@@ -65,8 +65,8 @@ public slots:
 
     void configureAbortIfAlreadyExists(bool flag) {AbortIfExists = flag;}
 
-signals:
-    void requestDraw(TObject * obj, QString options, bool fFocus);
+//signals:  // in the hub
+//    void requestDraw(TObject * obj, QString options, bool fFocus);
 
 private:
     ARootObjCollection & Graphs;

@@ -174,6 +174,7 @@ void CernRootModule::onDrawRequested(TObject *obj, QString opt, bool bDoUpdate)
     if (bDoUpdate) WOne->UpdateRootCanvas();
 }
 
+#include "ascripthub.h"
 void CernRootModule::CreateGraphWindows()
 {
     WOne     = new AGraphWindow("One",     MainWin);// WOne->resize(1001, 601);
@@ -197,6 +198,9 @@ void CernRootModule::CreateGraphWindows()
 
     connect(W2DNeg,  &AGraphWindow::wasHidden, this, &CernRootModule::onGraphWindowRequestHide);
     connect(W2DPos,  &AGraphWindow::wasHidden, this, &CernRootModule::onGraphWindowRequestHide);
+
+    AScriptHub * scrHub = &AScriptHub::getInstance();
+    connect(scrHub, &AScriptHub::requestDraw, WOne, &AGraphWindow::onDrawRequest, Qt::QueuedConnection);
 }
 
 void CernRootModule::onGraphWindowRequestHide(QString idStr)

@@ -54,6 +54,8 @@ public:
     void updateJsonTree();  // !!!***
     void reportError(QString error, int line = 0);   //0 - no line is highligted
 
+    void hideTooltipLabel();
+
     AGuiWindow * ScriptMsgWin = nullptr;
 
 private:

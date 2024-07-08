@@ -10,6 +10,7 @@
 class AJScriptManager;
 class AScriptInterface;
 class AGuiFromScrWin;
+class TObject;
 
 #ifdef ANTS3_PYTHON
     class APythonScriptManager;
@@ -68,6 +69,8 @@ signals:
     void requestUpdateGui();
     void reportProgress_JS(int percent);
     void reportProgress_P(int percent);
+
+    void requestDraw(TObject * obj, QString options, bool fFocus);
 
 private:
     AJScriptManager      * JavaScriptM = nullptr;

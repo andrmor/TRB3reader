@@ -346,6 +346,8 @@ void AScriptWindow::updateGui()
     updateJsonTree();
 
     updateFileStatusIndication();
+
+    lHelp->hide();
 }
 
 void AScriptWindow::reportError(QString error, int line)
@@ -355,6 +357,11 @@ void AScriptWindow::reportError(QString error, int line)
     pteOut->appendHtml(error);
     qDebug() << "ln:" << line;
     highlightErrorLine(line);
+}
+
+void AScriptWindow::hideTooltipLabel()
+{
+    lHelp->hide();
 }
 
 void AScriptWindow::highlightErrorLine(int line)
@@ -426,6 +433,8 @@ void AScriptWindow::ReadFromJson()
     QJsonObject js;
     LoadJsonFromFile(js, fileName);
     readFromJson(js);
+
+    hideTooltipLabel();
 }
 
 void AScriptWindow::removeAllBooksExceptFirst()
@@ -1130,9 +1139,11 @@ bool AScriptWindow::event(QEvent *e)
         // gained focus
         //qDebug() << "Focussed!";
         updateJsonTree();
+        lHelp->hide();
         break;
     case QEvent::WindowDeactivate :
         // lost focus
+        lHelp->hide();
         break;
 /*
     case QEvent::Hide :

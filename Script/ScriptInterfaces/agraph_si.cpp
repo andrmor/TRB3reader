@@ -495,6 +495,7 @@ void AGraph_SI::sort(QString graphName)
     else    r->sort();
 }
 
+#include "ascripthub.h"
 void AGraph_SI::draw(QString graphName, QString options)
 {
     if (!bGuiThread)
@@ -508,7 +509,7 @@ void AGraph_SI::draw(QString graphName, QString options)
     else
     {
         TObject * copy = r->GetObject()->Clone(r->GetObject()->GetName());
-        emit requestDraw(copy, options, true);
+        emit AScriptHub::getInstance().requestDraw(copy, options, true);
         r->LastDrawOption = options;
     }
 }
