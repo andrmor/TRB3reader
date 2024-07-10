@@ -10,8 +10,8 @@
 #include <limits>
 #include <cmath>
 
-AInterfaceToWaveforms::AInterfaceToWaveforms(MasterConfig* Config, Trb3dataReader* Reader) :
-    Config(Config), Reader(Reader)
+AInterfaceToWaveforms::AInterfaceToWaveforms(Trb3dataReader* Reader) :
+    Config(MasterConfig::getInstance()), Reader(Reader)
 {
     Description = "Low-level unit giving access to waveforms read from an hld file.";
 }

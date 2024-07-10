@@ -14,7 +14,7 @@ class AInterfaceToWaveforms : public AScriptInterface
     Q_OBJECT
 
 public:
-    AInterfaceToWaveforms(MasterConfig* Config, Trb3dataReader* Reader);
+    AInterfaceToWaveforms(Trb3dataReader* Reader);
 
 public slots:
 
@@ -50,8 +50,8 @@ public slots:
     int      getSampleWhereFirstBelowFast(int ievent, int iHardwChannel, int threshold);
 
 private:
-    MasterConfig*   Config;
-    Trb3dataReader* Reader;
+    MasterConfig   & Config;
+    Trb3dataReader * Reader;
 };
 
 #endif // AINTERFACETOWAVEFORMS_H

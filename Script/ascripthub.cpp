@@ -121,6 +121,8 @@ QString AScriptHub::getPythonVersion()
 #endif
 }
 
+#include "amsg_si.h"
+#include "ainterfacetowaveforms.h"
 AScriptHub::AScriptHub()
 {
     //qDebug() << ">Creating AJScriptManager and Generating/registering script units";
@@ -142,6 +144,8 @@ AScriptHub::AScriptHub()
     addCommonInterface(new AHist_SI(),         "hist");
     //addCommonInterface(new ATree_SI(),         "tree");
     addCommonInterface(new ARootStyle_SI(),    "root");
+    //addCommonInterface(new AMsg_SI(),          "msg");
+    addCommonInterface(new AInterfaceToWaveforms(), "wave");
 
     //JavaScriptM->registerInterface(new AMiniJS_SI(), "mini");  // !!!*** need here?
 #ifdef ANTS3_PYTHON

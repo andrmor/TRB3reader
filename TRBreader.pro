@@ -30,6 +30,7 @@ SOURCES += ROOT/cernrootmodule.cpp \
            Script/ScriptInterfaces/amsg_si.cpp \
            Script/ScriptInterfaces/arootstyle_si.cpp \
            Script/ScriptInterfaces/awindowinterfacebase.cpp \
+           Script/ScriptInterfaces/ainterfacetowaveforms.cpp \
            Script/ScriptWindow/ascriptwindow.cpp \
            Script/ScriptWindow/aargumentcounter.cpp \
            Script/ScriptWindow/ahighlighters.cpp \
@@ -74,6 +75,7 @@ HEADERS += ROOT/cernrootmodule.h \
            Script/ScriptInterfaces/amsg_si.h \
            Script/ScriptInterfaces/arootstyle_si.h \
            Script/ScriptInterfaces/awindowinterfacebase.h \
+           Script/ScriptInterfaces/ainterfacetowaveforms.h \
            Script/ScriptWindow/ascriptwindow.h \
            Script/ScriptWindow/aargumentcounter.h \
            Script/ScriptWindow/ahighlighters.h \
@@ -138,7 +140,6 @@ SOURCES += main.cpp \
     Script/ainterfacetomessagewindow.cpp \
     Common/amessage.cpp \
     Common/completingtexteditclass.cpp \    
-    Script/ainterfacetowaveforms.cpp \
     Script/ainterfacetoconfig.cpp \
     Common/adispatcher.cpp \
     GUI/aeditchannelsdialog.cpp \
@@ -167,7 +168,6 @@ HEADERS  += GUI/mainwindow.h \
     Script/ainterfacetomessagewindow.h \
     Common/amessage.h \
     Common/completingtexteditclass.h \    
-    Script/ainterfacetowaveforms.h \
     Script/ainterfacetoconfig.h \
     Common/adispatcher.h \
     GUI/aeditchannelsdialog.h \
