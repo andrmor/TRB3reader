@@ -1,17 +1,16 @@
 #include "mainwindow.h"
-#include <QApplication>
-#include <QObject>
-#include <QDebug>
-#include <QLoggingCategory>
-
+#include "ascripthub.h"
 #include "adatahub.h"
-#include "masterconfig.h"
 #include "trb3datareader.h"
 #include "trb3signalextractor.h"
 #include "adispatcher.h"
 #include "ahldfileprocessor.h"
 #include "anetworkmodule.h"
-//#include "ascriptmanager.h"
+
+#include <QApplication>
+#include <QObject>
+#include <QDebug>
+#include <QLoggingCategory>
 
 int main(int argc, char *argv[])
 {
@@ -30,6 +29,13 @@ int main(int argc, char *argv[])
     ANetworkModule Network(nullptr); // !!!***
 
     ADispatcher Dispatcher(&Reader, &Extractor, &Network);
+
+    AScriptHub & ScriptHub = AScriptHub::getInstance();
+    ScriptHub.registerReaderModule(&Reader);
+    ScriptHub.registerExtractorModule(&Extractor);
+    ScriptHub.registerDataModule(&DataHub);
+    ScriptHub.createInterfaces();
+    ScriptHub.finalizeInit();
 
     MainWindow MW(&Dispatcher, &DataHub, &Reader, &Extractor, HldFileProcessor, Network);
     MW.show();

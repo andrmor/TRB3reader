@@ -91,6 +91,8 @@ void CernRootModule::SetWindowGeometries(const QJsonObject &js)
 
 void CernRootModule::ResetPositionOfWindows()
 {
+    WScriptGraph->setGeometry(20,20,1000,700);
+
     WOne->setGeometry(20,20,1000,700);
     WOverNeg->setGeometry(50,50,1000,700);
     WOverPos->setGeometry(80,80,1000,700);
@@ -159,24 +161,11 @@ void CernRootModule::DrawSignature(bool bNeg)
     WOne->UpdateRootCanvas();
 }
 
-void CernRootModule::onDrawRequested(TObject *obj, QString opt, bool bDoUpdate)
-{
-    //WOne->SetAsActiveRootWindow();
-    WOne->ShowAndFocus();
-
-    if (!obj)
-    {
-        WOne->UpdateRootCanvas();
-        return;
-    }
-
-    obj->Draw(opt.toLatin1().data());
-    if (bDoUpdate) WOne->UpdateRootCanvas();
-}
-
 #include "ascripthub.h"
 void CernRootModule::CreateGraphWindows()
 {
+    WScriptGraph = new AGraphWindow("Script", MainWin); WScriptGraph->setWindowTitle("Script draw");
+
     WOne     = new AGraphWindow("One",     MainWin);// WOne->resize(1001, 601);
     WOverNeg = new AGraphWindow("OverNeg", MainWin);// WOverNeg->resize(1001, 601);
     WOverPos = new AGraphWindow("OverPos", MainWin);// WOverPos->resize(1001, 601);
@@ -187,6 +176,8 @@ void CernRootModule::CreateGraphWindows()
 
     W2DNeg  = new AGraphWindow("2DNeg",  MainWin); // WSigPos->resize(1001, 601);
     W2DPos  = new AGraphWindow("2DPos",  MainWin); // WSigPos->resize(1001, 601);
+
+    connect(WScriptGraph, &AGraphWindow::wasHidden, WScriptGraph, &AGraphWindow::hide);
 
     connect(WOne,     &AGraphWindow::wasHidden, this, &CernRootModule::onGraphWindowRequestHide);
     connect(WOverNeg, &AGraphWindow::wasHidden, this, &CernRootModule::onGraphWindowRequestHide);
@@ -200,7 +191,7 @@ void CernRootModule::CreateGraphWindows()
     connect(W2DPos,  &AGraphWindow::wasHidden, this, &CernRootModule::onGraphWindowRequestHide);
 
     AScriptHub * scrHub = &AScriptHub::getInstance();
-    connect(scrHub, &AScriptHub::requestDraw, WOne, &AGraphWindow::onDrawRequest, Qt::QueuedConnection);
+    connect(scrHub, &AScriptHub::requestDraw, WScriptGraph, &AGraphWindow::onDrawRequest, Qt::QueuedConnection);
 }
 
 void CernRootModule::onGraphWindowRequestHide(QString idStr)
@@ -218,6 +209,8 @@ void CernRootModule::onGraphWindowRequestHide(QString idStr)
 
 CernRootModule::~CernRootModule()
 {
+    delete WScriptGraph;
+
     delete WOne; delete WOverNeg; delete WOverPos; delete WAllNeg; delete WAllPos; delete WSigNeg; delete WSigPos; delete W2DNeg; delete W2DPos;
     WOne = WOverNeg = WOverPos = WAllNeg = WAllPos = WSigNeg = WSigPos = W2DNeg = W2DPos = nullptr;
 

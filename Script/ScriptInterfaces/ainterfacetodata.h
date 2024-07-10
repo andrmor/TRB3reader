@@ -13,9 +13,11 @@ class AInterfaceToData : public AScriptInterface
     Q_OBJECT
 
 public:
-    AInterfaceToData(ADataHub* DataHub);
+    AInterfaceToData();
 
     bool     IsMultithreadCapable() const {return true;}
+
+    AScriptInterface * cloneBase() const override {return new AInterfaceToData();}
 
 public slots:
 

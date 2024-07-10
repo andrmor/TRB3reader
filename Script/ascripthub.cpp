@@ -121,8 +121,6 @@ QString AScriptHub::getPythonVersion()
 #endif
 }
 
-#include "amsg_si.h"
-#include "ainterfacetowaveforms.h"
 AScriptHub::AScriptHub()
 {
     //qDebug() << ">Creating AJScriptManager and Generating/registering script units";
@@ -130,7 +128,14 @@ AScriptHub::AScriptHub()
 #ifdef ANTS3_PYTHON
     PythonM = new APythonScriptManager();
 #endif
+}
 
+#include "ainterfacetowaveforms.h"
+#include "ainterfacetodata.h"
+#include "ainterfacetoextractor.h"
+#include "ainterfacetohldfileprocessor.h"
+void AScriptHub::createInterfaces()
+{
     addCommonInterface(new ACore_SI(),         "core");
 
     //addCommonInterface(new AMath_SI(),         "math");  // conflicts with inbuild Python module "math"
@@ -139,15 +144,18 @@ AScriptHub::AScriptHub()
     PythonM->registerInterface(new AMath_SI(),     "Math");
 #endif
 
+    addCommonInterface(new AInterfaceToWaveforms(),        "wave");
+    addCommonInterface(new AInterfaceToExtractor(),        "extractor");
+    addCommonInterface(new AInterfaceToData(),             "data");
+    addCommonInterface(new AInterfaceToHldFileProcessor(), "hld");
+
     //addCommonInterface(new AConfig_SI(),       "config");
     addCommonInterface(new AGraph_SI(),        "graph");
     addCommonInterface(new AHist_SI(),         "hist");
     //addCommonInterface(new ATree_SI(),         "tree");
     addCommonInterface(new ARootStyle_SI(),    "root");
-    //addCommonInterface(new AMsg_SI(),          "msg");
-    addCommonInterface(new AInterfaceToWaveforms(), "wave");
 
-    //JavaScriptM->registerInterface(new AMiniJS_SI(), "mini");  // !!!*** need here?
+//JavaScriptM->registerInterface(new AMiniJS_SI(), "mini");  // !!!*** need here?
 #ifdef ANTS3_PYTHON
     //PythonM->registerInterface(new AMiniPython_SI(), "mini");
 #endif

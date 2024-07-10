@@ -1,8 +1,7 @@
 
 #---Operation mode---
-#DEFINES += MULTIBOARD  #setup used in Bern
 CONFIG += TextToSpeech  #text-to-speech support, requires Qt's multimedia and texttospeech modules
-#comment the line above to define setup with a single (large) TRB3 board
+#DEFINES += MULTIBOARD  # multiboard setup used in Bern
 #
 
 #---CERN ROOT---
@@ -10,102 +9,6 @@ DEFINES += CERN_ROOT  # obsolete
 
 INCLUDEPATH += $$system(root-config --incdir)
 LIBS += $$system(root-config --libs) -lSpectrum #-lGeom -lGeomPainter -lGeomBuilder -lMinuit2
-
-SOURCES += ROOT/cernrootmodule.cpp \
-           ROOT/GUI/arasterwindow.cpp \
-           ROOT/GUI/agraphwindow.cpp \
-           ROOT/apeakfinder.cpp \
-           Common/arandomhub.cpp \
-           Common/astopwatch.cpp \
-           Common/tmpobjhubclass.cpp \
-           GUI/alineedit.cpp \
-           GUI/atexttospeechconfigurator.cpp \
-           GUI/guitools.cpp \
-           Script/ScriptInterfaces/ascriptinterface.cpp \
-           Script/ScriptInterfaces/acore_si.cpp \
-           Script/ScriptInterfaces/amath_si.cpp \
-           Script/ScriptInterfaces/agraph_si.cpp \
-           Script/ScriptInterfaces/agui_si.cpp \
-           Script/ScriptInterfaces/ahist_si.cpp \
-           Script/ScriptInterfaces/amsg_si.cpp \
-           Script/ScriptInterfaces/arootstyle_si.cpp \
-           Script/ScriptInterfaces/awindowinterfacebase.cpp \
-           Script/ScriptInterfaces/ainterfacetowaveforms.cpp \
-           Script/ScriptWindow/ascriptwindow.cpp \
-           Script/ScriptWindow/aargumentcounter.cpp \
-           Script/ScriptWindow/ahighlighters.cpp \
-           Script/ScriptWindow/ascriptbook.cpp \
-           Script/ScriptWindow/ascriptexample.cpp \
-           Script/ScriptWindow/ascriptexampledatabase.cpp \
-           Script/ScriptWindow/ascriptexampleexplorer.cpp \
-           Script/ScriptWindow/atabrecord.cpp \
-           Script/ScriptWindow/atextedit.cpp \
-           Script/ScriptWindow/atextoutputwindow.cpp \
-           Script/aguifromscrwin.cpp \
-           Script/aguiwindow.cpp \
-           Script/ajscriptmanager.cpp \
-           Script/ajscriptworker.cpp \
-           Script/arootgraphrecord.cpp \
-           Script/aroothistrecord.cpp \
-           Script/arootobjbase.cpp \
-           Script/arootobjcollection.cpp \
-           Script/ascripthelpentry.cpp \
-           Script/ascripthub.cpp \
-           Script/ascriptmessenger.cpp \
-           Script/ascriptobjstore.cpp \
-           Script/avirtualscriptmanager.cpp \
-           TRB/trb3timingrecord.cpp
-
-HEADERS += ROOT/cernrootmodule.h \
-           ROOT/GUI/arasterwindow.h \
-           ROOT/GUI/agraphwindow.h \
-           ROOT/apeakfinder.h \
-           Common/arandomhub.h \
-           Common/astopwatch.h \
-           Common/tmpobjhubclass.h \
-           GUI/alineedit.h \
-           GUI/atexttospeechconfigurator.h \
-           GUI/guitools.h \
-           Script/ScriptInterfaces/ascriptinterface.h \
-           Script/ScriptInterfaces/acore_si.h \
-           Script/ScriptInterfaces/amath_si.h \
-           Script/ScriptInterfaces/agraph_si.h \
-           Script/ScriptInterfaces/agui_si.h \
-           Script/ScriptInterfaces/ahist_si.h \
-           Script/ScriptInterfaces/amsg_si.h \
-           Script/ScriptInterfaces/arootstyle_si.h \
-           Script/ScriptInterfaces/awindowinterfacebase.h \
-           Script/ScriptInterfaces/ainterfacetowaveforms.h \
-           Script/ScriptWindow/ascriptwindow.h \
-           Script/ScriptWindow/aargumentcounter.h \
-           Script/ScriptWindow/ahighlighters.h \
-           Script/ScriptWindow/ascriptbook.h \
-           Script/ScriptWindow/ascriptexample.h \
-           Script/ScriptWindow/ascriptexampledatabase.h \
-           Script/ScriptWindow/ascriptexampleexplorer.h \
-           Script/ScriptWindow/atabrecord.h \
-           Script/ScriptWindow/atextedit.h \
-           Script/ScriptWindow/atextoutputwindow.h \
-           Script/aguifromscrwin.h \
-           Script/aguiwindow.h \
-           Script/ajscriptmanager.h \
-           Script/ajscriptworker.h \
-           Script/arootgraphrecord.h \
-           Script/aroothistrecord.h \
-           Script/arootobjbase.h \
-           Script/arootobjcollection.h \
-           Script/ascripthelpentry.h \
-           Script/ascripthub.h \
-           Script/ascriptmessenger.h \
-           Script/ascriptobjstore.h \
-           Script/avirtualscriptmanager.h \
-           Script/escriptlanguage.h \
-           TRB/trb3timingrecord.h
-
-FORMS   += ROOT/GUI/agraphwindow.ui \
-    GUI/atexttospeechconfigurator.ui \
-    Script/ScriptWindow/ascriptexampleexplorer.ui \
-    Script/ScriptWindow/ascriptwindow.ui
 
 INCLUDEPATH += ROOT
 INCLUDEPATH += ROOT/GUI
@@ -128,68 +31,161 @@ QT += qml   #this is for qjsengine
 TARGET = TRBreader
 TEMPLATE = app
 
-SOURCES += main.cpp \
-    GUI/mainwindow.cpp \
-    TRB/trb3datareader.cpp \
-    TRB/trb3signalextractor.cpp \
-    Common/channelmapper.cpp \
-    Common/masterconfig.cpp \
-    Common/ajsontools.cpp \
-    GUI/mainwindowconfig.cpp \
-    Common/afiletools.cpp \
-    Script/ainterfacetomessagewindow.cpp \
-    Common/amessage.cpp \
-    Common/completingtexteditclass.cpp \    
-    Script/ainterfacetoconfig.cpp \
-    Common/adispatcher.cpp \
-    GUI/aeditchannelsdialog.cpp \
-    Common/adatahub.cpp \
-    Script/ainterfacetodata.cpp \
-    Script/ainterfacetoextractor.cpp \
-    Script/ainterfacetowebsocket.cpp \
-    Common/ahldfileprocessor.cpp \
-    Script/ainterfacetohldfileprocessor.cpp \
-    Net/awebsocketsession.cpp \
-    Net/awebsocketsessionserver.cpp \
-    Script/awebserverinterface.cpp \
-    Net/anetworkmodule.cpp \
-    aservermonitorwindow.cpp \
-    TRB/atrbruncontrol.cpp \
-    TRB/atrbrunsettings.cpp \
-    GUI/abufferdelegate.cpp
+SOURCES +=  main.cpp \
+            ROOT/cernrootmodule.cpp \
+            ROOT/GUI/arasterwindow.cpp \
+            ROOT/GUI/agraphwindow.cpp \
+            ROOT/apeakfinder.cpp \
+            Common/arandomhub.cpp \
+            Common/astopwatch.cpp \
+            Common/tmpobjhubclass.cpp \
+            Common/channelmapper.cpp \
+            Common/masterconfig.cpp \
+            Common/ajsontools.cpp \
+            Common/afiletools.cpp \
+            Common/amessage.cpp \
+            Common/completingtexteditclass.cpp \
+            Common/adispatcher.cpp \
+            Common/adatahub.cpp \
+            Common/ahldfileprocessor.cpp \
+            Script/ScriptInterfaces/ascriptinterface.cpp \
+            Script/ScriptInterfaces/acore_si.cpp \
+            Script/ScriptInterfaces/amath_si.cpp \
+            Script/ScriptInterfaces/agraph_si.cpp \
+            Script/ScriptInterfaces/agui_si.cpp \
+            Script/ScriptInterfaces/ahist_si.cpp \
+            Script/ScriptInterfaces/amsg_si.cpp \
+            Script/ScriptInterfaces/arootstyle_si.cpp \
+            Script/ScriptInterfaces/awindowinterfacebase.cpp \
+            Script/ScriptInterfaces/ainterfacetowaveforms.cpp \
+            Script/ScriptInterfaces/ainterfacetoextractor.cpp \
+            Script/ScriptInterfaces/ainterfacetohldfileprocessor.cpp \
+            Script/ScriptInterfaces/ainterfacetodata.cpp \
+            Script/ScriptWindow/ascriptwindow.cpp \
+            Script/ScriptWindow/aargumentcounter.cpp \
+            Script/ScriptWindow/ahighlighters.cpp \
+            Script/ScriptWindow/ascriptbook.cpp \
+            Script/ScriptWindow/ascriptexample.cpp \
+            Script/ScriptWindow/ascriptexampledatabase.cpp \
+            Script/ScriptWindow/ascriptexampleexplorer.cpp \
+            Script/ScriptWindow/atabrecord.cpp \
+            Script/ScriptWindow/atextedit.cpp \
+            Script/ScriptWindow/atextoutputwindow.cpp \
+            Script/aguifromscrwin.cpp \
+            Script/aguiwindow.cpp \
+            Script/ajscriptmanager.cpp \
+            Script/ajscriptworker.cpp \
+            Script/arootgraphrecord.cpp \
+            Script/aroothistrecord.cpp \
+            Script/arootobjbase.cpp \
+            Script/arootobjcollection.cpp \
+            Script/ascripthelpentry.cpp \
+            Script/ascripthub.cpp \
+            Script/ascriptmessenger.cpp \
+            Script/ascriptobjstore.cpp \
+            Script/avirtualscriptmanager.cpp \
+            TRB/trb3timingrecord.cpp \
+            GUI/alineedit.cpp \
+            GUI/atexttospeechconfigurator.cpp \
+            GUI/guitools.cpp \
+            GUI/mainwindow.cpp \
+            GUI/mainwindowconfig.cpp \
+            GUI/aeditchannelsdialog.cpp \
+            TRB/trb3datareader.cpp \
+            TRB/trb3signalextractor.cpp \
+            TRB/atrbruncontrol.cpp \
+            TRB/atrbrunsettings.cpp \
+            Script/ainterfacetomessagewindow.cpp \
+            Script/ainterfacetoconfig.cpp \
+            Script/ainterfacetowebsocket.cpp \
+            Script/awebserverinterface.cpp \
+            Net/awebsocketsession.cpp \
+            Net/awebsocketsessionserver.cpp \
+            Net/anetworkmodule.cpp \
+            aservermonitorwindow.cpp \
+            GUI/abufferdelegate.cpp
 
 HEADERS  += GUI/mainwindow.h \    
-    TRB/trb3datareader.h \
-    TRB/trb3signalextractor.h \
-    Common/channelmapper.h \
-    Common/masterconfig.h \
-    Common/ajsontools.h \
-    Common/afiletools.h \
-    Script/ainterfacetomessagewindow.h \
-    Common/amessage.h \
-    Common/completingtexteditclass.h \    
-    Script/ainterfacetoconfig.h \
-    Common/adispatcher.h \
-    GUI/aeditchannelsdialog.h \
-    Common/adatahub.h \
-    Script/ainterfacetodata.h \
-    Script/ainterfacetoextractor.h \
-    Script/ainterfacetowebsocket.h \
-    Common/ahldfileprocessor.h \
-    Script/ainterfacetohldfileprocessor.h \
-    Net/awebsocketsession.h \
-    Net/awebsocketsessionserver.h \
-    Script/awebserverinterface.h \
-    Net/anetworkmodule.h \
-    aservermonitorwindow.h \
-    TRB/atrbruncontrol.h \
-    TRB/atrbrunsettings.h \
-    GUI/abufferdelegate.h
+            ROOT/cernrootmodule.h \
+            ROOT/GUI/arasterwindow.h \
+            ROOT/GUI/agraphwindow.h \
+            ROOT/apeakfinder.h \
+            Common/arandomhub.h \
+            Common/astopwatch.h \
+            Common/tmpobjhubclass.h \
+            Common/channelmapper.h \
+            Common/masterconfig.h \
+            Common/ajsontools.h \
+            Common/afiletools.h \
+            Common/adispatcher.h \
+            Common/adatahub.h \
+            Common/amessage.h \
+            Common/completingtexteditclass.h \
+            Common/ahldfileprocessor.h \
+            GUI/alineedit.h \
+            GUI/atexttospeechconfigurator.h \
+            GUI/guitools.h \
+            Script/ScriptInterfaces/ascriptinterface.h \
+            Script/ScriptInterfaces/acore_si.h \
+            Script/ScriptInterfaces/amath_si.h \
+            Script/ScriptInterfaces/agraph_si.h \
+            Script/ScriptInterfaces/agui_si.h \
+            Script/ScriptInterfaces/ahist_si.h \
+            Script/ScriptInterfaces/amsg_si.h \
+            Script/ScriptInterfaces/arootstyle_si.h \
+            Script/ScriptInterfaces/awindowinterfacebase.h \
+            Script/ScriptInterfaces/ainterfacetowaveforms.h \
+            Script/ScriptInterfaces/ainterfacetoextractor.h \
+            Script/ScriptInterfaces/ainterfacetohldfileprocessor.h \
+            Script/ScriptInterfaces/ainterfacetodata.h \
+            Script/ScriptWindow/ascriptwindow.h \
+            Script/ScriptWindow/aargumentcounter.h \
+            Script/ScriptWindow/ahighlighters.h \
+            Script/ScriptWindow/ascriptbook.h \
+            Script/ScriptWindow/ascriptexample.h \
+            Script/ScriptWindow/ascriptexampledatabase.h \
+            Script/ScriptWindow/ascriptexampleexplorer.h \
+            Script/ScriptWindow/atabrecord.h \
+            Script/ScriptWindow/atextedit.h \
+            Script/ScriptWindow/atextoutputwindow.h \
+            Script/aguifromscrwin.h \
+            Script/aguiwindow.h \
+            Script/ajscriptmanager.h \
+            Script/ajscriptworker.h \
+            Script/arootgraphrecord.h \
+            Script/aroothistrecord.h \
+            Script/arootobjbase.h \
+            Script/arootobjcollection.h \
+            Script/ascripthelpentry.h \
+            Script/ascripthub.h \
+            Script/ascriptmessenger.h \
+            Script/ascriptobjstore.h \
+            Script/avirtualscriptmanager.h \
+            Script/escriptlanguage.h \
+            TRB/trb3timingrecord.h \
+            TRB/trb3datareader.h \
+            TRB/trb3signalextractor.h \
+            TRB/atrbruncontrol.h \
+            TRB/atrbrunsettings.h \
+            Script/ainterfacetomessagewindow.h \
+            Script/ainterfacetoconfig.h \
+            Script/ainterfacetowebsocket.h \
+            Script/awebserverinterface.h \
+            Net/awebsocketsession.h \
+            Net/awebsocketsessionserver.h \
+            Net/anetworkmodule.h \
+            aservermonitorwindow.h \
+            GUI/aeditchannelsdialog.h \
+            GUI/abufferdelegate.h
 
 FORMS    += GUI/mainwindow.ui \
-    GUI/aeditchannelsdialog.ui \
-    aservermonitorwindow.ui \
-    GUI/abufferdelegate.ui
+            GUI/atexttospeechconfigurator.ui \
+            GUI/aeditchannelsdialog.ui \
+            GUI/abufferdelegate.ui \
+            ROOT/GUI/agraphwindow.ui \
+            Script/ScriptWindow/ascriptexampleexplorer.ui \
+            Script/ScriptWindow/ascriptwindow.ui \
+            aservermonitorwindow.ui
 
 INCLUDEPATH += Common
 INCLUDEPATH += Script

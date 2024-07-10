@@ -65,9 +65,6 @@ public:
 
     void setMainWindow(QMainWindow * main) {MainWin = main;}
 
-public slots:
-    void onDrawRequested(TObject* obj, QString opt, bool bDoUpdate);
-
 private:
     Trb3dataReader* Reader;
     Trb3signalExtractor* Extractor;
@@ -87,6 +84,8 @@ private:
     TGraph * gPosSig = nullptr;
     TH2D * h2DNeg = nullptr;
     TH2D * h2DPos = nullptr;
+
+    AGraphWindow * WScriptGraph = nullptr;
 
     AGraphWindow * WOne     = nullptr;
     AGraphWindow * WOverNeg = nullptr;

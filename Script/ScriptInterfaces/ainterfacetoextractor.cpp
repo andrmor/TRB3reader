@@ -2,12 +2,13 @@
 #include "trb3signalextractor.h"
 #include "channelmapper.h"
 #include "masterconfig.h"
+#include "ascripthub.h"
 
 #include <QVariantList>
 #include <QJsonArray>
 
-AInterfaceToExtractor::AInterfaceToExtractor(MasterConfig* Config, Trb3signalExtractor* Extractor) :
-    Config(Config), Extractor(Extractor)
+AInterfaceToExtractor::AInterfaceToExtractor() :
+    Config(MasterConfig::getInstance()), Extractor(AScriptHub::getInstance().Extractor)
 {
     Description = "Low-elevel unit for signal extraction. Takes waveworm data from \"wav\" unit.";
 }
@@ -43,7 +44,7 @@ const QVariant AInterfaceToExtractor::getSignals_logical(int ievent) const
     const QVector<float>* vec = Extractor->GetSignals(ievent);
     if (!vec) return QVariantList();
 
-    const QVector<int>& map = Config->Map->GetMapToHardware();
+    const QVector<int>& map = Config.Map->GetMapToHardware();
 
     QJsonArray ar;
     for (int ihardw : map) ar << vec->at(ihardw);

@@ -2,6 +2,7 @@
 #include "trb3datareader.h"
 #include "masterconfig.h"
 #include "channelmapper.h"
+#include "ascripthub.h"
 
 #include <QJsonArray>
 #include <QJsonValue>
@@ -10,8 +11,8 @@
 #include <limits>
 #include <cmath>
 
-AInterfaceToWaveforms::AInterfaceToWaveforms(Trb3dataReader* Reader) :
-    Config(MasterConfig::getInstance()), Reader(Reader)
+AInterfaceToWaveforms::AInterfaceToWaveforms() :
+    Config(MasterConfig::getInstance()), Reader(AScriptHub::getInstance().Reader)
 {
     Description = "Low-level unit giving access to waveforms read from an hld file.";
 }

@@ -14,7 +14,9 @@ class AInterfaceToWaveforms : public AScriptInterface
     Q_OBJECT
 
 public:
-    AInterfaceToWaveforms(Trb3dataReader* Reader);
+    AInterfaceToWaveforms();
+
+    AScriptInterface * cloneBase() const override {return new AInterfaceToWaveforms();}
 
 public slots:
 

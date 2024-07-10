@@ -12,13 +12,15 @@ class AInterfaceToHldFileProcessor : public AScriptInterface
     Q_OBJECT
 
 public:
-    AInterfaceToHldFileProcessor(AHldFileProcessor& hldProcessor);
+    AInterfaceToHldFileProcessor();
+
+    AScriptInterface * cloneBase() const override {return new AInterfaceToHldFileProcessor();}
 
 public slots:
     const QString ProcessFile(QString FileName, int What_0signals1waves, bool bIncludeTimeData, QString SaveFileName, bool doNotSaveSuppressedChannels);
 
 private:
-    AHldFileProcessor& hldProcessor;
+    AHldFileProcessor * HldProcessor = nullptr;
 
 };
 

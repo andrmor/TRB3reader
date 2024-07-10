@@ -1,6 +1,7 @@
 #include "ainterfacetodata.h"
 #include "adatahub.h"
 #include "masterconfig.h"
+#include "ascripthub.h"
 
 #include <QJsonArray>
 
@@ -9,8 +10,8 @@
 
 const double NaN = std::numeric_limits<double>::quiet_NaN();
 
-AInterfaceToData::AInterfaceToData(ADataHub* DataHub) :
-    DataHub(DataHub)
+AInterfaceToData::AInterfaceToData() :
+    DataHub(AScriptHub::getInstance().DataHub)
 {
     Description = "Gives access to DataHub.";
 }

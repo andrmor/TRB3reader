@@ -16,6 +16,11 @@ class TObject;
     class APythonScriptManager;
 #endif
 
+class Trb3dataReader;
+class ADataHub;
+class Trb3signalExtractor;
+class AHldFileProcessor;
+
 class AScriptHub : public QObject
 {
     Q_OBJECT
@@ -32,7 +37,13 @@ public:
     APythonScriptManager   & getPythonManager()  {return *PythonM;}
 #endif
 
-    void addCommonInterface(AScriptInterface * interface, QString name);
+    void registerReaderModule(Trb3dataReader * reader) {Reader = reader;}
+    void registerExtractorModule(Trb3signalExtractor * extractor) {Extractor = extractor;}
+    void registerDataModule(ADataHub * dataHub) {DataHub = dataHub;}
+    void registerHldProcessorModule(AHldFileProcessor * hldProcessor) {HldProcessor = hldProcessor;}
+
+    void createInterfaces();
+
     void addGuiScriptUnit(AGuiFromScrWin * win);
     void finalizeInit(); // run when initialization is finished (all additional script units already registered)
 
@@ -53,6 +64,8 @@ private:
     AScriptHub(AScriptHub&&)                 = delete;
     AScriptHub& operator=(const AScriptHub&) = delete;
     AScriptHub& operator=(AScriptHub&&)      = delete;
+
+    void addCommonInterface(AScriptInterface * interface, QString name);
 
 signals:
     //for gui
@@ -77,6 +90,12 @@ private:
 #ifdef ANTS3_PYTHON
     APythonScriptManager * PythonM = nullptr;
 #endif
+
+public:
+    Trb3dataReader      * Reader       = nullptr;
+    Trb3signalExtractor * Extractor    = nullptr;
+    ADataHub            * DataHub      = nullptr;
+    AHldFileProcessor   * HldProcessor = nullptr;
 
 };
 

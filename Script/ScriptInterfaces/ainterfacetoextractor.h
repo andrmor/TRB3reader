@@ -14,7 +14,9 @@ class AInterfaceToExtractor : public AScriptInterface
     Q_OBJECT
 
 public:
-    AInterfaceToExtractor(MasterConfig *Config, Trb3signalExtractor *Extractor);
+    AInterfaceToExtractor();
+
+    AScriptInterface * cloneBase() const override {return new AInterfaceToExtractor();}
 
 public slots:
 
@@ -37,8 +39,8 @@ public slots:
     void     setRejected(int ievent, bool flag);
 
 private:
-    MasterConfig *Config;
-    Trb3signalExtractor* Extractor;
+    MasterConfig        & Config;
+    Trb3signalExtractor * Extractor = nullptr;
 
 };
 
