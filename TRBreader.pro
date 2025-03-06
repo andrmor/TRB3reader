@@ -1,6 +1,6 @@
 
 #---Operation mode---
-CONFIG += TextToSpeech  #text-to-speech support, requires Qt's multimedia and texttospeech modules
+#CONFIG += TextToSpeech  #text-to-speech support, requires Qt's multimedia and texttospeech modules
 #DEFINES += MULTIBOARD  # multiboard setup used in Bern
 #
 
@@ -86,7 +86,6 @@ SOURCES +=  main.cpp \
             Script/avirtualscriptmanager.cpp \
             TRB/trb3timingrecord.cpp \
             GUI/alineedit.cpp \
-            GUI/atexttospeechconfigurator.cpp \
             GUI/guitools.cpp \
             GUI/mainwindow.cpp \
             GUI/mainwindowconfig.cpp \
@@ -123,7 +122,6 @@ HEADERS  += GUI/mainwindow.h \
             Common/completingtexteditclass.h \
             Common/ahldfileprocessor.h \
             GUI/alineedit.h \
-            GUI/atexttospeechconfigurator.h \
             GUI/guitools.h \
             Script/ScriptInterfaces/ascriptinterface.h \
             Script/ScriptInterfaces/acore_si.h \
@@ -179,7 +177,6 @@ HEADERS  += GUI/mainwindow.h \
             GUI/abufferdelegate.h
 
 FORMS    += GUI/mainwindow.ui \
-            GUI/atexttospeechconfigurator.ui \
             GUI/aeditchannelsdialog.ui \
             GUI/abufferdelegate.ui \
             ROOT/GUI/agraphwindow.ui \
@@ -200,7 +197,10 @@ TextToSpeech {
     DEFINES += TextToSpeechEnabled
     QT += texttospeech
 
-    SOURCES += GUI/atexttospeech.cpp
-    HEADERS += GUI/atexttospeech.h
+    SOURCES += GUI/atexttospeech.cpp \
+               GUI/atexttospeechconfigurator.cpp
+    HEADERS += GUI/atexttospeech.h \
+               GUI/atexttospeechconfigurator.h
+    FORMS   += GUI/atexttospeechconfigurator.ui
 }
 #-----------
