@@ -178,7 +178,11 @@ bool AHldFileProcessor::sendSignalData(QTextStream &outStream, bool bUseHardware
                     outStream << Extractor.GetSignalFast(ie, ic) << " ";
                 }
 
-                if (bSaveTimeData) saveTimeData(ie, outStream);
+                if (bSaveTimeData)
+                {
+                    outStream << "\n";
+                    saveTimeData(ie, outStream);
+                }
 
                 outStream << "\n";
             }
@@ -195,7 +199,11 @@ bool AHldFileProcessor::sendSignalData(QTextStream &outStream, bool bUseHardware
                     outStream << Extractor.GetSignalFast(ie, Config.Map->LogicalToHardwareFast(ic)) << " ";
                 }
 
-                if (bSaveTimeData) saveTimeData(ie, outStream);
+                if (bSaveTimeData)
+                {
+                    outStream << "\n";
+                    saveTimeData(ie, outStream);
+                }
 
                 outStream << "\n";
             }
