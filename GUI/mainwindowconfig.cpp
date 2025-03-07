@@ -291,9 +291,6 @@ void MainWindow::UpdateGui()
 
     ui->sbNumChannels->setValue( Config.HldProcessSettings.NumChannels );
     ui->sbNumSamples->setValue( Config.HldProcessSettings.NumSamples );
-    ui->cbBulkExtract->setChecked( Config.HldProcessSettings.bDoSignalExtraction );
-    ui->cbAutoExecuteScript->setChecked( Config.HldProcessSettings.bDoScript );
-    ui->cbSaveSignalsToFiles->setChecked( Config.HldProcessSettings.bDoSave );
     ui->cobWhatToSave->setCurrentIndex( Config.HldProcessSettings.SaveWhat );
     ui->leAddToProcessed->setText( Config.HldProcessSettings.AddToFileName );
     ui->cbAddRunTime->setChecked( Config.HldProcessSettings.AddRunTime );
@@ -517,21 +514,6 @@ void MainWindow::on_sbNumChannels_editingFinished()
 void MainWindow::on_sbNumSamples_editingFinished()
 {
     Config.HldProcessSettings.NumSamples = ui->sbNumSamples->value();
-}
-
-void MainWindow::on_cbBulkExtract_clicked()
-{
-    Config.HldProcessSettings.bDoSignalExtraction = ui->cbBulkExtract->isChecked();
-}
-
-void MainWindow::on_cbAutoExecuteScript_clicked()
-{
-    Config.HldProcessSettings.bDoScript = ui->cbAutoExecuteScript->isChecked();
-}
-
-void MainWindow::on_cbSaveSignalsToFiles_clicked()
-{
-    Config.HldProcessSettings.bDoSave = ui->cbSaveSignalsToFiles->isChecked();
 }
 
 void MainWindow::on_cobWhatToSave_activated(int index)

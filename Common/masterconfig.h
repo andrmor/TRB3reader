@@ -17,10 +17,7 @@ class AHldProcessSettings
 public:
     int     NumChannels = 0;
     int     NumSamples = 0;
-    bool    bDoSignalExtraction = true;
-    bool    bDoScript = false;
     int     SaveWhat = 0; // 0=signals, 1=waveforms
-    bool    bDoSave = true;
     QString AddToFileName = "_proc.dat";
     bool    AddRunTime = false;
 

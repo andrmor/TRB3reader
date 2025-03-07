@@ -2,7 +2,6 @@
 #include "masterconfig.h"
 #include "trb3datareader.h"
 #include "trb3signalextractor.h"
-#include "adatahub.h"
 #include "channelmapper.h"
 
 #include <QFileInfo>
@@ -39,7 +38,7 @@ bool AHldFileProcessor::ProcessFile(const QString FileName, int What_0signals1wa
 
     // Extracting signals (or generating dummy data if disabled)
     Extractor.ClearData();
-    if (Config.HldProcessSettings.bDoSignalExtraction)
+    if (What_0signals1waves == 0)
     {
         emit LogAction("Extracting signals...");
         bool bOK = Extractor.ExtractSignals();
@@ -52,23 +51,9 @@ bool AHldFileProcessor::ProcessFile(const QString FileName, int What_0signals1wa
     }
     else
     {
-        emit LogAction("Generating default 0 signals");
-        qDebug() << "Generating default data (all signals = 0) in extractor data";
+        emit LogAction("Generating dummy signals");
+        //qDebug() << "Generating default data (all signals = 0) in extractor data";
         Extractor.GenerateDummyData();
-    }
-
-    // Executing script
-    if (Config.HldProcessSettings.bDoScript)
-    {
-        emit LogAction("Executing script...");
-        bool bOK;
-        emit RequestExecuteScript(bOK);
-        if (!bOK)
-        {
-            LogMessage("Script execution error");
-            LastError = "Script execution error";
-            return false;
-        }
     }
 
     // Checking that after extraction/script the data are consistent in num channels / mapping
@@ -82,42 +67,39 @@ bool AHldFileProcessor::ProcessFile(const QString FileName, int What_0signals1wa
     }
 
     // saving processed data to file
-    if (Config.HldProcessSettings.bDoSave || !SaveFileName.isEmpty())
+    QString nameSave;
+    if (SaveFileName.isEmpty())
     {
-        QString nameSave;
-        if (SaveFileName.isEmpty())
+        QFileInfo fi(FileName);
+        QString extra = Config.HldProcessSettings.AddToFileName;
+        if (Config.HldProcessSettings.AddRunTime)
         {
-            QFileInfo fi(FileName);
-            QString extra = Config.HldProcessSettings.AddToFileName;
-            if (Config.HldProcessSettings.AddRunTime)
-            {
-                long runDuration = Reader.timeOfStart.secsTo(Reader.timeOfEnd);
-                extra = "_" + QString::number(runDuration) + extra;
-            }
-            nameSave = fi.path() + "/" + fi.completeBaseName() + extra;
+            long runDuration = Reader.timeOfStart.secsTo(Reader.timeOfEnd);
+            extra = "_" + QString::number(runDuration) + extra;
         }
-        else nameSave = SaveFileName;
+        nameSave = fi.path() + "/" + fi.completeBaseName() + extra;
+    }
+    else nameSave = SaveFileName;
 
-        qDebug() << "Saving to file:"<< nameSave;
-        emit LogAction("Saving to file...");
+    qDebug() << "Saving to file:"<< nameSave;
+    emit LogAction("Saving to file...");
 
-        if (What_0signals1waves == 0)
-        {
-            bool bOK = SaveSignalsToFile(nameSave, false, bIncludeTimeData, doNotSaveSuppressedChannels);
-            if (!bOK) return false;
-        }
-        else if (What_0signals1waves == 1)
-        {
-            bool bOK = SaveWaveformsToFile(nameSave, false, bIncludeTimeData, doNotSaveSuppressedChannels);
-            if (!bOK) return false;
-        }
-        else
-        {
-            QString err = "Unknown option in AHldFileProcessor data processing: What_0signals1waves should be 0 or 1";
-            emit LogMessage(err);
-            LastError = err;
-            return false;
-        }
+    if (What_0signals1waves == 0)
+    {
+        bool bOK = SaveSignalsToFile(nameSave, false, bIncludeTimeData, doNotSaveSuppressedChannels);
+        if (!bOK) return false;
+    }
+    else if (What_0signals1waves == 1)
+    {
+        bool bOK = SaveWaveformsToFile(nameSave, false, bIncludeTimeData, doNotSaveSuppressedChannels);
+        if (!bOK) return false;
+    }
+    else
+    {
+        QString err = "Unknown option in AHldFileProcessor data processing: What_0signals1waves should be 0 or 1";
+        emit LogMessage(err);
+        LastError = err;
+        return false;
     }
 
     return true;

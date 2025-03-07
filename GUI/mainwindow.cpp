@@ -95,8 +95,6 @@ MainWindow::MainWindow(ADispatcher *Dispatcher,
 
     //Creating script window, registering script units, and setting up QObject connections
     CreateScriptWindow();
-    // !!!***
-//    connect(&HldFileProcessor, &AHldFileProcessor::RequestExecuteScript, ScriptWindow, &AScriptWindow::ExecuteScriptInFirstTab);
 
     //Loading window settings
     LoadWindowSettings();
@@ -912,20 +910,22 @@ void MainWindow::showAllWave(bool checked, bool bNeg)
 
 void MainWindow::on_pbShowAllNegatives_toggled(bool checked)
 {
+    bool sortByLogical = ui->cobSortBy->currentIndex() == 0;
     double Min = ui->ledMinNeg->text().toDouble();
     double Max = ui->ledMaxNeg->text().toDouble();
     RootModule->Show2DNegWindow(checked);
     if (checked)
-        RootModule->Draw2D(true, ui->cbAutoscaleY->isChecked(), Min, Max);
+        RootModule->Draw2D(true, sortByLogical, ui->cbAutoscaleY->isChecked(), Min, Max);
 }
 
 void MainWindow::on_pbShowAllPositives_toggled(bool checked)
 {
+    bool sortByLogical = ui->cobSortBy->currentIndex() == 0;
     double Min = ui->ledMinPos->text().toDouble();
     double Max = ui->ledMaxPos->text().toDouble();
     RootModule->Show2DPosWindow(checked);
     if (checked)
-        RootModule->Draw2D(false, ui->cbAutoscaleY->isChecked(), Min, Max);
+        RootModule->Draw2D(false, sortByLogical, ui->cbAutoscaleY->isChecked(), Min, Max);
 }
 
 void MainWindow::on_cbLabels_clicked()
@@ -1347,15 +1347,6 @@ void MainWindow::on_pbProcessSelectedFiles_clicked()
 void MainWindow::bulkProcessorEnvelope(const QStringList FileNames)
 {
     ui->pteBulkLog->clear();
-
-    // !!!***
-    /*
-    if (ui->cbAutoExecuteScript->isChecked())
-    {
-        ScriptWindow->show();
-        ScriptWindow->OpenFirstTab();
-    }
-    */
 
     ui->twMain->setEnabled(false);
     ui->pbStop->setVisible(true);
@@ -2611,4 +2602,3 @@ void MainWindow::on_leFolderForHldFiles_customContextMenuRequested(const QPoint 
     if (dir.isEmpty()) return;
     ui->leFolderForHldFiles->setText(dir);
 }
-

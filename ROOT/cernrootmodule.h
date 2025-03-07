@@ -52,7 +52,7 @@ public:
                  bool bAutoscale, float Min, float Max, int SortBy_0Logic1Hardw,
                  bool bShowlabels, int Channels0_Signals1);
     void DrawSignals(int ievent, bool bNeg);
-    void Draw2D(bool bNegatives, bool bAutoscale, double Min, double Max);
+    void Draw2D(bool bNegatives, bool sortByLogical, bool bAutoscale, double Min, double Max);
 
     void CreateGraphWindows();
     //const QJsonObject SaveGraphWindows() const;

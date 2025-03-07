@@ -38,7 +38,6 @@ private:
 signals:
     void LogAction(const QString currentAction);
     void LogMessage(const QString message);
-    void RequestExecuteScript(bool& returnState);
 };
 
 #endif // AHLDFILEPROCESSOR_H

@@ -533,9 +533,6 @@ QJsonObject AHldProcessSettings::WriteToJson() const
 
     js["NumChannels"] =      NumChannels;
     js["NumSamples"]  =      NumSamples;
-    js["DoExtraction"] =     bDoSignalExtraction;
-    js["DoScript"] =         bDoScript;
-    js["DoSave"] =           bDoSave;
     js["SaveWhat"] =         SaveWhat;
     js["AddToFileName"] =    AddToFileName;
     js["AddRunTime"] =       AddRunTime;
@@ -547,9 +544,6 @@ void AHldProcessSettings::ReadFromJson(const QJsonObject &json)
 {
     parseJson(json, "NumChannels",      NumChannels);
     parseJson(json, "NumSamples",       NumSamples);
-    parseJson(json, "DoExtraction",     bDoSignalExtraction);
-    parseJson(json, "DoScript",         bDoScript);
-    parseJson(json, "DoSave",           bDoSave);
     parseJson(json, "SaveWhat",         SaveWhat);
     parseJson(json, "AddToFileName",    AddToFileName);
     parseJson(json, "AddRunTime",       AddRunTime);

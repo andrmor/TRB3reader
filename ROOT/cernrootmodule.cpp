@@ -6,7 +6,6 @@
 #include "ajsontools.h"
 #include "tmpobjhubclass.h"
 #include "masterconfig.h"
-#include "adatahub.h"
 
 #include <QTimer>
 #include <QDebug>
@@ -626,25 +625,33 @@ void CernRootModule::DrawSignals(int ievent, bool bNeg)
     grwin->SetTitle(title);
 }
 
-void CernRootModule::Draw2D(bool bNegatives, bool bAutoscale, double Min, double Max)
+void CernRootModule::Draw2D(bool bNegatives, bool sortByLogical, bool bAutoscale, double Min, double Max)
 {
-    const int numChannels = Reader->CountChannels();
+    const int numChannels = ( sortByLogical ? Config.CountLogicalChannels() : Reader->CountChannels() );
     const int numEvents   = Reader->CountEvents();
 
     double minY = Min;
     double maxY = Max;
     //if (bAutoscale) {minY = maxY = 0;}
 
-    QVector<int> channels;
+    QVector<int> hardwareChannels;
     for (int iCh = 0; iCh < numChannels; iCh++)
     {
-        if (Config.IsIgnoredLogicalChannel(iCh)) continue;
-        bool isNegativeChannel = Config.IsNegativeLogicalChannel(iCh);
-        if (isNegativeChannel == bNegatives) channels << iCh;
-    }
-    //qDebug() << channels;
+        int iChannel;
+        if (sortByLogical)
+        {
+            iChannel = Config.Map->LogicalToHardware(iCh);
+            if ( iChannel < 0 ) continue;
+        }
+        else iChannel = iCh;
 
-    if (channels.isEmpty())
+        if (Config.IsIgnoredHardwareChannel(iChannel)) continue;
+        bool isNegativeChannel = Config.IsNegativeHardwareChannel(iChannel);
+        if (isNegativeChannel == bNegatives) hardwareChannels << iChannel;
+    }
+    qDebug() << hardwareChannels;
+
+    if (hardwareChannels.isEmpty())
     {
         ClearSingleWaveWindow();
         return;
@@ -657,33 +664,49 @@ void CernRootModule::Draw2D(bool bNegatives, bool bAutoscale, double Min, double
         maxY = -1e20;
 
         for (int iEv = 0; iEv < numEvents; iEv++)
-            for (int iCh : channels)
+            for (int iHwCh : hardwareChannels)
             {
-                const double sig = Extractor->GetSignalFast(iEv, Config.Map->LogicalToHardware(iCh));
+                const double sig = Extractor->GetSignalFast(iEv, iHwCh);
                 if (sig < minY) minY = sig;
                 if (sig > maxY) maxY = sig;
             }
     }
 
-    TH2D* & hAll = (bNegatives ? h2DNeg : h2DPos);
+    double start = 0;
+    double end   = 0;
+    int numBins  = 100;
+    if (sortByLogical)
+    {
+        numBins = numChannels;
+        start   = 0;
+        end     = numChannels;
+    }
+    else
+    {
+        numBins = 1 + hardwareChannels.last() - hardwareChannels.front();
+        start   = hardwareChannels.front();
+        end     = hardwareChannels.last() + 1;
+    }
 
+    TH2D* & hAll = (bNegatives ? h2DNeg : h2DPos);
     delete hAll;
-    hAll = new TH2D("", "", 1+channels.last() - channels.front(), channels.front(), channels.last()+1,    50, minY, maxY);
-    //qDebug() << 1+channels.last() - channels.front() << channels.front() << channels.last()+1;
+    hAll = new TH2D("", "", numBins, start, end,  50, minY, maxY);
 
     for (int iEv = 0; iEv < numEvents; iEv++)
-        for (int iCh : channels)
+        for (int i = 0; i < hardwareChannels.size(); i++)
         {
-            double sig = Extractor->GetSignalFast(iEv, Config.Map->LogicalToHardware(iCh));
-            //qDebug() << iCh << sig;
-            hAll->Fill(iCh+0.001, sig, 1);
+            int iHwCh = hardwareChannels[i];
+            double sig = Extractor->GetSignalFast(iEv, iHwCh);
+            hAll->Fill( (sortByLogical ? i : iHwCh) + 0.001, sig, 1);
         }
 
     AGraphWindow* & W2D = (bNegatives ? W2DNeg : W2DPos);
 
     W2D->SetAsActiveRootWindow();
     hAll->SetStats(false);
-    hAll->GetXaxis()->SetTitle("Logical channel number");
+    TString title = (sortByLogical ? "Logical" : "Hardware");
+    hAll->GetXaxis()->SetTitle(title + " channel number");
+    hAll->GetYaxis()->SetTitle("Signal");
     hAll->Draw("colz");
     W2D->UpdateRootCanvas();
 
