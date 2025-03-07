@@ -19,7 +19,7 @@ class ADispatcher : public QObject
     Q_OBJECT
 
 public:
-    ADispatcher(MasterConfig* Config, Trb3dataReader* Reader, Trb3signalExtractor* Extractor, ANetworkModule* Network);
+    ADispatcher(Trb3dataReader* Reader, Trb3signalExtractor* Extractor, ANetworkModule* Network);
 
     void ClearData();
 
@@ -32,16 +32,11 @@ public:
     void ClearMapping();
     void ClearIgnoreChannels();
 
-public:
-    QString ConfigDir;
-    QString AutosaveFile;
-    QString WinSetFile;
-
 private:
-    MasterConfig* Config;
-    Trb3dataReader* Reader;
-    Trb3signalExtractor* Extractor;
-    ANetworkModule* Network;
+    MasterConfig        & Config;
+    Trb3dataReader      * Reader;
+    Trb3signalExtractor * Extractor;
+    ANetworkModule      * Network;
 
     //interaction with GUI through the signals/slots
 signals:

@@ -10,23 +10,16 @@
 //#include "ascriptwindow.h"
 
 #include <QDebug>
-#include <QStandardPaths>
 #include <QDir>
 #include <QJsonObject>
 
-ADispatcher::ADispatcher(MasterConfig* Config, Trb3dataReader* Reader, Trb3signalExtractor* Extractor, ANetworkModule* Network) :
-    Config(Config),Reader(Reader), Extractor(Extractor), Network(Network)
-{
-    ConfigDir = QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation) + "/TRBreader";
-    AutosaveFile = ConfigDir+"/autosave.json";
-    WinSetFile = ConfigDir+"/winset.json";
-    qDebug() << "-> Config dir:" << ConfigDir;
-}
+ADispatcher::ADispatcher(Trb3dataReader * Reader, Trb3signalExtractor* Extractor, ANetworkModule* Network) :
+    Config(MasterConfig::getInstance()),Reader(Reader), Extractor(Extractor), Network(Network) {}
 
 void ADispatcher::LoadAutosaveConfig()
 {
-    if (!QDir(ConfigDir).exists()) QDir().mkdir(ConfigDir);
-    else LoadConfig(AutosaveFile);
+    if (!QDir(Config.ConfigDir).exists()) QDir().mkdir(Config.ConfigDir);
+    else LoadConfig(Config.AutosaveFile);
 }
 
 void ADispatcher::ClearData()
@@ -44,7 +37,7 @@ void ADispatcher::LoadConfig(const QString FileName)
 
 bool ADispatcher::LoadConfig(QJsonObject &json)
 {
-    Config->ReadFromJson(json);
+    Config.ReadFromJson(json);
     ClearData();
 
     emit RequestReadGuiFromJson(json);
@@ -56,7 +49,7 @@ bool ADispatcher::LoadConfig(QJsonObject &json)
 void ADispatcher::SaveConfig(const QString FileName)
 {
     QJsonObject json;
-    Config->WriteToJson(json);
+    Config.WriteToJson(json);
 
     emit RequestWriteGuiToJson(json);
     SaveJsonToFile(json, FileName);
@@ -66,7 +59,7 @@ void ADispatcher::SaveConfig(const QString FileName)
 
 void ADispatcher::ClearNegativeChannels()
 {
-    Config->SetNegativeChannels(QVector<int>());
+    Config.SetNegativeChannels(QVector<int>());
     ClearData();
 
     emit RequestUpdateGui();
@@ -74,7 +67,7 @@ void ADispatcher::ClearNegativeChannels()
 
 void ADispatcher::ClearMapping()
 {
-    Config->SetMapping(QVector<int>());
+    Config.SetMapping(QVector<int>());
     ClearData();
 
     emit RequestUpdateGui();
@@ -82,7 +75,7 @@ void ADispatcher::ClearMapping()
 
 void ADispatcher::ClearIgnoreChannels()
 {
-    Config->ClearListOfIgnoreChannels();
+    Config.ClearListOfIgnoreChannels();
     ClearData();
 
     emit RequestUpdateGui();

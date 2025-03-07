@@ -11,7 +11,6 @@ class Trb3dataReader;
 class Trb3signalExtractor;
 class QTextStream;
 class CernRootModule;
-//class AScriptWindow;
 class ADispatcher;
 class ADataHub;
 class AHldFileProcessor;
@@ -22,6 +21,8 @@ class QTimer;
 class QElapsedTimer;
 class ABufferDelegate;
 class QSpinBox;
+class AGuiFromScrWin;
+class AScriptWindow;
 
 #ifdef TextToSpeechEnabled
 class ATextToSpeech;
@@ -37,8 +38,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(MasterConfig* Config,
-                        ADispatcher* Dispatcher,
+    explicit MainWindow(ADispatcher* Dispatcher,
                         ADataHub* DataHub,
                         Trb3dataReader* Reader,
                         Trb3signalExtractor* Extractor,
@@ -179,20 +179,21 @@ protected:
     void closeEvent(QCloseEvent* event);
 
 private:
-    //aliases
-    MasterConfig* Config;
-    ADispatcher* Dispatcher;
-    ADataHub* DataHub;
-    Trb3dataReader* Reader;
-    Trb3signalExtractor* Extractor;
-    AHldFileProcessor& HldFileProcessor;
-    ANetworkModule& Network;
+    MasterConfig        & Config;
+    ADispatcher         * Dispatcher;
+    ADataHub            * DataHub;
+    Trb3dataReader      * Reader;
+    Trb3signalExtractor * Extractor;
+    AHldFileProcessor   & HldFileProcessor;
+    ANetworkModule      & Network;
 
     //owned objects
     Ui::MainWindow* ui;
-//    AScriptWindow * ScriptWindow = nullptr;
     CernRootModule * RootModule = nullptr;
     AServerMonitorWindow * ServerWindow = nullptr;
+
+    AGuiFromScrWin * GuiFromScrWin = nullptr;
+    AScriptWindow * JScriptWin = nullptr;
 
     //gui misc
     bool bStopFlag;
@@ -339,6 +340,7 @@ private slots:
     void on_sbChannel_editingFinished();
     void on_actionConfigure_triggered();
     void on_cbTellMeRate_customContextMenuRequested(const QPoint &pos);
+    void on_leFolderForHldFiles_customContextMenuRequested(const QPoint &pos);
 };
 
 #endif // MAINWINDOW_H

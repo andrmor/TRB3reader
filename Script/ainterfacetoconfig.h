@@ -26,18 +26,18 @@ public slots:
     void     loadConfig(const QString FileName);
 
     void     setKeyValue(QString Key, const QVariant val);
-    const QVariant getKeyValue(QString Key);
+    QVariant getKeyValue(QString Key);
 
     int      countLogicalChannels() const;
 
-    bool     isNegativeHardwareChannel(int iHardwChannel) const;
-    bool     isNegativeLogicalChannel(int iLogicalChannel) const;
+    bool     isNegativeHardwareChannel(int iHardwChannel);
+    bool     isNegativeLogicalChannel(int iLogicalChannel);
 
-    bool     isIgnoredHardwareChannel(int iHardwChannel) const;
-    bool     isIgnoredLogicalChannel(int iLogicalChannel) const;
+    bool     isIgnoredHardwareChannel(int iHardwChannel);
+    bool     isIgnoredLogicalChannel(int iLogicalChannel);
 
-    int      toHardware(int iLogicalChannel) const;
-    int      toLogical(int iHardwChannel) const;
+    int      toHardware(int iLogicalChannel);
+    int      toLogical(int iHardwChannel);
 
 private:
     MasterConfig* Config;

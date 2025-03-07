@@ -8,11 +8,8 @@
 #include <QFileInfo>
 #include <QDebug>
 
-AHldFileProcessor::AHldFileProcessor(MasterConfig& Config,
-                                     Trb3dataReader& Reader,
-                                     Trb3signalExtractor& Extractor,
-                                     ADataHub& DataHub) :
-    Config(Config), Reader(Reader), Extractor(Extractor), DataHub(DataHub) {}
+AHldFileProcessor::AHldFileProcessor(Trb3dataReader & Reader, Trb3signalExtractor & Extractor, ADataHub & DataHub) :
+    Config(MasterConfig::getConstInstance()), Reader(Reader), Extractor(Extractor), DataHub(DataHub) {}
 
 bool AHldFileProcessor::ProcessFile(const QString FileName, int What_0signals1waves, bool bIncludeTimeData, const QString SaveFileName, bool doNotSaveSuppressedChannels)
 {

@@ -2,6 +2,7 @@
 #define MASTERCONFIG_H
 
 #include "atrbrunsettings.h"
+#include "escriptlanguage.h"
 
 #include <QVector>
 #include <QSet>
@@ -50,9 +51,19 @@ public:
 class MasterConfig
 {
 public:
+    static MasterConfig       & getInstance();
+    static const MasterConfig & getConstInstance();
+
+private:
     MasterConfig();
     ~MasterConfig();
 
+    MasterConfig(const MasterConfig &)            = delete;
+    MasterConfig(MasterConfig &&)                 = delete;
+    MasterConfig& operator=(const MasterConfig &) = delete;
+    MasterConfig& operator=(MasterConfig &&)      = delete;
+
+public:
     //recognized datakinds
     bool                isBufferRecordsEmpty() const {return DatakindSet.isEmpty();}
     QVector<ABufferRecord> & getBufferRecords() {return DatakindSet;}
@@ -72,8 +83,13 @@ public:
     bool                IsNegativeHardwareChannel(int iHardwChannel) const;
     bool                IsNegativeLogicalChannel(int iLogical) const;
 
+    QString             ConfigDir;
+    QString             AutosaveFile;
+    QString             WinSetFile;
+    QString             getScriptingFileName(EScriptLanguage scriptLanguage) const;
+
     //channel map (hardware / logical)
-    ChannelMapper*      Map;  //use this class to access convertion methods!
+    ChannelMapper     * Map;  //use this class to access convertion methods!
     bool                SetMapping(const QVector<int> &mapping);
     const QVector<int>& GetMapping() const {return ChannelMap;}
     bool                UpdateNumberOfHardwareChannels(int numHardwChannels);

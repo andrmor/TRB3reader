@@ -15,10 +15,7 @@ class AHldFileProcessor : public QObject
     Q_OBJECT
 
 public:
-    AHldFileProcessor(MasterConfig& Config,
-                      Trb3dataReader& Reader,
-                      Trb3signalExtractor& Extractor,
-                      ADataHub& DataHub);
+    AHldFileProcessor(Trb3dataReader & Reader, Trb3signalExtractor & Extractor, ADataHub & DataHub);
 
     //bool ProcessFile(const QString FileName, bool bSaveTimeData, const QString SaveFileName = "", bool doNotSaveSuppressedChannels = false);
     bool ProcessFile(const QString FileName, int What_0signals1waves, bool bIncludeTimeData, const QString SaveFileName, bool doNotSaveSuppressedChannels);
@@ -28,10 +25,11 @@ public:
     const QString& GetLastError() const {return LastError;}
 
 private:
-    MasterConfig& Config;
-    Trb3dataReader& Reader;
-    Trb3signalExtractor& Extractor;
-    ADataHub& DataHub;
+    const MasterConfig  & Config;
+    Trb3dataReader      & Reader;
+    Trb3signalExtractor & Extractor;
+    ADataHub            & DataHub;
+
     QString LastError;
 
 private:

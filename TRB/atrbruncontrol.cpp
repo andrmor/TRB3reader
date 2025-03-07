@@ -10,10 +10,11 @@
 #include <QThread>
 #include <QTimer>
 
-ATrbRunControl::ATrbRunControl(MasterConfig & settings, ANetworkModule &Network, const QString & exchangeDir) :
-    QObject(), Settings(settings), RunSettings(settings.TrbRunSettings),
+ATrbRunControl::ATrbRunControl(ANetworkModule &Network, const QString & exchangeDir) :
+    QObject(),
+    Settings(MasterConfig::getInstance()), RunSettings(Settings.TrbRunSettings),
     Network(Network), sExchangeDir(exchangeDir),
-    Host(settings.TrbRunSettings.Host), User(settings.TrbRunSettings.User)
+    Host(Settings.TrbRunSettings.Host), User(Settings.TrbRunSettings.User)
 {
     timerFreeSpaceChecker = new QTimer(this);
     timerFreeSpaceChecker->setSingleShot(true);

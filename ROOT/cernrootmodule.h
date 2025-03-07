@@ -23,7 +23,7 @@ class CernRootModule : public QObject
     Q_OBJECT
 
 public:
-    CernRootModule(Trb3dataReader* Reader, Trb3signalExtractor* Extractor, MasterConfig* Config, ADataHub* DataHub, int refreshInterval = 100);
+    CernRootModule(Trb3dataReader* Reader, Trb3signalExtractor* Extractor, ADataHub* DataHub, int refreshInterval = 100);
     ~CernRootModule();
 
     void storeWindowGeometries();
@@ -65,13 +65,10 @@ public:
 
     void setMainWindow(QMainWindow * main) {MainWin = main;}
 
-public slots:
-    void onDrawRequested(TObject* obj, QString opt, bool bDoUpdate);
-
 private:
     Trb3dataReader* Reader;
     Trb3signalExtractor* Extractor;
-    MasterConfig* Config;
+    MasterConfig & Config;
     ADataHub* DataHub;
 
     QMainWindow * MainWin = nullptr;
@@ -87,6 +84,8 @@ private:
     TGraph * gPosSig = nullptr;
     TH2D * h2DNeg = nullptr;
     TH2D * h2DPos = nullptr;
+
+    AGraphWindow * WScriptGraph = nullptr;
 
     AGraphWindow * WOne     = nullptr;
     AGraphWindow * WOverNeg = nullptr;

@@ -1,17 +1,16 @@
 #include "mainwindow.h"
-#include <QApplication>
-#include <QObject>
-#include <QDebug>
-#include <QLoggingCategory>
-
+#include "ascripthub.h"
 #include "adatahub.h"
-#include "masterconfig.h"
 #include "trb3datareader.h"
 #include "trb3signalextractor.h"
 #include "adispatcher.h"
 #include "ahldfileprocessor.h"
 #include "anetworkmodule.h"
-//#include "ascriptmanager.h"
+
+#include <QApplication>
+#include <QObject>
+#include <QDebug>
+#include <QLoggingCategory>
 
 int main(int argc, char *argv[])
 {
@@ -20,20 +19,25 @@ int main(int argc, char *argv[])
     //SUPPRESS WARNINGS about ssl
     QLoggingCategory::setFilterRules("qt.network.ssl.warning=false");
 
-    MasterConfig Config;
-    ADataHub DataHub(Config);
-    Trb3dataReader Reader(&Config);
-    Trb3signalExtractor Extractor(&Config, &Reader);
-    AHldFileProcessor HldFileProcessor(Config, Reader, Extractor, DataHub);
+    ADataHub DataHub;
+    Trb3dataReader Reader;
+    Trb3signalExtractor Extractor(&Reader);
+    AHldFileProcessor HldFileProcessor(Reader, Extractor, DataHub);
 
 //    !!!***
-//    AScriptManager ScriptManager;
 //    ANetworkModule Network(&ScriptManager); // !!!***
     ANetworkModule Network(nullptr); // !!!***
 
-    ADispatcher Dispatcher(&Config, &Reader, &Extractor, &Network);
+    ADispatcher Dispatcher(&Reader, &Extractor, &Network);
 
-    MainWindow MW(&Config, &Dispatcher, &DataHub, &Reader, &Extractor, HldFileProcessor, Network);
+    AScriptHub & ScriptHub = AScriptHub::getInstance();
+    ScriptHub.registerReaderModule(&Reader);
+    ScriptHub.registerExtractorModule(&Extractor);
+    ScriptHub.registerDataModule(&DataHub);
+    ScriptHub.createInterfaces();
+    ScriptHub.finalizeInit();
+
+    MainWindow MW(&Dispatcher, &DataHub, &Reader, &Extractor, HldFileProcessor, Network);
     MW.show();
 
     QObject::connect(&Dispatcher, &ADispatcher::RequestUpdateGui, &MW, &MainWindow::UpdateGui);

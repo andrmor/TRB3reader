@@ -23,8 +23,8 @@
 #include "TH2D.h"
 #include "TROOT.h"
 
-CernRootModule::CernRootModule(Trb3dataReader *Reader, Trb3signalExtractor *Extractor, MasterConfig *Config, ADataHub* DataHub, int refreshInterval) :
-    Reader(Reader), Extractor(Extractor), Config(Config), DataHub(DataHub)
+CernRootModule::CernRootModule(Trb3dataReader *Reader, Trb3signalExtractor *Extractor, ADataHub* DataHub, int refreshInterval) :
+    Reader(Reader), Extractor(Extractor), Config(MasterConfig::getInstance()), DataHub(DataHub)
 {
     //create ROOT application
     int rootargc=1;
@@ -91,6 +91,8 @@ void CernRootModule::SetWindowGeometries(const QJsonObject &js)
 
 void CernRootModule::ResetPositionOfWindows()
 {
+    WScriptGraph->setGeometry(20,20,1000,700);
+
     WOne->setGeometry(20,20,1000,700);
     WOverNeg->setGeometry(50,50,1000,700);
     WOverPos->setGeometry(80,80,1000,700);
@@ -111,16 +113,16 @@ void CernRootModule::DrawSignature(bool bNeg)
                        100, -0.05, 1.05);
 
     int numEvents = Reader->CountEvents();
-    int numChan = Config->CountLogicalChannels();
+    int numChan = Config.CountLogicalChannels();
 
     for (int ievent=0; ievent<numEvents; ievent++)
         if (!Extractor->IsRejectedEventFast(ievent))
         for (int ilc=0; ilc<numChan; ilc++)
         {
-            int iHardwCh = Config->Map->LogicalToHardware(ilc);
+            int iHardwCh = Config.Map->LogicalToHardware(ilc);
             if ( iHardwCh < 0 ) continue;
-            if (Config->IsIgnoredHardwareChannel(iHardwCh)) continue;
-            if (bNeg != Config->IsNegativeHardwareChannel(iHardwCh)) continue;
+            if (Config.IsIgnoredHardwareChannel(iHardwCh)) continue;
+            if (bNeg != Config.IsNegativeHardwareChannel(iHardwCh)) continue;
 
             bool bRejected;
             int sig = Extractor->extractSignalFromWaveform(ievent, iHardwCh, &bRejected);
@@ -159,23 +161,11 @@ void CernRootModule::DrawSignature(bool bNeg)
     WOne->UpdateRootCanvas();
 }
 
-void CernRootModule::onDrawRequested(TObject *obj, QString opt, bool bDoUpdate)
-{
-    //WOne->SetAsActiveRootWindow();
-    WOne->ShowAndFocus();
-
-    if (!obj)
-    {
-        WOne->UpdateRootCanvas();
-        return;
-    }
-
-    obj->Draw(opt.toLatin1().data());
-    if (bDoUpdate) WOne->UpdateRootCanvas();
-}
-
+#include "ascripthub.h"
 void CernRootModule::CreateGraphWindows()
 {
+    WScriptGraph = new AGraphWindow("Script", MainWin); WScriptGraph->setWindowTitle("Script draw");
+
     WOne     = new AGraphWindow("One",     MainWin);// WOne->resize(1001, 601);
     WOverNeg = new AGraphWindow("OverNeg", MainWin);// WOverNeg->resize(1001, 601);
     WOverPos = new AGraphWindow("OverPos", MainWin);// WOverPos->resize(1001, 601);
@@ -187,6 +177,8 @@ void CernRootModule::CreateGraphWindows()
     W2DNeg  = new AGraphWindow("2DNeg",  MainWin); // WSigPos->resize(1001, 601);
     W2DPos  = new AGraphWindow("2DPos",  MainWin); // WSigPos->resize(1001, 601);
 
+    connect(WScriptGraph, &AGraphWindow::wasHidden, WScriptGraph, &AGraphWindow::hide);
+
     connect(WOne,     &AGraphWindow::wasHidden, this, &CernRootModule::onGraphWindowRequestHide);
     connect(WOverNeg, &AGraphWindow::wasHidden, this, &CernRootModule::onGraphWindowRequestHide);
     connect(WOverPos, &AGraphWindow::wasHidden, this, &CernRootModule::onGraphWindowRequestHide);
@@ -197,6 +189,9 @@ void CernRootModule::CreateGraphWindows()
 
     connect(W2DNeg,  &AGraphWindow::wasHidden, this, &CernRootModule::onGraphWindowRequestHide);
     connect(W2DPos,  &AGraphWindow::wasHidden, this, &CernRootModule::onGraphWindowRequestHide);
+
+    AScriptHub * scrHub = &AScriptHub::getInstance();
+    connect(scrHub, &AScriptHub::requestDraw, WScriptGraph, &AGraphWindow::onDrawRequest, Qt::QueuedConnection);
 }
 
 void CernRootModule::onGraphWindowRequestHide(QString idStr)
@@ -214,6 +209,8 @@ void CernRootModule::onGraphWindowRequestHide(QString idStr)
 
 CernRootModule::~CernRootModule()
 {
+    delete WScriptGraph;
+
     delete WOne; delete WOverNeg; delete WOverPos; delete WAllNeg; delete WAllPos; delete WSigNeg; delete WSigPos; delete W2DNeg; delete W2DPos;
     WOne = WOverNeg = WOverPos = WAllNeg = WAllPos = WSigNeg = WSigPos = W2DNeg = W2DPos = nullptr;
 
@@ -347,12 +344,12 @@ void CernRootModule::SetGraphAttributes(TGraph* g, bool bFromDataHub, int ievent
     bool bIgnoredChannel;
     if (bFromDataHub)
     {
-        bIgnoredChannel = Config->IsIgnoredLogicalChannel(ichannel);
+        bIgnoredChannel = Config.IsIgnoredLogicalChannel(ichannel);
         bRejected = DataHub->IsRejected(ievent) || bIgnoredChannel; // zero sig is not copied at all!
     }
     else
     {
-        bIgnoredChannel = Config->IsIgnoredHardwareChannel(ichannel);
+        bIgnoredChannel = Config.IsIgnoredHardwareChannel(ichannel);
         Extractor->extractSignalFromWaveform(ievent, ichannel, &bRejected);
         bRejected = bRejected || bIgnoredChannel || Extractor->IsRejectedEvent(ievent);
     }
@@ -383,7 +380,7 @@ bool CernRootModule::DrawSingle(bool bFromDataHub, int ievent, int ichannel, boo
     gSingle->Draw("AL");
     WOne->UpdateRootCanvas();
 
-    int ic = bFromDataHub ? ichannel : Config->Map->HardwareToLogical(ichannel);
+    int ic = bFromDataHub ? ichannel : Config.Map->HardwareToLogical(ichannel);
     WOne->SetTitle("Event: "+ QString::number(ievent) + "  LogicalChannel: "+QString::number(ic));
     return true;
 }
@@ -393,7 +390,7 @@ bool CernRootModule::DrawOverlay(bool bFromDataHub, int ievent, bool bNeg, bool 
     if (multiGraph) delete multiGraph;
     multiGraph = new TMultiGraph();
 
-    int numChan = ( (bFromDataHub || SortBy_0Logic1Hardw==0) ? Config->CountLogicalChannels() : Reader->CountChannels() );
+    int numChan = ( (bFromDataHub || SortBy_0Logic1Hardw==0) ? Config.CountLogicalChannels() : Reader->CountChannels() );
 
     for (int iCh=0; iCh<numChan; ++iCh)
     {
@@ -401,12 +398,12 @@ bool CernRootModule::DrawOverlay(bool bFromDataHub, int ievent, bool bNeg, bool 
         if (bFromDataHub) iChannel = iCh;
         else if (SortBy_0Logic1Hardw == 0)
         {
-            iChannel = Config->Map->LogicalToHardware(iCh);
+            iChannel = Config.Map->LogicalToHardware(iCh);
             if ( iChannel < 0 ) continue;
         }
         else iChannel = iCh;
 
-        bool bPolarity = bFromDataHub ? Config->IsNegativeLogicalChannel(iChannel) : Config->IsNegativeHardwareChannel(iChannel);
+        bool bPolarity = bFromDataHub ? Config.IsNegativeLogicalChannel(iChannel) : Config.IsNegativeHardwareChannel(iChannel);
         if (bNeg != bPolarity) continue;
 
         const QVector<float>* wave = bFromDataHub ? DataHub->GetWaveform(ievent, iChannel) : Reader->GetWaveformPtr(ievent, iChannel);
@@ -467,7 +464,7 @@ bool CernRootModule::DrawAll(bool bFromDataHub, int ievent, bool bNeg, int padsX
     gPad->Modified();
 
     int iPad = 0;
-    int numChannels = ( (bFromDataHub || SortBy_0Logic1Hardw==0) ? Config->CountLogicalChannels() : Reader->CountChannels() );
+    int numChannels = ( (bFromDataHub || SortBy_0Logic1Hardw==0) ? Config.CountLogicalChannels() : Reader->CountChannels() );
     if (bAutoscale)
     {
         Min = 1e20f;
@@ -478,12 +475,12 @@ bool CernRootModule::DrawAll(bool bFromDataHub, int ievent, bool bNeg, int padsX
             if (bFromDataHub) iChannel = iCh;
             else if (SortBy_0Logic1Hardw == 0)
             {
-                iChannel = Config->Map->LogicalToHardware(iCh);
+                iChannel = Config.Map->LogicalToHardware(iCh);
                 if ( iChannel < 0 ) continue;
             }
             else iChannel = iCh;
 
-            bool bPolarity = bFromDataHub ? Config->IsNegativeLogicalChannel(iChannel) : Config->IsNegativeHardwareChannel(iChannel);
+            bool bPolarity = bFromDataHub ? Config.IsNegativeLogicalChannel(iChannel) : Config.IsNegativeHardwareChannel(iChannel);
             if (bNeg != bPolarity) continue;
 
             const QVector<float>* wave = bFromDataHub ? DataHub->GetWaveform(ievent, iChannel) : Reader->GetWaveformPtr(ievent, iChannel);
@@ -513,12 +510,12 @@ bool CernRootModule::DrawAll(bool bFromDataHub, int ievent, bool bNeg, int padsX
         if (bFromDataHub) iChannel = iCh;
         else if (SortBy_0Logic1Hardw == 0)
         {
-            iChannel = Config->Map->LogicalToHardware(iCh);
+            iChannel = Config.Map->LogicalToHardware(iCh);
             if ( iChannel < 0 ) continue;
         }
         else iChannel = iCh;
 
-        bool bPolarity = bFromDataHub ? Config->IsNegativeLogicalChannel(iChannel) : Config->IsNegativeHardwareChannel(iChannel);
+        bool bPolarity = bFromDataHub ? Config.IsNegativeLogicalChannel(iChannel) : Config.IsNegativeHardwareChannel(iChannel);
 
         if (bNeg != bPolarity) continue;
 
@@ -598,18 +595,18 @@ void CernRootModule::DrawSignals(bool bFromDataHub, int ievent, bool bNeg)
 
     delete graph; graph = new TGraph();
 
-    const int numLogicalChan = Config->CountLogicalChannels();
+    const int numLogicalChan = Config.CountLogicalChannels();
 
     int from = -1;
     int to   = -1;
     for (int iLogicalCh = 0; iLogicalCh < numLogicalChan; iLogicalCh++)
     {
-        if (Config->IsIgnoredLogicalChannel(iLogicalCh)) continue;
+        if (Config.IsIgnoredLogicalChannel(iLogicalCh)) continue;
 
-        bool bPolarity = Config->IsNegativeLogicalChannel(iLogicalCh);
+        bool bPolarity = Config.IsNegativeLogicalChannel(iLogicalCh);
         if (bNeg != bPolarity) continue;
 
-        float sig = (bFromDataHub ? sigAr->at(iLogicalCh) : sigAr->at(Config->Map->LogicalToHardware(iLogicalCh)));
+        float sig = (bFromDataHub ? sigAr->at(iLogicalCh) : sigAr->at(Config.Map->LogicalToHardware(iLogicalCh)));
 
         graph->SetPoint(graph->GetN(), iLogicalCh, sig);
 
@@ -651,8 +648,8 @@ void CernRootModule::Draw2D(bool bNegatives, bool bFromDataHub, bool bAutoscale,
     QVector<int> channels;
     for (int iCh = 0; iCh < numChannels; iCh++)
     {
-        if (Config->IsIgnoredLogicalChannel(iCh)) continue;
-        bool isNegativeChannel = Config->IsNegativeLogicalChannel(iCh);
+        if (Config.IsIgnoredLogicalChannel(iCh)) continue;
+        bool isNegativeChannel = Config.IsNegativeLogicalChannel(iCh);
         if (isNegativeChannel == bNegatives) channels << iCh;
     }
     //qDebug() << channels;
@@ -672,7 +669,7 @@ void CernRootModule::Draw2D(bool bNegatives, bool bFromDataHub, bool bAutoscale,
         for (int iEv = 0; iEv < numEvents; iEv++)
             for (int iCh : channels)
             {
-                const double sig = (bFromDataHub ? DataHub->GetSignalFast(iEv, iCh) : Extractor->GetSignalFast(iEv, Config->Map->LogicalToHardware(iCh) ));
+                const double sig = (bFromDataHub ? DataHub->GetSignalFast(iEv, iCh) : Extractor->GetSignalFast(iEv, Config.Map->LogicalToHardware(iCh) ));
                 if (sig < minY) minY = sig;
                 if (sig > maxY) maxY = sig;
             }
@@ -687,7 +684,7 @@ void CernRootModule::Draw2D(bool bNegatives, bool bFromDataHub, bool bAutoscale,
     for (int iEv = 0; iEv < numEvents; iEv++)
         for (int iCh : channels)
         {
-            double sig = (bFromDataHub ? DataHub->GetSignalFast(iEv, iCh) : Extractor->GetSignalFast(iEv, Config->Map->LogicalToHardware(iCh) ));
+            double sig = (bFromDataHub ? DataHub->GetSignalFast(iEv, iCh) : Extractor->GetSignalFast(iEv, Config.Map->LogicalToHardware(iCh) ));
             //qDebug() << iCh << sig;
             hAll->Fill(iCh+0.001, sig, 1);
         }

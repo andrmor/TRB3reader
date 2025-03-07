@@ -72,7 +72,7 @@ class ADataHub : public QObject
     Q_OBJECT
 
 public:
-    ADataHub(const MasterConfig& Config);
+    ADataHub();
     ~ADataHub();
 
     // Counts
@@ -155,7 +155,7 @@ public:
     const MasterConfig& getConfig() {return Config;}
 
 private:
-    const MasterConfig& Config;
+    const MasterConfig & Config;
     QVector < AOneEvent* > Events;
 
     mutable QMutex   Mutex;

@@ -4,7 +4,7 @@
 
 APeakFinder::APeakFinder(const TH1 *hist) : H(hist) {}
 
-const QVector<double> APeakFinder::findPeaks(const double sigma, const double threshold, const int MaxNumberOfPeaks, bool SuppressDraw) const
+std::vector<double> APeakFinder::findPeaks(const double sigma, const double threshold, const int MaxNumberOfPeaks, bool SuppressDraw) const
 {
     TSpectrum *s = new TSpectrum(MaxNumberOfPeaks);
 
@@ -16,8 +16,8 @@ const QVector<double> APeakFinder::findPeaks(const double sigma, const double th
     float *pos = s->GetPositionX();
 #endif
 
-    QVector<double> peaks;
-    for (int i=0; i<numPeaks; i++) peaks << pos[i];
+    std::vector<double> peaks;
+    for (int i=0; i<numPeaks; i++) peaks.push_back(pos[i]);
 
     return peaks;
 }

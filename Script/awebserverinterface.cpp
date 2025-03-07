@@ -9,7 +9,7 @@
 AWebServerInterface::AWebServerInterface(AWebSocketSessionServer &Server) :
     AScriptInterface(), Server(Server)
 {
-    QObject::connect(&Server, &AWebSocketSessionServer::requestAbort, this, &AWebServerInterface::AbortScriptEvaluation);
+    QObject::connect(&Server, &AWebSocketSessionServer::requestAbort, this, &AWebServerInterface::abort);
 }
 
 void AWebServerInterface::SendText(const QString &message)
@@ -32,7 +32,7 @@ void AWebServerInterface::SendObjectAsJSON(const QVariant &object)
     Server.ReplyWithBinaryObject_asJSON(object);
 }
 
-bool AWebServerInterface::IsBufferEmpty() const
+bool AWebServerInterface::IsBufferEmpty()
 {
     return Server.isBinaryEmpty();
 }
@@ -42,7 +42,7 @@ void AWebServerInterface::ClearBuffer()
     Server.clearBinary();
 }
 
-const QVariant AWebServerInterface::GetBufferAsObject() const
+QVariant AWebServerInterface::GetBufferAsObject() const
 {
     const QByteArray& ba = Server.getBinary();
     QJsonDocument doc =  QJsonDocument::fromJson(ba);
