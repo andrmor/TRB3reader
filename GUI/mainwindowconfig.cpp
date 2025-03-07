@@ -7,7 +7,6 @@
 #include "trb3datareader.h"
 #include "ascriptwindow.h"
 #include "adispatcher.h"
-#include "adatahub.h"
 #include "amessage.h"
 #include "atrbruncontrol.h"
 
@@ -71,22 +70,16 @@ void MainWindow::WriteGUItoJson(QJsonObject &json)
 
     jsgui["HardOrLog"] = ui->cobHardwareOrLogical->currentIndex();
 
-    jsgui["KeepEventsOnStart"] = ui->cbKeepEvents->isChecked();
     //jsgui["BulkExtract"] = ui->cbBulkExtract->isChecked();
     //jsgui["AutoRunScript"] = ui->cbAutoExecuteScript->isChecked();
     //jsgui["SaveFiles"] = ui->cbSaveSignalsToFiles->isChecked();
     //jsgui["SuffixReplacement"] = ui->leAddToProcessed->text();
     //jsgui["BulkCopy"] = ui->cbBulkCopyToDatahub->isChecked();
     //jsgui["BulkCopyWaveforms"] = ui->cbBulkAlsoCopyWaveforms->isChecked();
-    jsgui["SaveAddPositions"] = ui->cbAddReconstructedPositions->isChecked();
-    jsgui["SaveSkipRejected"] = ui->cbSaveOnlyGood->isChecked();
-    jsgui["LoadAlsoPositions"] = ui->cbLoadIncludeReconstructed->isChecked();
 
     jsgui["SaveTime"] = ui->cbSaveTime->isChecked();
 
     jsgui["DoNotSaveDisabledChannels"] = ui->cbDoNotSaveDisabledChannels->isChecked();
-
-    jsgui["ExplorerSource"] = ui->cobExplorerSource->currentIndex();
 
     QJsonObject ja;
         ja["AutoY"] = ui->cbAutoscaleY->isChecked();
@@ -117,22 +110,16 @@ void MainWindow::ReadGUIfromJson(const QJsonObject& json)
 
     JsonToComboBox(jsgui, "HardOrLog", ui->cobHardwareOrLogical);
 
-    JsonToCheckbox(jsgui, "KeepEventsOnStart", ui->cbKeepEvents);
     //JsonToCheckbox(jsgui, "BulkExtract", ui->cbBulkExtract);
     //JsonToCheckbox(jsgui, "AutoRunScript", ui->cbAutoExecuteScript);
     //JsonToCheckbox(jsgui, "SaveFiles", ui->cbSaveSignalsToFiles);
     //JsonToLineEditText(jsgui, "SuffixReplacement", ui->leAddToProcessed);
     //JsonToCheckbox(jsgui, "BulkCopy", ui->cbBulkCopyToDatahub);
     //JsonToCheckbox(jsgui, "BulkCopyWaveforms", ui->cbBulkAlsoCopyWaveforms);
-    JsonToCheckbox(jsgui, "SaveAddPositions", ui->cbAddReconstructedPositions);
-    JsonToCheckbox(jsgui, "SaveSkipRejected", ui->cbSaveOnlyGood);
-    JsonToCheckbox(jsgui, "LoadAlsoPositions", ui->cbLoadIncludeReconstructed);
 
     JsonToCheckbox(jsgui, "SaveTime", ui->cbSaveTime);
 
     JsonToCheckbox(jsgui, "DoNotSaveDisabledChannels", ui->cbDoNotSaveDisabledChannels);
-
-    JsonToComboBox(jsgui, "ExplorerSource", ui->cobExplorerSource);
 
     QJsonObject ja = jsgui["GraphScale"].toObject();
         JsonToCheckbox(ja, "AutoY", ui->cbAutoscaleY);
@@ -310,8 +297,6 @@ void MainWindow::UpdateGui()
     ui->cobWhatToSave->setCurrentIndex( Config.HldProcessSettings.SaveWhat );
     ui->leAddToProcessed->setText( Config.HldProcessSettings.AddToFileName );
     ui->cbAddRunTime->setChecked( Config.HldProcessSettings.AddRunTime );
-    ui->cbBulkCopyToDatahub->setChecked( Config.HldProcessSettings.bDoCopyToDatahub );
-    ui->cbBulkAlsoCopyWaveforms->setChecked( Config.HldProcessSettings.bCopyWaveforms );
 
     updateNumEventsIndication();
     OnEventOrChannelChanged();
@@ -562,16 +547,6 @@ void MainWindow::on_leAddToProcessed_editingFinished()
 void MainWindow::on_cbAddRunTime_clicked(bool checked)
 {
     Config.HldProcessSettings.AddRunTime = checked;
-}
-
-void MainWindow::on_cbBulkCopyToDatahub_clicked()
-{
-    Config.HldProcessSettings.bDoCopyToDatahub = ui->cbBulkCopyToDatahub->isChecked();
-}
-
-void MainWindow::on_cbBulkAlsoCopyWaveforms_clicked()
-{
-    Config.HldProcessSettings.bCopyWaveforms = ui->cbBulkAlsoCopyWaveforms->isChecked();
 }
 
 void MainWindow::on_cobPedestalExtractionMethod_activated(int index)

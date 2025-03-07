@@ -23,7 +23,7 @@ class CernRootModule : public QObject
     Q_OBJECT
 
 public:
-    CernRootModule(Trb3dataReader* Reader, Trb3signalExtractor* Extractor, ADataHub* DataHub, int refreshInterval = 100);
+    CernRootModule(Trb3dataReader* Reader, Trb3signalExtractor* Extractor, int refreshInterval = 100);
     ~CernRootModule();
 
     void storeWindowGeometries();
@@ -46,13 +46,13 @@ public:
     void ClearAllNegWaveWindow();
     void ClearAllPosWaveWindow();
 
-    bool DrawSingle(bool bFromDataHub, int ievent, int iHardwChan, bool autoscale, float MinY, float MaxY);
-    bool DrawOverlay(bool bFromDataHub, int ievent, bool bNeg, bool bAutoscale, float Min, float Max, int SortBy_0Logic1Hardw);
-    bool DrawAll(bool bFromDataHub, int ievent, bool bNeg, int padsX, int padsY,
+    bool DrawSingle(int ievent, int iHardwChan, bool autoscale, float MinY, float MaxY);
+    bool DrawOverlay(int ievent, bool bNeg, bool bAutoscale, float Min, float Max, int SortBy_0Logic1Hardw);
+    bool DrawAll(int ievent, bool bNeg, int padsX, int padsY,
                  bool bAutoscale, float Min, float Max, int SortBy_0Logic1Hardw,
                  bool bShowlabels, int Channels0_Signals1);
-    void DrawSignals(bool bFromDataHub, int ievent, bool bNeg);
-    void Draw2D(bool bNegatives, bool bFromDataHub, bool bAutoscale, double Min, double Max);
+    void DrawSignals(int ievent, bool bNeg);
+    void Draw2D(bool bNegatives, bool bAutoscale, double Min, double Max);
 
     void CreateGraphWindows();
     //const QJsonObject SaveGraphWindows() const;
@@ -69,7 +69,6 @@ private:
     Trb3dataReader* Reader;
     Trb3signalExtractor* Extractor;
     MasterConfig & Config;
-    ADataHub* DataHub;
 
     QMainWindow * MainWin = nullptr;
 
@@ -106,7 +105,7 @@ private:
     void clearNegGraphVectors();
     void clearPosGraphVectors();
 
-    void SetGraphAttributes(TGraph* g, bool bFromDataHub, int ievent, int ichannel);
+    void SetGraphAttributes(TGraph * g, int ievent, int ichannel);
 
 private slots:
     void timerTimeout();

@@ -8,8 +8,8 @@
 #include <QFileInfo>
 #include <QDebug>
 
-AHldFileProcessor::AHldFileProcessor(Trb3dataReader & Reader, Trb3signalExtractor & Extractor, ADataHub & DataHub) :
-    Config(MasterConfig::getConstInstance()), Reader(Reader), Extractor(Extractor), DataHub(DataHub) {}
+AHldFileProcessor::AHldFileProcessor(Trb3dataReader & Reader, Trb3signalExtractor & Extractor) :
+    Config(MasterConfig::getConstInstance()), Reader(Reader), Extractor(Extractor) {}
 
 bool AHldFileProcessor::ProcessFile(const QString FileName, int What_0signals1waves, bool bIncludeTimeData, const QString SaveFileName, bool doNotSaveSuppressedChannels)
 {
@@ -117,49 +117,6 @@ bool AHldFileProcessor::ProcessFile(const QString FileName, int What_0signals1wa
             emit LogMessage(err);
             LastError = err;
             return false;
-        }
-    }
-
-    //Coping data to DataHub
-    if (Config.HldProcessSettings.bDoCopyToDatahub)
-    {
-        emit LogAction("Copying to datahub...");
-        qDebug() << "Copying to DataHub...";
-        const QVector<int>& map = Config.Map->GetMapToHardware();
-
-        for (int iev=0; iev<numEvents; iev++)
-        {
-            if (Extractor.IsRejectedEventFast(iev)) continue;
-
-            AOneEvent* ev = new AOneEvent;
-
-            //signals
-            const QVector<float>* vecHardw = Extractor.GetSignalsFast(iev);
-            QVector<float> vecLogical;
-            for (int ihardw : map) vecLogical << vecHardw->at(ihardw);
-            ev->SetSignals(&vecLogical);
-
-            //rejection status
-            ev->SetRejectedFlag(false);
-
-            //waveforms
-            if (Config.HldProcessSettings.bCopyWaveforms)
-            {
-                QVector< QVector<float>* > vec;
-                for (int ihardw : map)
-                {
-                    if (Extractor.GetSignalFast(iev, ihardw) == 0 || Config.IsIgnoredHardwareChannel(ihardw)) vec << 0;
-                    else
-                    {
-                        QVector<float>* wave = new QVector<float>();
-                        *wave = *Reader.GetWaveformPtrFast(iev, ihardw);
-                        vec << wave;
-                    }
-                }
-                ev->SetWaveforms(&vec);
-            }
-
-            DataHub.AddEventFast(ev);
         }
     }
 

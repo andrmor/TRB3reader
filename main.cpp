@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "ascripthub.h"
-#include "adatahub.h"
 #include "trb3datareader.h"
 #include "trb3signalextractor.h"
 #include "adispatcher.h"
@@ -19,10 +18,9 @@ int main(int argc, char *argv[])
     //SUPPRESS WARNINGS about ssl
     QLoggingCategory::setFilterRules("qt.network.ssl.warning=false");
 
-    ADataHub DataHub;
     Trb3dataReader Reader;
     Trb3signalExtractor Extractor(&Reader);
-    AHldFileProcessor HldFileProcessor(Reader, Extractor, DataHub);
+    AHldFileProcessor HldFileProcessor(Reader, Extractor);
 
 //    !!!***
 //    ANetworkModule Network(&ScriptManager); // !!!***
@@ -33,11 +31,10 @@ int main(int argc, char *argv[])
     AScriptHub & ScriptHub = AScriptHub::getInstance();
     ScriptHub.registerReaderModule(&Reader);
     ScriptHub.registerExtractorModule(&Extractor);
-    ScriptHub.registerDataModule(&DataHub);
     ScriptHub.createInterfaces();
     ScriptHub.finalizeInit();
 
-    MainWindow MW(&Dispatcher, &DataHub, &Reader, &Extractor, HldFileProcessor, Network);
+    MainWindow MW(&Dispatcher, &Reader, &Extractor, HldFileProcessor, Network);
     MW.show();
 
     QObject::connect(&Dispatcher, &ADispatcher::RequestUpdateGui, &MW, &MainWindow::UpdateGui);

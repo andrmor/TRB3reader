@@ -131,7 +131,6 @@ AScriptHub::AScriptHub()
 }
 
 #include "ainterfacetowaveforms.h"
-#include "ainterfacetodata.h"
 #include "ainterfacetoextractor.h"
 #include "ainterfacetohldfileprocessor.h"
 void AScriptHub::createInterfaces()
@@ -146,7 +145,6 @@ void AScriptHub::createInterfaces()
 
     addCommonInterface(new AInterfaceToWaveforms(),        "wave");
     addCommonInterface(new AInterfaceToExtractor(),        "extractor");
-    addCommonInterface(new AInterfaceToData(),             "data");
     addCommonInterface(new AInterfaceToHldFileProcessor(), "hld");
 
     //addCommonInterface(new AConfig_SI(),       "config");

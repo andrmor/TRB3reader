@@ -12,7 +12,6 @@ class Trb3signalExtractor;
 class QTextStream;
 class CernRootModule;
 class ADispatcher;
-class ADataHub;
 class AHldFileProcessor;
 class ANetworkModule;
 class AServerMonitorWindow;
@@ -39,7 +38,6 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(ADispatcher* Dispatcher,
-                        ADataHub* DataHub,
                         Trb3dataReader* Reader,
                         Trb3signalExtractor* Extractor,
                         AHldFileProcessor& HldFileProcessor,
@@ -112,7 +110,6 @@ private slots:
     void on_pbPrintHLDfileProperties_clicked();
     void on_pbProcessAllFromDir_clicked();
     void on_pbProcessSelectedFiles_clicked();
-    void on_pbSaveSignalsFromDataHub_clicked();
     void on_sbIntegrateFrom_editingFinished();
     void on_sbIntegrateTo_editingFinished();
 
@@ -155,9 +152,6 @@ private slots:
     void on_cbSubstractPedestal_toggled(bool checked);
     void on_cbSmoothWaveforms_toggled(bool checked);
     void on_cobSignalExtractionMethod_currentIndexChanged(int index);
-    void on_cobExplorerSource_currentIndexChanged(int index);
-    void on_pbClearDataHub_clicked();
-    void on_pbLoadToDataHub_clicked();
     void on_cobLableType_activated(int index);
     void on_sbNumChannels_editingFinished();
     void on_sbNumSamples_editingFinished();
@@ -165,8 +159,6 @@ private slots:
     void on_cbAutoExecuteScript_clicked();
     void on_cbSaveSignalsToFiles_clicked();
     void on_leAddToProcessed_editingFinished();
-    void on_cbBulkCopyToDatahub_clicked();
-    void on_cbBulkAlsoCopyWaveforms_clicked();
     void on_cobPedestalExtractionMethod_activated(int index);
     void on_ledPedestalPeakSigma_editingFinished();
     void on_ledPedestalPeakThreshold_editingFinished();
@@ -181,7 +173,6 @@ protected:
 private:
     MasterConfig        & Config;
     ADispatcher         * Dispatcher;
-    ADataHub            * DataHub;
     Trb3dataReader      * Reader;
     Trb3signalExtractor * Extractor;
     AHldFileProcessor   & HldFileProcessor;

@@ -539,8 +539,6 @@ QJsonObject AHldProcessSettings::WriteToJson() const
     js["SaveWhat"] =         SaveWhat;
     js["AddToFileName"] =    AddToFileName;
     js["AddRunTime"] =       AddRunTime;
-    js["DoCopyToDatahub"] =  bDoCopyToDatahub;
-    js["IncludeWaveforms"] = bCopyWaveforms;
 
     return js;
 }
@@ -555,8 +553,6 @@ void AHldProcessSettings::ReadFromJson(const QJsonObject &json)
     parseJson(json, "SaveWhat",         SaveWhat);
     parseJson(json, "AddToFileName",    AddToFileName);
     parseJson(json, "AddRunTime",       AddRunTime);
-    parseJson(json, "DoCopyToDatahub",  bDoCopyToDatahub);
-    parseJson(json, "IncludeWaveforms", bCopyWaveforms);
 }
 
 bool ABufferRecord::updateValues(int samples, int delay, int downs)

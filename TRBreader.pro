@@ -46,7 +46,6 @@ SOURCES +=  main.cpp \
             Common/amessage.cpp \
             Common/completingtexteditclass.cpp \
             Common/adispatcher.cpp \
-            Common/adatahub.cpp \
             Common/ahldfileprocessor.cpp \
             Script/ScriptInterfaces/ascriptinterface.cpp \
             Script/ScriptInterfaces/acore_si.cpp \
@@ -60,7 +59,6 @@ SOURCES +=  main.cpp \
             Script/ScriptInterfaces/ainterfacetowaveforms.cpp \
             Script/ScriptInterfaces/ainterfacetoextractor.cpp \
             Script/ScriptInterfaces/ainterfacetohldfileprocessor.cpp \
-            Script/ScriptInterfaces/ainterfacetodata.cpp \
             Script/ScriptWindow/ascriptwindow.cpp \
             Script/ScriptWindow/aargumentcounter.cpp \
             Script/ScriptWindow/ahighlighters.cpp \
@@ -117,7 +115,6 @@ HEADERS  += GUI/mainwindow.h \
             Common/ajsontools.h \
             Common/afiletools.h \
             Common/adispatcher.h \
-            Common/adatahub.h \
             Common/amessage.h \
             Common/completingtexteditclass.h \
             Common/ahldfileprocessor.h \
@@ -135,7 +132,6 @@ HEADERS  += GUI/mainwindow.h \
             Script/ScriptInterfaces/ainterfacetowaveforms.h \
             Script/ScriptInterfaces/ainterfacetoextractor.h \
             Script/ScriptInterfaces/ainterfacetohldfileprocessor.h \
-            Script/ScriptInterfaces/ainterfacetodata.h \
             Script/ScriptWindow/ascriptwindow.h \
             Script/ScriptWindow/aargumentcounter.h \
             Script/ScriptWindow/ahighlighters.h \
