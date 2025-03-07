@@ -40,6 +40,9 @@ protected:
 public slots:
     void onDrawRequest(TObject * obj, QString options, bool fFocus);
 
+private slots:
+    void onCursorPositionChanged(double x, double y);
+
 private:
     Ui::AGraphWindow * ui = nullptr;
 
@@ -47,6 +50,7 @@ private:
 
     QString IdStr;
     bool ColdStart = true;
+    QString Title;
 
 signals:
     void wasHidden(QString idStr);

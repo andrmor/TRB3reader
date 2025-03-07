@@ -34,6 +34,7 @@ public:
 signals:
     void LeftMouseButtonReleased();
     void UserChangedWindow(Double_t centerX, Double_t centerY, Double_t hWidth, Double_t hHeight, Double_t phi, Double_t theta);
+    void cursorPositionChanged(double x, double y);
 
 protected:
     void mouseMoveEvent(QMouseEvent *event);

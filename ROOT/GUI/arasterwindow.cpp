@@ -69,6 +69,7 @@ void ARasterWindow::UpdateRootCanvas()
   fCanvas->Update();
 }
 
+#include "TMath.h"
 void ARasterWindow::mouseMoveEvent(QMouseEvent *event)
 {
     //qDebug() << "Base: Mouse move event";
@@ -134,6 +135,17 @@ void ARasterWindow::mouseMoveEvent(QMouseEvent *event)
         //move
         //qDebug() << "mouse plain move event"<<event->x() << event->y();
         fCanvas->HandleInput(kMouseMotion, event->position().x(), event->position().y());
+
+        TVirtualPad * p = fCanvas->GetSelectedPad();
+        if (p)
+        {
+            double x = p->AbsPixeltoX(event->position().x());
+            double y = p->AbsPixeltoY(event->position().y());
+            if (p->GetLogx()) x = TMath::Power(10.0, x);
+            if (p->GetLogy()) y = TMath::Power(10.0, y);
+            emit cursorPositionChanged(x, y);
+        }
+
       }
     //qDebug() << "done";
 }
