@@ -340,6 +340,7 @@ private slots:
     void on_sbChannel_editingFinished();
     void on_actionConfigure_triggered();
     void on_cbTellMeRate_customContextMenuRequested(const QPoint &pos);
+    void on_leFolderForHldFiles_customContextMenuRequested(const QPoint &pos);
 };
 
 #endif // MAINWINDOW_H

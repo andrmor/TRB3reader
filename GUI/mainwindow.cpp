@@ -2694,15 +2694,6 @@ void MainWindow::CreateScriptWindow()
     PythonWin->updateGui();
 #endif
 
-
-
-
-
-
-
-
-
-
     /*
     ScriptWindow = new AScriptWindow(Config, Network.getScriptManager(), this);
 
@@ -2792,3 +2783,13 @@ void MainWindow::on_actionOpen_script_window_triggered()
     JScriptWin->showNormal();
     JScriptWin->raise();
 }
+
+#include "guitools.h"
+void MainWindow::on_leFolderForHldFiles_customContextMenuRequested(const QPoint &)
+{
+    QString txt = ui->leFolderForHldFiles->text();
+    QString dir = guitools::dialogDirectory(this, "Select directory to store hld files", txt, true, true);
+    if (dir.isEmpty()) return;
+    ui->leFolderForHldFiles->setText(dir);
+}
+

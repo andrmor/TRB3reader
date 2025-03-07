@@ -83,9 +83,9 @@ void ARasterWindow::mouseMoveEvent(QMouseEvent *event)
         if (!PressEventRegistered) return;
 
         if (fInvertedXYforDrag)
-            fCanvas->HandleInput(kButton1Motion, event->y(), event->x());
+            fCanvas->HandleInput(kButton1Motion, event->position().y(), event->position().x());
         else
-            fCanvas->HandleInput(kButton1Motion, event->x(), event->y());
+            fCanvas->HandleInput(kButton1Motion, event->position().x(), event->position().y());
 
         if (!fCanvas->HasViewer3D() || !fCanvas->GetView()) return;
         //qDebug() << "-->"<<fCanvas->GetView();
@@ -109,8 +109,8 @@ void ARasterWindow::mouseMoveEvent(QMouseEvent *event)
         if (!PressEventRegistered) return;
         if (!fCanvas->HasViewer3D()) return;
         //fCanvas->HandleInput(kButton2Motion, event->x(), event->y());
-        int x = event->x();
-        int y = event->y();
+        int x = event->position().x();
+        int y = event->position().y();
         int dx = x-lastX;
         int dy = y-lastY;
         Double_t centerX, centerY, viewSizeX, viewSizeY;
@@ -133,7 +133,7 @@ void ARasterWindow::mouseMoveEvent(QMouseEvent *event)
       {
         //move
         //qDebug() << "mouse plain move event"<<event->x() << event->y();
-        fCanvas->HandleInput(kMouseMotion, event->x(), event->y());        
+        fCanvas->HandleInput(kMouseMotion, event->position().x(), event->position().y());
       }
     //qDebug() << "done";
 }
@@ -145,15 +145,15 @@ void ARasterWindow::mousePressEvent(QMouseEvent *event)
   if (fBlockEvents) return;
   //qDebug() << "Mouse press event";
   PressEventRegistered = true;
-  if (event->button() == Qt::LeftButton)  fCanvas->HandleInput(kButton1Down, event->x(), event->y());
-  if (event->button() == Qt::RightButton) fCanvas->HandleInput(kButton3Down, event->x(), event->y());
+  if (event->button() == Qt::LeftButton)  fCanvas->HandleInput(kButton1Down, event->position().x(), event->position().y());
+  if (event->button() == Qt::RightButton) fCanvas->HandleInput(kButton3Down, event->position().x(), event->position().y());
 
   if (!fCanvas->HasViewer3D() || !fCanvas->GetView()) return;
   if (event->button() == Qt::MiddleButton)
     {
       //fCanvas->HandleInput(kButton2Down, event->x(), event->y());
-      lastX = event->x();
-      lastY = event->y();
+      lastX = event->position().x();
+      lastY = event->position().y();
       Double_t viewSizeX, viewSizeY;
       fCanvas->cd();
       fCanvas->GetView()->GetWindow(lastCenterX, lastCenterY, viewSizeX, viewSizeY);      
@@ -169,8 +169,8 @@ void ARasterWindow::mouseReleaseEvent(QMouseEvent *event)
   //qDebug() << "Mouse release event";
   if (!PressEventRegistered) return;
   PressEventRegistered = false;
-  if (event->button() == Qt::LeftButton) fCanvas->HandleInput(kButton1Up, event->x(), event->y());
-  if (event->button() == Qt::RightButton) fCanvas->HandleInput(kButton3Up, event->x(), event->y());
+  if (event->button() == Qt::LeftButton) fCanvas->HandleInput(kButton1Up, event->position().x(), event->position().y());
+  if (event->button() == Qt::RightButton) fCanvas->HandleInput(kButton3Up, event->position().x(), event->position().y());
 
   if (event->button() == Qt::LeftButton) emit LeftMouseButtonReleased();
 }
