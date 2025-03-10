@@ -30,7 +30,7 @@
     <item>
      <widget class="QTabWidget" name="twMain">
       <property name="currentIndex">
-       <number>1</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tab_8">
        <attribute name="title">
@@ -5994,8 +5994,8 @@ Right-click to set the averaging time</string>
      <y>578</y>
     </hint>
     <hint type="destinationlabel">
-     <x>420</x>
-     <y>644</y>
+     <x>426</x>
+     <y>669</y>
     </hint>
    </hints>
   </connection>
@@ -6022,8 +6022,8 @@ Right-click to set the averaging time</string>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>488</x>
-     <y>578</y>
+     <x>487</x>
+     <y>600</y>
     </hint>
     <hint type="destinationlabel">
      <x>746</x>
@@ -6042,8 +6042,8 @@ Right-click to set the averaging time</string>
      <y>659</y>
     </hint>
     <hint type="destinationlabel">
-     <x>367</x>
-     <y>660</y>
+     <x>366</x>
+     <y>661</y>
     </hint>
    </hints>
   </connection>
@@ -6058,8 +6058,8 @@ Right-click to set the averaging time</string>
      <y>578</y>
     </hint>
     <hint type="destinationlabel">
-     <x>304</x>
-     <y>644</y>
+     <x>306</x>
+     <y>669</y>
     </hint>
    </hints>
   </connection>
@@ -6070,12 +6070,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>126</x>
-     <y>148</y>
+     <x>124</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>124</x>
+     <y>135</y>
     </hint>
    </hints>
   </connection>
@@ -6086,12 +6086,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>131</x>
-     <y>175</y>
+     <x>124</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>124</x>
+     <y>135</y>
     </hint>
    </hints>
   </connection>
@@ -6102,12 +6102,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>149</x>
-     <y>202</y>
+     <x>124</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>124</x>
+     <y>135</y>
     </hint>
    </hints>
   </connection>
@@ -6118,12 +6118,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>149</x>
-     <y>229</y>
+     <x>124</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>124</x>
+     <y>135</y>
     </hint>
    </hints>
   </connection>
@@ -6134,12 +6134,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>149</x>
-     <y>256</y>
+     <x>124</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>124</x>
+     <y>135</y>
     </hint>
    </hints>
   </connection>
@@ -6150,12 +6150,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>149</x>
-     <y>283</y>
+     <x>124</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>124</x>
+     <y>135</y>
     </hint>
    </hints>
   </connection>
@@ -6166,12 +6166,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>149</x>
-     <y>310</y>
+     <x>124</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>124</x>
+     <y>135</y>
     </hint>
    </hints>
   </connection>
@@ -6182,12 +6182,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>158</x>
-     <y>360</y>
+     <x>124</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>124</x>
+     <y>135</y>
     </hint>
    </hints>
   </connection>
@@ -6198,12 +6198,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>274</x>
-     <y>467</y>
+     <x>124</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>124</x>
+     <y>135</y>
     </hint>
    </hints>
   </connection>
@@ -6214,12 +6214,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>274</x>
-     <y>497</y>
+     <x>124</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>124</x>
+     <y>135</y>
     </hint>
    </hints>
   </connection>
@@ -6230,12 +6230,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>486</x>
-     <y>468</y>
+     <x>124</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>124</x>
+     <y>135</y>
     </hint>
    </hints>
   </connection>
@@ -6246,12 +6246,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>486</x>
-     <y>499</y>
+     <x>124</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>124</x>
+     <y>135</y>
     </hint>
    </hints>
   </connection>
@@ -6262,12 +6262,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>221</x>
-     <y>149</y>
+     <x>124</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>124</x>
+     <y>135</y>
     </hint>
    </hints>
   </connection>
@@ -6278,12 +6278,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>308</x>
-     <y>149</y>
+     <x>124</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>124</x>
+     <y>135</y>
     </hint>
    </hints>
   </connection>
@@ -6294,12 +6294,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>260</x>
-     <y>252</y>
+     <x>124</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>124</x>
+     <y>135</y>
     </hint>
    </hints>
   </connection>
@@ -6310,12 +6310,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>260</x>
-     <y>275</y>
+     <x>124</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>124</x>
+     <y>135</y>
     </hint>
    </hints>
   </connection>
@@ -6326,12 +6326,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>289</x>
-     <y>252</y>
+     <x>124</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>124</x>
+     <y>135</y>
     </hint>
    </hints>
   </connection>
@@ -6342,12 +6342,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>289</x>
-     <y>275</y>
+     <x>124</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>124</x>
+     <y>135</y>
     </hint>
    </hints>
   </connection>
@@ -6358,12 +6358,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>319</x>
-     <y>252</y>
+     <x>124</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>124</x>
+     <y>135</y>
     </hint>
    </hints>
   </connection>
@@ -6374,12 +6374,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>319</x>
-     <y>275</y>
+     <x>124</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>124</x>
+     <y>135</y>
     </hint>
    </hints>
   </connection>
@@ -6390,12 +6390,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>349</x>
-     <y>252</y>
+     <x>124</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>124</x>
+     <y>135</y>
     </hint>
    </hints>
   </connection>
@@ -6406,12 +6406,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>349</x>
-     <y>275</y>
+     <x>124</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>124</x>
+     <y>135</y>
     </hint>
    </hints>
   </connection>
@@ -6422,12 +6422,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>460</x>
-     <y>252</y>
+     <x>124</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>124</x>
+     <y>135</y>
     </hint>
    </hints>
   </connection>
@@ -6438,12 +6438,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>460</x>
-     <y>275</y>
+     <x>124</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>124</x>
+     <y>135</y>
     </hint>
    </hints>
   </connection>
@@ -6454,12 +6454,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>489</x>
-     <y>252</y>
+     <x>124</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>124</x>
+     <y>135</y>
     </hint>
    </hints>
   </connection>
@@ -6470,12 +6470,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>489</x>
-     <y>275</y>
+     <x>124</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>124</x>
+     <y>135</y>
     </hint>
    </hints>
   </connection>
@@ -6486,12 +6486,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>519</x>
-     <y>252</y>
+     <x>124</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>124</x>
+     <y>135</y>
     </hint>
    </hints>
   </connection>
@@ -6502,12 +6502,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>519</x>
-     <y>275</y>
+     <x>124</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>124</x>
+     <y>135</y>
     </hint>
    </hints>
   </connection>
@@ -6518,12 +6518,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>549</x>
-     <y>252</y>
+     <x>124</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>124</x>
+     <y>135</y>
     </hint>
    </hints>
   </connection>
@@ -6534,12 +6534,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>549</x>
-     <y>275</y>
+     <x>124</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>124</x>
+     <y>135</y>
     </hint>
    </hints>
   </connection>
@@ -6550,12 +6550,12 @@ Right-click to set the averaging time</string>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>100</x>
-     <y>102</y>
+     <x>106</x>
+     <y>100</y>
     </hint>
     <hint type="destinationlabel">
-     <x>89</x>
-     <y>132</y>
+     <x>96</x>
+     <y>106</y>
     </hint>
    </hints>
   </connection>
@@ -6566,12 +6566,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>225</x>
-     <y>530</y>
+     <x>124</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
-     <x>449</x>
-     <y>573</y>
+     <x>124</x>
+     <y>135</y>
     </hint>
    </hints>
   </connection>
@@ -6582,12 +6582,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>380</x>
-     <y>534</y>
+     <x>124</x>
+     <y>130</y>
     </hint>
     <hint type="destinationlabel">
-     <x>491</x>
-     <y>569</y>
+     <x>124</x>
+     <y>135</y>
     </hint>
    </hints>
   </connection>

@@ -1,7 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
+//#include <QMainWindow>
+#include "aguiwindow.h"
 
 #include <string>
 #include <vector>
@@ -32,7 +33,7 @@ namespace Ui {
 class MainWindow;
 }
 
-class MainWindow : public QMainWindow
+class MainWindow : public AGuiWindow
 {
     Q_OBJECT
 
@@ -329,6 +330,8 @@ private slots:
     void on_actionConfigure_triggered();
     void on_cbTellMeRate_customContextMenuRequested(const QPoint &pos);
     void on_leFolderForHldFiles_customContextMenuRequested(const QPoint &pos);
+    void on_cbDoNotSaveDisabledChannels_clicked(bool checked);
+    void on_cbSaveTime_clicked(bool checked);
 };
 
 #endif // MAINWINDOW_H

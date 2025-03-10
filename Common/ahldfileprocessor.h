@@ -16,10 +16,7 @@ class AHldFileProcessor : public QObject
 public:
     AHldFileProcessor(Trb3dataReader & Reader, Trb3signalExtractor & Extractor);
 
-    //bool ProcessFile(const QString FileName, bool bSaveTimeData, const QString SaveFileName = "", bool doNotSaveSuppressedChannels = false);
     bool ProcessFile(const QString FileName, int What_0signals1waves, bool bIncludeTimeData, const QString SaveFileName, bool doNotSaveSuppressedChannels);
-    bool SaveSignalsToFile(const QString & FileName, bool bUseHardware, bool bSaveTimeData, bool doNotSaveSuppressed);
-    bool SaveWaveformsToFile(const QString & FileName, bool bUseHardware, bool bSaveTimeData, bool doNotSaveSuppressed);
 
     const QString& GetLastError() const {return LastError;}
 
@@ -31,6 +28,8 @@ private:
     QString LastError;
 
 private:
+    bool SaveSignalsToFile(const QString & FileName, bool bUseHardware, bool bSaveTimeData, bool doNotSaveSuppressed);
+    bool SaveWaveformsToFile(const QString & FileName, bool bUseHardware, bool bSaveTimeData, bool doNotSaveSuppressed);
     bool sendSignalData(QTextStream &outStream, bool bUseHardware, bool bSaveTimeData, bool doNotSaveSuppressed);
     bool sendWaveformData(QTextStream &outStream, bool bUseHardware, bool bSaveTimeData, bool doNotSaveSuppressed);
 

@@ -33,12 +33,12 @@
 
 #include <cmath>
 
-MainWindow::MainWindow(ADispatcher *Dispatcher,
-                       Trb3dataReader* Reader,
-                       Trb3signalExtractor* Extractor,
-                       AHldFileProcessor& HldFileProcessor, ANetworkModule &Network,
-                       QWidget *parent) :
-    QMainWindow(parent),
+MainWindow::MainWindow(ADispatcher * Dispatcher,
+                       Trb3dataReader * Reader,
+                       Trb3signalExtractor * Extractor,
+                       AHldFileProcessor & HldFileProcessor, ANetworkModule & Network,
+                       QWidget * parent) :
+    AGuiWindow("main", parent),
     Config(MasterConfig::getInstance()), Dispatcher(Dispatcher), Reader(Reader), Extractor(Extractor), HldFileProcessor(HldFileProcessor), Network(Network),
     ui(new Ui::MainWindow)
 {

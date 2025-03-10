@@ -531,22 +531,26 @@ QJsonObject AHldProcessSettings::WriteToJson() const
 {
     QJsonObject js;
 
-    js["NumChannels"] =      NumChannels;
-    js["NumSamples"]  =      NumSamples;
-    js["SaveWhat"] =         SaveWhat;
-    js["AddToFileName"] =    AddToFileName;
-    js["AddRunTime"] =       AddRunTime;
+    js["NumChannels"] =          NumChannels;
+    js["NumSamples"]  =          NumSamples;
+    js["SaveWhat"] =             SaveWhat;
+    js["SkipDisabledChannels"] = SkipDisabledChannels;
+    js["IncludeTimingData"] =    IncludeTimingData;
+    js["AddToFileName"] =        AddToFileName;
+    js["AddRunTime"] =           AddRunTime;
 
     return js;
 }
 
 void AHldProcessSettings::ReadFromJson(const QJsonObject &json)
 {
-    parseJson(json, "NumChannels",      NumChannels);
-    parseJson(json, "NumSamples",       NumSamples);
-    parseJson(json, "SaveWhat",         SaveWhat);
-    parseJson(json, "AddToFileName",    AddToFileName);
-    parseJson(json, "AddRunTime",       AddRunTime);
+    parseJson(json, "NumChannels",          NumChannels);
+    parseJson(json, "NumSamples",           NumSamples);
+    parseJson(json, "SaveWhat",             SaveWhat);
+    parseJson(json, "SkipDisabledChannels", SkipDisabledChannels);
+    parseJson(json, "IncludeTimingData",    IncludeTimingData);
+    parseJson(json, "AddToFileName",        AddToFileName);
+    parseJson(json, "AddRunTime",           AddRunTime);
 }
 
 bool ABufferRecord::updateValues(int samples, int delay, int downs)

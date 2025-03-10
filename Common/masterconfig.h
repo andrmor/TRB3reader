@@ -18,6 +18,8 @@ public:
     int     NumChannels = 0;
     int     NumSamples = 0;
     int     SaveWhat = 0; // 0=signals, 1=waveforms
+    bool    SkipDisabledChannels = true;
+    bool    IncludeTimingData = false;
     QString AddToFileName = "_proc.dat";
     bool    AddRunTime = false;
 
