@@ -157,9 +157,6 @@ private slots:
     void on_sbNumChannels_editingFinished();
     void on_sbNumSamples_editingFinished();
     void on_leAddToProcessed_editingFinished();
-    void on_cobPedestalExtractionMethod_activated(int index);
-    void on_ledPedestalPeakSigma_editingFinished();
-    void on_ledPedestalPeakThreshold_editingFinished();
     void on_actionConfigure_WebSocket_server_triggered();
 
     void on_pbBoardOn_clicked();

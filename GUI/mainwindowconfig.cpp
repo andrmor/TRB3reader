@@ -183,12 +183,8 @@ void MainWindow::UpdateGui()
     ui->pteIgnoreHardwareChannels->appendPlainText(s);
 
     ui->cbSubstractPedestal->setChecked(Config.bPedestalSubstraction);
-        ui->cobPedestalExtractionMethod->setCurrentIndex(Config.PedestalExtractionMethod);
         ui->sbPedestalFrom->setValue(Config.PedestalFrom);
         ui->sbPedestalTo->setValue(Config.PedestalTo);
-        ui->ledPedestalPeakSigma->setText( QString::number(Config.PedestalPeakSigma) );
-        ui->ledPedestalPeakThreshold->setText( QString::number(Config.PedestalPeakThreshold) );
-
 
     ui->cbSmoothWaveforms->setChecked(Config.bSmoothWaveforms);
     ui->cbSmoothBeforePedestal->setChecked(Config.bSmoothingBeforePedestals);
@@ -491,19 +487,4 @@ void MainWindow::on_leAddToProcessed_editingFinished()
 void MainWindow::on_cbAddRunTime_clicked(bool checked)
 {
     Config.HldProcessSettings.AddRunTime = checked;
-}
-
-void MainWindow::on_cobPedestalExtractionMethod_activated(int index)
-{
-    Config.PedestalExtractionMethod = index;
-}
-
-void MainWindow::on_ledPedestalPeakSigma_editingFinished()
-{
-    Config.PedestalPeakSigma = ui->ledPedestalPeakSigma->text().toDouble();
-}
-
-void MainWindow::on_ledPedestalPeakThreshold_editingFinished()
-{
-    Config.PedestalPeakThreshold = ui->ledPedestalPeakThreshold->text().toDouble();
 }
