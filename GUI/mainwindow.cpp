@@ -103,7 +103,7 @@ MainWindow::MainWindow(ADispatcher * Dispatcher,
     JScriptWin->ReadFromJson();
 
     //misc gui settings
-    menuBar()->setNativeMenuBar(false);  //otherwise on some system menu bar is not wisible!
+    menuBar()->setNativeMenuBar(false);  //otherwise on some system menu bar is not visible!
     ui->prbMainBar->setVisible(false);
     ui->cbAutoscaleY->setChecked(true);
     ui->pbStop->setVisible(false);
@@ -1030,19 +1030,24 @@ void MainWindow::on_sbAllPosY_editingFinished()
     on_pbShowAllPos_toggled(ui->pbShowAllPos->isChecked());
 }
 
-void MainWindow::on_cbSubstractPedestal_toggled(bool)
+void MainWindow::on_cbSubstractPedestal_toggled(bool checked)
 {
+    ui->frSubstractPedestals->setVisible(checked);
+
     updateSmoothAfterPedeEnableStatus();
 }
 
-void MainWindow::on_cbSmoothWaveforms_toggled(bool)
+void MainWindow::on_cbSmoothWaveforms_toggled(bool checked)
 {
+    ui->frAdjAv->setVisible(checked);
+    ui->frTrapezoidal->setVisible(checked);
+
     updateSmoothAfterPedeEnableStatus();
 }
 
 void MainWindow::updateSmoothAfterPedeEnableStatus()
 {
-    ui->cbSmoothBeforePedestal->setEnabled(ui->cbSubstractPedestal->isChecked() && ui->cbSmoothWaveforms->isChecked());
+    ui->cbSmoothBeforePedestal->setVisible(ui->cbSubstractPedestal->isChecked() && ui->cbSmoothWaveforms->isChecked());
 }
 
 void MainWindow::ClearData()

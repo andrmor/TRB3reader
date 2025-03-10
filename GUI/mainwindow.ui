@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>793</width>
+    <width>784</width>
     <height>833</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>TRBreader v4.0.1</string>
+   <string>TRBreader v4.1.0</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -30,7 +30,7 @@
     <item>
      <widget class="QTabWidget" name="twMain">
       <property name="currentIndex">
-       <number>3</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_8">
        <attribute name="title">
@@ -40,7 +40,7 @@
         <item>
          <widget class="QTabWidget" name="tabWidget">
           <property name="currentIndex">
-           <number>0</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="tab_11">
            <attribute name="title">
@@ -715,46 +715,52 @@
                 </widget>
                </item>
                <item>
-                <widget class="QComboBox" name="cobPedestalExtractionMethod">
-                 <item>
-                  <property name="text">
-                   <string>Average in range from-to</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>From amplitude occurrence peak</string>
-                  </property>
-                 </item>
-                </widget>
-               </item>
-               <item>
-                <widget class="QStackedWidget" name="stackedWidget">
-                 <property name="currentIndex">
-                  <number>0</number>
+                <widget class="QFrame" name="frSubstractPedestals">
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>0</height>
+                  </size>
                  </property>
-                 <widget class="QWidget" name="page">
-                  <layout class="QVBoxLayout" name="verticalLayout_25">
-                   <property name="leftMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="topMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="rightMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="bottomMargin">
-                    <number>0</number>
-                   </property>
-                   <item>
-                    <widget class="QFrame" name="frSmoothing">
-                     <property name="frameShape">
-                      <enum>QFrame::Shape::NoFrame</enum>
+                 <property name="frameShape">
+                  <enum>QFrame::Shape::NoFrame</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Shadow::Raised</enum>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_40">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QComboBox" name="cobPedestalExtractionMethod">
+                    <item>
+                     <property name="text">
+                      <string>Average in range from-to</string>
                      </property>
-                     <property name="frameShadow">
-                      <enum>QFrame::Shadow::Raised</enum>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>From amplitude occurrence peak</string>
                      </property>
+                    </item>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QStackedWidget" name="stackedWidget">
+                    <property name="currentIndex">
+                     <number>0</number>
+                    </property>
+                    <widget class="QWidget" name="page">
                      <layout class="QHBoxLayout" name="horizontalLayout_9">
                       <property name="leftMargin">
                        <number>0</number>
@@ -818,6 +824,75 @@
                         </property>
                         <property name="sizeHint" stdset="0">
                          <size>
+                          <width>160</width>
+                          <height>20</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                     </layout>
+                    </widget>
+                    <widget class="QWidget" name="page_2">
+                     <layout class="QHBoxLayout" name="horizontalLayout_46">
+                      <property name="leftMargin">
+                       <number>0</number>
+                      </property>
+                      <property name="topMargin">
+                       <number>0</number>
+                      </property>
+                      <property name="rightMargin">
+                       <number>0</number>
+                      </property>
+                      <property name="bottomMargin">
+                       <number>0</number>
+                      </property>
+                      <item>
+                       <widget class="QLabel" name="label_41">
+                        <property name="text">
+                         <string>Sigma:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="ledPedestalPeakSigma">
+                        <property name="maximumSize">
+                         <size>
+                          <width>75</width>
+                          <height>16777215</height>
+                         </size>
+                        </property>
+                        <property name="text">
+                         <string>3</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLabel" name="label_42">
+                        <property name="text">
+                         <string>Threshold:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="ledPedestalPeakThreshold">
+                        <property name="maximumSize">
+                         <size>
+                          <width>75</width>
+                          <height>16777215</height>
+                         </size>
+                        </property>
+                        <property name="text">
+                         <string>0.5</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <spacer name="horizontalSpacer_9">
+                        <property name="orientation">
+                         <enum>Qt::Orientation::Horizontal</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
                           <width>40</width>
                           <height>20</height>
                          </size>
@@ -826,78 +901,9 @@
                       </item>
                      </layout>
                     </widget>
-                   </item>
-                  </layout>
-                 </widget>
-                 <widget class="QWidget" name="page_2">
-                  <layout class="QHBoxLayout" name="horizontalLayout_46">
-                   <property name="leftMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="topMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="rightMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="bottomMargin">
-                    <number>0</number>
-                   </property>
-                   <item>
-                    <widget class="QLabel" name="label_41">
-                     <property name="text">
-                      <string>Sigma:</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLineEdit" name="ledPedestalPeakSigma">
-                     <property name="maximumSize">
-                      <size>
-                       <width>75</width>
-                       <height>16777215</height>
-                      </size>
-                     </property>
-                     <property name="text">
-                      <string>3</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLabel" name="label_42">
-                     <property name="text">
-                      <string>Threshold:</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLineEdit" name="ledPedestalPeakThreshold">
-                     <property name="maximumSize">
-                      <size>
-                       <width>75</width>
-                       <height>16777215</height>
-                      </size>
-                     </property>
-                     <property name="text">
-                      <string>0.5</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <spacer name="horizontalSpacer_9">
-                     <property name="orientation">
-                      <enum>Qt::Orientation::Horizontal</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>40</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
-                  </layout>
-                 </widget>
+                   </widget>
+                  </item>
+                 </layout>
                 </widget>
                </item>
               </layout>
@@ -918,6 +924,18 @@
             </item>
             <item>
              <widget class="QFrame" name="gbSmoothing">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="sizeIncrement">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
               <property name="frameShape">
                <enum>QFrame::Shape::Box</enum>
               </property>
@@ -989,7 +1007,7 @@
                  <property name="frameShape">
                   <enum>QFrame::Shape::NoFrame</enum>
                  </property>
-                 <layout class="QVBoxLayout" name="verticalLayout_9">
+                 <layout class="QHBoxLayout" name="horizontalLayout_2">
                   <property name="leftMargin">
                    <number>0</number>
                   </property>
@@ -1003,128 +1021,147 @@
                    <number>0</number>
                   </property>
                   <item>
-                   <layout class="QHBoxLayout" name="horizontalLayout_2">
-                    <item>
-                     <widget class="QCheckBox" name="cbAdjacentAveraging">
-                      <property name="text">
-                       <string>Adjacent averaging</string>
-                      </property>
-                      <property name="checked">
-                       <bool>true</bool>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QLabel" name="label_5">
-                      <property name="text">
-                       <string>Points (each dir):</string>
-                      </property>
-                      <property name="alignment">
-                       <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QSpinBox" name="sbAdjAvPoints">
-                      <property name="minimum">
-                       <number>1</number>
-                      </property>
-                      <property name="maximum">
-                       <number>1000000</number>
-                      </property>
-                      <property name="value">
-                       <number>5</number>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QCheckBox" name="cbAdjAvWeighted">
-                      <property name="toolTip">
-                       <string>Weight is proportional to the reciprocal square of the offset distance from the center</string>
-                      </property>
-                      <property name="text">
-                       <string>Weighted</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <spacer name="horizontalSpacer_19">
-                      <property name="orientation">
-                       <enum>Qt::Orientation::Horizontal</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>40</width>
-                        <height>20</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
-                   </layout>
+                   <widget class="QCheckBox" name="cbAdjacentAveraging">
+                    <property name="text">
+                     <string>Adjacent averaging</string>
+                    </property>
+                    <property name="checked">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_5">
+                    <property name="text">
+                     <string>Points (each direction):</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QSpinBox" name="sbAdjAvPoints">
+                    <property name="minimum">
+                     <number>1</number>
+                    </property>
+                    <property name="maximum">
+                     <number>1000000</number>
+                    </property>
+                    <property name="value">
+                     <number>5</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QCheckBox" name="cbAdjAvWeighted">
+                    <property name="toolTip">
+                     <string>Weight is proportional to the reciprocal square of the offset distance from the center</string>
+                    </property>
+                    <property name="text">
+                     <string>Weighted</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_19">
+                    <property name="orientation">
+                     <enum>Qt::Orientation::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>211</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
                   </item>
                  </layout>
                 </widget>
                </item>
                <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_67">
-                 <property name="topMargin">
-                  <number>0</number>
+                <widget class="QFrame" name="frTrapezoidal">
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>0</height>
+                  </size>
                  </property>
-                 <item>
-                  <widget class="QCheckBox" name="cbTrapezoidal">
-                   <property name="text">
-                    <string>Apply trapezoidal filter</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QLabel" name="label_73">
-                   <property name="text">
-                    <string>    L =</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QSpinBox" name="sbTrapezoidalL">
-                   <property name="minimum">
-                    <number>1</number>
-                   </property>
-                   <property name="maximum">
-                    <number>9999</number>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QLabel" name="label_74">
-                   <property name="text">
-                    <string>   G =</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QSpinBox" name="sbTrapezoidalG">
-                   <property name="minimum">
-                    <number>1</number>
-                   </property>
-                   <property name="maximum">
-                    <number>9999</number>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <spacer name="horizontalSpacer_48">
-                   <property name="orientation">
-                    <enum>Qt::Orientation::Horizontal</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>40</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                </layout>
+                 <property name="frameShape">
+                  <enum>QFrame::Shape::NoFrame</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Shadow::Raised</enum>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_41">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QCheckBox" name="cbTrapezoidal">
+                    <property name="text">
+                     <string>Apply trapezoidal filter</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_73">
+                    <property name="text">
+                     <string>    L =</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QSpinBox" name="sbTrapezoidalL">
+                    <property name="minimum">
+                     <number>1</number>
+                    </property>
+                    <property name="maximum">
+                     <number>9999</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_74">
+                    <property name="text">
+                     <string>   G =</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QSpinBox" name="sbTrapezoidalG">
+                    <property name="minimum">
+                     <number>1</number>
+                    </property>
+                    <property name="maximum">
+                     <number>9999</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_48">
+                    <property name="orientation">
+                     <enum>Qt::Orientation::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>322</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </widget>
                </item>
               </layout>
              </widget>
@@ -5875,7 +5912,7 @@ Right-click to set the averaging time</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>793</width>
+     <width>784</width>
      <height>22</height>
     </rect>
    </property>
@@ -5958,12 +5995,12 @@ Right-click to set the averaging time</string>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>125</x>
-     <y>659</y>
+     <x>126</x>
+     <y>727</y>
     </hint>
     <hint type="destinationlabel">
      <x>268</x>
-     <y>660</y>
+     <y>728</y>
     </hint>
    </hints>
   </connection>
@@ -5975,11 +6012,11 @@ Right-click to set the averaging time</string>
    <hints>
     <hint type="sourcelabel">
      <x>118</x>
-     <y>578</y>
+     <y>646</y>
     </hint>
     <hint type="destinationlabel">
-     <x>304</x>
-     <y>613</y>
+     <x>306</x>
+     <y>682</y>
     </hint>
    </hints>
   </connection>
@@ -5991,11 +6028,11 @@ Right-click to set the averaging time</string>
    <hints>
     <hint type="sourcelabel">
      <x>118</x>
-     <y>578</y>
+     <y>646</y>
     </hint>
     <hint type="destinationlabel">
      <x>426</x>
-     <y>669</y>
+     <y>715</y>
     </hint>
    </hints>
   </connection>
@@ -6007,11 +6044,11 @@ Right-click to set the averaging time</string>
    <hints>
     <hint type="sourcelabel">
      <x>118</x>
-     <y>578</y>
+     <y>646</y>
     </hint>
     <hint type="destinationlabel">
-     <x>420</x>
-     <y>613</y>
+     <x>426</x>
+     <y>682</y>
     </hint>
    </hints>
   </connection>
@@ -6023,11 +6060,11 @@ Right-click to set the averaging time</string>
    <hints>
     <hint type="sourcelabel">
      <x>487</x>
-     <y>600</y>
+     <y>646</y>
     </hint>
     <hint type="destinationlabel">
-     <x>746</x>
-     <y>579</y>
+     <x>777</x>
+     <y>647</y>
     </hint>
    </hints>
   </connection>
@@ -6038,12 +6075,12 @@ Right-click to set the averaging time</string>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>108</x>
-     <y>659</y>
+     <x>116</x>
+     <y>727</y>
     </hint>
     <hint type="destinationlabel">
      <x>366</x>
-     <y>661</y>
+     <y>728</y>
     </hint>
    </hints>
   </connection>
@@ -6055,11 +6092,11 @@ Right-click to set the averaging time</string>
    <hints>
     <hint type="sourcelabel">
      <x>118</x>
-     <y>578</y>
+     <y>646</y>
     </hint>
     <hint type="destinationlabel">
      <x>306</x>
-     <y>669</y>
+     <y>715</y>
     </hint>
    </hints>
   </connection>
@@ -6070,12 +6107,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>130</y>
+     <x>133</x>
+     <y>157</y>
     </hint>
     <hint type="destinationlabel">
-     <x>124</x>
-     <y>135</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6086,12 +6123,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>130</y>
+     <x>133</x>
+     <y>186</y>
     </hint>
     <hint type="destinationlabel">
-     <x>124</x>
-     <y>135</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6102,12 +6139,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>130</y>
+     <x>133</x>
+     <y>215</y>
     </hint>
     <hint type="destinationlabel">
-     <x>124</x>
-     <y>135</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6118,12 +6155,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>130</y>
+     <x>133</x>
+     <y>244</y>
     </hint>
     <hint type="destinationlabel">
-     <x>124</x>
-     <y>135</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6134,12 +6171,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>130</y>
+     <x>133</x>
+     <y>273</y>
     </hint>
     <hint type="destinationlabel">
-     <x>124</x>
-     <y>135</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6150,12 +6187,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>130</y>
+     <x>133</x>
+     <y>302</y>
     </hint>
     <hint type="destinationlabel">
-     <x>124</x>
-     <y>135</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6166,12 +6203,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>130</y>
+     <x>133</x>
+     <y>331</y>
     </hint>
     <hint type="destinationlabel">
-     <x>124</x>
-     <y>135</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6182,12 +6219,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>130</y>
+     <x>133</x>
+     <y>360</y>
     </hint>
     <hint type="destinationlabel">
-     <x>124</x>
-     <y>135</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6198,12 +6235,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>130</y>
+     <x>271</x>
+     <y>491</y>
     </hint>
     <hint type="destinationlabel">
-     <x>124</x>
-     <y>135</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6214,12 +6251,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>130</y>
+     <x>271</x>
+     <y>521</y>
     </hint>
     <hint type="destinationlabel">
-     <x>124</x>
-     <y>135</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6230,12 +6267,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>130</y>
+     <x>482</x>
+     <y>492</y>
     </hint>
     <hint type="destinationlabel">
-     <x>124</x>
-     <y>135</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6246,12 +6283,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>130</y>
+     <x>482</x>
+     <y>523</y>
     </hint>
     <hint type="destinationlabel">
-     <x>124</x>
-     <y>135</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6262,12 +6299,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>130</y>
+     <x>252</x>
+     <y>158</y>
     </hint>
     <hint type="destinationlabel">
-     <x>124</x>
-     <y>135</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6278,12 +6315,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>130</y>
+     <x>331</x>
+     <y>158</y>
     </hint>
     <hint type="destinationlabel">
-     <x>124</x>
-     <y>135</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6294,12 +6331,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>130</y>
+     <x>258</x>
+     <y>252</y>
     </hint>
     <hint type="destinationlabel">
-     <x>124</x>
-     <y>135</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6310,12 +6347,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>130</y>
+     <x>258</x>
+     <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>124</x>
-     <y>135</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6326,12 +6363,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>130</y>
+     <x>288</x>
+     <y>252</y>
     </hint>
     <hint type="destinationlabel">
-     <x>124</x>
-     <y>135</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6342,12 +6379,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>130</y>
+     <x>288</x>
+     <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>124</x>
-     <y>135</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6358,12 +6395,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>130</y>
+     <x>318</x>
+     <y>252</y>
     </hint>
     <hint type="destinationlabel">
-     <x>124</x>
-     <y>135</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6374,12 +6411,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>130</y>
+     <x>318</x>
+     <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>124</x>
-     <y>135</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6390,12 +6427,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>130</y>
+     <x>348</x>
+     <y>252</y>
     </hint>
     <hint type="destinationlabel">
-     <x>124</x>
-     <y>135</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6406,12 +6443,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>130</y>
+     <x>348</x>
+     <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>124</x>
-     <y>135</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6422,12 +6459,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>130</y>
+     <x>459</x>
+     <y>252</y>
     </hint>
     <hint type="destinationlabel">
-     <x>124</x>
-     <y>135</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6438,12 +6475,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>130</y>
+     <x>459</x>
+     <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>124</x>
-     <y>135</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6454,12 +6491,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>130</y>
+     <x>489</x>
+     <y>252</y>
     </hint>
     <hint type="destinationlabel">
-     <x>124</x>
-     <y>135</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6470,12 +6507,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>130</y>
+     <x>489</x>
+     <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>124</x>
-     <y>135</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6486,12 +6523,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>130</y>
+     <x>519</x>
+     <y>252</y>
     </hint>
     <hint type="destinationlabel">
-     <x>124</x>
-     <y>135</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6502,12 +6539,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>130</y>
+     <x>519</x>
+     <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>124</x>
-     <y>135</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6518,12 +6555,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>130</y>
+     <x>549</x>
+     <y>252</y>
     </hint>
     <hint type="destinationlabel">
-     <x>124</x>
-     <y>135</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6534,12 +6571,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>130</y>
+     <x>549</x>
+     <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>124</x>
-     <y>135</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6550,12 +6587,12 @@ Right-click to set the averaging time</string>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>106</x>
-     <y>100</y>
+     <x>113</x>
+     <y>123</y>
     </hint>
     <hint type="destinationlabel">
-     <x>96</x>
-     <y>106</y>
+     <x>103</x>
+     <y>212</y>
     </hint>
    </hints>
   </connection>
@@ -6566,12 +6603,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>130</y>
+     <x>260</x>
+     <y>587</y>
     </hint>
     <hint type="destinationlabel">
-     <x>124</x>
-     <y>135</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6582,12 +6619,28 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>130</y>
+     <x>396</x>
+     <y>589</y>
     </hint>
     <hint type="destinationlabel">
-     <x>124</x>
-     <y>135</y>
+     <x>509</x>
+     <y>633</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cobPedestalExtractionMethod</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>stackedWidget</receiver>
+   <slot>setCurrentIndex(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>156</x>
+     <y>146</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>600</x>
+     <y>147</y>
     </hint>
    </hints>
   </connection>
