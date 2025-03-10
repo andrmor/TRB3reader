@@ -14,7 +14,34 @@
 AInterfaceToWaveforms::AInterfaceToWaveforms() :
     Config(MasterConfig::getInstance()), Reader(AScriptHub::getInstance().Reader)
 {
-    Description = "Low-level unit giving access to waveforms read from an hld file.";
+    Description = "Low-level unit giving access to waveforms/timing_data read from an hld file.";
+
+    Help["readFile"] = "Read hld file respecting the configured smoothing/pedestal correction and number of channels";
+    Help["getTiming"] = "Read timing information for a selected event. The output is an array of [BoardId, BoardChannel, DefinedTimingChannel, ArrayOfTriggers]";
+}
+
+void AInterfaceToWaveforms::readFile(QString hldFileName)
+{
+    if (hldFileName.isEmpty())
+    {
+        abort("Provide a name for the hld file to read") ;
+        return;
+    }
+
+    qDebug() << "Reading hlf file:" <<  hldFileName;
+
+    QString err = Reader->Read(hldFileName);
+    if (!err.isEmpty())
+    {
+        abort("Error during reading hld file:\n" + err);
+        return;
+    }
+    QString ValRes = Config.Map->ValidateForAvailableHardwareChannels(Reader->CountChannels());
+    if (!ValRes.isEmpty())
+    {
+        abort("Error in data validation after hld file read:\n" + err);
+        return;
+    }
 }
 
 int AInterfaceToWaveforms::countSamples() const
@@ -190,5 +217,33 @@ int AInterfaceToWaveforms::getSampleWhereFirstBelow(int ievent, int iHardwChanne
 int AInterfaceToWaveforms::getSampleWhereFirstBelowFast(int ievent, int iHardwChannel, int threshold)
 {
     return Reader->GetSampleWhereFirstBelowFast(ievent, iHardwChannel, threshold);
+}
+
+QVariantList AInterfaceToWaveforms::getTiming(int ievent)
+{
+    QVariantList vl;
+
+    const std::vector<Trb3TimingRecord> * time = Reader->GetTimingPtr(ievent);
+    if (!time)
+    {
+        abort("Failed to get timing data");
+        return vl;
+    }
+
+    for (const Trb3TimingRecord & rec : *time)
+    {
+        QVariantList el;
+        el << rec.BoardDatakind;
+        el << rec.InternalChannel;
+        el << rec.TimingCannel;
+
+        QVariantList ar;
+        for (double t : rec.Triggers) ar << t;
+        el.push_back(ar);
+
+        vl.push_back(el);
+    }
+
+    return vl;
 }
 

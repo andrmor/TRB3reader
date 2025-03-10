@@ -19,7 +19,7 @@ public:
     Trb3dataReader();
 
     QString GetFileInfo(const QString &FileName); // used only in the gui when clicking "...print file data structure"
-    QString Read(const QString &FileName); // Reading waveform data from the file, optional - substract pedestals and apply smoothing
+    QString Read(const QString &FileName, bool skipSmoothAndPedestalExtraction = false); // Reading waveform data from the file, optional - substract pedestals and apply smoothing
 
     float   GetValue(int ievent, int ichannel, int isample) const;
     float   GetValueFast(int ievent, int ichannel, int isample) const; //no argument validity check!
@@ -30,6 +30,8 @@ public:
     //const QVector<float>* GetWaveformsPtr(int ievent, int ichannel) const;
     const QVector<float>* GetWaveformPtr(int ievent, int ichannel) const;
     const QVector<float>* GetWaveformPtrFast(int ievent, int ichannel) const; //no argument validity check!
+
+    const std::vector<Trb3TimingRecord>* GetTimingPtr(int ievent);
 
     bool    SetWaveform(int ievent, int ichannel, const QVector<float> &array);
     void    SetWaveformFast(int ievent, int ichannel, const QVector<float> &array);

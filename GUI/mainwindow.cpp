@@ -1357,7 +1357,7 @@ void MainWindow::bulkProcessorEnvelope(const QStringList FileNames)
     int numBadEvents = 0;
     for (const QString & name : FileNames)
     {
-        bool bOK = HldFileProcessor.ProcessFile(name, ui->cobWhatToSave->currentIndex(), ui->cbSaveTime->isChecked(), "", ui->cbDoNotSaveDisabledChannels->isChecked(), true);
+        bool bOK = HldFileProcessor.processFile(name, ui->cobWhatToSave->currentIndex(), ui->cbSaveTime->isChecked(), "", ui->cbDoNotSaveDisabledChannels->isChecked(), true);
         if (!bOK) numErrors++;
 
         updateNumEventsIndication();

@@ -171,7 +171,7 @@ void AScriptHub::createInterfaces()
     PythonM->registerInterface(new AMath_SI(),     "Math");
 #endif
 
-    addCommonInterface(new AInterfaceToWaveforms(),        "wave");
+    addCommonInterface(new AInterfaceToWaveforms(),        "reader");
     addCommonInterface(new AInterfaceToExtractor(),        "extractor");
     addCommonInterface(new AInterfaceToHldFileProcessor(), "hld");
 

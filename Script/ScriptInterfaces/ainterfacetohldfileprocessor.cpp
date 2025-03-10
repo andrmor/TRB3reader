@@ -11,13 +11,13 @@ AInterfaceToHldFileProcessor::AInterfaceToHldFileProcessor() :
     //connect(this, &AInterfaceToHldFileProcessor::requestProcess, this, &AInterfaceToHldFileProcessor::doProcess, Qt::QueuedConnection);
 }
 
-void AInterfaceToHldFileProcessor::ProcessFile_saveSignals(QString hldFileName, bool includeTimingData, bool skipSuppressedChannels, QString outputFileName)
+void AInterfaceToHldFileProcessor::processFile_saveSignals(QString hldFileName, bool includeTimingData, bool skipSuppressedChannels, QString outputFileName)
 {
-    HldProcessor->ProcessFile(hldFileName, 0, includeTimingData, outputFileName, skipSuppressedChannels, false);
+    HldProcessor->processFile(hldFileName, 0, includeTimingData, outputFileName, skipSuppressedChannels, false);
 }
 
-void AInterfaceToHldFileProcessor::ProcessFile_saveWaveforms(QString hldFileName, bool includeTimingData, bool skipSuppressedChannels, QString outputFileName)
+void AInterfaceToHldFileProcessor::processFile_saveWaveforms(QString hldFileName, bool includeTimingData, bool skipSuppressedChannels, QString outputFileName)
 {
-    HldProcessor->ProcessFile(hldFileName, 1, includeTimingData, outputFileName, skipSuppressedChannels, false);
+    HldProcessor->processFile(hldFileName, 1, includeTimingData, outputFileName, skipSuppressedChannels, false);
 }
 

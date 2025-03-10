@@ -20,6 +20,8 @@ public:
 
 public slots:
 
+    void     computeSignals();
+
     int      countEvents() const;
     int      countChannels() const;
 

@@ -10,7 +10,7 @@
 AHldFileProcessor::AHldFileProcessor(Trb3dataReader & Reader, Trb3signalExtractor & Extractor) :
     Config(MasterConfig::getConstInstance()), Reader(Reader), Extractor(Extractor) {}
 
-bool AHldFileProcessor::ProcessFile(const QString & FileName, int What_0signals1waves, bool bIncludeTimeData, const QString & SaveFileName, bool doNotSaveSuppressedChannels, bool doLogs)
+bool AHldFileProcessor::processFile(const QString & FileName, int What_0signals1waves, bool bIncludeTimeData, const QString & SaveFileName, bool doNotSaveSuppressedChannels, bool doLogs)
 {
     if (FileName.isEmpty())
     {

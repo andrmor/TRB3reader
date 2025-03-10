@@ -833,7 +833,7 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
 #endif
 */
 
-QString Trb3dataReader::Read(const QString& FileName)
+QString Trb3dataReader::Read(const QString & FileName, bool skipSmoothAndPedestalExtraction)
 {
     qDebug() << "--> Reading hld file...";
     readRawData(FileName, Config.HldProcessSettings.NumChannels, Config.HldProcessSettings.NumSamples);
@@ -854,6 +854,8 @@ QString Trb3dataReader::Read(const QString& FileName)
 
     bool bOK = Config.UpdateNumberOfHardwareChannels(numChannels);
     if (!bOK) return "The number of hardware channels in the file (" + QString::number(numChannels) + ") is incompatible with the defined number of logical channels";
+
+    if (skipSmoothAndPedestalExtraction) return "";
 
     if (Config.bSmoothingBeforePedestals)
     {
@@ -927,6 +929,12 @@ const QVector<float> *Trb3dataReader::GetWaveformPtr(int ievent, int ichannel) c
 const QVector<float> *Trb3dataReader::GetWaveformPtrFast(int ievent, int ichannel) const
 {
     return &(waveData.at(ievent).at(ichannel));
+}
+
+const std::vector<Trb3TimingRecord> * Trb3dataReader::GetTimingPtr(int ievent)
+{
+    if (ievent < 0 || ievent >= timeData.size()) return nullptr;
+    return &(timeData[ievent]);
 }
 
 bool Trb3dataReader::SetWaveform(int ievent, int ichannel, const QVector<float>& array)
