@@ -10,29 +10,33 @@
 AHldFileProcessor::AHldFileProcessor(Trb3dataReader & Reader, Trb3signalExtractor & Extractor) :
     Config(MasterConfig::getConstInstance()), Reader(Reader), Extractor(Extractor) {}
 
-bool AHldFileProcessor::ProcessFile(const QString FileName, int What_0signals1waves, bool bIncludeTimeData, const QString SaveFileName, bool doNotSaveSuppressedChannels)
+bool AHldFileProcessor::ProcessFile(const QString & FileName, int What_0signals1waves, bool bIncludeTimeData, const QString & SaveFileName, bool doNotSaveSuppressedChannels, bool doLogs)
 {
     if (FileName.isEmpty())
     {
-        emit LogMessage("File name is empty!");
+        if (doLogs) emit LogMessage("File name is empty!");
         LastError = "File name is not defined";
         return false;
     }
-    emit LogAction("Reading file...");
-    emit LogMessage("Processing " + QFileInfo(FileName).fileName());
+
+    if (doLogs)
+    {
+        emit LogAction("Reading file...");
+        emit LogMessage("Processing " + QFileInfo(FileName).fileName());
+    }
     qDebug() << "Processing" <<  FileName;
 
     // Reading waveforms, pefroming optional smoothing/pedestal substraction
     LastError = Reader.Read(FileName);
     if (!LastError.isEmpty())
     {
-        emit LogMessage(LastError);
+        if (doLogs) emit LogMessage(LastError);
         return false;
     }
-    const QString ValRes = Config.Map->ValidateForAvailableHardwareChannels(Reader.CountChannels());
+    QString ValRes = Config.Map->ValidateForAvailableHardwareChannels(Reader.CountChannels());
     if (!ValRes.isEmpty())
     {
-        emit LogMessage(ValRes);
+        if (doLogs) emit LogMessage(ValRes);
         return false;
     }
 
@@ -40,18 +44,18 @@ bool AHldFileProcessor::ProcessFile(const QString FileName, int What_0signals1wa
     Extractor.ClearData();
     if (What_0signals1waves == 0)
     {
-        emit LogAction("Extracting signals...");
+        if (doLogs) emit LogAction("Extracting signals...");
         bool bOK = Extractor.ExtractSignals();
         if (!bOK)
         {
-            emit LogMessage("Signal extraction failed!");
+            if (doLogs) emit LogMessage("Signal extraction failed!");
             LastError = "Signal extraction failed";
             return false;
         }
     }
     else
     {
-        emit LogAction("Generating dummy signals");
+        if (doLogs) emit LogAction("Generating dummy signals");
         //qDebug() << "Generating default data (all signals = 0) in extractor data";
         Extractor.GenerateDummyData();
     }
@@ -61,7 +65,7 @@ bool AHldFileProcessor::ProcessFile(const QString FileName, int What_0signals1wa
     int numChannels = Extractor.CountChannels();
     if (numEvents == 0 || numChannels == 0)
     {
-        emit LogMessage("Extractor data not valid -> ignoring this file");
+        if (doLogs) emit LogMessage("Extractor data not valid -> ignoring this file");
         LastError = "Extractor data not valid -> ignoring this file";
         return false;
     }
@@ -82,7 +86,7 @@ bool AHldFileProcessor::ProcessFile(const QString FileName, int What_0signals1wa
     else nameSave = SaveFileName;
 
     qDebug() << "Saving to file:"<< nameSave;
-    emit LogAction("Saving to file...");
+    if (doLogs) emit LogAction("Saving to file...");
 
     if (What_0signals1waves == 0)
     {
@@ -97,7 +101,7 @@ bool AHldFileProcessor::ProcessFile(const QString FileName, int What_0signals1wa
     else
     {
         QString err = "Unknown option in AHldFileProcessor data processing: What_0signals1waves should be 0 or 1";
-        emit LogMessage(err);
+        if (doLogs) emit LogMessage(err);
         LastError = err;
         return false;
     }

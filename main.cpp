@@ -32,6 +32,7 @@ int main(int argc, char *argv[])
     ScriptHub.registerDispatcher(&Dispatcher);
     ScriptHub.registerReaderModule(&Reader);
     ScriptHub.registerExtractorModule(&Extractor);
+    ScriptHub.registerHldProcessorModule(&HldFileProcessor);
     ScriptHub.createInterfaces();
     ScriptHub.finalizeInit();
 
