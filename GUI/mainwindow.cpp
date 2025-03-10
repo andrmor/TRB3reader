@@ -2486,7 +2486,7 @@ void MainWindow::CreateScriptWindow()
     connect(ScriptHub,  &AScriptHub::outputFromBuffer_JS, JScriptWin, &AScriptWindow::outputFromBuffer, Qt::QueuedConnection);
     connect(ScriptHub,  &AScriptHub::reportProgress_JS,   JScriptWin, &AScriptWindow::onProgressChanged, Qt::QueuedConnection);
     connect(ScriptHub,  &AScriptHub::showAbortMessage_JS, JScriptWin, &AScriptWindow::outputAbortMessage);
-//    connect(JScriptWin, &AScriptWindow::requestUpdateGui, this,       &MainWindow::updateAllGuiFromConfig);
+    connect(JScriptWin, &AScriptWindow::requestUpdateGui, this,       &MainWindow::UpdateGui);
     JScriptWin->updateGui();
 
 #ifdef ANTS3_PYTHON
@@ -2497,10 +2497,9 @@ void MainWindow::CreateScriptWindow()
     connect(ScriptHub,  &AScriptHub::outputText_P,        PythonWin, &AScriptWindow::outputText);
     connect(ScriptHub,  &AScriptHub::outputHtml_P,        PythonWin, &AScriptWindow::outputHtml);
     connect(ScriptHub,  &AScriptHub::outputFromBuffer_P,  PythonWin, &AScriptWindow::outputFromBuffer);
-    connect(ScriptHub,  &AScriptHub::reportProgress_P,    JScriptWin, &AScriptWindow::onProgressChanged);
+    connect(ScriptHub,  &AScriptHub::reportProgress_P,    PythonWin, &AScriptWindow::onProgressChanged);
     connect(ScriptHub,  &AScriptHub::showAbortMessage_P,  PythonWin, &AScriptWindow::outputAbortMessage);
-    connect(PythonWin,  &AScriptWindow::requestUpdateGui, this,      &MainWindow::updateAllGuiFromConfig);
-    connect(GeoTreeWin, &AGeoTreeWin::requestAddPythonScript,   PythonWin, &AScriptWindow::onRequestAddScript);
+    connect(PythonWin,  &AScriptWindow::requestUpdateGui, this,      &MainWindow::UpdateGui);
     PythonWin->updateGui();
 #endif
 

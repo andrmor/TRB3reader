@@ -18,9 +18,9 @@ int main(int argc, char *argv[])
     //SUPPRESS WARNINGS about ssl
     QLoggingCategory::setFilterRules("qt.network.ssl.warning=false");
 
-    Trb3dataReader Reader;
+    Trb3dataReader      Reader;
     Trb3signalExtractor Extractor(&Reader);
-    AHldFileProcessor HldFileProcessor(Reader, Extractor);
+    AHldFileProcessor   HldFileProcessor(Reader, Extractor);
 
 //    !!!***
 //    ANetworkModule Network(&ScriptManager); // !!!***
@@ -29,6 +29,7 @@ int main(int argc, char *argv[])
     ADispatcher Dispatcher(&Reader, &Extractor, &Network);
 
     AScriptHub & ScriptHub = AScriptHub::getInstance();
+    ScriptHub.registerDispatcher(&Dispatcher);
     ScriptHub.registerReaderModule(&Reader);
     ScriptHub.registerExtractorModule(&Extractor);
     ScriptHub.createInterfaces();

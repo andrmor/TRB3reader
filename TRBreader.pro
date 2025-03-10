@@ -47,6 +47,7 @@ SOURCES +=  main.cpp \
             Common/completingtexteditclass.cpp \
             Common/adispatcher.cpp \
             Common/ahldfileprocessor.cpp \
+            Script/ScriptInterfaces/aconfig_si.cpp \
             Script/ScriptInterfaces/ascriptinterface.cpp \
             Script/ScriptInterfaces/acore_si.cpp \
             Script/ScriptInterfaces/amath_si.cpp \
@@ -93,7 +94,6 @@ SOURCES +=  main.cpp \
             TRB/atrbruncontrol.cpp \
             TRB/atrbrunsettings.cpp \
             Script/ainterfacetomessagewindow.cpp \
-            Script/ainterfacetoconfig.cpp \
             Script/ainterfacetowebsocket.cpp \
             Script/awebserverinterface.cpp \
             Net/awebsocketsession.cpp \
@@ -102,7 +102,7 @@ SOURCES +=  main.cpp \
             aservermonitorwindow.cpp \
             GUI/abufferdelegate.cpp
 
-HEADERS  += GUI/mainwindow.h \    
+HEADERS  += GUI/mainwindow.h \
             ROOT/cernrootmodule.h \
             ROOT/GUI/arasterwindow.h \
             ROOT/GUI/agraphwindow.h \
@@ -120,6 +120,7 @@ HEADERS  += GUI/mainwindow.h \
             Common/ahldfileprocessor.h \
             GUI/alineedit.h \
             GUI/guitools.h \
+            Script/ScriptInterfaces/aconfig_si.h \
             Script/ScriptInterfaces/ascriptinterface.h \
             Script/ScriptInterfaces/acore_si.h \
             Script/ScriptInterfaces/amath_si.h \
@@ -162,7 +163,6 @@ HEADERS  += GUI/mainwindow.h \
             TRB/atrbruncontrol.h \
             TRB/atrbrunsettings.h \
             Script/ainterfacetomessagewindow.h \
-            Script/ainterfacetoconfig.h \
             Script/ainterfacetowebsocket.h \
             Script/awebserverinterface.h \
             Net/awebsocketsession.h \
