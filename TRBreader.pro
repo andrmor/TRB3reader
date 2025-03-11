@@ -70,6 +70,8 @@ SOURCES +=  main.cpp \
             Script/ScriptWindow/atabrecord.cpp \
             Script/ScriptWindow/atextedit.cpp \
             Script/ScriptWindow/atextoutputwindow.cpp \
+            Script/ScriptInterfaces/ainterfacetowebsocket.cpp \
+            Script/ScriptInterfaces/awebserverinterface.cpp \
             Script/aguifromscrwin.cpp \
             Script/aguiwindow.cpp \
             Script/ajscriptmanager.cpp \
@@ -93,13 +95,10 @@ SOURCES +=  main.cpp \
             TRB/trb3signalextractor.cpp \
             TRB/atrbruncontrol.cpp \
             TRB/atrbrunsettings.cpp \
-            Script/ainterfacetomessagewindow.cpp \
-            Script/ainterfacetowebsocket.cpp \
-            Script/awebserverinterface.cpp \
             Net/awebsocketsession.cpp \
             Net/awebsocketsessionserver.cpp \
             Net/anetworkmodule.cpp \
-            aservermonitorwindow.cpp \
+            GUI/aservermonitorwindow.cpp \
             GUI/abufferdelegate.cpp
 
 HEADERS  += GUI/mainwindow.h \
@@ -143,6 +142,8 @@ HEADERS  += GUI/mainwindow.h \
             Script/ScriptWindow/atabrecord.h \
             Script/ScriptWindow/atextedit.h \
             Script/ScriptWindow/atextoutputwindow.h \
+            Script/ScriptInterfaces/ainterfacetowebsocket.h \
+            Script/ScriptInterfaces/awebserverinterface.h \
             Script/aguifromscrwin.h \
             Script/aguiwindow.h \
             Script/ajscriptmanager.h \
@@ -162,13 +163,10 @@ HEADERS  += GUI/mainwindow.h \
             TRB/trb3signalextractor.h \
             TRB/atrbruncontrol.h \
             TRB/atrbrunsettings.h \
-            Script/ainterfacetomessagewindow.h \
-            Script/ainterfacetowebsocket.h \
-            Script/awebserverinterface.h \
             Net/awebsocketsession.h \
             Net/awebsocketsessionserver.h \
             Net/anetworkmodule.h \
-            aservermonitorwindow.h \
+            GUI/aservermonitorwindow.h \
             GUI/aeditchannelsdialog.h \
             GUI/abufferdelegate.h
 
@@ -178,7 +176,7 @@ FORMS    += GUI/mainwindow.ui \
             ROOT/GUI/agraphwindow.ui \
             Script/ScriptWindow/ascriptexampleexplorer.ui \
             Script/ScriptWindow/ascriptwindow.ui \
-            aservermonitorwindow.ui
+            GUI/aservermonitorwindow.ui
 
 INCLUDEPATH += Common
 INCLUDEPATH += Script
