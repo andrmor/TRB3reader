@@ -248,12 +248,14 @@ void CernRootModule::showGraphWindow(AGraphWindow * win, bool flag)
 
 void CernRootModule::clearNegGraphVectors()
 {
-    for (TGraph* g : graphsNeg) delete g;  graphsNeg.clear();
+    for (TGraph* g : graphsNeg) delete g;
+    graphsNeg.clear();
 }
 
 void CernRootModule::clearPosGraphVectors()
 {
-    for (TGraph* g : graphsPos) delete g;  graphsPos.clear();
+    for (TGraph* g : graphsPos) delete g;
+    graphsPos.clear();
 }
 
 void CernRootModule::ShowSingleWaveWindow(bool flag)
