@@ -697,7 +697,7 @@ void CernRootModule::Draw2D(bool bNegatives, bool sortByLogical, bool bAutoscale
         {
             int iHwCh = hardwareChannels[i];
             double sig = Extractor->GetSignalFast(iEv, iHwCh);
-            hAll->Fill( (sortByLogical ? i : iHwCh) + 0.001, sig, 1);
+            hAll->Fill( (sortByLogical ? Config.Map->HardwareToLogical(iHwCh) : iHwCh) + 0.001, sig, 1 );
         }
 
     AGraphWindow* & W2D = (bNegatives ? W2DNeg : W2DPos);
