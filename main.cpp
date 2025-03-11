@@ -22,9 +22,7 @@ int main(int argc, char *argv[])
     Trb3signalExtractor Extractor(&Reader);
     AHldFileProcessor   HldFileProcessor(Reader, Extractor);
 
-//    !!!***
-//    ANetworkModule Network(&ScriptManager); // !!!***
-    ANetworkModule Network(nullptr); // !!!***
+    ANetworkModule Network;
 
     ADispatcher Dispatcher(&Reader, &Extractor, &Network);
 

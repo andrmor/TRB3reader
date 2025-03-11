@@ -15,7 +15,7 @@ class ANetworkModule : public QObject
 {
     Q_OBJECT
 public:
-    ANetworkModule(AScriptManager* ScriptManager);
+    ANetworkModule();
     ~ANetworkModule();
 
     AScriptManager* getScriptManager() {return ScriptManager;}

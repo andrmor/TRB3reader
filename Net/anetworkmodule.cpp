@@ -8,13 +8,13 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 
-ANetworkModule::ANetworkModule(AScriptManager *ScriptManager) : ScriptManager(ScriptManager)
+ANetworkModule::ANetworkModule()
 {
     WebSocketServer = new AWebSocketSessionServer();
 
     QObject::connect(WebSocketServer, &AWebSocketSessionServer::textMessageReceived, this, &ANetworkModule::OnWebSocketTextMessageReceived);
-    QObject::connect(WebSocketServer, &AWebSocketSessionServer::reportToGUI, this, &ANetworkModule::ReportTextToGUI);
-    QObject::connect(WebSocketServer, &AWebSocketSessionServer::clientDisconnected, this, &ANetworkModule::OnClientDisconnected);
+    QObject::connect(WebSocketServer, &AWebSocketSessionServer::reportToGUI,         this, &ANetworkModule::ReportTextToGUI);
+    QObject::connect(WebSocketServer, &AWebSocketSessionServer::clientDisconnected,  this, &ANetworkModule::OnClientDisconnected);
 
 }
 
@@ -54,10 +54,34 @@ void ANetworkModule::StopWebSocketServer()
     emit StatusChanged();
 }
 
+#include "ascripthub.h"
+#include "ajscriptmanager.h"
+#include <QVariant>
 void ANetworkModule::OnWebSocketTextMessageReceived(QString message)
 {
     qDebug() << "Websocket server: Message (script) received";
     qDebug() << "  Evaluating as JavaScript";
+
+    AScriptHub & ScriptHub = AScriptHub::getInstance();
+    AJScriptManager & ScriptManager = ScriptHub.getJScriptManager();
+
+    bool ok = ScriptManager.evaluate(message);
+    if (ok)
+    {
+        if ( !WebSocketServer->isReplied() )
+        {
+            QVariant res = ScriptManager.getResult();
+            WebSocketServer->ReplyWithText("{ \"result\" : true, \"evaluation\" : \"" + res.toString() + "\" }");
+        }
+    }
+    else
+    {
+        if (ScriptManager.isError())
+            WebSocketServer->sendError( QString("Script error -> %0 in line %1").arg(ScriptManager.getErrorDescription()).arg(ScriptManager.getErrorLineNumber()) );
+        else if (ScriptManager.isAborted())
+            WebSocketServer->sendError( QString("Script eval aborted") );
+    }
+
 /*
     int line = ScriptManager->FindSyntaxError(message);
     if (line != -1)
