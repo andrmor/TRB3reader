@@ -186,7 +186,7 @@ void MainWindow::on_pbProcessData_clicked()
     //on_pbShowAllPositives_toggled(ui->pbShowAllNegatives->isChecked());
 }
 
-const QString MainWindow::ProcessData()
+QString MainWindow::ProcessData()
 {
     if (Config.FileName.isEmpty()) return "File name not defined!";
 
@@ -1133,7 +1133,7 @@ bool MainWindow::ExtractNumbersFromQString(const QString input, QVector<int> *To
   return true;
 }
 
-const QString MainWindow::PackChannelList(QVector<int> vec)
+QString MainWindow::PackChannelList(QVector<int> vec)
 {
     if (vec.isEmpty()) return "";
 
@@ -1178,7 +1178,7 @@ const QString MainWindow::PackChannelList(QVector<int> vec)
     return out;
 }
 
-const QString MainWindow::PackMappingList(QVector<int> vec)
+QString MainWindow::PackMappingList(QVector<int> vec)
 {
     if (vec.isEmpty()) return "";
 

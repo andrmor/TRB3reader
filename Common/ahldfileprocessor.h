@@ -32,6 +32,7 @@ private:
     bool sendWaveformData(QTextStream &outStream, bool bUseHardware, bool bSaveTimeData, bool doNotSaveSuppressed);
 
     void saveTimeData(int iEvent, QTextStream &outStream);
+
 signals:
     void LogAction(const QString currentAction);
     void LogMessage(const QString message);

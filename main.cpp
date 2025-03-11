@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    //SUPPRESS WARNINGS about ssl
+    //Suppress warnings about ssl
     QLoggingCategory::setFilterRules("qt.network.ssl.warning=false");
 
     Trb3dataReader      Reader;

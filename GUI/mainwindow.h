@@ -174,25 +174,23 @@ private:
     ANetworkModule      & Network;
 
     //owned objects
-    Ui::MainWindow* ui;
-    CernRootModule * RootModule = nullptr;
+    Ui::MainWindow       * ui = nullptr;
+    CernRootModule       * RootModule = nullptr;
     AServerMonitorWindow * ServerWindow = nullptr;
-
-    AGuiFromScrWin * GuiFromScrWin = nullptr;
-    AScriptWindow * JScriptWin = nullptr;
+    AGuiFromScrWin       * GuiFromScrWin = nullptr;
+    AScriptWindow        * JScriptWin = nullptr;
 
     //gui misc
-    bool bStopFlag;
+    bool bStopFlag = false;
     bool bNeverRemindAppendToHub = false;
-    //int  numProcessedEvents;
-    //int  numBadEvents;
 
-    QTimer * watchdogTimer = nullptr;
-    QTimer * aTimer = nullptr;
+    QTimer        * watchdogTimer = nullptr;
+    QTimer        * aTimer = nullptr;
     QElapsedTimer * elTimer = nullptr;
+    QTimer        * timerAutoFreeSpace = nullptr;
+
     bool bLimitMaxEvents = false;
     int MaxEventsToRun = 0;
-    QTimer * timerAutoFreeSpace = nullptr;
     bool bAlreadyStopping = false;
 
 #ifdef TextToSpeechEnabled
@@ -201,7 +199,7 @@ private:
 #endif
 
 private:
-    const QString ProcessData(); //returns error message if any
+    QString ProcessData(); //returns error message if any
     void LogMessage(const QString message);
     bool saveSignalsToFile(const QString FileName, bool bUseHardware);
     bool sendSignalData(QTextStream& outStream, bool bUseHardware = false);
@@ -218,10 +216,9 @@ private:
     void ClearData();
     void CreateScriptWindow();
 
-    const QString PackChannelList(QVector<int> vec);
-    const QString PackMappingList(QVector<int> vec);
+    QString PackChannelList(QVector<int> vec);
+    QString PackMappingList(QVector<int> vec);
     bool ExtractNumbersFromQString(const QString input, QVector<int>* ToAdd);
-    //bool bulkProcessCore();
     void bulkProcessorEnvelope(const QStringList FileNames); // !!!***
     void updateNumEventsIndication();
 
