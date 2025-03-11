@@ -861,7 +861,7 @@ void AScriptWindow::onJsonTWCollapsed(QTreeWidgetItem *item)
 
 void AScriptWindow::updateJsonTree()
 {
-    qDebug() << "updateJsonTree()";
+    //qDebug() << "updateJsonTree()";
 
     ScriptHub.updateJSON();
 
