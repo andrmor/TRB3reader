@@ -20,6 +20,8 @@ public:
 
 public slots:
 
+    void     readFile(QString hldFileName);
+
     int      countSamples() const;
 
     float    getValue(int ievent, int iHardwChannel, int isample);
@@ -51,9 +53,12 @@ public slots:
     int      getSampleWhereFirstBelow(int ievent, int iHardwChannel, int threshold);
     int      getSampleWhereFirstBelowFast(int ievent, int iHardwChannel, int threshold);
 
+    QVariantList getTiming(int ievent);
+
 private:
     MasterConfig   & Config;
-    Trb3dataReader * Reader;
+    Trb3dataReader * Reader = nullptr;
+
 };
 
 #endif // AINTERFACETOWAVEFORMS_H

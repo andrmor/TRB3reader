@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>793</width>
-    <height>833</height>
+    <width>739</width>
+    <height>767</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>TRBreader v4.0.1</string>
+   <string>TRBreader v4.1.0</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -40,7 +40,7 @@
         <item>
          <widget class="QTabWidget" name="tabWidget">
           <property name="currentIndex">
-           <number>0</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="tab_11">
            <attribute name="title">
@@ -52,7 +52,7 @@
               <item>
                <spacer name="horizontalSpacer_10">
                 <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
+                 <enum>Qt::Horizontal</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -73,7 +73,7 @@
                    <string>ADC boards</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignmentFlag::AlignCenter</set>
+                   <set>Qt::AlignCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -137,7 +137,7 @@
               <item>
                <spacer name="horizontalSpacer_11">
                 <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
+                 <enum>Qt::Horizontal</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -158,7 +158,7 @@
                    <string>Timing boards</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignmentFlag::AlignCenter</set>
+                   <set>Qt::AlignCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -222,7 +222,7 @@
               <item>
                <spacer name="horizontalSpacer_59">
                 <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
+                 <enum>Qt::Horizontal</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -237,7 +237,7 @@
             <item>
              <widget class="Line" name="line_4">
               <property name="orientation">
-               <enum>Qt::Orientation::Horizontal</enum>
+               <enum>Qt::Horizontal</enum>
               </property>
              </widget>
             </item>
@@ -295,7 +295,7 @@
                    </size>
                   </property>
                   <property name="contextMenuPolicy">
-                   <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
+                   <enum>Qt::CustomContextMenu</enum>
                   </property>
                   <property name="readOnly">
                    <bool>true</bool>
@@ -314,7 +314,7 @@
               <item>
                <spacer name="horizontalSpacer_42">
                 <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
+                 <enum>Qt::Horizontal</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -367,7 +367,7 @@
               <item>
                <spacer name="horizontalSpacer_43">
                 <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
+                 <enum>Qt::Horizontal</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -382,7 +382,7 @@
             <item>
              <spacer name="verticalSpacer_17">
               <property name="orientation">
-               <enum>Qt::Orientation::Vertical</enum>
+               <enum>Qt::Vertical</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -395,14 +395,14 @@
             <item>
              <widget class="Line" name="line_5">
               <property name="orientation">
-               <enum>Qt::Orientation::Horizontal</enum>
+               <enum>Qt::Horizontal</enum>
               </property>
              </widget>
             </item>
             <item>
              <spacer name="verticalSpacer_19">
               <property name="orientation">
-               <enum>Qt::Orientation::Vertical</enum>
+               <enum>Qt::Vertical</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -456,7 +456,7 @@
                    </size>
                   </property>
                   <property name="contextMenuPolicy">
-                   <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
+                   <enum>Qt::CustomContextMenu</enum>
                   </property>
                   <property name="readOnly">
                    <bool>true</bool>
@@ -475,7 +475,7 @@
               <item>
                <spacer name="horizontalSpacer_44">
                 <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
+                 <enum>Qt::Horizontal</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -528,7 +528,7 @@
               <item>
                <spacer name="horizontalSpacer_45">
                 <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
+                 <enum>Qt::Horizontal</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -543,7 +543,7 @@
             <item>
              <spacer name="verticalSpacer_10">
               <property name="orientation">
-               <enum>Qt::Orientation::Vertical</enum>
+               <enum>Qt::Vertical</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -556,7 +556,7 @@
             <item>
              <spacer name="verticalSpacer_14">
               <property name="orientation">
-               <enum>Qt::Orientation::Vertical</enum>
+               <enum>Qt::Vertical</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -569,14 +569,14 @@
             <item>
              <widget class="Line" name="line_6">
               <property name="orientation">
-               <enum>Qt::Orientation::Horizontal</enum>
+               <enum>Qt::Horizontal</enum>
               </property>
              </widget>
             </item>
             <item>
              <spacer name="verticalSpacer_16">
               <property name="orientation">
-               <enum>Qt::Orientation::Vertical</enum>
+               <enum>Qt::Vertical</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -589,7 +589,7 @@
             <item>
              <widget class="QLabel" name="label_23">
               <property name="text">
-               <string>These channels will be always digitized to zero signal:</string>
+               <string>These hardware channels will be always digitized to zero signal:</string>
               </property>
              </widget>
             </item>
@@ -602,7 +602,7 @@
                </size>
               </property>
               <property name="contextMenuPolicy">
-               <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
+               <enum>Qt::CustomContextMenu</enum>
               </property>
               <property name="readOnly">
                <bool>true</bool>
@@ -614,7 +614,7 @@
               <item>
                <spacer name="horizontalSpacer_46">
                 <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
+                 <enum>Qt::Horizontal</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -644,7 +644,7 @@
               <item>
                <spacer name="horizontalSpacer_47">
                 <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
+                 <enum>Qt::Horizontal</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -678,10 +678,10 @@
                </size>
               </property>
               <property name="frameShape">
-               <enum>QFrame::Shape::Box</enum>
+               <enum>QFrame::Box</enum>
               </property>
               <property name="frameShadow">
-               <enum>QFrame::Shadow::Raised</enum>
+               <enum>QFrame::Raised</enum>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_14">
                <property name="spacing">
@@ -715,189 +715,96 @@
                 </widget>
                </item>
                <item>
-                <widget class="QComboBox" name="cobPedestalExtractionMethod">
-                 <item>
-                  <property name="text">
-                   <string>Average in range from-to</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>From amplitude occurrence peak</string>
-                  </property>
-                 </item>
-                </widget>
-               </item>
-               <item>
-                <widget class="QStackedWidget" name="stackedWidget">
-                 <property name="currentIndex">
-                  <number>0</number>
+                <widget class="QFrame" name="frSubstractPedestals">
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>0</height>
+                  </size>
                  </property>
-                 <widget class="QWidget" name="page">
-                  <layout class="QVBoxLayout" name="verticalLayout_25">
-                   <property name="leftMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="topMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="rightMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="bottomMargin">
-                    <number>0</number>
-                   </property>
-                   <item>
-                    <widget class="QFrame" name="frSmoothing">
-                     <property name="frameShape">
-                      <enum>QFrame::Shape::NoFrame</enum>
-                     </property>
-                     <property name="frameShadow">
-                      <enum>QFrame::Shadow::Raised</enum>
-                     </property>
-                     <layout class="QHBoxLayout" name="horizontalLayout_9">
-                      <property name="leftMargin">
-                       <number>0</number>
-                      </property>
-                      <property name="topMargin">
-                       <number>0</number>
-                      </property>
-                      <property name="rightMargin">
-                       <number>0</number>
-                      </property>
-                      <property name="bottomMargin">
-                       <number>0</number>
-                      </property>
-                      <item>
-                       <widget class="QLabel" name="label_8">
-                        <property name="text">
-                         <string>From sample#</string>
-                        </property>
-                        <property name="alignment">
-                         <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QSpinBox" name="sbPedestalFrom">
-                        <property name="maximum">
-                         <number>100000</number>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QLabel" name="label_9">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <property name="text">
-                         <string>to #</string>
-                        </property>
-                        <property name="alignment">
-                         <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <widget class="QSpinBox" name="sbPedestalTo">
-                        <property name="maximum">
-                         <number>100000</number>
-                        </property>
-                        <property name="value">
-                         <number>5</number>
-                        </property>
-                       </widget>
-                      </item>
-                      <item>
-                       <spacer name="horizontalSpacer_35">
-                        <property name="orientation">
-                         <enum>Qt::Orientation::Horizontal</enum>
-                        </property>
-                        <property name="sizeHint" stdset="0">
-                         <size>
-                          <width>40</width>
-                          <height>20</height>
-                         </size>
-                        </property>
-                       </spacer>
-                      </item>
-                     </layout>
-                    </widget>
-                   </item>
-                  </layout>
-                 </widget>
-                 <widget class="QWidget" name="page_2">
-                  <layout class="QHBoxLayout" name="horizontalLayout_46">
-                   <property name="leftMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="topMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="rightMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="bottomMargin">
-                    <number>0</number>
-                   </property>
-                   <item>
-                    <widget class="QLabel" name="label_41">
-                     <property name="text">
-                      <string>Sigma:</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLineEdit" name="ledPedestalPeakSigma">
-                     <property name="maximumSize">
-                      <size>
-                       <width>75</width>
-                       <height>16777215</height>
-                      </size>
-                     </property>
-                     <property name="text">
-                      <string>3</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLabel" name="label_42">
-                     <property name="text">
-                      <string>Threshold:</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLineEdit" name="ledPedestalPeakThreshold">
-                     <property name="maximumSize">
-                      <size>
-                       <width>75</width>
-                       <height>16777215</height>
-                      </size>
-                     </property>
-                     <property name="text">
-                      <string>0.5</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <spacer name="horizontalSpacer_9">
-                     <property name="orientation">
-                      <enum>Qt::Orientation::Horizontal</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>40</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
-                  </layout>
-                 </widget>
+                 <property name="frameShape">
+                  <enum>QFrame::NoFrame</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Raised</enum>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_40">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="label_8">
+                    <property name="text">
+                     <string>Average in range from sample#</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QSpinBox" name="sbPedestalFrom">
+                    <property name="maximum">
+                     <number>100000</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_9">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string>to #</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QSpinBox" name="sbPedestalTo">
+                    <property name="maximum">
+                     <number>100000</number>
+                    </property>
+                    <property name="value">
+                     <number>5</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_41">
+                    <property name="text">
+                     <string>(inclusive)</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_35">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>301</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
                 </widget>
                </item>
               </layout>
@@ -906,7 +813,7 @@
             <item>
              <spacer name="verticalSpacer_12">
               <property name="orientation">
-               <enum>Qt::Orientation::Vertical</enum>
+               <enum>Qt::Vertical</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -918,11 +825,23 @@
             </item>
             <item>
              <widget class="QFrame" name="gbSmoothing">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="sizeIncrement">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
               <property name="frameShape">
-               <enum>QFrame::Shape::Box</enum>
+               <enum>QFrame::Box</enum>
               </property>
               <property name="frameShadow">
-               <enum>QFrame::Shadow::Raised</enum>
+               <enum>QFrame::Raised</enum>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_8">
                <property name="spacing">
@@ -987,9 +906,9 @@
                   </size>
                  </property>
                  <property name="frameShape">
-                  <enum>QFrame::Shape::NoFrame</enum>
+                  <enum>QFrame::NoFrame</enum>
                  </property>
-                 <layout class="QVBoxLayout" name="verticalLayout_9">
+                 <layout class="QHBoxLayout" name="horizontalLayout_2">
                   <property name="leftMargin">
                    <number>0</number>
                   </property>
@@ -1003,128 +922,147 @@
                    <number>0</number>
                   </property>
                   <item>
-                   <layout class="QHBoxLayout" name="horizontalLayout_2">
-                    <item>
-                     <widget class="QCheckBox" name="cbAdjacentAveraging">
-                      <property name="text">
-                       <string>Adjacent averaging</string>
-                      </property>
-                      <property name="checked">
-                       <bool>true</bool>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QLabel" name="label_5">
-                      <property name="text">
-                       <string>Points (each dir):</string>
-                      </property>
-                      <property name="alignment">
-                       <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QSpinBox" name="sbAdjAvPoints">
-                      <property name="minimum">
-                       <number>1</number>
-                      </property>
-                      <property name="maximum">
-                       <number>1000000</number>
-                      </property>
-                      <property name="value">
-                       <number>5</number>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QCheckBox" name="cbAdjAvWeighted">
-                      <property name="toolTip">
-                       <string>Weight is proportional to the reciprocal square of the offset distance from the center</string>
-                      </property>
-                      <property name="text">
-                       <string>Weighted</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <spacer name="horizontalSpacer_19">
-                      <property name="orientation">
-                       <enum>Qt::Orientation::Horizontal</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>40</width>
-                        <height>20</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
-                   </layout>
+                   <widget class="QCheckBox" name="cbAdjacentAveraging">
+                    <property name="text">
+                     <string>Adjacent averaging</string>
+                    </property>
+                    <property name="checked">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_5">
+                    <property name="text">
+                     <string>Points (each direction):</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QSpinBox" name="sbAdjAvPoints">
+                    <property name="minimum">
+                     <number>1</number>
+                    </property>
+                    <property name="maximum">
+                     <number>1000000</number>
+                    </property>
+                    <property name="value">
+                     <number>5</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QCheckBox" name="cbAdjAvWeighted">
+                    <property name="toolTip">
+                     <string>Weight is proportional to the reciprocal square of the offset distance from the center</string>
+                    </property>
+                    <property name="text">
+                     <string>Weighted</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_19">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>211</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
                   </item>
                  </layout>
                 </widget>
                </item>
                <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_67">
-                 <property name="topMargin">
-                  <number>0</number>
+                <widget class="QFrame" name="frTrapezoidal">
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>0</height>
+                  </size>
                  </property>
-                 <item>
-                  <widget class="QCheckBox" name="cbTrapezoidal">
-                   <property name="text">
-                    <string>Apply trapezoidal filter</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QLabel" name="label_73">
-                   <property name="text">
-                    <string>    L =</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QSpinBox" name="sbTrapezoidalL">
-                   <property name="minimum">
-                    <number>1</number>
-                   </property>
-                   <property name="maximum">
-                    <number>9999</number>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QLabel" name="label_74">
-                   <property name="text">
-                    <string>   G =</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QSpinBox" name="sbTrapezoidalG">
-                   <property name="minimum">
-                    <number>1</number>
-                   </property>
-                   <property name="maximum">
-                    <number>9999</number>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <spacer name="horizontalSpacer_48">
-                   <property name="orientation">
-                    <enum>Qt::Orientation::Horizontal</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>40</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                </layout>
+                 <property name="frameShape">
+                  <enum>QFrame::NoFrame</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Raised</enum>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_41">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QCheckBox" name="cbTrapezoidal">
+                    <property name="text">
+                     <string>Apply trapezoidal filter</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_73">
+                    <property name="text">
+                     <string>    L =</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QSpinBox" name="sbTrapezoidalL">
+                    <property name="minimum">
+                     <number>1</number>
+                    </property>
+                    <property name="maximum">
+                     <number>9999</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_74">
+                    <property name="text">
+                     <string>   G =</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QSpinBox" name="sbTrapezoidalG">
+                    <property name="minimum">
+                     <number>1</number>
+                    </property>
+                    <property name="maximum">
+                     <number>9999</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_48">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>322</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </widget>
                </item>
               </layout>
              </widget>
@@ -1132,7 +1070,7 @@
             <item>
              <spacer name="verticalSpacer_13">
               <property name="orientation">
-               <enum>Qt::Orientation::Vertical</enum>
+               <enum>Qt::Vertical</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -1195,10 +1133,10 @@
                  </size>
                 </property>
                 <property name="frameShape">
-                 <enum>QFrame::Shape::NoFrame</enum>
+                 <enum>QFrame::NoFrame</enum>
                 </property>
                 <property name="frameShadow">
-                 <enum>QFrame::Shadow::Raised</enum>
+                 <enum>QFrame::Raised</enum>
                 </property>
                 <layout class="QHBoxLayout" name="horizontalLayout_15">
                  <property name="leftMargin">
@@ -1277,7 +1215,7 @@
             <item>
              <spacer name="verticalSpacer_15">
               <property name="orientation">
-               <enum>Qt::Orientation::Vertical</enum>
+               <enum>Qt::Vertical</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -1302,10 +1240,10 @@
             <item>
              <widget class="QFrame" name="gbSignalRejection">
               <property name="frameShape">
-               <enum>QFrame::Shape::Box</enum>
+               <enum>QFrame::Box</enum>
               </property>
               <property name="frameShadow">
-               <enum>QFrame::Shadow::Raised</enum>
+               <enum>QFrame::Raised</enum>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_7">
                <property name="spacing">
@@ -1370,7 +1308,7 @@
                  <item>
                   <spacer name="horizontalSpacer_8">
                    <property name="orientation">
-                    <enum>Qt::Orientation::Horizontal</enum>
+                    <enum>Qt::Horizontal</enum>
                    </property>
                    <property name="sizeHint" stdset="0">
                     <size>
@@ -1437,7 +1375,7 @@
                  <item>
                   <spacer name="horizontalSpacer_49">
                    <property name="orientation">
-                    <enum>Qt::Orientation::Horizontal</enum>
+                    <enum>Qt::Horizontal</enum>
                    </property>
                    <property name="sizeHint" stdset="0">
                     <size>
@@ -1504,7 +1442,7 @@
                  <item>
                   <spacer name="horizontalSpacer_50">
                    <property name="orientation">
-                    <enum>Qt::Orientation::Horizontal</enum>
+                    <enum>Qt::Horizontal</enum>
                    </property>
                    <property name="sizeHint" stdset="0">
                     <size>
@@ -1549,7 +1487,7 @@
                     </size>
                    </property>
                    <property name="text">
-                    <string>Signal never reaches            </string>
+                    <string>Peak value is less than</string>
                    </property>
                   </widget>
                  </item>
@@ -1575,7 +1513,7 @@
                  <item>
                   <spacer name="horizontalSpacer_29">
                    <property name="orientation">
-                    <enum>Qt::Orientation::Horizontal</enum>
+                    <enum>Qt::Horizontal</enum>
                    </property>
                    <property name="sizeHint" stdset="0">
                     <size>
@@ -1620,7 +1558,7 @@
                     </size>
                    </property>
                    <property name="text">
-                    <string>Inverse signal never reaches</string>
+                    <string>Inverse peak value is less than</string>
                    </property>
                   </widget>
                  </item>
@@ -1646,7 +1584,7 @@
                  <item>
                   <spacer name="horizontalSpacer_30">
                    <property name="orientation">
-                    <enum>Qt::Orientation::Horizontal</enum>
+                    <enum>Qt::Horizontal</enum>
                    </property>
                    <property name="sizeHint" stdset="0">
                     <size>
@@ -1664,7 +1602,7 @@
             <item>
              <spacer name="verticalSpacer_18">
               <property name="orientation">
-               <enum>Qt::Orientation::Vertical</enum>
+               <enum>Qt::Vertical</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -1682,17 +1620,17 @@
                </font>
               </property>
               <property name="text">
-               <string>Ignore event if:</string>
+               <string>Ignore event during signal extraction if:</string>
               </property>
              </widget>
             </item>
             <item>
              <widget class="QFrame" name="frame">
               <property name="frameShape">
-               <enum>QFrame::Shape::Box</enum>
+               <enum>QFrame::Box</enum>
               </property>
               <property name="frameShadow">
-               <enum>QFrame::Shadow::Raised</enum>
+               <enum>QFrame::Raised</enum>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_17">
                <property name="spacing">
@@ -1735,7 +1673,7 @@
                      <item>
                       <widget class="QCheckBox" name="cbIgnorePosThreshold">
                        <property name="text">
-                        <string>Any waveform signal exceeds             </string>
+                        <string>Any waveform sample exceeds             </string>
                        </property>
                       </widget>
                      </item>
@@ -1761,7 +1699,7 @@
                      <item>
                       <spacer name="horizontalSpacer_31">
                        <property name="orientation">
-                        <enum>Qt::Orientation::Horizontal</enum>
+                        <enum>Qt::Horizontal</enum>
                        </property>
                        <property name="sizeHint" stdset="0">
                         <size>
@@ -1778,7 +1716,7 @@
                      <item>
                       <widget class="QCheckBox" name="cbPosMaxSignalGate">
                        <property name="text">
-                        <string>Max signal is in sample# &lt;</string>
+                        <string>Max amplitude is in sample# &lt;</string>
                        </property>
                       </widget>
                      </item>
@@ -1815,7 +1753,7 @@
                      <item>
                       <spacer name="horizontalSpacer_32">
                        <property name="orientation">
-                        <enum>Qt::Orientation::Horizontal</enum>
+                        <enum>Qt::Horizontal</enum>
                        </property>
                        <property name="sizeHint" stdset="0">
                         <size>
@@ -1834,7 +1772,7 @@
                <item>
                 <widget class="Line" name="line_2">
                  <property name="orientation">
-                  <enum>Qt::Orientation::Horizontal</enum>
+                  <enum>Qt::Horizontal</enum>
                  </property>
                 </widget>
                </item>
@@ -1863,7 +1801,7 @@
                      <item>
                       <widget class="QCheckBox" name="cbIgnoreNegThreshold">
                        <property name="text">
-                        <string>Any waveform inverse signal exceeds</string>
+                        <string>Any waveform inverse sample exceeds</string>
                        </property>
                       </widget>
                      </item>
@@ -1889,7 +1827,7 @@
                      <item>
                       <spacer name="horizontalSpacer_33">
                        <property name="orientation">
-                        <enum>Qt::Orientation::Horizontal</enum>
+                        <enum>Qt::Horizontal</enum>
                        </property>
                        <property name="sizeHint" stdset="0">
                         <size>
@@ -1906,7 +1844,7 @@
                      <item>
                       <widget class="QCheckBox" name="cbNegMaxSignalGate">
                        <property name="text">
-                        <string>Max signal is in sample# &lt;</string>
+                        <string>Max amplitude is in sample# &lt;</string>
                        </property>
                       </widget>
                      </item>
@@ -1937,7 +1875,7 @@
                      <item>
                       <spacer name="horizontalSpacer_34">
                        <property name="orientation">
-                        <enum>Qt::Orientation::Horizontal</enum>
+                        <enum>Qt::Horizontal</enum>
                        </property>
                        <property name="sizeHint" stdset="0">
                         <size>
@@ -1959,7 +1897,7 @@
             <item>
              <spacer name="verticalSpacer_11">
               <property name="orientation">
-               <enum>Qt::Orientation::Vertical</enum>
+               <enum>Qt::Vertical</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -1979,7 +1917,10 @@
             <item>
              <spacer name="verticalSpacer_28">
               <property name="orientation">
-               <enum>Qt::Orientation::Vertical</enum>
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -1992,10 +1933,10 @@
             <item>
              <widget class="QFrame" name="frame_2">
               <property name="frameShape">
-               <enum>QFrame::Shape::StyledPanel</enum>
+               <enum>QFrame::StyledPanel</enum>
               </property>
               <property name="frameShadow">
-               <enum>QFrame::Shadow::Raised</enum>
+               <enum>QFrame::Raised</enum>
               </property>
               <layout class="QHBoxLayout" name="horizontalLayout_47">
                <item>
@@ -2038,7 +1979,10 @@
             <item>
              <spacer name="verticalSpacer_27">
               <property name="orientation">
-               <enum>Qt::Orientation::Vertical</enum>
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -2110,7 +2054,7 @@
             <item>
              <spacer name="verticalSpacer_26">
               <property name="orientation">
-               <enum>Qt::Orientation::Vertical</enum>
+               <enum>Qt::Vertical</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -2162,7 +2106,7 @@
                 <item>
                  <spacer name="verticalSpacer_21">
                   <property name="orientation">
-                   <enum>Qt::Orientation::Vertical</enum>
+                   <enum>Qt::Vertical</enum>
                   </property>
                   <property name="sizeHint" stdset="0">
                    <size>
@@ -2210,7 +2154,7 @@
             <item>
              <spacer name="verticalSpacer_32">
               <property name="orientation">
-               <enum>Qt::Orientation::Vertical</enum>
+               <enum>Qt::Vertical</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -2226,7 +2170,7 @@
                <string>Export current buffer config</string>
               </property>
               <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignCenter</set>
+               <set>Qt::AlignCenter</set>
               </property>
              </widget>
             </item>
@@ -2238,7 +2182,7 @@
               <item>
                <spacer name="horizontalSpacer_24">
                 <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
+                 <enum>Qt::Horizontal</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -2267,7 +2211,7 @@
               <item>
                <spacer name="horizontalSpacer_25">
                 <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
+                 <enum>Qt::Horizontal</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -2282,7 +2226,7 @@
             <item>
              <spacer name="verticalSpacer_33">
               <property name="orientation">
-               <enum>Qt::Orientation::Vertical</enum>
+               <enum>Qt::Vertical</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -2298,7 +2242,7 @@
                <string>Warning! Will override current buffer config</string>
               </property>
               <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignCenter</set>
+               <set>Qt::AlignCenter</set>
               </property>
              </widget>
             </item>
@@ -2310,7 +2254,7 @@
               <item>
                <spacer name="horizontalSpacer_26">
                 <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
+                 <enum>Qt::Horizontal</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -2336,7 +2280,7 @@
               <item>
                <spacer name="horizontalSpacer_28">
                 <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
+                 <enum>Qt::Horizontal</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -2372,7 +2316,7 @@
                 <item>
                  <widget class="Line" name="line_13">
                   <property name="orientation">
-                   <enum>Qt::Orientation::Horizontal</enum>
+                   <enum>Qt::Horizontal</enum>
                   </property>
                  </widget>
                 </item>
@@ -2435,7 +2379,7 @@
                 <item>
                  <spacer name="verticalSpacer_20">
                   <property name="orientation">
-                   <enum>Qt::Orientation::Vertical</enum>
+                   <enum>Qt::Vertical</enum>
                   </property>
                   <property name="sizeHint" stdset="0">
                    <size>
@@ -2450,7 +2394,7 @@
               <item>
                <widget class="Line" name="line_12">
                 <property name="orientation">
-                 <enum>Qt::Orientation::Vertical</enum>
+                 <enum>Qt::Vertical</enum>
                 </property>
                </widget>
               </item>
@@ -2462,14 +2406,14 @@
                    <string>Periphery FPGA</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignmentFlag::AlignCenter</set>
+                   <set>Qt::AlignCenter</set>
                   </property>
                  </widget>
                 </item>
                 <item>
                  <widget class="Line" name="line_16">
                   <property name="orientation">
-                   <enum>Qt::Orientation::Horizontal</enum>
+                   <enum>Qt::Horizontal</enum>
                   </property>
                  </widget>
                 </item>
@@ -2495,7 +2439,7 @@
                   <item>
                    <spacer name="horizontalSpacer_53">
                     <property name="orientation">
-                     <enum>Qt::Orientation::Horizontal</enum>
+                     <enum>Qt::Horizontal</enum>
                     </property>
                     <property name="sizeHint" stdset="0">
                      <size>
@@ -2612,7 +2556,7 @@
                        <string>from FPGA 3</string>
                       </property>
                       <property name="alignment">
-                       <set>Qt::AlignmentFlag::AlignCenter</set>
+                       <set>Qt::AlignCenter</set>
                       </property>
                      </widget>
                     </item>
@@ -2743,7 +2687,7 @@
                        <string>from FPGA 4</string>
                       </property>
                       <property name="alignment">
-                       <set>Qt::AlignmentFlag::AlignCenter</set>
+                       <set>Qt::AlignCenter</set>
                       </property>
                      </widget>
                     </item>
@@ -2956,7 +2900,7 @@
                 <item>
                  <spacer name="verticalSpacer_31">
                   <property name="orientation">
-                   <enum>Qt::Orientation::Vertical</enum>
+                   <enum>Qt::Vertical</enum>
                   </property>
                   <property name="sizeHint" stdset="0">
                    <size>
@@ -2972,14 +2916,14 @@
                    <string>Pulsers</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignmentFlag::AlignCenter</set>
+                   <set>Qt::AlignCenter</set>
                   </property>
                  </widget>
                 </item>
                 <item>
                  <widget class="Line" name="line_14">
                   <property name="orientation">
-                   <enum>Qt::Orientation::Horizontal</enum>
+                   <enum>Qt::Horizontal</enum>
                   </property>
                  </widget>
                 </item>
@@ -3059,7 +3003,7 @@
                 <item>
                  <spacer name="verticalSpacer_22">
                   <property name="orientation">
-                   <enum>Qt::Orientation::Vertical</enum>
+                   <enum>Qt::Vertical</enum>
                   </property>
                   <property name="sizeHint" stdset="0">
                    <size>
@@ -3108,7 +3052,7 @@
                   <item>
                    <spacer name="horizontalSpacer_60">
                     <property name="orientation">
-                     <enum>Qt::Orientation::Horizontal</enum>
+                     <enum>Qt::Horizontal</enum>
                     </property>
                     <property name="sizeHint" stdset="0">
                      <size>
@@ -3125,7 +3069,7 @@
               <item>
                <widget class="Line" name="line_9">
                 <property name="orientation">
-                 <enum>Qt::Orientation::Vertical</enum>
+                 <enum>Qt::Vertical</enum>
                 </property>
                </widget>
               </item>
@@ -3155,7 +3099,7 @@
             <item>
              <widget class="Line" name="line_10">
               <property name="orientation">
-               <enum>Qt::Orientation::Horizontal</enum>
+               <enum>Qt::Horizontal</enum>
               </property>
              </widget>
             </item>
@@ -3167,7 +3111,7 @@
               <item>
                <spacer name="horizontalSpacer_12">
                 <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
+                 <enum>Qt::Horizontal</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -3208,7 +3152,7 @@
               <item>
                <spacer name="horizontalSpacer_18">
                 <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
+                 <enum>Qt::Horizontal</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -3230,7 +3174,7 @@
             <item>
              <spacer name="verticalSpacer_30">
               <property name="orientation">
-               <enum>Qt::Orientation::Vertical</enum>
+               <enum>Qt::Vertical</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -3246,7 +3190,7 @@
                <string>Export current trigger config</string>
               </property>
               <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignCenter</set>
+               <set>Qt::AlignCenter</set>
               </property>
              </widget>
             </item>
@@ -3255,7 +3199,7 @@
               <item>
                <spacer name="horizontalSpacer_22">
                 <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
+                 <enum>Qt::Horizontal</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -3284,7 +3228,7 @@
               <item>
                <spacer name="horizontalSpacer_17">
                 <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
+                 <enum>Qt::Horizontal</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -3299,7 +3243,7 @@
             <item>
              <spacer name="verticalSpacer_29">
               <property name="orientation">
-               <enum>Qt::Orientation::Vertical</enum>
+               <enum>Qt::Vertical</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -3315,7 +3259,7 @@
                <string>Warning! Will override current trigger config</string>
               </property>
               <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignCenter</set>
+               <set>Qt::AlignCenter</set>
               </property>
              </widget>
             </item>
@@ -3324,7 +3268,7 @@
               <item>
                <spacer name="horizontalSpacer_20">
                 <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
+                 <enum>Qt::Horizontal</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -3350,7 +3294,7 @@
               <item>
                <spacer name="horizontalSpacer_21">
                 <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
+                 <enum>Qt::Horizontal</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -3395,24 +3339,30 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QCheckBox" name="cbTimeEnable_FPGA3">
-                  <property name="text">
-                   <string>Enable</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
                  <widget class="QLineEdit" name="leTimeChannelsFPGA3"/>
                 </item>
                 <item>
                  <widget class="Line" name="line_19">
                   <property name="orientation">
-                   <enum>Qt::Orientation::Horizontal</enum>
+                   <enum>Qt::Horizontal</enum>
                   </property>
                  </widget>
                 </item>
                 <item>
                  <layout class="QGridLayout" name="gridLayout_3">
+                  <item row="0" column="2">
+                   <widget class="QLineEdit" name="ledTimeWinBefore_FPGA3"/>
+                  </item>
+                  <item row="1" column="2">
+                   <widget class="QLineEdit" name="ledTimeWinAfter_FPGA3"/>
+                  </item>
+                  <item row="0" column="0" rowspan="2">
+                   <widget class="QLabel" name="label_106">
+                    <property name="text">
+                     <string>Windows</string>
+                    </property>
+                   </widget>
+                  </item>
                   <item row="0" column="1">
                    <widget class="QLabel" name="label_105">
                     <property name="text">
@@ -3420,11 +3370,12 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="1" column="2">
-                   <widget class="QLineEdit" name="ledTimeWinAfter_FPGA3"/>
-                  </item>
-                  <item row="0" column="2">
-                   <widget class="QLineEdit" name="ledTimeWinBefore_FPGA3"/>
+                  <item row="0" column="3">
+                   <widget class="QLabel" name="label_107">
+                    <property name="text">
+                     <string>ns</string>
+                    </property>
+                   </widget>
                   </item>
                   <item row="1" column="1">
                    <widget class="QLabel" name="label_109">
@@ -3440,21 +3391,14 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="0" column="3">
-                   <widget class="QLabel" name="label_107">
-                    <property name="text">
-                     <string>ns</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="0" rowspan="2">
-                   <widget class="QLabel" name="label_106">
-                    <property name="text">
-                     <string>Windows</string>
-                    </property>
-                   </widget>
-                  </item>
                  </layout>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="cbTimeEnable_FPGA3">
+                  <property name="text">
+                   <string>Enable flag (does not switch off!)</string>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </item>
@@ -3468,19 +3412,12 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QCheckBox" name="cbTimeEnable_FPGA4">
-                  <property name="text">
-                   <string>Enable</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
                  <widget class="QLineEdit" name="leTimeChannelsFPGA4"/>
                 </item>
                 <item>
                  <widget class="Line" name="line_20">
                   <property name="orientation">
-                   <enum>Qt::Orientation::Horizontal</enum>
+                   <enum>Qt::Horizontal</enum>
                   </property>
                  </widget>
                 </item>
@@ -3533,12 +3470,19 @@
                   </item>
                  </layout>
                 </item>
+                <item>
+                 <widget class="QCheckBox" name="cbTimeEnable_FPGA4">
+                  <property name="text">
+                   <string>Enable flag (does not switch off!)</string>
+                  </property>
+                 </widget>
+                </item>
                </layout>
               </item>
               <item>
                <widget class="Line" name="line_21">
                 <property name="orientation">
-                 <enum>Qt::Orientation::Vertical</enum>
+                 <enum>Qt::Vertical</enum>
                 </property>
                </widget>
               </item>
@@ -3565,7 +3509,7 @@
             <item>
              <spacer name="verticalSpacer_36">
               <property name="orientation">
-               <enum>Qt::Orientation::Vertical</enum>
+               <enum>Qt::Vertical</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -3581,7 +3525,7 @@
                <string>Warning! Will override current trigger config</string>
               </property>
               <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignCenter</set>
+               <set>Qt::AlignCenter</set>
               </property>
              </widget>
             </item>
@@ -3590,7 +3534,7 @@
               <item>
                <spacer name="horizontalSpacer_54">
                 <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
+                 <enum>Qt::Horizontal</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -3616,7 +3560,7 @@
               <item>
                <spacer name="horizontalSpacer_55">
                 <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
+                 <enum>Qt::Horizontal</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -3631,7 +3575,7 @@
             <item>
              <spacer name="verticalSpacer_37">
               <property name="orientation">
-               <enum>Qt::Orientation::Vertical</enum>
+               <enum>Qt::Vertical</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -3661,10 +3605,10 @@
             <item>
              <widget class="QFrame" name="frame_3">
               <property name="frameShape">
-               <enum>QFrame::Shape::StyledPanel</enum>
+               <enum>QFrame::StyledPanel</enum>
               </property>
               <property name="frameShadow">
-               <enum>QFrame::Shadow::Raised</enum>
+               <enum>QFrame::Raised</enum>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_52">
                <item>
@@ -3690,7 +3634,7 @@
                      <item>
                       <spacer name="horizontalSpacer_56">
                        <property name="orientation">
-                        <enum>Qt::Orientation::Horizontal</enum>
+                        <enum>Qt::Horizontal</enum>
                        </property>
                        <property name="sizeHint" stdset="0">
                         <size>
@@ -3736,10 +3680,10 @@
                    <item>
                     <widget class="QFrame" name="frame_4">
                      <property name="frameShape">
-                      <enum>QFrame::Shape::StyledPanel</enum>
+                      <enum>QFrame::StyledPanel</enum>
                      </property>
                      <property name="frameShadow">
-                      <enum>QFrame::Shadow::Raised</enum>
+                      <enum>QFrame::Raised</enum>
                      </property>
                      <layout class="QVBoxLayout" name="vlTriggerBoard">
                       <item>
@@ -3757,7 +3701,7 @@
                  <item>
                   <widget class="Line" name="line_22">
                    <property name="orientation">
-                    <enum>Qt::Orientation::Vertical</enum>
+                    <enum>Qt::Vertical</enum>
                    </property>
                   </widget>
                  </item>
@@ -3787,7 +3731,7 @@
             <item>
              <spacer name="verticalSpacer_38">
               <property name="orientation">
-               <enum>Qt::Orientation::Vertical</enum>
+               <enum>Qt::Vertical</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -3823,7 +3767,7 @@
           <item>
            <spacer name="horizontalSpacer_23">
             <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
+             <enum>Qt::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -3877,14 +3821,14 @@
                <string>Not connected</string>
               </property>
               <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignCenter</set>
+               <set>Qt::AlignCenter</set>
               </property>
              </widget>
             </item>
             <item>
              <spacer name="verticalSpacer_25">
               <property name="orientation">
-               <enum>Qt::Orientation::Vertical</enum>
+               <enum>Qt::Vertical</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -3904,7 +3848,7 @@
             <item>
              <spacer name="verticalSpacer_24">
               <property name="orientation">
-               <enum>Qt::Orientation::Vertical</enum>
+               <enum>Qt::Vertical</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -3959,7 +3903,7 @@
         <item>
          <widget class="Line" name="line_7">
           <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
+           <enum>Qt::Horizontal</enum>
           </property>
          </widget>
         </item>
@@ -3975,7 +3919,10 @@
           <item>
            <widget class="QLineEdit" name="leFolderForHldFiles">
             <property name="contextMenuPolicy">
-             <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
+             <enum>Qt::CustomContextMenu</enum>
+            </property>
+            <property name="toolTip">
+             <string>This is the directory at the storage computer. If the storage computer is the same as the one running TRBreader, one can use right-click to select the directory</string>
             </property>
             <property name="text">
              <string>/media/externalDrive/hlds/</string>
@@ -4110,7 +4057,7 @@
           <item>
            <widget class="Line" name="line_3">
             <property name="orientation">
-             <enum>Qt::Orientation::Vertical</enum>
+             <enum>Qt::Vertical</enum>
             </property>
            </widget>
           </item>
@@ -4124,7 +4071,7 @@
                  <string>Elapsed time:</string>
                 </property>
                 <property name="alignment">
-                 <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                 </property>
                </widget>
               </item>
@@ -4134,7 +4081,7 @@
                  <string>Events:</string>
                 </property>
                 <property name="alignment">
-                 <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                 </property>
                </widget>
               </item>
@@ -4144,7 +4091,7 @@
                  <string>Current rate:</string>
                 </property>
                 <property name="alignment">
-                 <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                 </property>
                </widget>
               </item>
@@ -4154,7 +4101,7 @@
                  <string>Data:</string>
                 </property>
                 <property name="alignment">
-                 <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                 </property>
                </widget>
               </item>
@@ -4239,7 +4186,7 @@
         <item>
          <widget class="Line" name="line_15">
           <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
+           <enum>Qt::Horizontal</enum>
           </property>
          </widget>
         </item>
@@ -4268,7 +4215,7 @@
           <item>
            <widget class="QCheckBox" name="cbTellMeRate">
             <property name="contextMenuPolicy">
-             <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
+             <enum>Qt::CustomContextMenu</enum>
             </property>
             <property name="toolTip">
              <string>Use voice module to tell the rate
@@ -4282,7 +4229,7 @@ Right-click to set the averaging time</string>
           <item>
            <spacer name="horizontalSpacer_36">
             <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
+             <enum>Qt::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -4326,93 +4273,12 @@ Right-click to set the averaging time</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_19">
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_43">
-          <item>
-           <widget class="QLabel" name="label_37">
-            <property name="text">
-             <string>Events from:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QComboBox" name="cobExplorerSource">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>25</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <bold>true</bold>
-             </font>
-            </property>
-            <item>
-             <property name="text">
-              <string>Directly from file</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>From DataHub</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_38">
-            <property name="text">
-             <string>Events available:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="leNumEvents">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>100</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="readOnly">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_41">
-            <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </item>
-        <item>
          <widget class="QFrame" name="frExploreDirectly">
           <property name="frameShape">
-           <enum>QFrame::Shape::NoFrame</enum>
+           <enum>QFrame::NoFrame</enum>
           </property>
           <property name="frameShadow">
-           <enum>QFrame::Shadow::Raised</enum>
+           <enum>QFrame::Raised</enum>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_10">
            <property name="spacing">
@@ -4438,7 +4304,7 @@ Right-click to set the averaging time</string>
                 <string/>
                </property>
                <property name="alignment">
-                <set>Qt::AlignmentFlag::AlignCenter</set>
+                <set>Qt::AlignCenter</set>
                </property>
               </widget>
              </item>
@@ -4475,7 +4341,7 @@ Right-click to set the averaging time</string>
              <item>
               <widget class="Line" name="line_11">
                <property name="orientation">
-                <enum>Qt::Orientation::Vertical</enum>
+                <enum>Qt::Vertical</enum>
                </property>
               </widget>
              </item>
@@ -4496,7 +4362,7 @@ Right-click to set the averaging time</string>
              <item>
               <spacer name="horizontalSpacer_37">
                <property name="orientation">
-                <enum>Qt::Orientation::Horizontal</enum>
+                <enum>Qt::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
@@ -4551,7 +4417,7 @@ Right-click to set the averaging time</string>
              <item>
               <spacer name="horizontalSpacer_38">
                <property name="orientation">
-                <enum>Qt::Orientation::Horizontal</enum>
+                <enum>Qt::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
@@ -4569,7 +4435,7 @@ Right-click to set the averaging time</string>
         <item>
          <spacer name="verticalSpacer">
           <property name="orientation">
-           <enum>Qt::Orientation::Vertical</enum>
+           <enum>Qt::Vertical</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -4582,14 +4448,14 @@ Right-click to set the averaging time</string>
         <item>
          <widget class="Line" name="line">
           <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
+           <enum>Qt::Horizontal</enum>
           </property>
          </widget>
         </item>
         <item>
          <spacer name="verticalSpacer_4">
           <property name="orientation">
-           <enum>Qt::Orientation::Vertical</enum>
+           <enum>Qt::Vertical</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -4604,7 +4470,7 @@ Right-click to set the averaging time</string>
           <item>
            <spacer name="horizontalSpacer_14">
             <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
+             <enum>Qt::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -4630,7 +4496,7 @@ Right-click to set the averaging time</string>
              </size>
             </property>
             <property name="buttonSymbols">
-             <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
+             <enum>QAbstractSpinBox::NoButtons</enum>
             </property>
             <property name="maximum">
              <number>10000000</number>
@@ -4714,9 +4580,23 @@ Right-click to set the averaging time</string>
            </widget>
           </item>
           <item>
+           <widget class="QLabel" name="label_37">
+            <property name="text">
+             <string>Available events:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="labNumEvents">
+            <property name="text">
+             <string>TextLabel</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <spacer name="horizontalSpacer_13">
             <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
+             <enum>Qt::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -4776,7 +4656,7 @@ Right-click to set the averaging time</string>
           <item>
            <widget class="Line" name="line_17">
             <property name="orientation">
-             <enum>Qt::Orientation::Vertical</enum>
+             <enum>Qt::Vertical</enum>
             </property>
            </widget>
           </item>
@@ -4890,7 +4770,7 @@ Right-click to set the averaging time</string>
           <item>
            <widget class="Line" name="line_18">
             <property name="orientation">
-             <enum>Qt::Orientation::Vertical</enum>
+             <enum>Qt::Vertical</enum>
             </property>
            </widget>
           </item>
@@ -4926,7 +4806,7 @@ Right-click to set the averaging time</string>
         <item>
          <spacer name="verticalSpacer_9">
           <property name="orientation">
-           <enum>Qt::Orientation::Vertical</enum>
+           <enum>Qt::Vertical</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -4941,7 +4821,7 @@ Right-click to set the averaging time</string>
           <item>
            <spacer name="horizontalSpacer">
             <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
+             <enum>Qt::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -4950,13 +4830,6 @@ Right-click to set the averaging time</string>
              </size>
             </property>
            </spacer>
-          </item>
-          <item>
-           <widget class="QLabel" name="labLogicalChannelNumber">
-            <property name="text">
-             <string>Logical channel#:</string>
-            </property>
-           </widget>
           </item>
           <item>
            <widget class="QComboBox" name="cobHardwareOrLogical">
@@ -4993,7 +4866,7 @@ Right-click to set the averaging time</string>
              </size>
             </property>
             <property name="buttonSymbols">
-             <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
+             <enum>QAbstractSpinBox::NoButtons</enum>
             </property>
             <property name="maximum">
              <number>1000</number>
@@ -5041,7 +4914,7 @@ Right-click to set the averaging time</string>
           <item>
            <spacer name="horizontalSpacer_2">
             <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
+             <enum>Qt::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -5067,7 +4940,7 @@ Right-click to set the averaging time</string>
              <string>Hardware channel #:</string>
             </property>
             <property name="alignment">
-             <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
@@ -5096,7 +4969,7 @@ Right-click to set the averaging time</string>
              <string>Logical channel #:</string>
             </property>
             <property name="alignment">
-             <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
@@ -5125,7 +4998,7 @@ Right-click to set the averaging time</string>
              <string>Polarity:</string>
             </property>
             <property name="alignment">
-             <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
@@ -5149,7 +5022,7 @@ Right-click to set the averaging time</string>
           <item>
            <spacer name="horizontalSpacer_39">
             <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
+             <enum>Qt::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -5214,7 +5087,7 @@ Right-click to set the averaging time</string>
           <item>
            <spacer name="horizontalSpacer_40">
             <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
+             <enum>Qt::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -5229,7 +5102,7 @@ Right-click to set the averaging time</string>
         <item>
          <spacer name="verticalSpacer_8">
           <property name="orientation">
-           <enum>Qt::Orientation::Vertical</enum>
+           <enum>Qt::Vertical</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -5258,7 +5131,7 @@ Right-click to set the averaging time</string>
         <item>
          <spacer name="verticalSpacer_34">
           <property name="orientation">
-           <enum>Qt::Orientation::Vertical</enum>
+           <enum>Qt::Vertical</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -5271,14 +5144,14 @@ Right-click to set the averaging time</string>
         <item>
          <widget class="Line" name="line_8">
           <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
+           <enum>Qt::Horizontal</enum>
           </property>
          </widget>
         </item>
         <item>
          <spacer name="verticalSpacer_5">
           <property name="orientation">
-           <enum>Qt::Orientation::Vertical</enum>
+           <enum>Qt::Vertical</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -5293,7 +5166,7 @@ Right-click to set the averaging time</string>
           <item>
            <spacer name="horizontalSpacer_16">
             <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
+             <enum>Qt::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -5318,7 +5191,7 @@ Right-click to set the averaging time</string>
           <item>
            <spacer name="horizontalSpacer_15">
             <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
+             <enum>Qt::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -5335,7 +5208,7 @@ Right-click to set the averaging time</string>
           <item>
            <widget class="QCheckBox" name="cbAutoscaleY">
             <property name="layoutDirection">
-             <enum>Qt::LayoutDirection::LeftToRight</enum>
+             <enum>Qt::LeftToRight</enum>
             </property>
             <property name="text">
              <string>Autoscale Y</string>
@@ -5436,7 +5309,7 @@ Right-click to set the averaging time</string>
                  <string>Negative polarity - Min:</string>
                 </property>
                 <property name="alignment">
-                 <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                 </property>
                </widget>
               </item>
@@ -5459,7 +5332,7 @@ Right-click to set the averaging time</string>
                  <string>Max:</string>
                 </property>
                 <property name="alignment">
-                 <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                 </property>
                </widget>
               </item>
@@ -5479,7 +5352,7 @@ Right-click to set the averaging time</string>
               <item>
                <spacer name="horizontalSpacer_3">
                 <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
+                 <enum>Qt::Horizontal</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -5508,7 +5381,7 @@ Right-click to set the averaging time</string>
                  <string>Positive polarity - Min:</string>
                 </property>
                 <property name="alignment">
-                 <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                 </property>
                </widget>
               </item>
@@ -5531,7 +5404,7 @@ Right-click to set the averaging time</string>
                  <string>Max:</string>
                 </property>
                 <property name="alignment">
-                 <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                 </property>
                </widget>
               </item>
@@ -5551,7 +5424,7 @@ Right-click to set the averaging time</string>
               <item>
                <spacer name="horizontalSpacer_4">
                 <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
+                 <enum>Qt::Horizontal</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -5570,7 +5443,7 @@ Right-click to set the averaging time</string>
         <item>
          <spacer name="verticalSpacer_2">
           <property name="orientation">
-           <enum>Qt::Orientation::Vertical</enum>
+           <enum>Qt::Vertical</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -5588,7 +5461,7 @@ Right-click to set the averaging time</string>
           <item>
            <spacer name="horizontalSpacer_51">
             <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
+             <enum>Qt::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -5599,9 +5472,16 @@ Right-click to set the averaging time</string>
            </spacer>
           </item>
           <item>
+           <widget class="QLabel" name="label_42">
+            <property name="text">
+             <string>Signal distribution over all events:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="pbShowAllNegatives">
             <property name="text">
-             <string>Show all negatives</string>
+             <string>Show negatives</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -5611,7 +5491,7 @@ Right-click to set the averaging time</string>
           <item>
            <widget class="QPushButton" name="pbShowAllPositives">
             <property name="text">
-             <string>Show all positives</string>
+             <string>Show positives</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -5621,7 +5501,7 @@ Right-click to set the averaging time</string>
           <item>
            <spacer name="horizontalSpacer_52">
             <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
+             <enum>Qt::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -5636,7 +5516,7 @@ Right-click to set the averaging time</string>
         <item>
          <spacer name="verticalSpacer_35">
           <property name="orientation">
-           <enum>Qt::Orientation::Vertical</enum>
+           <enum>Qt::Vertical</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -5646,16 +5526,6 @@ Right-click to set the averaging time</string>
           </property>
          </spacer>
         </item>
-        <item>
-         <widget class="QLabel" name="labDatahubEvents">
-          <property name="text">
-           <string>DataHub contains 0 events</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignmentFlag::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="tab_3">
@@ -5664,25 +5534,11 @@ Right-click to set the averaging time</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_5">
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_42">
-          <property name="topMargin">
-           <number>0</number>
+         <widget class="QLabel" name="label_34">
+          <property name="text">
+           <string>Process multiple files:</string>
           </property>
-          <item>
-           <widget class="QLabel" name="label_34">
-            <property name="text">
-             <string>Process multiple files:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="cbKeepEvents">
-            <property name="text">
-             <string>Keep events in DataHub</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         </widget>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_37">
@@ -5738,7 +5594,7 @@ Right-click to set the averaging time</string>
              <string>Files should contain #channels:</string>
             </property>
             <property name="alignment">
-             <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
@@ -5764,7 +5620,7 @@ Right-click to set the averaging time</string>
              <string>and #samples:</string>
             </property>
             <property name="alignment">
-             <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
@@ -5794,7 +5650,7 @@ Right-click to set the averaging time</string>
           <item>
            <spacer name="horizontalSpacer_7">
             <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
+             <enum>Qt::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -5807,26 +5663,25 @@ Right-click to set the averaging time</string>
          </layout>
         </item>
         <item>
+         <spacer name="verticalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Minimum</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>10</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
          <widget class="QLabel" name="label_15">
           <property name="text">
-           <string>Execute the following actions for each file (in this order)</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="cbBulkExtract">
-          <property name="text">
-           <string>Extract signals</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="cbAutoExecuteScript">
-          <property name="text">
-           <string>Execute the script in the first tab of the Script Window</string>
+           <string/>
           </property>
          </widget>
         </item>
@@ -5838,7 +5693,7 @@ Right-click to set the averaging time</string>
           <item>
            <widget class="QLabel" name="label_7">
             <property name="text">
-             <string>Include</string>
+             <string>Save</string>
             </property>
            </widget>
           </item>
@@ -5857,16 +5712,9 @@ Right-click to set the averaging time</string>
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="cbDoNotSaveDisabledChannels">
-            <property name="text">
-             <string>skipping disabled channels</string>
-            </property>
-           </widget>
-          </item>
-          <item>
            <spacer name="horizontalSpacer_57">
             <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
+             <enum>Qt::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -5879,9 +5727,9 @@ Right-click to set the averaging time</string>
          </layout>
         </item>
         <item>
-         <widget class="QCheckBox" name="cbSaveTime">
+         <widget class="QCheckBox" name="cbDoNotSaveDisabledChannels">
           <property name="text">
-           <string>Include timing data</string>
+           <string>Skip disabled channels</string>
           </property>
           <property name="checked">
            <bool>true</bool>
@@ -5889,14 +5737,21 @@ Right-click to set the averaging time</string>
          </widget>
         </item>
         <item>
+         <widget class="QCheckBox" name="cbSaveTime">
+          <property name="text">
+           <string>Include timing data</string>
+          </property>
+          <property name="checked">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
          <layout class="QHBoxLayout" name="horizontalLayout_20">
           <item>
-           <widget class="QCheckBox" name="cbSaveSignalsToFiles">
+           <widget class="QLabel" name="label_38">
             <property name="text">
-             <string>Save data to files --&gt; remove filename suffix, add</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
+             <string>Output file name: --&gt; remove suffix, add</string>
             </property>
            </widget>
           </item>
@@ -5917,44 +5772,7 @@ Right-click to set the averaging time</string>
           <item>
            <spacer name="horizontalSpacer_27">
             <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_34">
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="QCheckBox" name="cbBulkCopyToDatahub">
-            <property name="text">
-             <string>Copy data to DataHub</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="cbBulkAlsoCopyWaveforms">
-            <property name="text">
-             <string>including waveforms for not-disabled channels </string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_58">
-            <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
+             <enum>Qt::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -5968,209 +5786,6 @@ Right-click to set the averaging time</string>
         </item>
         <item>
          <widget class="QPlainTextEdit" name="pteBulkLog"/>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="tab_5">
-       <attribute name="title">
-        <string>DataHub</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_24">
-        <item>
-         <spacer name="verticalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Orientation::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>98</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_44">
-          <item>
-           <spacer name="horizontalSpacer_5">
-            <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pbClearDataHub">
-            <property name="minimumSize">
-             <size>
-              <width>150</width>
-              <height>35</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Clear all data</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_6">
-            <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <spacer name="verticalSpacer_7">
-          <property name="orientation">
-           <enum>Qt::Orientation::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_40">
-          <item>
-           <widget class="QPushButton" name="pbLoadToDataHub">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>35</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Load signals from text file</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="cbLoadIncludeReconstructed">
-            <property name="text">
-             <string>File contains reconstructed XYZ</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <spacer name="verticalSpacer_23">
-          <property name="orientation">
-           <enum>Qt::Orientation::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_41">
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="QPushButton" name="pbSaveSignalsFromDataHub">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>35</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Save signals to text file</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout_23">
-            <item>
-             <widget class="QCheckBox" name="cbSaveOnlyGood">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>Skip rejected events</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="cbAddReconstructedPositions">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>Add reconstructed XYZ</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <spacer name="verticalSpacer_6">
-          <property name="orientation">
-           <enum>Qt::Orientation::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>98</height>
-           </size>
-          </property>
-         </spacer>
         </item>
        </layout>
       </widget>
@@ -6211,8 +5826,8 @@ Right-click to set the averaging time</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>793</width>
-     <height>22</height>
+     <width>739</width>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -6294,12 +5909,12 @@ Right-click to set the averaging time</string>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>125</x>
-     <y>659</y>
+     <x>126</x>
+     <y>727</y>
     </hint>
     <hint type="destinationlabel">
      <x>268</x>
-     <y>660</y>
+     <y>728</y>
     </hint>
    </hints>
   </connection>
@@ -6311,11 +5926,11 @@ Right-click to set the averaging time</string>
    <hints>
     <hint type="sourcelabel">
      <x>118</x>
-     <y>578</y>
+     <y>646</y>
     </hint>
     <hint type="destinationlabel">
-     <x>304</x>
-     <y>613</y>
+     <x>306</x>
+     <y>682</y>
     </hint>
    </hints>
   </connection>
@@ -6327,11 +5942,11 @@ Right-click to set the averaging time</string>
    <hints>
     <hint type="sourcelabel">
      <x>118</x>
-     <y>578</y>
+     <y>646</y>
     </hint>
     <hint type="destinationlabel">
-     <x>420</x>
-     <y>644</y>
+     <x>426</x>
+     <y>715</y>
     </hint>
    </hints>
   </connection>
@@ -6343,11 +5958,11 @@ Right-click to set the averaging time</string>
    <hints>
     <hint type="sourcelabel">
      <x>118</x>
-     <y>578</y>
+     <y>646</y>
     </hint>
     <hint type="destinationlabel">
-     <x>420</x>
-     <y>613</y>
+     <x>426</x>
+     <y>682</y>
     </hint>
    </hints>
   </connection>
@@ -6358,12 +5973,12 @@ Right-click to set the averaging time</string>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>488</x>
-     <y>578</y>
+     <x>487</x>
+     <y>646</y>
     </hint>
     <hint type="destinationlabel">
-     <x>746</x>
-     <y>579</y>
+     <x>777</x>
+     <y>647</y>
     </hint>
    </hints>
   </connection>
@@ -6374,44 +5989,12 @@ Right-click to set the averaging time</string>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>108</x>
-     <y>659</y>
+     <x>116</x>
+     <y>727</y>
     </hint>
     <hint type="destinationlabel">
-     <x>367</x>
-     <y>660</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cbSaveSignalsToFiles</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>leAddToProcessed</receiver>
-   <slot>setVisible(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>124</x>
-     <y>333</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>573</x>
-     <y>334</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cbBulkCopyToDatahub</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>cbBulkAlsoCopyWaveforms</receiver>
-   <slot>setVisible(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>124</x>
-     <y>365</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>539</x>
-     <y>365</y>
+     <x>366</x>
+     <y>728</y>
     </hint>
    </hints>
   </connection>
@@ -6423,11 +6006,11 @@ Right-click to set the averaging time</string>
    <hints>
     <hint type="sourcelabel">
      <x>118</x>
-     <y>578</y>
+     <y>646</y>
     </hint>
     <hint type="destinationlabel">
-     <x>304</x>
-     <y>644</y>
+     <x>306</x>
+     <y>715</y>
     </hint>
    </hints>
   </connection>
@@ -6438,12 +6021,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>126</x>
-     <y>148</y>
+     <x>133</x>
+     <y>157</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6454,12 +6037,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>131</x>
-     <y>175</y>
+     <x>133</x>
+     <y>186</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6470,12 +6053,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>149</x>
-     <y>202</y>
+     <x>133</x>
+     <y>215</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6486,12 +6069,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>149</x>
-     <y>229</y>
+     <x>133</x>
+     <y>244</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6502,12 +6085,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>149</x>
-     <y>256</y>
+     <x>133</x>
+     <y>273</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6518,12 +6101,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>149</x>
-     <y>283</y>
+     <x>133</x>
+     <y>302</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6534,12 +6117,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>149</x>
-     <y>310</y>
+     <x>133</x>
+     <y>331</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6550,12 +6133,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>158</x>
+     <x>133</x>
      <y>360</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6566,12 +6149,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>274</x>
-     <y>467</y>
+     <x>271</x>
+     <y>491</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6582,12 +6165,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>274</x>
-     <y>497</y>
+     <x>271</x>
+     <y>521</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6598,12 +6181,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>486</x>
-     <y>468</y>
+     <x>482</x>
+     <y>492</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6614,12 +6197,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>486</x>
-     <y>499</y>
+     <x>482</x>
+     <y>523</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6630,12 +6213,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>221</x>
-     <y>149</y>
+     <x>252</x>
+     <y>158</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6646,12 +6229,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>308</x>
-     <y>149</y>
+     <x>331</x>
+     <y>158</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6662,12 +6245,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>260</x>
+     <x>258</x>
      <y>252</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6678,12 +6261,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>260</x>
+     <x>258</x>
      <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6694,12 +6277,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>289</x>
+     <x>288</x>
      <y>252</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6710,12 +6293,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>289</x>
+     <x>288</x>
      <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6726,12 +6309,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>319</x>
+     <x>318</x>
      <y>252</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6742,12 +6325,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>319</x>
+     <x>318</x>
      <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6758,12 +6341,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>349</x>
+     <x>348</x>
      <y>252</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6774,12 +6357,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>349</x>
+     <x>348</x>
      <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6790,12 +6373,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>460</x>
+     <x>459</x>
      <y>252</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6806,12 +6389,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>460</x>
+     <x>459</x>
      <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6826,8 +6409,8 @@ Right-click to set the averaging time</string>
      <y>252</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6842,8 +6425,8 @@ Right-click to set the averaging time</string>
      <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6858,8 +6441,8 @@ Right-click to set the averaging time</string>
      <y>252</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6874,8 +6457,8 @@ Right-click to set the averaging time</string>
      <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6890,8 +6473,8 @@ Right-click to set the averaging time</string>
      <y>252</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6906,8 +6489,8 @@ Right-click to set the averaging time</string>
      <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>526</x>
-     <y>586</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6918,12 +6501,12 @@ Right-click to set the averaging time</string>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>100</x>
-     <y>102</y>
+     <x>113</x>
+     <y>123</y>
     </hint>
     <hint type="destinationlabel">
-     <x>89</x>
-     <y>132</y>
+     <x>103</x>
+     <y>212</y>
     </hint>
    </hints>
   </connection>
@@ -6934,12 +6517,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>225</x>
-     <y>530</y>
+     <x>260</x>
+     <y>587</y>
     </hint>
     <hint type="destinationlabel">
-     <x>449</x>
-     <y>573</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>
@@ -6950,12 +6533,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>380</x>
-     <y>534</y>
+     <x>396</x>
+     <y>589</y>
     </hint>
     <hint type="destinationlabel">
-     <x>491</x>
-     <y>569</y>
+     <x>509</x>
+     <y>633</y>
     </hint>
    </hints>
   </connection>

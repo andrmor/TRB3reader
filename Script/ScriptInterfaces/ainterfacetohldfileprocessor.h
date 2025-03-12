@@ -17,7 +17,8 @@ public:
     AScriptInterface * cloneBase() const override {return new AInterfaceToHldFileProcessor();}
 
 public slots:
-    const QString ProcessFile(QString FileName, int What_0signals1waves, bool bIncludeTimeData, QString SaveFileName, bool doNotSaveSuppressedChannels);
+    void processFile_saveSignals(QString hldFileName,   bool includeTimingData, bool skipSuppressedChannels, QString outputFileName);
+    void processFile_saveWaveforms(QString hldFileName, bool includeTimingData, bool skipSuppressedChannels, QString outputFileName);
 
 private:
     AHldFileProcessor * HldProcessor = nullptr;

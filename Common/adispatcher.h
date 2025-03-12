@@ -25,7 +25,7 @@ public:
 
     void LoadAutosaveConfig();
     void LoadConfig(const QString FileName);
-    bool LoadConfig(QJsonObject& json);
+    bool LoadConfig(QJsonObject& json, bool includeGui);
     void SaveConfig(const QString FileName);
 
     void ClearNegativeChannels();

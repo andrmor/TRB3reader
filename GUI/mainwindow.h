@@ -1,7 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
+//#include <QMainWindow>
+#include "aguiwindow.h"
 
 #include <string>
 #include <vector>
@@ -12,7 +13,6 @@ class Trb3signalExtractor;
 class QTextStream;
 class CernRootModule;
 class ADispatcher;
-class ADataHub;
 class AHldFileProcessor;
 class ANetworkModule;
 class AServerMonitorWindow;
@@ -33,13 +33,12 @@ namespace Ui {
 class MainWindow;
 }
 
-class MainWindow : public QMainWindow
+class MainWindow : public AGuiWindow
 {
     Q_OBJECT
 
 public:
     explicit MainWindow(ADispatcher* Dispatcher,
-                        ADataHub* DataHub,
                         Trb3dataReader* Reader,
                         Trb3signalExtractor* Extractor,
                         AHldFileProcessor& HldFileProcessor,
@@ -112,7 +111,6 @@ private slots:
     void on_pbPrintHLDfileProperties_clicked();
     void on_pbProcessAllFromDir_clicked();
     void on_pbProcessSelectedFiles_clicked();
-    void on_pbSaveSignalsFromDataHub_clicked();
     void on_sbIntegrateFrom_editingFinished();
     void on_sbIntegrateTo_editingFinished();
 
@@ -155,21 +153,10 @@ private slots:
     void on_cbSubstractPedestal_toggled(bool checked);
     void on_cbSmoothWaveforms_toggled(bool checked);
     void on_cobSignalExtractionMethod_currentIndexChanged(int index);
-    void on_cobExplorerSource_currentIndexChanged(int index);
-    void on_pbClearDataHub_clicked();
-    void on_pbLoadToDataHub_clicked();
     void on_cobLableType_activated(int index);
     void on_sbNumChannels_editingFinished();
     void on_sbNumSamples_editingFinished();
-    void on_cbBulkExtract_clicked();
-    void on_cbAutoExecuteScript_clicked();
-    void on_cbSaveSignalsToFiles_clicked();
     void on_leAddToProcessed_editingFinished();
-    void on_cbBulkCopyToDatahub_clicked();
-    void on_cbBulkAlsoCopyWaveforms_clicked();
-    void on_cobPedestalExtractionMethod_activated(int index);
-    void on_ledPedestalPeakSigma_editingFinished();
-    void on_ledPedestalPeakThreshold_editingFinished();
     void on_actionConfigure_WebSocket_server_triggered();
 
     void on_pbBoardOn_clicked();
@@ -181,32 +168,29 @@ protected:
 private:
     MasterConfig        & Config;
     ADispatcher         * Dispatcher;
-    ADataHub            * DataHub;
     Trb3dataReader      * Reader;
     Trb3signalExtractor * Extractor;
     AHldFileProcessor   & HldFileProcessor;
     ANetworkModule      & Network;
 
     //owned objects
-    Ui::MainWindow* ui;
-    CernRootModule * RootModule = nullptr;
+    Ui::MainWindow       * ui = nullptr;
+    CernRootModule       * RootModule = nullptr;
     AServerMonitorWindow * ServerWindow = nullptr;
-
-    AGuiFromScrWin * GuiFromScrWin = nullptr;
-    AScriptWindow * JScriptWin = nullptr;
+    AGuiFromScrWin       * GuiFromScrWin = nullptr;
+    AScriptWindow        * JScriptWin = nullptr;
 
     //gui misc
-    bool bStopFlag;
+    bool bStopFlag = false;
     bool bNeverRemindAppendToHub = false;
-    //int  numProcessedEvents;
-    //int  numBadEvents;
 
-    QTimer * watchdogTimer = nullptr;
-    QTimer * aTimer = nullptr;
+    QTimer        * watchdogTimer = nullptr;
+    QTimer        * aTimer = nullptr;
     QElapsedTimer * elTimer = nullptr;
+    QTimer        * timerAutoFreeSpace = nullptr;
+
     bool bLimitMaxEvents = false;
     int MaxEventsToRun = 0;
-    QTimer * timerAutoFreeSpace = nullptr;
     bool bAlreadyStopping = false;
 
 #ifdef TextToSpeechEnabled
@@ -215,7 +199,7 @@ private:
 #endif
 
 private:
-    const QString ProcessData(); //returns error message if any
+    QString ProcessData(); //returns error message if any
     void LogMessage(const QString message);
     bool saveSignalsToFile(const QString FileName, bool bUseHardware);
     bool sendSignalData(QTextStream& outStream, bool bUseHardware = false);
@@ -232,10 +216,9 @@ private:
     void ClearData();
     void CreateScriptWindow();
 
-    const QString PackChannelList(QVector<int> vec);
-    const QString PackMappingList(QVector<int> vec);
+    QString PackChannelList(QVector<int> vec);
+    QString PackMappingList(QVector<int> vec);
     bool ExtractNumbersFromQString(const QString input, QVector<int>* ToAdd);
-    //bool bulkProcessCore();
     void bulkProcessorEnvelope(const QStringList FileNames); // !!!***
     void updateNumEventsIndication();
 
@@ -341,6 +324,8 @@ private slots:
     void on_actionConfigure_triggered();
     void on_cbTellMeRate_customContextMenuRequested(const QPoint &pos);
     void on_leFolderForHldFiles_customContextMenuRequested(const QPoint &pos);
+    void on_cbDoNotSaveDisabledChannels_clicked(bool checked);
+    void on_cbSaveTime_clicked(bool checked);
 };
 
 #endif // MAINWINDOW_H

@@ -11,6 +11,14 @@ AInterfaceToExtractor::AInterfaceToExtractor() :
     Config(MasterConfig::getInstance()), Extractor(AScriptHub::getInstance().Extractor)
 {
     Description = "Low-elevel unit for signal extraction. Takes waveworm data from \"wav\" unit.";
+
+    Help["computeSignals"] = "Compute signals for the waveforms loaded with the Reader script unit";
+}
+
+void AInterfaceToExtractor::computeSignals()
+{
+    bool ok = Extractor->ExtractSignals();
+    if (!ok) abort("Signal extraction failed!");
 }
 
 int AInterfaceToExtractor::countEvents() const

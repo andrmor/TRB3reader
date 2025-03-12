@@ -7,16 +7,17 @@ AInterfaceToHldFileProcessor::AInterfaceToHldFileProcessor() :
 {
     Description = "Provides full cycle of load/extraction/save_signals for an hld file.\n"
                   "To modify settings use the global configuration.";
+
+    //connect(this, &AInterfaceToHldFileProcessor::requestProcess, this, &AInterfaceToHldFileProcessor::doProcess, Qt::QueuedConnection);
 }
 
-const QString AInterfaceToHldFileProcessor::ProcessFile(QString FileName, int What_0signals1waves, bool bIncludeTimeData, QString SaveFileName, bool doNotSaveSuppressedChannels)
+void AInterfaceToHldFileProcessor::processFile_saveSignals(QString hldFileName, bool includeTimingData, bool skipSuppressedChannels, QString outputFileName)
 {
-    bool bOK = HldProcessor->ProcessFile(FileName, What_0signals1waves, bIncludeTimeData, SaveFileName, doNotSaveSuppressedChannels);
-    if (bOK) return "";
-    else
-    {
-        abort("HldFileProcessor: " + HldProcessor->GetLastError());
-        return "";
-    }
+    HldProcessor->processFile(hldFileName, 0, includeTimingData, outputFileName, skipSuppressedChannels, false);
+}
+
+void AInterfaceToHldFileProcessor::processFile_saveWaveforms(QString hldFileName, bool includeTimingData, bool skipSuppressedChannels, QString outputFileName)
+{
+    HldProcessor->processFile(hldFileName, 1, includeTimingData, outputFileName, skipSuppressedChannels, false);
 }
 

@@ -17,14 +17,11 @@ class AHldProcessSettings
 public:
     int     NumChannels = 0;
     int     NumSamples = 0;
-    bool    bDoSignalExtraction = true;
-    bool    bDoScript = false;
     int     SaveWhat = 0; // 0=signals, 1=waveforms
-    bool    bDoSave = true;
+    bool    SkipDisabledChannels = true;
+    bool    IncludeTimingData = false;
     QString AddToFileName = "_proc.dat";
     bool    AddRunTime = false;
-    bool    bDoCopyToDatahub = false;
-    bool    bCopyWaveforms = false;
 
     QJsonObject WriteToJson() const;
     void        ReadFromJson(const QJsonObject & json);
@@ -111,11 +108,8 @@ public:
 
     bool                bPedestalSubstraction = false;
     bool                bSmoothingBeforePedestals = false;
-    int                 PedestalExtractionMethod = 0;
     int                 PedestalFrom = 0;
     int                 PedestalTo = 0;
-    double              PedestalPeakSigma = 3;
-    double              PedestalPeakThreshold = 0.5;
 
     int                 SignalExtractionMethod = 0; //0 - independent max, 1 - common sample, at global max
     int                 CommonSampleNumber = 0;

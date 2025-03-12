@@ -833,7 +833,7 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
 #endif
 */
 
-QString Trb3dataReader::Read(const QString& FileName)
+QString Trb3dataReader::Read(const QString & FileName, bool skipSmoothAndPedestalExtraction)
 {
     qDebug() << "--> Reading hld file...";
     readRawData(FileName, Config.HldProcessSettings.NumChannels, Config.HldProcessSettings.NumSamples);
@@ -854,6 +854,8 @@ QString Trb3dataReader::Read(const QString& FileName)
 
     bool bOK = Config.UpdateNumberOfHardwareChannels(numChannels);
     if (!bOK) return "The number of hardware channels in the file (" + QString::number(numChannels) + ") is incompatible with the defined number of logical channels";
+
+    if (skipSmoothAndPedestalExtraction) return "";
 
     if (Config.bSmoothingBeforePedestals)
     {
@@ -927,6 +929,12 @@ const QVector<float> *Trb3dataReader::GetWaveformPtr(int ievent, int ichannel) c
 const QVector<float> *Trb3dataReader::GetWaveformPtrFast(int ievent, int ichannel) const
 {
     return &(waveData.at(ievent).at(ichannel));
+}
+
+const std::vector<Trb3TimingRecord> * Trb3dataReader::GetTimingPtr(int ievent)
+{
+    if (ievent < 0 || ievent >= timeData.size()) return nullptr;
+    return &(timeData[ievent]);
 }
 
 bool Trb3dataReader::SetWaveform(int ievent, int ichannel, const QVector<float>& array)
@@ -1064,7 +1072,6 @@ int Trb3dataReader::GetSampleWhereFirstAboveFast(int ievent, int ichannel, int t
     return -1;
 }
 
-#include "TSpectrum.h"
 void Trb3dataReader::substractPedestals()
 {
     for (int ievent=0; ievent<waveData.size(); ievent++)
@@ -1073,40 +1080,9 @@ void Trb3dataReader::substractPedestals()
             if (waveData.at(ievent).at(ichannel).isEmpty()) continue;
 
             float pedestal = 0;
-
-            switch (Config.PedestalExtractionMethod)
-            {
-            case 0:
-                for (int isample = Config.PedestalFrom; isample <= Config.PedestalTo; isample++)
-                    pedestal += waveData.at(ievent).at(ichannel).at(isample);
-                pedestal /= ( Config.PedestalTo + 1 - Config.PedestalFrom );
-                break;
-            case 1:
-
-                /*
-            TH1 *hist;
-
-            //const QVector<double> APeakFinder::findPeaks(const double sigma, const double threshold, const int MaxNumberOfPeaks, bool SuppressDraw) const
-    TSpectrum *s = new TSpectrum(MaxNumberOfPeaks);
-
-    int numPeaks = s->Search(H, sigma, (SuppressDraw ? "goff nodraw" : ""), threshold);
-
-#if ROOT_VERSION_CODE > ROOT_VERSION(6,0,0)
-    double *pos = s->GetPositionX();
-#else
-    float *pos = s->GetPositionX();
-#endif
-
-    QVector<double> peaks;
-    for (int i=0; i<numPeaks; i++) peaks << pos[i];
-*/
-
-                break;
-            default:
-                qDebug() << "Invalid pedestal extraction method index: "<< Config.PedestalExtractionMethod;
-                throw std::invalid_argument( "invalid pedestal extraction method index" );
-                break;
-            }
+            for (int isample = Config.PedestalFrom; isample <= Config.PedestalTo; isample++)
+                pedestal += waveData.at(ievent).at(ichannel).at(isample);
+            pedestal /= ( Config.PedestalTo + 1 - Config.PedestalFrom );
 
             for (int isample = 0; isample < numSamples; isample++)
                 waveData[ievent][ichannel][isample] -= pedestal;

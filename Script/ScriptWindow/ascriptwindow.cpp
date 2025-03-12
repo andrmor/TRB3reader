@@ -563,6 +563,9 @@ void AScriptWindow::on_pbRunScript_clicked()
     ui->pbStop->setVisible(true);
     ui->pbRunScript->setVisible(false);
 
+    ScriptHub.updateJSON();
+
+    // !!!*** make a method of ScriptHub, Scriptmanager should be private
     ScriptManager->evaluate(Script);
     do
     {
@@ -856,17 +859,15 @@ void AScriptWindow::onJsonTWCollapsed(QTreeWidgetItem *item)
     ExpandedItemsInJsonTW.remove(item->text(0));
 }
 
-//#include "aconfig.h"
 void AScriptWindow::updateJsonTree()
 {
-    qDebug() << "updateJsonTree() ---> Not yet implemented";
-/*
-    AConfig & Config = AConfig::getInstance();
-    Config.updateJSONfromConfig();
+    //qDebug() << "updateJsonTree()";
+
+    ScriptHub.updateJSON();
 
     trwJson->clear();
 
-    const QJsonObject & json = AConfig::getConstInstance().JSON;
+    const QJsonObject & json = ScriptHub.JSON;
     QJsonObject::const_iterator it;
     for (it = json.begin(); it != json.end(); ++it)
     {
@@ -892,7 +893,6 @@ void AScriptWindow::updateJsonTree()
         foreach (QTreeWidgetItem* item, l)
             item->setExpanded(true);
     }
-*/
 }
 
 void AScriptWindow::fillSubObject(QTreeWidgetItem *parent, const QJsonObject &obj)

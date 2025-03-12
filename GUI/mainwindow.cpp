@@ -8,7 +8,6 @@
 #include "amessage.h"
 #include "adispatcher.h"
 #include "aeditchannelsdialog.h"
-#include "adatahub.h"
 #include "aservermonitorwindow.h"
 #include "atrbruncontrol.h"
 #include "cernrootmodule.h"
@@ -34,14 +33,13 @@
 
 #include <cmath>
 
-MainWindow::MainWindow(ADispatcher *Dispatcher,
-                       ADataHub* DataHub,
-                       Trb3dataReader* Reader,
-                       Trb3signalExtractor* Extractor,
-                       AHldFileProcessor& HldFileProcessor, ANetworkModule &Network,
-                       QWidget *parent) :
-    QMainWindow(parent),
-    Config(MasterConfig::getInstance()), Dispatcher(Dispatcher), DataHub(DataHub), Reader(Reader), Extractor(Extractor), HldFileProcessor(HldFileProcessor), Network(Network),
+MainWindow::MainWindow(ADispatcher * Dispatcher,
+                       Trb3dataReader * Reader,
+                       Trb3signalExtractor * Extractor,
+                       AHldFileProcessor & HldFileProcessor, ANetworkModule & Network,
+                       QWidget * parent) :
+    AGuiWindow("main", parent),
+    Config(MasterConfig::getInstance()), Dispatcher(Dispatcher), Reader(Reader), Extractor(Extractor), HldFileProcessor(HldFileProcessor), Network(Network),
     ui(new Ui::MainWindow)
 {
     bStopFlag = false;
@@ -79,7 +77,7 @@ MainWindow::MainWindow(ADispatcher *Dispatcher,
     ui->pbRefreshBufferIndication->setVisible(false);
     ui->pbUpdateTriggerGui->setVisible(false);
 
-    RootModule = new CernRootModule(Reader, Extractor, DataHub);
+    RootModule = new CernRootModule(Reader, Extractor);
     RootModule->setMainWindow(this);
     connect(RootModule, &CernRootModule::WOneHidden, [=](){ui->pbShowWaveform->setChecked(false);});
     connect(RootModule, &CernRootModule::WOverNegHidden, [=](){ui->pbShowOverlayNeg->setChecked(false);});
@@ -91,17 +89,12 @@ MainWindow::MainWindow(ADispatcher *Dispatcher,
     connect(RootModule, &CernRootModule::W2DNegHidden, [=](){ui->pbShowAllNegatives->setChecked(false);});
     connect(RootModule, &CernRootModule::W2DPosHidden, [=](){ui->pbShowAllPositives->setChecked(false);});
 
-    connect(DataHub, &ADataHub::requestGuiUpdate, this, &MainWindow::UpdateGui);
-    connect(DataHub, &ADataHub::reportProgress, this, &MainWindow::onProgressUpdate);
-
     //messaging during bulk processing of hld files
     connect(&HldFileProcessor, &AHldFileProcessor::LogMessage, this, &MainWindow::onShowMessageRequest);
     connect(&HldFileProcessor, &AHldFileProcessor::LogAction, this, &MainWindow::onShowActionRequest);
 
     //Creating script window, registering script units, and setting up QObject connections
     CreateScriptWindow();
-    // !!!***
-//    connect(&HldFileProcessor, &AHldFileProcessor::RequestExecuteScript, ScriptWindow, &AScriptWindow::ExecuteScriptInFirstTab);
 
     //Loading window settings
     LoadWindowSettings();
@@ -110,7 +103,7 @@ MainWindow::MainWindow(ADispatcher *Dispatcher,
     JScriptWin->ReadFromJson();
 
     //misc gui settings
-    menuBar()->setNativeMenuBar(false);  //otherwise on some system menu bar is not wisible!
+    menuBar()->setNativeMenuBar(false);  //otherwise on some system menu bar is not visible!
     ui->prbMainBar->setVisible(false);
     ui->cbAutoscaleY->setChecked(true);
     ui->pbStop->setVisible(false);
@@ -125,6 +118,8 @@ MainWindow::MainWindow(ADispatcher *Dispatcher,
     TextToSpeechHub = new ATextToSpeech();
     TextToSpeechWindow = new ATextToSpeechConfigurator(*TextToSpeechHub);
 #endif
+
+    ui->cobHardwareOrLogical->setCurrentIndex(1);
 }
 
 MainWindow::~MainWindow()
@@ -191,7 +186,7 @@ void MainWindow::on_pbProcessData_clicked()
     //on_pbShowAllPositives_toggled(ui->pbShowAllNegatives->isChecked());
 }
 
-const QString MainWindow::ProcessData()
+QString MainWindow::ProcessData()
 {
     if (Config.FileName.isEmpty()) return "File name not defined!";
 
@@ -650,8 +645,7 @@ void MainWindow::OnEventOrChannelChanged()
     int iChannel = ui->sbChannel->value();
 
     int iHardwChan;
-    bool bFromDataHub = (ui->cobExplorerSource->currentIndex() == 1);
-    bool bUseLogical = (bFromDataHub || ui->cobHardwareOrLogical->currentIndex() == 1);
+    bool bUseLogical = ui->cobHardwareOrLogical->currentIndex() == 1;
 
     // Update channel indication
     if (bUseLogical)
@@ -696,7 +690,7 @@ void MainWindow::OnEventOrChannelChanged()
     }
 
     // Event/Signal check and indication
-    const int numEvents = (bFromDataHub ? DataHub->CountEvents() : Extractor->CountEvents());
+    const int numEvents = Extractor->CountEvents();
     if (numEvents == 0)
     {
         ui->leSignal->setText("");
@@ -708,40 +702,22 @@ void MainWindow::OnEventOrChannelChanged()
         return;
     }
     QString ss;
-    if (bFromDataHub)
-    {
-        if (DataHub->IsRejected(iEvent)) ss = "Rejected event";
-        else
-        {
-            const int numChannels = DataHub->CountChannels();
-            if ( iChannel >= numChannels ) ss = "n.a.";  //paranoic :)
-            else
-            {
-                double signal = DataHub->GetSignal(iEvent, iChannel);
-                if ( std::isnan(signal) ) ss = "n.a.";
-                else ss = QString::number(signal);
-            }
-        }
-    }
+    if (Extractor->IsRejectedEventFast(iEvent)) ss = "Rejected event";
     else
     {
-        if (Extractor->IsRejectedEventFast(iEvent)) ss = "Rejected event";
+        if ( iHardwChan < 0 ) ss = "n.a.";
         else
         {
-            if ( iHardwChan < 0 ) ss = "n.a.";
-            else
-            {
-                double signal = Extractor->GetSignalFast(iEvent, iHardwChan);
-                if ( std::isnan(signal) ) ss = "n.a.";
-                else ss = QString::number(signal);
-            }
+            double signal = Extractor->GetSignalFast(iEvent, iHardwChan);
+            if ( std::isnan(signal) ) ss = "n.a.";
+            else ss = QString::number(signal);
         }
     }
     ui->leSignal->setText(ss);
 
     ui->lwTriggers->clear();
 
-    if (!bFromDataHub && iEvent < Reader->timeData.size())
+    if (iEvent < Reader->timeData.size())
     {
         std::vector<Trb3TimingRecord> & vec = Reader->timeData[iEvent];
         for (const Trb3TimingRecord & rec : vec)
@@ -771,8 +747,7 @@ void MainWindow::on_pbShowWaveform_toggled(bool checked)
     LogMessage("");
     if (!checked) return;
 
-    const bool bFromDataHub = (ui->cobExplorerSource->currentIndex() == 1);
-    int numEvents = bFromDataHub ? DataHub->CountEvents() : Reader->CountEvents();
+    int numEvents = Reader->CountEvents();
     int ievent = ui->sbEvent->value();
     if (ievent >= numEvents)
     {
@@ -782,26 +757,14 @@ void MainWindow::on_pbShowWaveform_toggled(bool checked)
     }
 
     int ichannel;
-    if (bFromDataHub)
+    ichannel = getCurrentlySelectedHardwareChannel();
+    if (ichannel<0 || Reader->isEmpty())
     {
-        ichannel = ui->sbChannel->value();
-        if (ichannel >= DataHub->CountChannels())
-        {
-            RootModule->ClearSingleWaveWindow();
-            return;
-        }
-    }
-    else
-    {
-        ichannel = getCurrentlySelectedHardwareChannel();
-        if (ichannel<0 || Reader->isEmpty())
-        {
-            RootModule->ClearSingleWaveWindow();
-            return;
-        }
+        RootModule->ClearSingleWaveWindow();
+        return;
     }
 
-    bool bNegative = bFromDataHub ? Config.IsNegativeLogicalChannel(ichannel) : Config.IsNegativeHardwareChannel(ichannel);
+    bool bNegative = Config.IsNegativeHardwareChannel(ichannel);
     double Min, Max;
     if (bNegative)
     {
@@ -814,7 +777,7 @@ void MainWindow::on_pbShowWaveform_toggled(bool checked)
         Max = ui->ledMaxPos->text().toDouble();
     }
 
-    bool bOK = RootModule->DrawSingle(bFromDataHub, ievent, ichannel, ui->cbAutoscaleY->isChecked(), Min, Max);
+    bool bOK = RootModule->DrawSingle(ievent, ichannel, ui->cbAutoscaleY->isChecked(), Min, Max);
     if (!bOK) RootModule->ClearSingleWaveWindow();
 }
 
@@ -834,8 +797,7 @@ void MainWindow::showOverlay(bool checked, bool bNeg)
     LogMessage("");
     if (!checked) return;
 
-    const bool bFromDataHub = (ui->cobExplorerSource->currentIndex() == 1);
-    int numEvents = bFromDataHub ? DataHub->CountEvents() : Reader->CountEvents();
+    int numEvents = Reader->CountEvents();
     int ievent = ui->sbEvent->value();
     if (ievent >= numEvents)
     {
@@ -856,7 +818,7 @@ void MainWindow::showOverlay(bool checked, bool bNeg)
         Max = ui->ledMaxPos->text().toDouble();
     }
 
-    bool bOK = RootModule->DrawOverlay(bFromDataHub, ievent, bNeg, ui->cbAutoscaleY->isChecked(), Min, Max, ui->cobSortBy->currentIndex());
+    bool bOK = RootModule->DrawOverlay(ievent, bNeg, ui->cbAutoscaleY->isChecked(), Min, Max, ui->cobSortBy->currentIndex());
     if (!bOK)
     {
         if (bNeg) RootModule->ClearOverNegWaveWindow();
@@ -880,8 +842,7 @@ void MainWindow::showSignals(bool checked, bool bNeg)
     LogMessage("");
     if (!checked) return;
 
-    const bool bFromDataHub = (ui->cobExplorerSource->currentIndex() == 1);
-    int numEvents = bFromDataHub ? DataHub->CountEvents() : Reader->CountEvents();
+    int numEvents = Reader->CountEvents();
     int ievent = ui->sbEvent->value();
     if (ievent >= numEvents)
     {
@@ -890,14 +851,7 @@ void MainWindow::showSignals(bool checked, bool bNeg)
         return;
     }
 
-    RootModule->DrawSignals(bFromDataHub, ievent, bNeg);
-    /*
-    if (!bOK)
-    {
-        if (bNeg) RootModule->ClearOverNegWaveWindow();
-        else      RootModule->ClearOverPosWaveWindow();
-    }
-    */
+    RootModule->DrawSignals(ievent, bNeg);
 }
 
 void MainWindow::on_pbShowAllNeg_toggled(bool checked)
@@ -917,8 +871,7 @@ void MainWindow::showAllWave(bool checked, bool bNeg)
     LogMessage("");
     if (!checked) return;
 
-    const bool bFromDataHub = (ui->cobExplorerSource->currentIndex() == 1);
-    int numEvents = bFromDataHub ? DataHub->CountEvents() : Reader->CountEvents();
+    int numEvents = Reader->CountEvents();
     int ievent = ui->sbEvent->value();
     if (ievent >= numEvents)
     {
@@ -944,7 +897,7 @@ void MainWindow::showAllWave(bool checked, bool bNeg)
         padsY = ui->sbAllPosY->value();
     }
 
-    bool bOK = RootModule->DrawAll(bFromDataHub, ievent, bNeg, padsX, padsY,
+    bool bOK = RootModule->DrawAll(ievent, bNeg, padsX, padsY,
                                    ui->cbAutoscaleY->isChecked(), Min, Max,
                                    ui->cobSortBy->currentIndex(),
                                    ui->cbLabels->isChecked(), ui->cobLableType->currentIndex());
@@ -957,22 +910,22 @@ void MainWindow::showAllWave(bool checked, bool bNeg)
 
 void MainWindow::on_pbShowAllNegatives_toggled(bool checked)
 {
-    const bool bFromDataHub = (ui->cobExplorerSource->currentIndex() == 1);
+    bool sortByLogical = ui->cobSortBy->currentIndex() == 0;
     double Min = ui->ledMinNeg->text().toDouble();
     double Max = ui->ledMaxNeg->text().toDouble();
     RootModule->Show2DNegWindow(checked);
     if (checked)
-        RootModule->Draw2D(true, bFromDataHub, ui->cbAutoscaleY->isChecked(), Min, Max);
+        RootModule->Draw2D(true, sortByLogical, ui->cbAutoscaleY->isChecked(), Min, Max);
 }
 
 void MainWindow::on_pbShowAllPositives_toggled(bool checked)
 {
-    const bool bFromDataHub = (ui->cobExplorerSource->currentIndex() == 1);
+    bool sortByLogical = ui->cobSortBy->currentIndex() == 0;
     double Min = ui->ledMinPos->text().toDouble();
     double Max = ui->ledMaxPos->text().toDouble();
     RootModule->Show2DPosWindow(checked);
     if (checked)
-        RootModule->Draw2D(false, bFromDataHub, ui->cbAutoscaleY->isChecked(), Min, Max);
+        RootModule->Draw2D(false, sortByLogical, ui->cbAutoscaleY->isChecked(), Min, Max);
 }
 
 void MainWindow::on_cbLabels_clicked()
@@ -1077,19 +1030,24 @@ void MainWindow::on_sbAllPosY_editingFinished()
     on_pbShowAllPos_toggled(ui->pbShowAllPos->isChecked());
 }
 
-void MainWindow::on_cbSubstractPedestal_toggled(bool)
+void MainWindow::on_cbSubstractPedestal_toggled(bool checked)
 {
+    ui->frSubstractPedestals->setVisible(checked);
+
     updateSmoothAfterPedeEnableStatus();
 }
 
-void MainWindow::on_cbSmoothWaveforms_toggled(bool)
+void MainWindow::on_cbSmoothWaveforms_toggled(bool checked)
 {
+    ui->frAdjAv->setVisible(checked);
+    ui->frTrapezoidal->setVisible(checked);
+
     updateSmoothAfterPedeEnableStatus();
 }
 
 void MainWindow::updateSmoothAfterPedeEnableStatus()
 {
-    ui->cbSmoothBeforePedestal->setEnabled(ui->cbSubstractPedestal->isChecked() && ui->cbSmoothWaveforms->isChecked());
+    ui->cbSmoothBeforePedestal->setVisible(ui->cbSubstractPedestal->isChecked() && ui->cbSmoothWaveforms->isChecked());
 }
 
 void MainWindow::ClearData()
@@ -1175,7 +1133,7 @@ bool MainWindow::ExtractNumbersFromQString(const QString input, QVector<int> *To
   return true;
 }
 
-const QString MainWindow::PackChannelList(QVector<int> vec)
+QString MainWindow::PackChannelList(QVector<int> vec)
 {
     if (vec.isEmpty()) return "";
 
@@ -1220,7 +1178,7 @@ const QString MainWindow::PackChannelList(QVector<int> vec)
     return out;
 }
 
-const QString MainWindow::PackMappingList(QVector<int> vec)
+QString MainWindow::PackMappingList(QVector<int> vec)
 {
     if (vec.isEmpty()) return "";
 
@@ -1393,17 +1351,7 @@ void MainWindow::on_pbProcessSelectedFiles_clicked()
 
 void MainWindow::bulkProcessorEnvelope(const QStringList FileNames)
 {
-    if (!ui->cbKeepEvents->isChecked()) DataHub->Clear();
     ui->pteBulkLog->clear();
-
-    // !!!***
-    /*
-    if (ui->cbAutoExecuteScript->isChecked())
-    {
-        ScriptWindow->show();
-        ScriptWindow->OpenFirstTab();
-    }
-    */
 
     ui->twMain->setEnabled(false);
     ui->pbStop->setVisible(true);
@@ -1412,9 +1360,9 @@ void MainWindow::bulkProcessorEnvelope(const QStringList FileNames)
     int numErrors = 0;    
     int numProcessedEvents = 0;
     int numBadEvents = 0;
-    for (QString name : FileNames)
+    for (const QString & name : FileNames)
     {
-        bool bOK = HldFileProcessor.ProcessFile(name, ui->cobWhatToSave->currentIndex(), ui->cbSaveTime->isChecked(), "", ui->cbDoNotSaveDisabledChannels->isChecked());
+        bool bOK = HldFileProcessor.processFile(name, ui->cobWhatToSave->currentIndex(), ui->cbSaveTime->isChecked(), "", ui->cbDoNotSaveDisabledChannels->isChecked(), true);
         if (!bOK) numErrors++;
 
         updateNumEventsIndication();
@@ -1566,39 +1514,10 @@ bool MainWindow::bulkProcessCore()
 }
 */
 
-void MainWindow::on_pbSaveSignalsFromDataHub_clicked()
-{
-    QString FileName = QFileDialog::getSaveFileName(this, "Save events from DataHub", Config.WorkingDir, "Data files (*.dat *.txt);;All files (*.*)");
-    if (FileName.isEmpty()) return;
-    Config.WorkingDir = QFileInfo(FileName).absolutePath();
-
-    bool bSavePositions = ui->cbAddReconstructedPositions->isChecked();
-    bool bSkipRejected = ui->cbSaveOnlyGood->isChecked();
-    const QString ErrStr = DataHub->Save(FileName, bSavePositions, bSkipRejected);
-
-    if(!ErrStr.isEmpty()) message(ErrStr, this);
-}
-
-void MainWindow::on_cobExplorerSource_currentIndexChanged(int index)
-{
-    const bool bDirect = (index == 0);
-
-    ui->frExploreDirectly->setVisible(bDirect);
-    ui->cobHardwareOrLogical->setVisible(bDirect);
-    ui->labLogicalChannelNumber->setVisible(!bDirect);
-    ui->cobSortBy->setVisible(bDirect);
-
-    OnEventOrChannelChanged();
-    onEventChanged(ui->sbEvent->value());
-}
-
 void MainWindow::updateNumEventsIndication()
 {
-    ui->labDatahubEvents->setText("DataHub contains " + QString::number(DataHub->CountEvents()) + " events");
-
-    const bool bFromDataHub = (ui->cobExplorerSource->currentIndex()==1);
-    const int numEvents = ( bFromDataHub ? DataHub->CountEvents() : Extractor->CountEvents());
-    ui->leNumEvents->setText( QString::number(numEvents) );
+    const int numEvents = Extractor->CountEvents();
+    ui->labNumEvents->setText( QString::number(numEvents) );
 }
 
 void MainWindow::onBoardLogNewText(const QString text)
@@ -1623,110 +1542,6 @@ void MainWindow::onBoardLogNewText(const QString text)
 void MainWindow::onRequestClearLog()
 {
     ui->pteBoardLog->clear();
-}
-
-void MainWindow::on_pbClearDataHub_clicked()
-{
-    DataHub->Clear();
-    UpdateGui();
-}
-
-void MainWindow::on_pbLoadToDataHub_clicked()
-{
-    if ( DataHub->CountEvents() != 0 && !bNeverRemindAppendToHub)
-    {
-        QMessageBox mb;
-        mb.setText("DataHub is not empty - data will be appended");
-        mb.addButton("OK", QMessageBox::YesRole);
-        QAbstractButton* ConfAlways = mb.addButton("OK, and do not remind", QMessageBox::YesRole);
-        QAbstractButton* Nope = mb.addButton("Cancel", QMessageBox::NoRole);
-        mb.setIcon(QMessageBox::Question);
-        mb.exec();
-
-        if (mb.clickedButton() == Nope) return;
-        if (mb.clickedButton() == ConfAlways) bNeverRemindAppendToHub = true;
-    }
-
-    QString FileName = QFileDialog::getOpenFileName(this, "Load events", Config.WorkingDir, "Data files (*.dat *.txt);;All files (*.*)");
-    if (FileName.isEmpty()) return;
-    Config.WorkingDir = QFileInfo(FileName).absolutePath();
-
-    QFile inFile( FileName );
-    inFile.open(QIODevice::ReadOnly);
-    if(!inFile.isOpen())
-      {
-        message("Unable to open file " +FileName+ " for reading!", this);
-        return;
-      }
-    QTextStream inStream(&inFile);
-
-    this->setEnabled(false);
-    ui->prbMainBar->setVisible(true);
-
-    int numChannels = Config.CountLogicalChannels();
-    int upperLim = numChannels;
-    bool bLoadXYZ = ui->cbLoadIncludeReconstructed->isChecked();
-    if (bLoadXYZ) upperLim += 3;
-    int numEvents = 0;
-    qint64 totSize = QFileInfo(FileName).size();
-    while (!inStream.atEnd())  // optimized assuming proper format of the file
-    {
-        const QString s = inStream.readLine();
-
-        if (numEvents % 200 == 0)
-        {
-            ui->prbMainBar->setValue(100.0 * inStream.pos() / totSize);
-            updateNumEventsIndication();
-            qApp->processEvents();
-        }
-
-        QRegularExpression rx("(\\ |\\,|\\:|\\t)");
-        QStringList fields = s.split(rx, Qt::SkipEmptyParts);
-        if (fields.size() < upperLim) continue;
-
-        QVector<float>* vec = new QVector<float>(numChannels);
-        for (int i=0; i<numChannels; i++)
-        {
-            bool bOK;
-            const QString f = fields.at(i);
-            float val = f.toFloat(&bOK);
-            if (!bOK)
-            {
-                delete vec;
-                continue;
-            }
-            (*vec)[i] = val;
-        }
-
-        float xyz[3];
-        if (bLoadXYZ)
-        {
-
-            bool bOK;
-            for (int i=0; i<3; i++)
-            {
-                const QString ss = fields.at(numChannels+i);
-                xyz[i] = ss.toFloat(&bOK);
-                if (!bOK)
-                {
-                    delete vec;
-                    continue;
-                }
-            }
-        }
-
-        AOneEvent* ev = new AOneEvent();
-        ev->SetSignals(vec);  // transfer ownership!
-        if (bLoadXYZ) ev->SetPosition(xyz);
-
-        DataHub->AddEventFast(ev);
-        numEvents++;
-    }
-
-    setEnabled(true);
-    ui->prbMainBar->setVisible(false);
-    message("Added " + QString::number(numEvents) + " events", this);
-    UpdateGui();
 }
 
 void MainWindow::on_cobLableType_activated(int)
@@ -2676,7 +2491,7 @@ void MainWindow::CreateScriptWindow()
     connect(ScriptHub,  &AScriptHub::outputFromBuffer_JS, JScriptWin, &AScriptWindow::outputFromBuffer, Qt::QueuedConnection);
     connect(ScriptHub,  &AScriptHub::reportProgress_JS,   JScriptWin, &AScriptWindow::onProgressChanged, Qt::QueuedConnection);
     connect(ScriptHub,  &AScriptHub::showAbortMessage_JS, JScriptWin, &AScriptWindow::outputAbortMessage);
-//    connect(JScriptWin, &AScriptWindow::requestUpdateGui, this,       &MainWindow::updateAllGuiFromConfig);
+    connect(JScriptWin, &AScriptWindow::requestUpdateGui, this,       &MainWindow::UpdateGui);
     JScriptWin->updateGui();
 
 #ifdef ANTS3_PYTHON
@@ -2687,10 +2502,9 @@ void MainWindow::CreateScriptWindow()
     connect(ScriptHub,  &AScriptHub::outputText_P,        PythonWin, &AScriptWindow::outputText);
     connect(ScriptHub,  &AScriptHub::outputHtml_P,        PythonWin, &AScriptWindow::outputHtml);
     connect(ScriptHub,  &AScriptHub::outputFromBuffer_P,  PythonWin, &AScriptWindow::outputFromBuffer);
-    connect(ScriptHub,  &AScriptHub::reportProgress_P,    JScriptWin, &AScriptWindow::onProgressChanged);
+    connect(ScriptHub,  &AScriptHub::reportProgress_P,    PythonWin, &AScriptWindow::onProgressChanged);
     connect(ScriptHub,  &AScriptHub::showAbortMessage_P,  PythonWin, &AScriptWindow::outputAbortMessage);
-    connect(PythonWin,  &AScriptWindow::requestUpdateGui, this,      &MainWindow::updateAllGuiFromConfig);
-    connect(GeoTreeWin, &AGeoTreeWin::requestAddPythonScript,   PythonWin, &AScriptWindow::onRequestAddScript);
+    connect(PythonWin,  &AScriptWindow::requestUpdateGui, this,      &MainWindow::UpdateGui);
     PythonWin->updateGui();
 #endif
 
@@ -2792,4 +2606,3 @@ void MainWindow::on_leFolderForHldFiles_customContextMenuRequested(const QPoint 
     if (dir.isEmpty()) return;
     ui->leFolderForHldFiles->setText(dir);
 }
-

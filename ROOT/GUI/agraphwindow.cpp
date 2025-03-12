@@ -20,8 +20,8 @@ AGraphWindow::AGraphWindow(const QString & idStr, QWidget * parent) :
     //RasterWindow->resize(width(), height());
     RasterWindow->resize(800, 500);
     RasterWindow->ForceResize();
-
     setCentralWidget(RasterWindow);
+    connect(RasterWindow, &ARasterWindow::cursorPositionChanged, this, &AGraphWindow::onCursorPositionChanged);
 
     restoreGeomStatus();
     hide();
@@ -80,6 +80,7 @@ void AGraphWindow::SaveAs(const QString & filename)
 
 void AGraphWindow::SetTitle(const QString & title)
 {
+    Title = title;
     setWindowTitle(title);
 }
 
@@ -141,6 +142,13 @@ void AGraphWindow::onDrawRequest(TObject *obj, QString options, bool )
     SetAsActiveRootWindow();
     obj->Draw(options.toLatin1().data());
     UpdateRootCanvas();
+}
+
+void AGraphWindow::onCursorPositionChanged(double x, double y)
+{
+    QString s = QString("%0  (%1, %2)").arg(Title).arg(x).arg(y);
+    setWindowTitle(s);
+    //qDebug() << x << y;
 }
 
 #include <QSettings>

@@ -1,5 +1,7 @@
 #include "ascripthub.h"
 #include "ajscriptmanager.h"
+#include "ajsontools.h"
+#include "adispatcher.h"
 
 #ifdef ANTS3_PYTHON
     #include "apythonscriptmanager.h"
@@ -17,11 +19,6 @@ AScriptHub & AScriptHub::getInstance()
 {
     static AScriptHub instance;
     return instance;
-}
-
-AJScriptManager & AScriptHub::manager()
-{
-    return getInstance().getJScriptManager();
 }
 
 #include <QTimer>
@@ -106,6 +103,36 @@ void AScriptHub::clearOutput(EScriptLanguage lang)
     else                                     emit clearOutput_P();
 }
 
+QString AScriptHub::loadConfig(const QString & fileName)
+{
+    QJsonObject json;
+    bool ok = LoadJsonFromFile(json, fileName);
+    if (!ok) return "Failed to open file to read config: " + fileName;
+
+    return loadConfig(json);
+}
+
+QString AScriptHub::loadConfig(QJsonObject & json)
+{
+    // !!!*** add error control?
+    Dispatcher->LoadConfig(json, false);
+    JSON = json;
+    return "";
+}
+
+QString AScriptHub::saveConfig(const QString & fileName)
+{
+    bool ok = SaveJsonToFile(JSON, fileName);
+    if (!ok) return "Filed to save config to file: " + fileName;
+    return "";
+}
+
+#include "masterconfig.h"
+void AScriptHub::updateJSON()
+{
+    MasterConfig::getInstance().WriteToJson(JSON);
+}
+
 void AScriptHub::reportProgress(int percents, EScriptLanguage lang)
 {
     if (lang == EScriptLanguage::JavaScript) emit reportProgress_JS(percents);
@@ -131,9 +158,9 @@ AScriptHub::AScriptHub()
 }
 
 #include "ainterfacetowaveforms.h"
-#include "ainterfacetodata.h"
 #include "ainterfacetoextractor.h"
 #include "ainterfacetohldfileprocessor.h"
+#include "aconfig_si.h"
 void AScriptHub::createInterfaces()
 {
     addCommonInterface(new ACore_SI(),         "core");
@@ -144,12 +171,11 @@ void AScriptHub::createInterfaces()
     PythonM->registerInterface(new AMath_SI(),     "Math");
 #endif
 
-    addCommonInterface(new AInterfaceToWaveforms(),        "wave");
+    addCommonInterface(new AInterfaceToWaveforms(),        "reader");
     addCommonInterface(new AInterfaceToExtractor(),        "extractor");
-    addCommonInterface(new AInterfaceToData(),             "data");
     addCommonInterface(new AInterfaceToHldFileProcessor(), "hld");
 
-    //addCommonInterface(new AConfig_SI(),       "config");
+    addCommonInterface(new AConfig_SI(),       "config");
     addCommonInterface(new AGraph_SI(),        "graph");
     addCommonInterface(new AHist_SI(),         "hist");
     //addCommonInterface(new ATree_SI(),         "tree");

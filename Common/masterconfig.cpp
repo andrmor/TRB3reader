@@ -309,11 +309,8 @@ void MasterConfig::writePedestalsToJson(QJsonObject &json)
     QJsonObject js;
 
     js["SubstractPedestals"] = bPedestalSubstraction;
-    js["Method"] = PedestalExtractionMethod;
     js["PedestalsFrom"] = PedestalFrom;
     js["PedestalsTo"] = PedestalTo;
-    js["PeakSigma"] = PedestalPeakSigma;
-    js["PeakThreshold"] = PedestalPeakThreshold;
 
     json["Pedestals"] = js;
 }
@@ -325,11 +322,8 @@ bool MasterConfig::readPedestalsFromJson(QJsonObject &json)
     QJsonObject js = json["Pedestals"].toObject();
 
     bPedestalSubstraction = js["SubstractPedestals"].toBool();
-    parseJson(js, "Method", PedestalExtractionMethod);
     PedestalFrom = js["PedestalsFrom"].toInt();
     PedestalTo = js["PedestalsTo"].toInt();
-    parseJson(js, "PeakSigma", PedestalPeakSigma);
-    parseJson(js, "PeakThreshold", PedestalPeakThreshold);
 
     return true;
 }
@@ -531,32 +525,26 @@ QJsonObject AHldProcessSettings::WriteToJson() const
 {
     QJsonObject js;
 
-    js["NumChannels"] =      NumChannels;
-    js["NumSamples"]  =      NumSamples;
-    js["DoExtraction"] =     bDoSignalExtraction;
-    js["DoScript"] =         bDoScript;
-    js["DoSave"] =           bDoSave;
-    js["SaveWhat"] =         SaveWhat;
-    js["AddToFileName"] =    AddToFileName;
-    js["AddRunTime"] =       AddRunTime;
-    js["DoCopyToDatahub"] =  bDoCopyToDatahub;
-    js["IncludeWaveforms"] = bCopyWaveforms;
+    js["NumChannels"] =          NumChannels;
+    js["NumSamples"]  =          NumSamples;
+    js["SaveWhat"] =             SaveWhat;
+    js["SkipDisabledChannels"] = SkipDisabledChannels;
+    js["IncludeTimingData"] =    IncludeTimingData;
+    js["AddToFileName"] =        AddToFileName;
+    js["AddRunTime"] =           AddRunTime;
 
     return js;
 }
 
 void AHldProcessSettings::ReadFromJson(const QJsonObject &json)
 {
-    parseJson(json, "NumChannels",      NumChannels);
-    parseJson(json, "NumSamples",       NumSamples);
-    parseJson(json, "DoExtraction",     bDoSignalExtraction);
-    parseJson(json, "DoScript",         bDoScript);
-    parseJson(json, "DoSave",           bDoSave);
-    parseJson(json, "SaveWhat",         SaveWhat);
-    parseJson(json, "AddToFileName",    AddToFileName);
-    parseJson(json, "AddRunTime",       AddRunTime);
-    parseJson(json, "DoCopyToDatahub",  bDoCopyToDatahub);
-    parseJson(json, "IncludeWaveforms", bCopyWaveforms);
+    parseJson(json, "NumChannels",          NumChannels);
+    parseJson(json, "NumSamples",           NumSamples);
+    parseJson(json, "SaveWhat",             SaveWhat);
+    parseJson(json, "SkipDisabledChannels", SkipDisabledChannels);
+    parseJson(json, "IncludeTimingData",    IncludeTimingData);
+    parseJson(json, "AddToFileName",        AddToFileName);
+    parseJson(json, "AddRunTime",           AddRunTime);
 }
 
 bool ABufferRecord::updateValues(int samples, int delay, int downs)

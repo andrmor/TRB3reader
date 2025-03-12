@@ -46,8 +46,8 @@ SOURCES +=  main.cpp \
             Common/amessage.cpp \
             Common/completingtexteditclass.cpp \
             Common/adispatcher.cpp \
-            Common/adatahub.cpp \
             Common/ahldfileprocessor.cpp \
+            Script/ScriptInterfaces/aconfig_si.cpp \
             Script/ScriptInterfaces/ascriptinterface.cpp \
             Script/ScriptInterfaces/acore_si.cpp \
             Script/ScriptInterfaces/amath_si.cpp \
@@ -60,7 +60,6 @@ SOURCES +=  main.cpp \
             Script/ScriptInterfaces/ainterfacetowaveforms.cpp \
             Script/ScriptInterfaces/ainterfacetoextractor.cpp \
             Script/ScriptInterfaces/ainterfacetohldfileprocessor.cpp \
-            Script/ScriptInterfaces/ainterfacetodata.cpp \
             Script/ScriptWindow/ascriptwindow.cpp \
             Script/ScriptWindow/aargumentcounter.cpp \
             Script/ScriptWindow/ahighlighters.cpp \
@@ -71,6 +70,8 @@ SOURCES +=  main.cpp \
             Script/ScriptWindow/atabrecord.cpp \
             Script/ScriptWindow/atextedit.cpp \
             Script/ScriptWindow/atextoutputwindow.cpp \
+            Script/ScriptInterfaces/ainterfacetowebsocket.cpp \
+            Script/ScriptInterfaces/awebserverinterface.cpp \
             Script/aguifromscrwin.cpp \
             Script/aguiwindow.cpp \
             Script/ajscriptmanager.cpp \
@@ -94,17 +95,13 @@ SOURCES +=  main.cpp \
             TRB/trb3signalextractor.cpp \
             TRB/atrbruncontrol.cpp \
             TRB/atrbrunsettings.cpp \
-            Script/ainterfacetomessagewindow.cpp \
-            Script/ainterfacetoconfig.cpp \
-            Script/ainterfacetowebsocket.cpp \
-            Script/awebserverinterface.cpp \
             Net/awebsocketsession.cpp \
             Net/awebsocketsessionserver.cpp \
             Net/anetworkmodule.cpp \
-            aservermonitorwindow.cpp \
+            GUI/aservermonitorwindow.cpp \
             GUI/abufferdelegate.cpp
 
-HEADERS  += GUI/mainwindow.h \    
+HEADERS  += GUI/mainwindow.h \
             ROOT/cernrootmodule.h \
             ROOT/GUI/arasterwindow.h \
             ROOT/GUI/agraphwindow.h \
@@ -117,12 +114,12 @@ HEADERS  += GUI/mainwindow.h \
             Common/ajsontools.h \
             Common/afiletools.h \
             Common/adispatcher.h \
-            Common/adatahub.h \
             Common/amessage.h \
             Common/completingtexteditclass.h \
             Common/ahldfileprocessor.h \
             GUI/alineedit.h \
             GUI/guitools.h \
+            Script/ScriptInterfaces/aconfig_si.h \
             Script/ScriptInterfaces/ascriptinterface.h \
             Script/ScriptInterfaces/acore_si.h \
             Script/ScriptInterfaces/amath_si.h \
@@ -135,7 +132,6 @@ HEADERS  += GUI/mainwindow.h \
             Script/ScriptInterfaces/ainterfacetowaveforms.h \
             Script/ScriptInterfaces/ainterfacetoextractor.h \
             Script/ScriptInterfaces/ainterfacetohldfileprocessor.h \
-            Script/ScriptInterfaces/ainterfacetodata.h \
             Script/ScriptWindow/ascriptwindow.h \
             Script/ScriptWindow/aargumentcounter.h \
             Script/ScriptWindow/ahighlighters.h \
@@ -146,6 +142,8 @@ HEADERS  += GUI/mainwindow.h \
             Script/ScriptWindow/atabrecord.h \
             Script/ScriptWindow/atextedit.h \
             Script/ScriptWindow/atextoutputwindow.h \
+            Script/ScriptInterfaces/ainterfacetowebsocket.h \
+            Script/ScriptInterfaces/awebserverinterface.h \
             Script/aguifromscrwin.h \
             Script/aguiwindow.h \
             Script/ajscriptmanager.h \
@@ -165,14 +163,10 @@ HEADERS  += GUI/mainwindow.h \
             TRB/trb3signalextractor.h \
             TRB/atrbruncontrol.h \
             TRB/atrbrunsettings.h \
-            Script/ainterfacetomessagewindow.h \
-            Script/ainterfacetoconfig.h \
-            Script/ainterfacetowebsocket.h \
-            Script/awebserverinterface.h \
             Net/awebsocketsession.h \
             Net/awebsocketsessionserver.h \
             Net/anetworkmodule.h \
-            aservermonitorwindow.h \
+            GUI/aservermonitorwindow.h \
             GUI/aeditchannelsdialog.h \
             GUI/abufferdelegate.h
 
@@ -182,7 +176,7 @@ FORMS    += GUI/mainwindow.ui \
             ROOT/GUI/agraphwindow.ui \
             Script/ScriptWindow/ascriptexampleexplorer.ui \
             Script/ScriptWindow/ascriptwindow.ui \
-            aservermonitorwindow.ui
+            GUI/aservermonitorwindow.ui
 
 INCLUDEPATH += Common
 INCLUDEPATH += Script

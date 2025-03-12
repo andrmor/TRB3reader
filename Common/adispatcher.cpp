@@ -32,16 +32,19 @@ void ADispatcher::LoadConfig(const QString FileName)
 {
     QJsonObject json;
     LoadJsonFromFile(json, FileName);
-    LoadConfig(json);
+    LoadConfig(json, true);
 }
 
-bool ADispatcher::LoadConfig(QJsonObject &json)
+bool ADispatcher::LoadConfig(QJsonObject & json, bool includeGui)
 {
     Config.ReadFromJson(json);
     ClearData();
 
-    emit RequestReadGuiFromJson(json);
-    emit RequestUpdateGui();
+    if (includeGui)
+    {
+        emit RequestReadGuiFromJson(json);
+        emit RequestUpdateGui();
+    }
 
     return true;
 }

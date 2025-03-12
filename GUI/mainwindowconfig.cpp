@@ -7,7 +7,6 @@
 #include "trb3datareader.h"
 #include "ascriptwindow.h"
 #include "adispatcher.h"
-#include "adatahub.h"
 #include "amessage.h"
 #include "atrbruncontrol.h"
 
@@ -36,7 +35,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
     delete RootModule; RootModule = nullptr;
 
-    QMainWindow::closeEvent(event);
+    AGuiWindow::closeEvent(event);
 }
 
 void MainWindow::saveCompleteState()
@@ -71,23 +70,6 @@ void MainWindow::WriteGUItoJson(QJsonObject &json)
 
     jsgui["HardOrLog"] = ui->cobHardwareOrLogical->currentIndex();
 
-    jsgui["KeepEventsOnStart"] = ui->cbKeepEvents->isChecked();
-    //jsgui["BulkExtract"] = ui->cbBulkExtract->isChecked();
-    //jsgui["AutoRunScript"] = ui->cbAutoExecuteScript->isChecked();
-    //jsgui["SaveFiles"] = ui->cbSaveSignalsToFiles->isChecked();
-    //jsgui["SuffixReplacement"] = ui->leAddToProcessed->text();
-    //jsgui["BulkCopy"] = ui->cbBulkCopyToDatahub->isChecked();
-    //jsgui["BulkCopyWaveforms"] = ui->cbBulkAlsoCopyWaveforms->isChecked();
-    jsgui["SaveAddPositions"] = ui->cbAddReconstructedPositions->isChecked();
-    jsgui["SaveSkipRejected"] = ui->cbSaveOnlyGood->isChecked();
-    jsgui["LoadAlsoPositions"] = ui->cbLoadIncludeReconstructed->isChecked();
-
-    jsgui["SaveTime"] = ui->cbSaveTime->isChecked();
-
-    jsgui["DoNotSaveDisabledChannels"] = ui->cbDoNotSaveDisabledChannels->isChecked();
-
-    jsgui["ExplorerSource"] = ui->cobExplorerSource->currentIndex();
-
     QJsonObject ja;
         ja["AutoY"] = ui->cbAutoscaleY->isChecked();
         ja["Sort"] = ui->cobSortBy->currentIndex();
@@ -117,23 +99,6 @@ void MainWindow::ReadGUIfromJson(const QJsonObject& json)
 
     JsonToComboBox(jsgui, "HardOrLog", ui->cobHardwareOrLogical);
 
-    JsonToCheckbox(jsgui, "KeepEventsOnStart", ui->cbKeepEvents);
-    //JsonToCheckbox(jsgui, "BulkExtract", ui->cbBulkExtract);
-    //JsonToCheckbox(jsgui, "AutoRunScript", ui->cbAutoExecuteScript);
-    //JsonToCheckbox(jsgui, "SaveFiles", ui->cbSaveSignalsToFiles);
-    //JsonToLineEditText(jsgui, "SuffixReplacement", ui->leAddToProcessed);
-    //JsonToCheckbox(jsgui, "BulkCopy", ui->cbBulkCopyToDatahub);
-    //JsonToCheckbox(jsgui, "BulkCopyWaveforms", ui->cbBulkAlsoCopyWaveforms);
-    JsonToCheckbox(jsgui, "SaveAddPositions", ui->cbAddReconstructedPositions);
-    JsonToCheckbox(jsgui, "SaveSkipRejected", ui->cbSaveOnlyGood);
-    JsonToCheckbox(jsgui, "LoadAlsoPositions", ui->cbLoadIncludeReconstructed);
-
-    JsonToCheckbox(jsgui, "SaveTime", ui->cbSaveTime);
-
-    JsonToCheckbox(jsgui, "DoNotSaveDisabledChannels", ui->cbDoNotSaveDisabledChannels);
-
-    JsonToComboBox(jsgui, "ExplorerSource", ui->cobExplorerSource);
-
     QJsonObject ja = jsgui["GraphScale"].toObject();
         JsonToCheckbox(ja, "AutoY", ui->cbAutoscaleY);
         JsonToComboBox(ja, "Sort", ui->cobSortBy);
@@ -157,41 +122,13 @@ void MainWindow::ReadGUIfromJson(const QJsonObject& json)
 
 void MainWindow::SaveWindowSettings()
 {
-    QJsonObject json;
-
-    json["Main"] = SaveWindowToJson(x(), y(), width(), height(), true);
-    // !!!***
-//    json["ScriptWindow"] = SaveWindowToJson(ScriptWindow->x(), ScriptWindow->y(), ScriptWindow->width(), ScriptWindow->height(), ScriptWindow->isVisible());
-
-    //json["GraphWindows"] = RootModule->SaveGraphWindows();
-
-    SaveJsonToFile(json, Config.WinSetFile);
+    storeGeomStatus();
 }
 
 void MainWindow::LoadWindowSettings()
 {
-    QJsonObject js;
-    LoadJsonFromFile(js, Config.WinSetFile);
-    if (js.isEmpty()) return;
-
-    int x=10, y=10, w=500, h=700;
-    bool bVis=true;
-
-    if (js.contains("Main"))
-    {
-        QJsonObject jsMain = js["Main"].toObject();
-        LoadWindowFromJson(jsMain, x, y, w, h, bVis);
-        this->move(x, y);
-        this->resize(w, h);
-        //setGeometry(x, y, w, h); // introduces a shift up on Windows7
-    }
-
-    // !!!***
+    restoreGeomStatus();
     JScriptWin->restoreGeomStatus();
-
-    //QJsonObject jsW;
-    //parseJson(js, "GraphWindows", jsW);
-    //RootModule->SetWindowGeometries(jsW);
 }
 
 // --- Update GUI controls on Config change ---
@@ -246,12 +183,8 @@ void MainWindow::UpdateGui()
     ui->pteIgnoreHardwareChannels->appendPlainText(s);
 
     ui->cbSubstractPedestal->setChecked(Config.bPedestalSubstraction);
-        ui->cobPedestalExtractionMethod->setCurrentIndex(Config.PedestalExtractionMethod);
         ui->sbPedestalFrom->setValue(Config.PedestalFrom);
         ui->sbPedestalTo->setValue(Config.PedestalTo);
-        ui->ledPedestalPeakSigma->setText( QString::number(Config.PedestalPeakSigma) );
-        ui->ledPedestalPeakThreshold->setText( QString::number(Config.PedestalPeakThreshold) );
-
 
     ui->cbSmoothWaveforms->setChecked(Config.bSmoothWaveforms);
     ui->cbSmoothBeforePedestal->setChecked(Config.bSmoothingBeforePedestals);
@@ -302,16 +235,13 @@ void MainWindow::UpdateGui()
     ui->sbPosMaxFrom->setValue(Config.PosMaxGateFrom);
     ui->sbPosMaxTo->setValue(Config.PosMaxGateTo);
 
-    ui->sbNumChannels->setValue( Config.HldProcessSettings.NumChannels );
-    ui->sbNumSamples->setValue( Config.HldProcessSettings.NumSamples );
-    ui->cbBulkExtract->setChecked( Config.HldProcessSettings.bDoSignalExtraction );
-    ui->cbAutoExecuteScript->setChecked( Config.HldProcessSettings.bDoScript );
-    ui->cbSaveSignalsToFiles->setChecked( Config.HldProcessSettings.bDoSave );
-    ui->cobWhatToSave->setCurrentIndex( Config.HldProcessSettings.SaveWhat );
-    ui->leAddToProcessed->setText( Config.HldProcessSettings.AddToFileName );
-    ui->cbAddRunTime->setChecked( Config.HldProcessSettings.AddRunTime );
-    ui->cbBulkCopyToDatahub->setChecked( Config.HldProcessSettings.bDoCopyToDatahub );
-    ui->cbBulkAlsoCopyWaveforms->setChecked( Config.HldProcessSettings.bCopyWaveforms );
+    ui->sbNumChannels->setValue( Config.HldProcessSettings.NumChannels);
+    ui->sbNumSamples->setValue( Config.HldProcessSettings.NumSamples);
+    ui->cobWhatToSave->setCurrentIndex( Config.HldProcessSettings.SaveWhat);
+    ui->cbDoNotSaveDisabledChannels->setChecked(Config.HldProcessSettings.SkipDisabledChannels);
+    ui->cbSaveTime->setChecked(Config.HldProcessSettings.IncludeTimingData);
+    ui->leAddToProcessed->setText( Config.HldProcessSettings.AddToFileName);
+    ui->cbAddRunTime->setChecked( Config.HldProcessSettings.AddRunTime);
 
     updateNumEventsIndication();
     OnEventOrChannelChanged();
@@ -534,24 +464,19 @@ void MainWindow::on_sbNumSamples_editingFinished()
     Config.HldProcessSettings.NumSamples = ui->sbNumSamples->value();
 }
 
-void MainWindow::on_cbBulkExtract_clicked()
-{
-    Config.HldProcessSettings.bDoSignalExtraction = ui->cbBulkExtract->isChecked();
-}
-
-void MainWindow::on_cbAutoExecuteScript_clicked()
-{
-    Config.HldProcessSettings.bDoScript = ui->cbAutoExecuteScript->isChecked();
-}
-
-void MainWindow::on_cbSaveSignalsToFiles_clicked()
-{
-    Config.HldProcessSettings.bDoSave = ui->cbSaveSignalsToFiles->isChecked();
-}
-
 void MainWindow::on_cobWhatToSave_activated(int index)
 {
     Config.HldProcessSettings.SaveWhat = index;
+}
+
+void MainWindow::on_cbDoNotSaveDisabledChannels_clicked(bool checked)
+{
+    Config.HldProcessSettings.SkipDisabledChannels = checked;
+}
+
+void MainWindow::on_cbSaveTime_clicked(bool checked)
+{
+    Config.HldProcessSettings.IncludeTimingData = checked;
 }
 
 void MainWindow::on_leAddToProcessed_editingFinished()
@@ -562,29 +487,4 @@ void MainWindow::on_leAddToProcessed_editingFinished()
 void MainWindow::on_cbAddRunTime_clicked(bool checked)
 {
     Config.HldProcessSettings.AddRunTime = checked;
-}
-
-void MainWindow::on_cbBulkCopyToDatahub_clicked()
-{
-    Config.HldProcessSettings.bDoCopyToDatahub = ui->cbBulkCopyToDatahub->isChecked();
-}
-
-void MainWindow::on_cbBulkAlsoCopyWaveforms_clicked()
-{
-    Config.HldProcessSettings.bCopyWaveforms = ui->cbBulkAlsoCopyWaveforms->isChecked();
-}
-
-void MainWindow::on_cobPedestalExtractionMethod_activated(int index)
-{
-    Config.PedestalExtractionMethod = index;
-}
-
-void MainWindow::on_ledPedestalPeakSigma_editingFinished()
-{
-    Config.PedestalPeakSigma = ui->ledPedestalPeakSigma->text().toDouble();
-}
-
-void MainWindow::on_ledPedestalPeakThreshold_editingFinished()
-{
-    Config.PedestalPeakThreshold = ui->ledPedestalPeakThreshold->text().toDouble();
 }
