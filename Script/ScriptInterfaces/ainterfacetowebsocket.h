@@ -27,7 +27,7 @@ public slots:
     void     Disconnect();
 
     QString  SendText(const QString & message);
-    QString  SendObject(const QVariant & object);
+    QString  SendObject(const QVariantMap & object);
     QString  SendFile(const QString & fileName);
 
     QString  ResumeWaitForAnswer();

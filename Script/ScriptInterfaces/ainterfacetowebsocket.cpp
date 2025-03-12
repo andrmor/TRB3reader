@@ -75,15 +75,9 @@ QString AInterfaceToWebSocket::SendText(const QString &message)
     }
 }
 
-QString AInterfaceToWebSocket::SendObject(const QVariant &object)
+QString AInterfaceToWebSocket::SendObject(const QVariantMap & object)
 {
-    if (object.type() != QVariant::Map)
-    {
-        abort("Argument type of SendObject() method should be object!");
-        return "";
-    }
-    QVariantMap vm = object.toMap();
-    QJsonObject js = QJsonObject::fromVariantMap(vm);
+    QJsonObject js = QJsonObject::fromVariantMap(object);
 
     return sendQJsonObject(js);
 }
