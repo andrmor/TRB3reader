@@ -35,7 +35,7 @@ int ANetworkModule::getWebSocketPort() const
     return WebSocketServer->GetPort();
 }
 
-const QString ANetworkModule::getWebSocketServerURL() const
+QString ANetworkModule::getWebSocketServerURL() const
 {
   if (!WebSocketServer) return "";
   return WebSocketServer->GetUrl();
@@ -57,32 +57,58 @@ void ANetworkModule::StopWebSocketServer()
 #include "ascripthub.h"
 #include "ajscriptmanager.h"
 #include <QVariant>
+#include <QApplication>
+#include <QThread>
 void ANetworkModule::OnWebSocketTextMessageReceived(QString message)
 {
-    qDebug() << "Websocket server: Message (script) received";
-    qDebug() << "  Evaluating as JavaScript";
+    qDebug() << "-->Websocket server: Message (script) received:\n" << message;
+    qDebug() << "-->Evaluating as JavaScript";
 
     AScriptHub & ScriptHub = AScriptHub::getInstance();
     AJScriptManager & ScriptManager = ScriptHub.getJScriptManager();
 
+    AbortRequestTmp = false;
     bool ok = ScriptManager.evaluate(message);
-    if (ok)
+    if (!ok)
     {
-        if ( !WebSocketServer->isReplied() )
-        {
-            QVariant res = ScriptManager.getResult();
-            WebSocketServer->ReplyWithText("{ \"result\" : true, \"evaluation\" : \"" + res.toString() + "\" }");
-        }
+        qDebug() << "-->Failed to start script evaluation (worker is busy)";
+        WebSocketServer->sendError( QString("failed to start evaluation, worker is busy") );
+    }
+
+    do
+    {
+        QApplication::processEvents();
+        QThread::usleep(100);
+        if (AbortRequestTmp) ScriptManager.abort();
+    }
+    while ( !ScriptManager.isAborted() && !ScriptManager.isFinished());
+    //qDebug() << ScriptManager.isAborted() << ScriptManager.isFinished();
+
+    if (ScriptManager.isError())
+    {
+        qDebug() << "-->Evaluation error:" << ScriptManager.getErrorDescription() << "in line" << ScriptManager.getErrorLineNumber();
+        WebSocketServer->sendError( QString("Script error -> %0 in line %1").arg(ScriptManager.getErrorDescription()).arg(ScriptManager.getErrorLineNumber()) );
+    }
+    else if (ScriptManager.isAborted())
+    {
+        qDebug() << "-->Evaluation aborted";
+        WebSocketServer->sendError( QString("Script eval aborted") );
     }
     else
     {
-        if (ScriptManager.isError())
-            WebSocketServer->sendError( QString("Script error -> %0 in line %1").arg(ScriptManager.getErrorDescription()).arg(ScriptManager.getErrorLineNumber()) );
-        else if (ScriptManager.isAborted())
-            WebSocketServer->sendError( QString("Script eval aborted") );
+        qDebug() << "-->Evaluation success";
+        if ( !WebSocketServer->isReplied() )
+        {
+            qDebug() << "-->Generating reply";
+            QVariant res = ScriptManager.getResult();
+            qDebug() << "-->Result:" << res;
+            WebSocketServer->ReplyWithText("{ \"result\" : true, \"evaluation\" : \"" + res.toString() + "\" }");
+        }
+        else qDebug() << "-->Not need to reply, script already generated one";
     }
 
 /*
+    // Qt5 version
     int line = ScriptManager->FindSyntaxError(message);
     if (line != -1)
     {

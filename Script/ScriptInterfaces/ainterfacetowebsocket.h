@@ -16,39 +16,39 @@ class AInterfaceToWebSocket: public AScriptInterface
 
 public:
     AInterfaceToWebSocket();
-    AInterfaceToWebSocket(const AInterfaceToWebSocket& other);
     ~AInterfaceToWebSocket();
 
-    virtual bool IsMultithreadCapable() const {return true;}
-    virtual void ForceStop();
+    AScriptInterface * cloneBase() const override {return new AInterfaceToWebSocket();}
+
+    void abortRun() override;
 
 public slots:    
-    const QString  Connect(const QString& Url, bool GetAnswerOnConnection);
-    void           Disconnect();
+    QString  Connect(const QString & Url, bool GetAnswerOnConnection);
+    void     Disconnect();
 
-    const QString  SendText(const QString& message);
-    const QString  SendObject(const QVariant& object);
-    const QString  SendFile(const QString& fileName);
+    QString  SendText(const QString & message);
+    QString  SendObject(const QVariant & object);
+    QString  SendFile(const QString & fileName);
 
-    const QString  ResumeWaitForAnswer();
+    QString  ResumeWaitForAnswer();
 
-    const QVariant GetBinaryReplyAsObject();
-    bool           SaveBinaryReplyToFile(const QString& fileName);
+    QVariant GetBinaryReplyAsObject();
+    bool     SaveBinaryReplyToFile(const QString & fileName);
 
-    void           SetTimeout(int milliseconds);
+    void     SetTimeout(int milliseconds);
 
 signals:
-    void showTextOnMessageWindow(const QString& text);
+    void showTextOnMessageWindow(const QString & text);
     void clearTextOnMessageWindow();
 
 private:
-    AWebSocketSession* socket = 0;
+    AWebSocketSession * socket = nullptr;
 
     int TimeOut = 3000; //milliseconds
 
 private:
-    const QString sendQJsonObject(const QJsonObject &json);
-    const QString sendQByteArray(const QByteArray &ba);
+    QString sendQJsonObject(const QJsonObject & json);
+    QString sendQByteArray(const QByteArray & ba);
 };
 
 #endif // AINTERFACETOWEBSOCKET_H

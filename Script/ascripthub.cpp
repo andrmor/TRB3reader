@@ -148,6 +148,7 @@ QString AScriptHub::getPythonVersion()
 #endif
 }
 
+#include "anetworkmodule.h"
 AScriptHub::AScriptHub()
 {
     //qDebug() << ">Creating AJScriptManager and Generating/registering script units";
@@ -161,6 +162,8 @@ AScriptHub::AScriptHub()
 #include "ainterfacetoextractor.h"
 #include "ainterfacetohldfileprocessor.h"
 #include "aconfig_si.h"
+#include "ainterfacetowebsocket.h"
+#include "awebserverinterface.h"
 void AScriptHub::createInterfaces()
 {
     addCommonInterface(new ACore_SI(),         "core");
@@ -180,6 +183,9 @@ void AScriptHub::createInterfaces()
     addCommonInterface(new AHist_SI(),         "hist");
     //addCommonInterface(new ATree_SI(),         "tree");
     addCommonInterface(new ARootStyle_SI(),    "root");
+
+    addCommonInterface(new AInterfaceToWebSocket(), "websocket");
+    addCommonInterface(new AWebServerInterface(*Dispatcher->Network->WebSocketServer), "webserver");
 
 //JavaScriptM->registerInterface(new AMiniJS_SI(), "mini");  // !!!*** need here?
 #ifdef ANTS3_PYTHON

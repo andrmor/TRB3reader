@@ -1,14 +1,13 @@
 #include "ainterfacetowebsocket.h"
-#include "anetworkmodule.h"
 #include "awebsocketsession.h"
-#include "awebsocketsessionserver.h"
+//#include "awebsocketsessionserver.h"
 
 #include <QDebug>
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QFile>
 
-const QJsonObject strToObject(const QString& s)
+QJsonObject strToObject(const QString & s)
 {
     QJsonDocument doc = QJsonDocument::fromJson(s.toUtf8());
     return doc.object();
@@ -16,17 +15,12 @@ const QJsonObject strToObject(const QString& s)
 
 AInterfaceToWebSocket::AInterfaceToWebSocket() : AScriptInterface() {}
 
-AInterfaceToWebSocket::AInterfaceToWebSocket(const AInterfaceToWebSocket &) : AScriptInterface()
-{
-    socket = 0;
-}
-
 AInterfaceToWebSocket::~AInterfaceToWebSocket()
 {
-    if (socket) socket->deleteLater();
+    socket->deleteLater();
 }
 
-void AInterfaceToWebSocket::ForceStop()
+void AInterfaceToWebSocket::abortRun()
 {
     if (socket) socket->ExternalAbort();
 }
@@ -38,7 +32,7 @@ void AInterfaceToWebSocket::SetTimeout(int milliseconds)
     if (socket) socket->SetTimeout(milliseconds);
 }
 
-const QString AInterfaceToWebSocket::Connect(const QString &Url, bool GetAnswerOnConnection)
+QString AInterfaceToWebSocket::Connect(const QString &Url, bool GetAnswerOnConnection)
 {
     if (!socket)
     {
@@ -63,7 +57,7 @@ void AInterfaceToWebSocket::Disconnect()
     if (socket) socket->Disconnect();
 }
 
-const QString AInterfaceToWebSocket::SendText(const QString &message)
+QString AInterfaceToWebSocket::SendText(const QString &message)
 {
     if (!socket)
     {
@@ -81,7 +75,7 @@ const QString AInterfaceToWebSocket::SendText(const QString &message)
     }
 }
 
-const QString AInterfaceToWebSocket::SendObject(const QVariant &object)
+QString AInterfaceToWebSocket::SendObject(const QVariant &object)
 {
     if (object.type() != QVariant::Map)
     {
@@ -94,7 +88,7 @@ const QString AInterfaceToWebSocket::SendObject(const QVariant &object)
     return sendQJsonObject(js);
 }
 
-const QString AInterfaceToWebSocket::sendQJsonObject(const QJsonObject& json)
+QString AInterfaceToWebSocket::sendQJsonObject(const QJsonObject& json)
 {
     if (!socket)
     {
@@ -112,7 +106,7 @@ const QString AInterfaceToWebSocket::sendQJsonObject(const QJsonObject& json)
     }
 }
 
-const QString AInterfaceToWebSocket::sendQByteArray(const QByteArray &ba)
+QString AInterfaceToWebSocket::sendQByteArray(const QByteArray &ba)
 {
     if (!socket)
     {
@@ -130,7 +124,7 @@ const QString AInterfaceToWebSocket::sendQByteArray(const QByteArray &ba)
     }
 }
 
-const QString AInterfaceToWebSocket::SendFile(const QString &fileName)
+QString AInterfaceToWebSocket::SendFile(const QString &fileName)
 {
     if (!socket)
     {
@@ -148,7 +142,7 @@ const QString AInterfaceToWebSocket::SendFile(const QString &fileName)
     }
 }
 
-const QString AInterfaceToWebSocket::ResumeWaitForAnswer()
+QString AInterfaceToWebSocket::ResumeWaitForAnswer()
 {
     if (!socket)
     {
@@ -166,7 +160,7 @@ const QString AInterfaceToWebSocket::ResumeWaitForAnswer()
     }
 }
 
-const QVariant AInterfaceToWebSocket::GetBinaryReplyAsObject()
+QVariant AInterfaceToWebSocket::GetBinaryReplyAsObject()
 {
     if (!socket)
     {

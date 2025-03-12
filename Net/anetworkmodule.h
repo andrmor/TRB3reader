@@ -23,17 +23,18 @@ public:
 
     bool isWebSocketServerRunning() const;
     int getWebSocketPort() const;
-    const QString getWebSocketServerURL() const;
-
-    AWebSocketSessionServer* WebSocketServer = 0;
+    QString getWebSocketServerURL() const;
 
     void StartWebSocketServer(QHostAddress ip, quint16 port);
     void StopWebSocketServer();
 
     bool makeHttpRequest(const QString & url, QString & replyOrError, int timeout_ms);
 
+    AWebSocketSessionServer * WebSocketServer = nullptr;
+    bool AbortRequestTmp = false;
+
 public slots:
-  void OnWebSocketTextMessageReceived(QString message); // !!!***
+  void OnWebSocketTextMessageReceived(QString message);
   void OnClientDisconnected();
 
 private slots:
@@ -44,7 +45,7 @@ signals:
   void ReportTextToGUI(const QString text);
 
 private:
-  AScriptManager* ScriptManager;
+  AScriptManager * ScriptManager;
   bool fDebug = true;
 
   QNetworkAccessManager * HttpManager = nullptr;

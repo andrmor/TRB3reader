@@ -32,7 +32,6 @@ public:
     void ClearMapping();
     void ClearIgnoreChannels();
 
-private:
     MasterConfig        & Config;
     Trb3dataReader      * Reader;
     Trb3signalExtractor * Extractor;
