@@ -73,6 +73,7 @@ void ANetworkModule::OnWebSocketTextMessageReceived(QString message)
     {
         qDebug() << "-->Failed to start script evaluation (worker is busy)";
         WebSocketServer->sendError( QString("failed to start evaluation, worker is busy") );
+        return;
     }
 
     do
