@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>TRBreader v4.1.1</string>
+   <string/>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -589,7 +589,7 @@
             <item>
              <widget class="QLabel" name="label_23">
               <property name="text">
-               <string>These hardware channels will be always digitized to zero signal:</string>
+               <string>Ignored channels (assigned zero signal, can be skipped in hld files: see ADCs tab):</string>
               </property>
              </widget>
             </item>
@@ -2074,17 +2074,51 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_58">
               <item>
-               <widget class="QListWidget" name="lwBufferControl">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>300</height>
-                 </size>
+               <layout class="QVBoxLayout" name="verticalLayout_9">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QCheckBox" name="cbDisableIgnoredChannels">
+                  <property name="text">
+                   <string>Ignored channels will not appear in the hld files</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QListWidget" name="lwBufferControl">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>300</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="Line" name="line_23">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Vertical</enum>
                 </property>
                </widget>
               </item>
               <item>
                <layout class="QVBoxLayout" name="verticalLayout_37">
+                <item>
+                 <spacer name="verticalSpacer_6">
+                  <property name="orientation">
+                   <enum>Qt::Orientation::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
                 <item>
                  <widget class="QPushButton" name="pbBufferSendToTRB">
                   <property name="minimumSize">
@@ -2127,13 +2161,6 @@
               </property>
               <property name="checked">
                <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="cbDisableIgnoredChannels">
-              <property name="text">
-               <string>Ignored channels are disabled and not saved to hld files</string>
               </property>
              </widget>
             </item>
@@ -2425,14 +2452,14 @@
                   <item>
                    <widget class="QCheckBox" name="cbPeripheryFPGA0">
                     <property name="text">
-                     <string>Input 0</string>
+                     <string>Input #0</string>
                     </property>
                    </widget>
                   </item>
                   <item>
                    <widget class="QCheckBox" name="cbPeripheryFPGA1">
                     <property name="text">
-                     <string>Input 1</string>
+                     <string>Input #1</string>
                     </property>
                    </widget>
                   </item>
@@ -2590,6 +2617,11 @@
                     </item>
                     <item row="1" column="3">
                      <widget class="QLabel" name="label_88">
+                      <property name="font">
+                       <font>
+                        <fontweight>DemiBold</fontweight>
+                       </font>
+                      </property>
                       <property name="text">
                        <string>1</string>
                       </property>
@@ -2597,6 +2629,11 @@
                     </item>
                     <item row="1" column="4">
                      <widget class="QLabel" name="label_89">
+                      <property name="font">
+                       <font>
+                        <fontweight>DemiBold</fontweight>
+                       </font>
+                      </property>
                       <property name="text">
                        <string>0</string>
                       </property>
@@ -2735,6 +2772,11 @@
                     </item>
                     <item row="1" column="3">
                      <widget class="QLabel" name="label_93">
+                      <property name="font">
+                       <font>
+                        <fontweight>DemiBold</fontweight>
+                       </font>
+                      </property>
                       <property name="text">
                        <string>1</string>
                       </property>
@@ -2742,6 +2784,11 @@
                     </item>
                     <item row="1" column="4">
                      <widget class="QLabel" name="label_94">
+                      <property name="font">
+                       <font>
+                        <fontweight>DemiBold</fontweight>
+                       </font>
+                      </property>
                       <property name="text">
                        <string>0</string>
                       </property>
@@ -2792,6 +2839,11 @@
                       </property>
                       <item>
                        <widget class="QLabel" name="label_98">
+                        <property name="font">
+                         <font>
+                          <fontweight>DemiBold</fontweight>
+                         </font>
+                        </property>
                         <property name="text">
                          <string>Slice0:</string>
                         </property>
@@ -2813,6 +2865,11 @@
                       </property>
                       <item>
                        <widget class="QLabel" name="label_102">
+                        <property name="font">
+                         <font>
+                          <fontweight>DemiBold</fontweight>
+                         </font>
+                        </property>
                         <property name="text">
                          <string>Slice1:</string>
                         </property>
@@ -2856,6 +2913,11 @@
                         </property>
                         <item>
                          <widget class="QLabel" name="label_100">
+                          <property name="font">
+                           <font>
+                            <fontweight>DemiBold</fontweight>
+                           </font>
+                          </property>
                           <property name="text">
                            <string>Slice0:</string>
                           </property>
@@ -2877,6 +2939,11 @@
                         </property>
                         <item>
                          <widget class="QLabel" name="label_101">
+                          <property name="font">
+                           <font>
+                            <fontweight>DemiBold</fontweight>
+                           </font>
+                          </property>
                           <property name="text">
                            <string>Slice1:</string>
                           </property>
@@ -5910,11 +5977,11 @@ Right-click to set the averaging time</string>
    <hints>
     <hint type="sourcelabel">
      <x>126</x>
-     <y>727</y>
+     <y>660</y>
     </hint>
     <hint type="destinationlabel">
-     <x>268</x>
-     <y>728</y>
+     <x>264</x>
+     <y>661</y>
     </hint>
    </hints>
   </connection>
@@ -5926,11 +5993,11 @@ Right-click to set the averaging time</string>
    <hints>
     <hint type="sourcelabel">
      <x>118</x>
-     <y>646</y>
+     <y>600</y>
     </hint>
     <hint type="destinationlabel">
      <x>306</x>
-     <y>682</y>
+     <y>636</y>
     </hint>
    </hints>
   </connection>
@@ -5942,11 +6009,11 @@ Right-click to set the averaging time</string>
    <hints>
     <hint type="sourcelabel">
      <x>118</x>
-     <y>646</y>
+     <y>600</y>
     </hint>
     <hint type="destinationlabel">
      <x>426</x>
-     <y>715</y>
+     <y>669</y>
     </hint>
    </hints>
   </connection>
@@ -5958,11 +6025,11 @@ Right-click to set the averaging time</string>
    <hints>
     <hint type="sourcelabel">
      <x>118</x>
-     <y>646</y>
+     <y>600</y>
     </hint>
     <hint type="destinationlabel">
      <x>426</x>
-     <y>682</y>
+     <y>636</y>
     </hint>
    </hints>
   </connection>
@@ -5973,12 +6040,12 @@ Right-click to set the averaging time</string>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>487</x>
-     <y>646</y>
+     <x>482</x>
+     <y>600</y>
     </hint>
     <hint type="destinationlabel">
-     <x>777</x>
-     <y>647</y>
+     <x>768</x>
+     <y>601</y>
     </hint>
    </hints>
   </connection>
@@ -5989,12 +6056,12 @@ Right-click to set the averaging time</string>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>116</x>
-     <y>727</y>
+     <x>124</x>
+     <y>660</y>
     </hint>
     <hint type="destinationlabel">
-     <x>366</x>
-     <y>728</y>
+     <x>362</x>
+     <y>661</y>
     </hint>
    </hints>
   </connection>
@@ -6006,11 +6073,11 @@ Right-click to set the averaging time</string>
    <hints>
     <hint type="sourcelabel">
      <x>118</x>
-     <y>646</y>
+     <y>600</y>
     </hint>
     <hint type="destinationlabel">
      <x>306</x>
-     <y>715</y>
+     <y>669</y>
     </hint>
    </hints>
   </connection>
@@ -6025,8 +6092,8 @@ Right-click to set the averaging time</string>
      <y>157</y>
     </hint>
     <hint type="destinationlabel">
-     <x>509</x>
-     <y>633</y>
+     <x>522</x>
+     <y>587</y>
     </hint>
    </hints>
   </connection>
@@ -6041,8 +6108,8 @@ Right-click to set the averaging time</string>
      <y>186</y>
     </hint>
     <hint type="destinationlabel">
-     <x>509</x>
-     <y>633</y>
+     <x>522</x>
+     <y>587</y>
     </hint>
    </hints>
   </connection>
@@ -6057,8 +6124,8 @@ Right-click to set the averaging time</string>
      <y>215</y>
     </hint>
     <hint type="destinationlabel">
-     <x>509</x>
-     <y>633</y>
+     <x>522</x>
+     <y>587</y>
     </hint>
    </hints>
   </connection>
@@ -6073,8 +6140,8 @@ Right-click to set the averaging time</string>
      <y>244</y>
     </hint>
     <hint type="destinationlabel">
-     <x>509</x>
-     <y>633</y>
+     <x>522</x>
+     <y>587</y>
     </hint>
    </hints>
   </connection>
@@ -6089,8 +6156,8 @@ Right-click to set the averaging time</string>
      <y>273</y>
     </hint>
     <hint type="destinationlabel">
-     <x>509</x>
-     <y>633</y>
+     <x>522</x>
+     <y>587</y>
     </hint>
    </hints>
   </connection>
@@ -6105,8 +6172,8 @@ Right-click to set the averaging time</string>
      <y>302</y>
     </hint>
     <hint type="destinationlabel">
-     <x>509</x>
-     <y>633</y>
+     <x>522</x>
+     <y>587</y>
     </hint>
    </hints>
   </connection>
@@ -6121,8 +6188,8 @@ Right-click to set the averaging time</string>
      <y>331</y>
     </hint>
     <hint type="destinationlabel">
-     <x>509</x>
-     <y>633</y>
+     <x>522</x>
+     <y>587</y>
     </hint>
    </hints>
   </connection>
@@ -6137,8 +6204,8 @@ Right-click to set the averaging time</string>
      <y>360</y>
     </hint>
     <hint type="destinationlabel">
-     <x>509</x>
-     <y>633</y>
+     <x>522</x>
+     <y>587</y>
     </hint>
    </hints>
   </connection>
@@ -6150,11 +6217,11 @@ Right-click to set the averaging time</string>
    <hints>
     <hint type="sourcelabel">
      <x>271</x>
-     <y>491</y>
+     <y>468</y>
     </hint>
     <hint type="destinationlabel">
-     <x>509</x>
-     <y>633</y>
+     <x>522</x>
+     <y>587</y>
     </hint>
    </hints>
   </connection>
@@ -6166,11 +6233,11 @@ Right-click to set the averaging time</string>
    <hints>
     <hint type="sourcelabel">
      <x>271</x>
-     <y>521</y>
+     <y>498</y>
     </hint>
     <hint type="destinationlabel">
-     <x>509</x>
-     <y>633</y>
+     <x>522</x>
+     <y>587</y>
     </hint>
    </hints>
   </connection>
@@ -6182,11 +6249,11 @@ Right-click to set the averaging time</string>
    <hints>
     <hint type="sourcelabel">
      <x>482</x>
-     <y>492</y>
+     <y>469</y>
     </hint>
     <hint type="destinationlabel">
-     <x>509</x>
-     <y>633</y>
+     <x>522</x>
+     <y>587</y>
     </hint>
    </hints>
   </connection>
@@ -6198,11 +6265,11 @@ Right-click to set the averaging time</string>
    <hints>
     <hint type="sourcelabel">
      <x>482</x>
-     <y>523</y>
+     <y>500</y>
     </hint>
     <hint type="destinationlabel">
-     <x>509</x>
-     <y>633</y>
+     <x>522</x>
+     <y>587</y>
     </hint>
    </hints>
   </connection>
@@ -6217,8 +6284,8 @@ Right-click to set the averaging time</string>
      <y>158</y>
     </hint>
     <hint type="destinationlabel">
-     <x>509</x>
-     <y>633</y>
+     <x>522</x>
+     <y>587</y>
     </hint>
    </hints>
   </connection>
@@ -6233,8 +6300,8 @@ Right-click to set the averaging time</string>
      <y>158</y>
     </hint>
     <hint type="destinationlabel">
-     <x>509</x>
-     <y>633</y>
+     <x>522</x>
+     <y>587</y>
     </hint>
    </hints>
   </connection>
@@ -6245,12 +6312,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>258</x>
+     <x>257</x>
      <y>252</y>
     </hint>
     <hint type="destinationlabel">
-     <x>509</x>
-     <y>633</y>
+     <x>522</x>
+     <y>587</y>
     </hint>
    </hints>
   </connection>
@@ -6261,12 +6328,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>258</x>
+     <x>257</x>
      <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>509</x>
-     <y>633</y>
+     <x>522</x>
+     <y>587</y>
     </hint>
    </hints>
   </connection>
@@ -6277,12 +6344,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>288</x>
+     <x>286</x>
      <y>252</y>
     </hint>
     <hint type="destinationlabel">
-     <x>509</x>
-     <y>633</y>
+     <x>522</x>
+     <y>587</y>
     </hint>
    </hints>
   </connection>
@@ -6293,12 +6360,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>288</x>
+     <x>286</x>
      <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>509</x>
-     <y>633</y>
+     <x>522</x>
+     <y>587</y>
     </hint>
    </hints>
   </connection>
@@ -6309,12 +6376,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>318</x>
+     <x>315</x>
      <y>252</y>
     </hint>
     <hint type="destinationlabel">
-     <x>509</x>
-     <y>633</y>
+     <x>522</x>
+     <y>587</y>
     </hint>
    </hints>
   </connection>
@@ -6325,12 +6392,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>318</x>
+     <x>315</x>
      <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>509</x>
-     <y>633</y>
+     <x>522</x>
+     <y>587</y>
     </hint>
    </hints>
   </connection>
@@ -6341,12 +6408,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>348</x>
+     <x>345</x>
      <y>252</y>
     </hint>
     <hint type="destinationlabel">
-     <x>509</x>
-     <y>633</y>
+     <x>522</x>
+     <y>587</y>
     </hint>
    </hints>
   </connection>
@@ -6357,12 +6424,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>348</x>
+     <x>345</x>
      <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>509</x>
-     <y>633</y>
+     <x>522</x>
+     <y>587</y>
     </hint>
    </hints>
   </connection>
@@ -6373,12 +6440,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>459</x>
+     <x>453</x>
      <y>252</y>
     </hint>
     <hint type="destinationlabel">
-     <x>509</x>
-     <y>633</y>
+     <x>522</x>
+     <y>587</y>
     </hint>
    </hints>
   </connection>
@@ -6389,12 +6456,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>459</x>
+     <x>453</x>
      <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>509</x>
-     <y>633</y>
+     <x>522</x>
+     <y>587</y>
     </hint>
    </hints>
   </connection>
@@ -6405,12 +6472,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>489</x>
+     <x>482</x>
      <y>252</y>
     </hint>
     <hint type="destinationlabel">
-     <x>509</x>
-     <y>633</y>
+     <x>522</x>
+     <y>587</y>
     </hint>
    </hints>
   </connection>
@@ -6421,12 +6488,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>489</x>
+     <x>482</x>
      <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>509</x>
-     <y>633</y>
+     <x>522</x>
+     <y>587</y>
     </hint>
    </hints>
   </connection>
@@ -6437,12 +6504,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>519</x>
+     <x>512</x>
      <y>252</y>
     </hint>
     <hint type="destinationlabel">
-     <x>509</x>
-     <y>633</y>
+     <x>522</x>
+     <y>587</y>
     </hint>
    </hints>
   </connection>
@@ -6453,12 +6520,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>519</x>
+     <x>512</x>
      <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>509</x>
-     <y>633</y>
+     <x>522</x>
+     <y>587</y>
     </hint>
    </hints>
   </connection>
@@ -6469,12 +6536,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>549</x>
+     <x>541</x>
      <y>252</y>
     </hint>
     <hint type="destinationlabel">
-     <x>509</x>
-     <y>633</y>
+     <x>522</x>
+     <y>587</y>
     </hint>
    </hints>
   </connection>
@@ -6485,12 +6552,12 @@ Right-click to set the averaging time</string>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>549</x>
+     <x>541</x>
      <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>509</x>
-     <y>633</y>
+     <x>522</x>
+     <y>587</y>
     </hint>
    </hints>
   </connection>
@@ -6518,11 +6585,11 @@ Right-click to set the averaging time</string>
    <hints>
     <hint type="sourcelabel">
      <x>260</x>
-     <y>587</y>
+     <y>541</y>
     </hint>
     <hint type="destinationlabel">
-     <x>509</x>
-     <y>633</y>
+     <x>522</x>
+     <y>587</y>
     </hint>
    </hints>
   </connection>
@@ -6534,11 +6601,11 @@ Right-click to set the averaging time</string>
    <hints>
     <hint type="sourcelabel">
      <x>396</x>
-     <y>589</y>
+     <y>543</y>
     </hint>
     <hint type="destinationlabel">
-     <x>509</x>
-     <y>633</y>
+     <x>522</x>
+     <y>587</y>
     </hint>
    </hints>
   </connection>

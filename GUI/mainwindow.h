@@ -23,6 +23,7 @@ class ABufferDelegate;
 class QSpinBox;
 class AGuiFromScrWin;
 class AScriptWindow;
+class QListWidgetItem;
 
 #ifdef TextToSpeechEnabled
 class ATextToSpeech;
@@ -235,6 +236,10 @@ private:
     QString intToBitString(int val);
     QString intToBitStringShift1(int val);
     void updateTriggerGainGui();
+    void setWarningIcon_ADC(bool flag);
+    void setWarningIcon_Trigger(bool flag);
+    void setWarningIcon_Time(bool flag);
+    void setWarningIcon_Gain(bool flag);
 
 private slots:
     void onBoardLogNewText(const QString text);
@@ -326,6 +331,10 @@ private slots:
     void on_leFolderForHldFiles_customContextMenuRequested(const QPoint &pos);
     void on_cbDoNotSaveDisabledChannels_clicked(bool checked);
     void on_cbSaveTime_clicked(bool checked);
+    void on_lwBufferControl_itemChanged(QListWidgetItem *item);
+    void on_cbDisableIgnoredChannels_clicked();
+    void on_cbTimeEnable_FPGA3_clicked();
+    void on_cbTimeEnable_FPGA4_clicked();
 };
 
 #endif // MAINWINDOW_H

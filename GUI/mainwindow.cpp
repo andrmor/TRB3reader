@@ -45,6 +45,8 @@ MainWindow::MainWindow(ADispatcher * Dispatcher,
     bStopFlag = false;
     ui->setupUi(this);
 
+    setWindowTitle("TrbReader v4.1.2");
+
     TrbRunManager = new ATrbRunControl(Network, Config.ConfigDir);
     QObject::connect(TrbRunManager, &ATrbRunControl::sigBoardIsAlive, this, &MainWindow::onBoardIsAlive);
     QObject::connect(TrbRunManager, &ATrbRunControl::sigBoardOff, this, &MainWindow::onBoardDisconnected);
@@ -1858,6 +1860,8 @@ void MainWindow::on_pbSendCTStoTRB_clicked()
         if (!err.isEmpty()) message(err, this);
     }
     SetEnabled(true);
+
+    setWarningIcon_Trigger(false);
 }
 
 #include "abufferdelegate.h"
@@ -1878,6 +1882,8 @@ void MainWindow::on_pbRefreshBufferIndication_clicked()
         ui->lwBufferControl->setItemWidget(item, wid);
         item->setSizeHint( wid->sizeHint());
     }
+
+    setWarningIcon_ADC(false);
 }
 
 void MainWindow::on_cbBufferReadFromTRB_clicked()
@@ -1896,7 +1902,7 @@ void MainWindow::on_cbBufferReadFromTRB_clicked()
 
 void MainWindow::on_pbBufferSendToTRB_clicked()
 {
-    this->SetEnabled(false);
+    SetEnabled(false);
     qApp->processEvents();
 
     QString err = TrbRunManager->sendBufferControlToTRB();
@@ -1904,6 +1910,7 @@ void MainWindow::on_pbBufferSendToTRB_clicked()
     this->SetEnabled(true);
     if (!err.isEmpty())
         message(err, this);
+    else setWarningIcon_ADC(false);
 }
 
 void MainWindow::on_pbBufferUpdateScript_clicked()
@@ -1941,8 +1948,9 @@ void MainWindow::onBufferDeleagateChanged(ABufferDelegate * del)
                 r.updateValues(samples, delay, down);
     }
     on_pbRefreshBufferIndication_clicked();
-
     // todo value canged -> update board? or just flag
+
+    setWarningIcon_ADC(true);
 }
 
 void MainWindow::onFreeSpaceReportReady(long bytes)
@@ -2036,6 +2044,8 @@ void MainWindow::on_pbUpdateTriggerGui_clicked()
         ui->cbT411->setChecked(bits.test(17));
         ui->cbT401->setChecked(bits.test(16));
     }
+
+    setWarningIcon_Trigger(false);
 }
 
 void MainWindow::on_pbUpdateTriggerSettings_clicked()
@@ -2099,6 +2109,7 @@ void MainWindow::on_pbUpdateTriggerSettings_clicked()
         Config.TrbRunSettings.PeripheryTriggerInputs1 = "0x" + QString::number(bits.to_ulong(), 16);
     }
 
+    setWarningIcon_Trigger(true);
 }
 
 void MainWindow::on_pbOpenBufferWebPage_clicked()
@@ -2222,6 +2233,8 @@ void MainWindow::on_leFPGA3_0_editingFinished()
     if (ok) Config.TrbRunSettings.OR_0_FPGA3 = vectorToBitInt(vec);
     ui->leFPGA3_0->setText(intToBitString(Config.TrbRunSettings.OR_0_FPGA3));
     if (!ok) message("Bad format: use, e.g., 0,1,3-5,7,10-20", this);
+
+    setWarningIcon_Trigger(true);
 }
 
 void MainWindow::on_leFPGA3_1_editingFinished()
@@ -2231,6 +2244,8 @@ void MainWindow::on_leFPGA3_1_editingFinished()
     if (ok) Config.TrbRunSettings.OR_1_FPGA3 = vectorToBitInt(vec);
     ui->leFPGA3_1->setText(intToBitString(Config.TrbRunSettings.OR_1_FPGA3));
     if (!ok) message("Bad format: use, e.g., 0,1,3-5,7,10-20", this);
+
+    setWarningIcon_Trigger(true);
 }
 
 void MainWindow::on_leFPGA4_0_editingFinished()
@@ -2240,6 +2255,8 @@ void MainWindow::on_leFPGA4_0_editingFinished()
     if (ok) Config.TrbRunSettings.OR_0_FPGA4 = vectorToBitInt(vec);
     ui->leFPGA4_0->setText(intToBitString(Config.TrbRunSettings.OR_0_FPGA4));
     if (!ok) message("Bad format: use, e.g., 0,1,3-5,7,10-20", this);
+
+    setWarningIcon_Trigger(true);
 }
 
 void MainWindow::on_leFPGA4_1_editingFinished()
@@ -2249,6 +2266,8 @@ void MainWindow::on_leFPGA4_1_editingFinished()
     if (ok) Config.TrbRunSettings.OR_1_FPGA4 = vectorToBitInt(vec);
     ui->leFPGA4_1->setText(intToBitString(Config.TrbRunSettings.OR_1_FPGA4));
     if (!ok) message("Bad format: use, e.g., 0,1,3-5,7,10-20", this);
+
+    setWarningIcon_Trigger(true);
 }
 
 void MainWindow::on_leTimeChannelsFPGA3_editingFinished()
@@ -2266,6 +2285,8 @@ void MainWindow::on_leTimeChannelsFPGA3_editingFinished()
     ui->leTimeChannelsFPGA3->setText(intToBitStringShift1(Config.TrbRunSettings.TimeChannels_FPGA3));
 
     ui->leTimeChannelsFPGA3->blockSignals(false); // <--
+
+    setWarningIcon_Time(true);
 }
 
 void MainWindow::on_leTimeChannelsFPGA4_editingFinished()
@@ -2283,6 +2304,8 @@ void MainWindow::on_leTimeChannelsFPGA4_editingFinished()
     ui->leTimeChannelsFPGA4->setText(intToBitStringShift1(Config.TrbRunSettings.TimeChannels_FPGA4));
 
     ui->leTimeChannelsFPGA4->blockSignals(false); // <--
+
+    setWarningIcon_Time(true);
 }
 
 void MainWindow::on_ledTimeWinBefore_FPGA3_editingFinished()
@@ -2293,6 +2316,8 @@ void MainWindow::on_ledTimeWinBefore_FPGA3_editingFinished()
     int base = val / 5;
     Config.TrbRunSettings.TimeWinBefore_FPGA3 = base * 5;
     ui->ledTimeWinBefore_FPGA3->setText(QString::number(Config.TrbRunSettings.TimeWinBefore_FPGA3));
+
+    setWarningIcon_Time(true);
 }
 
 void MainWindow::on_ledTimeWinAfter_FPGA3_editingFinished()
@@ -2303,6 +2328,8 @@ void MainWindow::on_ledTimeWinAfter_FPGA3_editingFinished()
     int base = val / 5;
     Config.TrbRunSettings.TimeWinAfter_FPGA3 = base * 5;
     ui->ledTimeWinAfter_FPGA3->setText(QString::number(Config.TrbRunSettings.TimeWinAfter_FPGA3));
+
+    setWarningIcon_Time(true);
 }
 
 void MainWindow::on_ledTimeWinBefore_FPGA4_editingFinished()
@@ -2313,6 +2340,8 @@ void MainWindow::on_ledTimeWinBefore_FPGA4_editingFinished()
     int base = val / 5;
     Config.TrbRunSettings.TimeWinBefore_FPGA4 = base * 5;
     ui->ledTimeWinBefore_FPGA4->setText(QString::number(Config.TrbRunSettings.TimeWinBefore_FPGA4));
+
+    setWarningIcon_Time(true);
 }
 
 void MainWindow::on_ledTimeWinAfter_FPGA4_editingFinished()
@@ -2323,6 +2352,8 @@ void MainWindow::on_ledTimeWinAfter_FPGA4_editingFinished()
     int base = val / 5;
     Config.TrbRunSettings.TimeWinAfter_FPGA4 = base * 5;
     ui->ledTimeWinAfter_FPGA4->setText(QString::number(Config.TrbRunSettings.TimeWinAfter_FPGA4));
+
+    setWarningIcon_Time(true);
 }
 
 void MainWindow::on_pbWriteTimeSettingsToTrb_clicked()
@@ -2334,6 +2365,8 @@ void MainWindow::on_pbWriteTimeSettingsToTrb_clicked()
 
     if (!err.isEmpty()) message(err, this);
     SetEnabled(true);
+
+    setWarningIcon_Time(false);
 }
 
 void MainWindow::on_pbReadTimeSettingsFromTrb_clicked()
@@ -2440,6 +2473,7 @@ void MainWindow::on_pbSendTriggerBoardGains_clicked()
 {
     QString err = TrbRunManager->sendTriggerGainsToBoard();
     if (!err.isEmpty()) message(err, this);
+    else setWarningIcon_Gain(false);
 }
 
 void MainWindow::on_cbGainsForTriggerBoard_clicked(bool checked)
@@ -2457,6 +2491,8 @@ void MainWindow::storeTriggerGainSettings()
     Config.TrbRunSettings.TriggerGains.clear();
     for (QSpinBox * sb : TriggerGainSpinBoxes)
         Config.TrbRunSettings.TriggerGains.push_back(sb->value());
+
+    setWarningIcon_Gain(true);
 }
 
 void MainWindow::on_cbDisableIgnoredChannels_clicked(bool checked)
@@ -2605,4 +2641,52 @@ void MainWindow::on_leFolderForHldFiles_customContextMenuRequested(const QPoint 
     QString dir = guitools::dialogDirectory(this, "Select directory to store hld files", txt, true, true);
     if (dir.isEmpty()) return;
     ui->leFolderForHldFiles->setText(dir);
+}
+
+//--- Icon ADCs
+
+void MainWindow::setWarningIcon_ADC(bool flag)
+{
+    ui->pbBufferSendToTRB->setIcon( flag ? guitools::createColorCircleIcon(ui->pbBufferSendToTRB->iconSize(), Qt::red) : QIcon() );
+}
+
+void MainWindow::on_lwBufferControl_itemChanged(QListWidgetItem*)
+{
+    setWarningIcon_ADC(true);
+}
+
+void MainWindow::on_cbDisableIgnoredChannels_clicked()
+{
+    setWarningIcon_ADC(true);
+}
+
+//--- Icon Trigger
+
+void MainWindow::setWarningIcon_Trigger(bool flag)
+{
+    ui->pbSendCTStoTRB->setIcon( flag ? guitools::createColorCircleIcon(ui->pbSendCTStoTRB->iconSize(), Qt::red) : QIcon() );
+}
+
+// --- Icon Time
+
+void MainWindow::setWarningIcon_Time(bool flag)
+{
+    ui->pbWriteTimeSettingsToTrb->setIcon( flag ? guitools::createColorCircleIcon(ui->pbWriteTimeSettingsToTrb->iconSize(), Qt::red) : QIcon() );
+}
+
+void MainWindow::on_cbTimeEnable_FPGA3_clicked()
+{
+    setWarningIcon_Time(true);
+}
+
+void MainWindow::on_cbTimeEnable_FPGA4_clicked()
+{
+    setWarningIcon_Time(true);
+}
+
+// Icon Gains
+
+void MainWindow::setWarningIcon_Gain(bool flag)
+{
+    ui->pbSendTriggerBoardGains->setIcon( flag ? guitools::createColorCircleIcon(ui->pbSendTriggerBoardGains->iconSize(), Qt::red) : QIcon() );
 }
