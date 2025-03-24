@@ -1,6 +1,5 @@
 #include "ainterfacetowebsocket.h"
 #include "awebsocketsession.h"
-//#include "awebsocketsessionserver.h"
 
 #include <QDebug>
 #include <QJsonObject>
@@ -17,7 +16,7 @@ AInterfaceToWebSocket::AInterfaceToWebSocket() : AScriptInterface() {}
 
 AInterfaceToWebSocket::~AInterfaceToWebSocket()
 {
-    socket->deleteLater();
+    if (socket) socket->deleteLater();
 }
 
 void AInterfaceToWebSocket::abortRun()

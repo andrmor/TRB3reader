@@ -1861,7 +1861,7 @@ void MainWindow::on_pbSendCTStoTRB_clicked()
     }
     SetEnabled(true);
 
-    setWarningIcon_Trigger(false);
+    if (err.isEmpty()) setWarningIcon_Trigger(false);
 }
 
 #include "abufferdelegate.h"
@@ -1908,8 +1908,8 @@ void MainWindow::on_pbBufferSendToTRB_clicked()
     QString err = TrbRunManager->sendBufferControlToTRB();
 
     this->SetEnabled(true);
-    if (!err.isEmpty())
-        message(err, this);
+
+    if (!err.isEmpty()) message(err, this);
     else setWarningIcon_ADC(false);
 }
 
@@ -2363,10 +2363,10 @@ void MainWindow::on_pbWriteTimeSettingsToTrb_clicked()
 
     QString err = TrbRunManager->sendTimeSettingsToTRB();
 
-    if (!err.isEmpty()) message(err, this);
     SetEnabled(true);
 
-    setWarningIcon_Time(false);
+    if (!err.isEmpty()) message(err, this);
+    else setWarningIcon_Time(false);
 }
 
 void MainWindow::on_pbReadTimeSettingsFromTrb_clicked()
