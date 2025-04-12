@@ -100,6 +100,8 @@ void CernRootModule::ResetPositionOfWindows()
 
     W2DNeg->setGeometry(140,140,1000,700);
     W2DPos->setGeometry(140,140,1000,700);
+
+    WSigDist->setGeometry(140,140,1000,700);
 }
 
 void CernRootModule::DrawSignature(bool bNeg)
@@ -176,6 +178,8 @@ void CernRootModule::CreateGraphWindows()
     W2DNeg  = new AGraphWindow("2DNeg",  MainWin); // WSigPos->resize(1001, 601);
     W2DPos  = new AGraphWindow("2DPos",  MainWin); // WSigPos->resize(1001, 601);
 
+    WSigDist = new AGraphWindow("SigDist",  MainWin); // WSigPos->resize(1001, 601);
+
     connect(WScriptGraph, &AGraphWindow::wasHidden, WScriptGraph, &AGraphWindow::hide);
 
     connect(WOne,     &AGraphWindow::wasHidden, this, &CernRootModule::onGraphWindowRequestHide);
@@ -188,6 +192,8 @@ void CernRootModule::CreateGraphWindows()
 
     connect(W2DNeg,  &AGraphWindow::wasHidden, this, &CernRootModule::onGraphWindowRequestHide);
     connect(W2DPos,  &AGraphWindow::wasHidden, this, &CernRootModule::onGraphWindowRequestHide);
+
+    connect(WSigDist, &AGraphWindow::wasHidden, this, &CernRootModule::onGraphWindowRequestHide);
 
     AScriptHub * scrHub = &AScriptHub::getInstance();
     connect(scrHub, &AScriptHub::requestDraw, WScriptGraph, &AGraphWindow::onDrawRequest, Qt::QueuedConnection);
@@ -204,14 +210,15 @@ void CernRootModule::onGraphWindowRequestHide(QString idStr)
     else if (idStr == "SigPos")  emit WSigPosHidden();
     else if (idStr == "2DNeg")   emit W2DNegHidden();
     else if (idStr == "2DPos")   emit W2DPosHidden();
+    else if (idStr == "SigDist") emit WSigDistHidden();
 }
 
 CernRootModule::~CernRootModule()
 {
     delete WScriptGraph;
 
-    delete WOne; delete WOverNeg; delete WOverPos; delete WAllNeg; delete WAllPos; delete WSigNeg; delete WSigPos; delete W2DNeg; delete W2DPos;
-    WOne = WOverNeg = WOverPos = WAllNeg = WAllPos = WSigNeg = WSigPos = W2DNeg = W2DPos = nullptr;
+    delete WOne; delete WOverNeg; delete WOverPos; delete WAllNeg; delete WAllPos; delete WSigNeg; delete WSigPos; delete W2DNeg; delete W2DPos; delete WSigDist;
+    WOne = WOverNeg = WOverPos = WAllNeg = WAllPos = WSigNeg = WSigPos = W2DNeg = W2DPos = WSigDist = nullptr;
 
     delete gSingle; gSingle = nullptr;
     delete gNegSig; gNegSig = nullptr;
@@ -230,7 +237,7 @@ CernRootModule::~CernRootModule()
 
 void CernRootModule::storeWindowGeometries()
 {
-    std::vector<AGraphWindow*> wins = {WOne, WOverNeg, WOverPos, WAllNeg, WAllPos, WSigNeg, WSigPos, W2DNeg, W2DPos};
+    std::vector<AGraphWindow*> wins = {WOne, WOverNeg, WOverPos, WAllNeg, WAllPos, WSigNeg, WSigPos, W2DNeg, W2DPos, WSigDist};
     for (auto * w : wins) w->storeGeomStatus();
 }
 
@@ -293,6 +300,11 @@ void CernRootModule::ShowPositiveSignalWindow(bool flag)
     showGraphWindow(WSigPos, flag);
 }
 
+void CernRootModule::ShowSignalDistWindow(bool flag)
+{
+    showGraphWindow(WSigDist, flag);
+}
+
 void CernRootModule::Show2DNegWindow(bool flag)
 {
     showGraphWindow(W2DNeg, flag);
@@ -339,6 +351,13 @@ void CernRootModule::ClearAllPosWaveWindow()
     WAllPos->UpdateRootCanvas();
 }
 
+void CernRootModule::ClearSignalDistWindow()
+{
+    if (!WSigDist) return; //paranoic
+    WSigDist->ClearRootCanvas();
+    WSigDist->UpdateRootCanvas();
+}
+
 void CernRootModule::SetGraphAttributes(TGraph* g, int ievent, int ichannel)
 {
     bool bRejected;
@@ -376,6 +395,35 @@ bool CernRootModule::DrawSingle(int ievent, int ichannel, bool autoscale, float 
 
     int ic = Config.Map->HardwareToLogical(ichannel);
     WOne->SetTitle("Event: "+ QString::number(ievent) + "  LogicalChannel: "+QString::number(ic));
+    return true;
+}
+
+#include "TH1D.h"
+bool CernRootModule::DrawSignalDistributionForChannel(int iHardwChan)
+{
+    if (iHardwChan < 0 || iHardwChan >= Extractor->CountChannels()) return false;
+
+    delete hSignalDistr; hSignalDistr = nullptr;
+    hSignalDistr = new TH1D("", "", 100,0,0);
+    for (int iEv = 0; iEv < Extractor->CountEvents(); iEv++)
+    {
+        double sig = Extractor->GetSignalFast(iEv, iHardwChan);
+        hSignalDistr->Fill(sig);
+    }
+    hSignalDistr->GetXaxis()->SetTitle("Signal");
+
+    WSigDist->SetAsActiveRootWindow();
+    WSigDist->activateWindow();
+
+    int logical = -1;
+    if (Config.Map) logical = Config.Map->HardwareToLogical(iHardwChan);
+    QString txt;
+    if (logical == -1) txt = QString("Signal distribution for hardware channel # %1").arg(iHardwChan);
+    else               txt = QString("Signal distribution for logical channel # %1 (hardware # %2)").arg(logical).arg(iHardwChan);
+    WSigDist->setWindowTitle(txt);
+
+    hSignalDistr->Draw("hist");
+    WSigDist->UpdateRootCanvas();
     return true;
 }
 

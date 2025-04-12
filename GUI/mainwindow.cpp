@@ -45,7 +45,7 @@ MainWindow::MainWindow(ADispatcher * Dispatcher,
     bStopFlag = false;
     ui->setupUi(this);
 
-    setWindowTitle("TrbReader v4.1.2");
+    setWindowTitle("TrbReader v4.1.3");
 
     TrbRunManager = new ATrbRunControl(Network, Config.ConfigDir);
     QObject::connect(TrbRunManager, &ATrbRunControl::sigBoardIsAlive, this, &MainWindow::onBoardIsAlive);
@@ -183,6 +183,8 @@ void MainWindow::on_pbProcessData_clicked()
     else onEventChanged(0);
 
     updateNumEventsIndication();
+
+    if (ui->pbShowSignalDistribution1D->isChecked()) on_pbShowSignalDistribution1D_toggled(true);
 
     //on_pbShowAllNegatives_toggled(ui->pbShowAllNegatives->isChecked());
     //on_pbShowAllPositives_toggled(ui->pbShowAllNegatives->isChecked());
@@ -608,7 +610,8 @@ void MainWindow::onChannelChanged()
 {
     OnEventOrChannelChanged();
 
-    if (ui->pbShowWaveform->isChecked()) on_pbShowWaveform_toggled(true);
+    if (ui->pbShowWaveform->isChecked())             on_pbShowWaveform_toggled(true);
+    if (ui->pbShowSignalDistribution1D->isChecked()) on_pbShowSignalDistribution1D_toggled(true);
 }
 
 int MainWindow::getCurrentlySelectedHardwareChannel()
@@ -710,7 +713,7 @@ void MainWindow::OnEventOrChannelChanged()
         if ( iHardwChan < 0 ) ss = "n.a.";
         else
         {
-            double signal = Extractor->GetSignalFast(iEvent, iHardwChan);
+            double signal = Extractor->GetSignal(iEvent, iHardwChan);
             if ( std::isnan(signal) ) ss = "n.a.";
             else ss = QString::number(signal);
         }
@@ -2418,6 +2421,8 @@ void MainWindow::on_pbLoadLastAndProcess_clicked()
     Config.FileName = fn;
     qApp->processEvents();
     on_pbProcessData_clicked();
+
+    if (ui->pbShowSignalDistribution1D->isChecked()) on_pbShowSignalDistribution1D_toggled(true);
 }
 
 // ---- Gains for trigger board ----
@@ -2690,3 +2695,29 @@ void MainWindow::setWarningIcon_Gain(bool flag)
 {
     ui->pbSendTriggerBoardGains->setIcon( flag ? guitools::createColorCircleIcon(ui->pbSendTriggerBoardGains->iconSize(), Qt::red) : QIcon() );
 }
+
+void MainWindow::on_pbShowSignalDistribution1D_toggled(bool checked)
+{
+    RootModule->ShowSignalDistWindow(checked);
+    LogMessage("");
+    if (!checked) return;
+
+    int numEvents = Extractor->CountEvents();
+    if (numEvents == 0)
+    {
+        //message("There are no events with extracted signals", this);
+        RootModule->ShowSignalDistWindow(false);
+        return;
+    }
+
+    int iHardwChan = getCurrentlySelectedHardwareChannel();
+    if (iHardwChan < 0 || Reader->isEmpty())
+    {
+        RootModule->ClearSignalDistWindow();
+        message("Invalid chanel number", this);
+        return;
+    }
+    bool ok = RootModule->DrawSignalDistributionForChannel(iHardwChan);
+    if (!ok) RootModule->ClearSignalDistWindow();
+}
+

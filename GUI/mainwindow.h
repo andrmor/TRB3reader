@@ -335,6 +335,7 @@ private slots:
     void on_cbDisableIgnoredChannels_clicked();
     void on_cbTimeEnable_FPGA3_clicked();
     void on_cbTimeEnable_FPGA4_clicked();
+    void on_pbShowSignalDistribution1D_toggled(bool checked);
 };
 
 #endif // MAINWINDOW_H

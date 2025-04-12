@@ -184,6 +184,7 @@ QString Trb3dataReader::GetFileInfo(const QString & FileName)
                         }
                     }
                     numChannels++;
+                    if (numSamples == 0 && sampleCounter != 0) numSamples = sampleCounter; // if only one channel is enabled
 
                     //qDebug() << "Channels:" << numChannels << "Samples:" << numSamples;
                     if (bReportOnStart) output += "--> This is an ADC block. 48 channels (" +QString::number(numChannels) +" enabled)   Samples: " +QString::number(numSamples) +"\n";
@@ -632,7 +633,7 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
                             }
 
                             sampleCounter = 1;
-                            thisEventData[oldSize + thisChanNum].reserve(numSamples);
+                            thisEventData[oldSize + thisChanNum].reserve(numSamples+1);
                         }
                         else
                             sampleCounter++;
@@ -640,6 +641,7 @@ void Trb3dataReader::readRawData(const QString &FileName, int enforceNumChannels
                         thisEventData[oldSize + thisChanNum].push_back(data);
                     }
                     numChannelsThisSubEvent++;
+                    if (numSamples == 0 && sampleCounter != 0) numSamples = sampleCounter; // if only one channel is enabled
 
                     if (bReportOnStart) qDebug() << "--> This is an ADC block. Channels: " << numChannelsThisSubEvent << "   Samples: "<< numSamples;
 

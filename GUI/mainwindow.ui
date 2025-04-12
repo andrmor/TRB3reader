@@ -30,7 +30,7 @@
     <item>
      <widget class="QTabWidget" name="twMain">
       <property name="currentIndex">
-       <number>1</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab_8">
        <attribute name="title">
@@ -4991,6 +4991,19 @@ Right-click to set the averaging time</string>
             </property>
            </spacer>
           </item>
+          <item>
+           <widget class="QPushButton" name="pbShowSignalDistribution1D">
+            <property name="toolTip">
+             <string>Hardware or logical is defined by the &quot;Sort by logical&quot; or &quot;Sort by hardware&quot; above</string>
+            </property>
+            <property name="text">
+             <string>Signal distribution</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
         <item>
@@ -5521,6 +5534,13 @@ Right-click to set the averaging time</string>
          </spacer>
         </item>
         <item>
+         <widget class="QLabel" name="label_42">
+          <property name="text">
+           <string>Signal distribution over all events:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <layout class="QHBoxLayout" name="horizontalLayout_70">
           <property name="topMargin">
            <number>0</number>
@@ -5539,9 +5559,9 @@ Right-click to set the averaging time</string>
            </spacer>
           </item>
           <item>
-           <widget class="QLabel" name="label_42">
+           <widget class="QLabel" name="label_126">
             <property name="text">
-             <string>Signal distribution over all events:</string>
+             <string>Heatmap (all channels):</string>
             </property>
            </widget>
           </item>

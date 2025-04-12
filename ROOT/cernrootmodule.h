@@ -16,6 +16,7 @@ class TGraph;
 class TmpObjHubClass;
 class TObject;
 class TH2D;
+class TH1D;
 class QMainWindow;
 
 class CernRootModule : public QObject
@@ -36,6 +37,7 @@ public:
     void ShowAllPosWaveWindow(bool flag);
     void ShowNegativeSignalWindow(bool flag);
     void ShowPositiveSignalWindow(bool flag);
+    void ShowSignalDistWindow(bool flag);
 
     void Show2DNegWindow(bool flag);
     void Show2DPosWindow(bool flag);
@@ -45,8 +47,10 @@ public:
     void ClearOverPosWaveWindow();
     void ClearAllNegWaveWindow();
     void ClearAllPosWaveWindow();
+    void ClearSignalDistWindow();
 
     bool DrawSingle(int ievent, int iHardwChan, bool autoscale, float MinY, float MaxY);
+    bool DrawSignalDistributionForChannel(int iHardwChan);
     bool DrawOverlay(int ievent, bool bNeg, bool bAutoscale, float Min, float Max, int SortBy_0Logic1Hardw);
     bool DrawAll(int ievent, bool bNeg, int padsX, int padsY,
                  bool bAutoscale, float Min, float Max, int SortBy_0Logic1Hardw,
@@ -83,6 +87,7 @@ private:
     TGraph * gPosSig = nullptr;
     TH2D * h2DNeg = nullptr;
     TH2D * h2DPos = nullptr;
+    TH1D * hSignalDistr = nullptr;
 
     AGraphWindow * WScriptGraph = nullptr;
 
@@ -96,6 +101,7 @@ private:
 
     AGraphWindow * W2DNeg  = nullptr;
     AGraphWindow * W2DPos  = nullptr;
+    AGraphWindow * WSigDist = nullptr;
 
     int NormalColor = 4;
     int RejectedColor = 2;
@@ -121,6 +127,7 @@ signals:
     void WSigPosHidden();
     void W2DNegHidden();
     void W2DPosHidden();
+    void WSigDistHidden();
 
 };
 
